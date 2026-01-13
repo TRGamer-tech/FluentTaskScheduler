@@ -13,10 +13,10 @@ namespace FluentTaskScheduler
         public ObservableCollection<ScheduledTaskModel> FilteredTasks { get; } = new();
         private List<ScheduledTaskModel> _allTasks = new();
         private readonly Services.TaskServiceWrapper _taskService = new();
-        private ScheduledTaskModel _selectedTask;
+        private ScheduledTaskModel _selectedTask = null!;
         private bool _isEditMode = false;
-        private Microsoft.UI.Dispatching.DispatcherQueue _dispatcherQueue;
-        private Microsoft.UI.Dispatching.DispatcherQueueTimer _searchDebounceTimer;
+        private Microsoft.UI.Dispatching.DispatcherQueue _dispatcherQueue = null!;
+        private Microsoft.UI.Dispatching.DispatcherQueueTimer _searchDebounceTimer = null!;
 
         public MainPage()
         {
@@ -46,7 +46,9 @@ namespace FluentTaskScheduler
         {
             if (args.InvokedItemContainer is NavigationViewItem item && item.Tag != null && item.Tag.ToString() == "Add")
             {
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type
                 NewTaskButton_Click(null, null);
+#pragma warning restore CS8625
             }
         }
         
@@ -120,7 +122,9 @@ namespace FluentTaskScheduler
                 // Tab filter
                 if (NavView != null && NavView.SelectedItem is NavigationViewItem item && item.Tag != null)
                 {
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type
                     string tag = item.Tag.ToString();
+#pragma warning restore CS8600
                     if (tag == "running")
                     {
                         query = query.Where(t => t.State == "Running");
@@ -227,7 +231,6 @@ namespace FluentTaskScheduler
             EditTaskOnlyIfNetwork.IsChecked = false;
             EditTaskWakeToRun.IsChecked = false;
             EditTaskStopOnBattery.IsChecked = false;
-            // EditTaskStopIfRunsLongerThan.SelectedIndex = 3; // Replaced by EditTaskStopAfter
             EditTaskRunIfMissed.IsChecked = false;
             EditTaskRestartOnFailure.IsChecked = false;
             EditTaskRestartInterval.Text = "1";
@@ -403,7 +406,6 @@ namespace FluentTaskScheduler
                 EditTaskOnlyIfNetwork.IsChecked = _selectedTask.OnlyIfNetwork;
                 EditTaskWakeToRun.IsChecked = _selectedTask.WakeToRun;
                 EditTaskStopOnBattery.IsChecked = _selectedTask.StopOnBattery;
-                // SetComboBoxByTag(EditTaskStopIfRunsLongerThan, _selectedTask.StopIfRunsLongerThan); // Replaced
                 EditTaskRunIfMissed.IsChecked = _selectedTask.RunIfMissed;
                 EditTaskRestartOnFailure.IsChecked = _selectedTask.RestartOnFailure;
                 
@@ -465,7 +467,10 @@ namespace FluentTaskScheduler
             Frame.Navigate(typeof(SettingsPage));
         }
 
+
+#pragma warning disable CS1998 // Async method lacks 'await' operators
         private async void TaskEditDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+#pragma warning restore CS1998
         {
             if (string.IsNullOrWhiteSpace(EditTaskName.Text))
             {
@@ -786,6 +791,12 @@ namespace FluentTaskScheduler
                     break;
                 }
             }
+        }
+
+        private void DialogScrollViewer_PointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+        {
+            // Prevent the event from bubbling up which would cause focus to reset
+            e.Handled = true;
         }
     }
 }

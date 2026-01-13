@@ -23,11 +23,14 @@ namespace FluentTaskScheduler
             }
             catch { }
             
+            
             this.InitializeComponent();
             
             // Global handlers
+#pragma warning disable CS8622 // Nullability of reference types in type of parameter doesn't match
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+#pragma warning restore CS8622
             this.UnhandledException += App_UnhandledException;
         }
 

@@ -113,7 +113,7 @@
                        CloseButtonText="Cancel"
                        DefaultButton="Primary"
                        PrimaryButtonClick="TaskEditDialog_PrimaryButtonClick">
-            <ScrollViewer MaxHeight="600" VerticalScrollBarVisibility="Auto" IsTabStop="False">
+            <ScrollViewer MaxHeight="600" VerticalScrollBarVisibility="Auto" IsTabStop="False" Background="Transparent" PointerPressed="DialogScrollViewer_PointerPressed">
                 <StackPanel Spacing="16" MaxWidth="500" Margin="0,8">
                 <TextBox x:Name="EditTaskName" x:Uid="TaskNameHeader" Header="Task Name" PlaceholderText="Enter task name"/>
                 <TextBox x:Name="EditTaskDescription" x:Uid="DescriptionHeader" Header="Description" AcceptsReturn="True" Height="80"/>
@@ -140,10 +140,10 @@
                     <ComboBoxItem Content="At Startup" Tag="AtStartup"/>
                     <ComboBoxItem Content="One Time" Tag="Once"/>
                 </ComboBox>
-                <StackPanel Orientation="Vertical" Spacing="8">
-                     <StackPanel Orientation="Horizontal" Spacing="16">
-                         <TimePicker x:Name="EditTaskStartTime" Header="Start Time" ClockIdentifier="24HourClock"/>
-                         <DatePicker x:Name="EditTaskStartDate" Header="Start Date"/>
+                <StackPanel Spacing="8">
+                     <StackPanel Spacing="16">
+                         <DatePicker x:Name="EditTaskStartDate" HorizontalAlignment="Left"/>
+                         <TimePicker x:Name="EditTaskStartTime" HorizontalAlignment="Left" ClockIdentifier="24HourClock"/>
                      </StackPanel>
                     
                     <StackPanel Orientation="Horizontal" Spacing="8">
@@ -260,9 +260,9 @@
 
                 <StackPanel Spacing="8" Margin="0,12,0,0">
                      <CheckBox x:Name="EditTaskExpires" Content="Expire task on:" Click="EditTaskExpires_Click"/>
-                     <StackPanel Orientation="Horizontal" Spacing="8" Margin="28,0,0,0">
-                         <DatePicker x:Name="EditTaskExpirationDate"/>
-                         <TimePicker x:Name="EditTaskExpirationTime" ClockIdentifier="24HourClock"/>
+                     <StackPanel Spacing="8" Margin="28,0,0,0">
+                         <DatePicker x:Name="EditTaskExpirationDate" HorizontalAlignment="Left"/>
+                         <TimePicker x:Name="EditTaskExpirationTime" HorizontalAlignment="Left" ClockIdentifier="24HourClock"/>
                      </StackPanel>
                 </StackPanel>
                 
@@ -309,17 +309,6 @@
                 <!-- Settings Section -->
                 <TextBlock x:Uid="SettingsTitle" Text="Settings" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,12,0,4"/>
                 <StackPanel Spacing="12">
-                    <ComboBox x:Name="EditTaskStopIfRunsLongerThan" x:Uid="StopIfRunsLongerHeader" Header="Stop task if it runs longer than" SelectedIndex="3">
-                        <ComboBoxItem Content="15 minutes" Tag="PT15M"/>
-                        <ComboBoxItem Content="30 minutes" Tag="PT30M"/>
-                        <ComboBoxItem Content="1 hour" Tag="PT1H"/>
-                        <ComboBoxItem Content="2 hours" Tag="PT2H"/>
-                        <ComboBoxItem Content="4 hours" Tag="PT4H"/>
-                        <ComboBoxItem Content="6 hours" Tag="PT6H"/>
-                        <ComboBoxItem Content="12 hours" Tag="PT12H"/>
-                        <ComboBoxItem Content="1 day" Tag="P1D"/>
-                        <ComboBoxItem Content="3 days" Tag="PT72H"/>
-                    </ComboBox>
                     <CheckBox x:Name="EditTaskRunIfMissed" x:Uid="RunIfMissed" Content="Run task as soon as possible after a scheduled start is missed"/>
                     <CheckBox x:Name="EditTaskRestartOnFailure" x:Uid="RestartOnFailure" Content="If the task fails, restart every:"/>
                     <StackPanel Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
