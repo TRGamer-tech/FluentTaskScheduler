@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using System;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using SS = global::FluentTaskScheduler.Services.SettingsService;
 
@@ -13,6 +14,22 @@ namespace FluentTaskScheduler
     public partial class App : Application
     {
         public static Window? m_window;
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern IntPtr GetModuleHandle(string? lpModuleName);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern IntPtr LoadImage(IntPtr hInst, IntPtr lpszName, uint uType, int cxDesired, int cyDesired, uint fuLoad);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        private static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+        private const uint IMAGE_ICON = 1;
+        private const uint LR_DEFAULTSIZE = 0x00000040;
+        private const uint LR_SHARED = 0x00008000;
+        private const uint WM_SETICON = 0x0080;
+        private static readonly IntPtr ICON_SMALL = IntPtr.Zero;
+        private static readonly IntPtr ICON_BIG = new IntPtr(1);
 
         public App()
         {
@@ -68,7 +85,30 @@ namespace FluentTaskScheduler
         {
             m_window = new Window();
             m_window.Title = "FluentTaskScheduler";
-            try { m_window.AppWindow.SetIcon("Assets/AppIcon.ico"); } catch { }
+            
+            // Try to set icon from file first (works when icon is copied to output)
+            try 
+            {
+                string iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "AppIcon.ico");
+                if (System.IO.File.Exists(iconPath))
+                {
+                    m_window.AppWindow.SetIcon(iconPath);
+                }
+                else
+                {
+                    // Fallback: Try Win32 API to load from embedded resources
+                    var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(m_window);
+                    IntPtr hModule = GetModuleHandle(null);
+                    IntPtr hIcon = LoadImage(hModule, new IntPtr(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
+                    
+                    if (hIcon != IntPtr.Zero)
+                    {
+                        SendMessage(hwnd, WM_SETICON, ICON_SMALL, hIcon);
+                        SendMessage(hwnd, WM_SETICON, ICON_BIG, hIcon);
+                    }
+                }
+            } 
+            catch { }
             
             // Set default window size
             var appWindow = m_window.AppWindow;

@@ -27,3 +27,6 @@ crash_log.txt
 # Temporary JSON inputs
 fixed_input*.json
 input.json
+
+#publish directory
+publish
