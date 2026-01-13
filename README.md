@@ -37,7 +37,7 @@ FluentTaskScheduler is a professional-grade wrapper for the Windows Task Schedul
 
 ### Prerequisites
 
-- [Visual Studio 2022](https://visualstudio.microsoft.com/vs/) with the "Windows application development" workload.
+- [Visual Studio 2022 or newer](https://visualstudio.microsoft.com/vs/) with the "Windows application development" workload.
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 - Windows App SDK 1.5.240627000 or later.
 
