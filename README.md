@@ -45,7 +45,7 @@ FluentTaskScheduler is a professional-grade wrapper for the Windows Task Schedul
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/FluentTaskScheduler.git
+   git clone https://github.com/TRGamer-tech/FluentTaskScheduler.git
    ```
 2. Open `FluentTaskScheduler.csproj` in Visual Studio.
 3. Ensure the target platform is set to `x64`.
