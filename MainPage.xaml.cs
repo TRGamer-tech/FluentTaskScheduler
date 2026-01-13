@@ -139,10 +139,31 @@ namespace FluentTaskScheduler
                 // This prevents "Collection modified" exceptions during enumeration
                 var results = query.ToList();
 
-                FilteredTasks.Clear();
-                foreach (var task in results)
+                // Synchronize FilteredTasks with results to preserve scroll position
+                // Removing items that are no longer in the filtered results
+                for (int i = FilteredTasks.Count - 1; i >= 0; i--)
                 {
-                    FilteredTasks.Add(task);
+                    if (!results.Contains(FilteredTasks[i]))
+                    {
+                        FilteredTasks.RemoveAt(i);
+                    }
+                }
+
+                // Inserting or moving items to match the results list
+                for (int i = 0; i < results.Count; i++)
+                {
+                    if (!FilteredTasks.Contains(results[i]))
+                    {
+                        FilteredTasks.Insert(i, results[i]);
+                    }
+                    else
+                    {
+                        int oldIndex = FilteredTasks.IndexOf(results[i]);
+                        if (oldIndex != i)
+                        {
+                            FilteredTasks.Move(oldIndex, i);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -279,7 +300,8 @@ namespace FluentTaskScheduler
                 DialogTaskDescription.Text = task.Description;
                 DialogTaskAuthor.Text = task.Author;
                 
-                // Update button states based on task state could be added here
+                // Update button states based on task state
+                RunTaskButton.IsEnabled = task.IsEnabled;
                 
                 await TaskDetailsDialog.ShowAsync();
             }
@@ -444,9 +466,15 @@ namespace FluentTaskScheduler
         try
         {
             if (toggle.IsOn)
+            {
                 _taskService.EnableTask(task.Path);
+                task.State = "Ready";
+            }
             else
+            {
                 _taskService.DisableTask(task.Path);
+                task.State = "Disabled";
+            }
             
             // Update the model without reloading entire list
             task.IsEnabled = toggle.IsOn;

@@ -1,19 +1,56 @@
 using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace FluentTaskScheduler.Models
 {
-    public class ScheduledTaskModel
+    public class ScheduledTaskModel : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private string _state = "";
+        private bool _isEnabled;
+
         public string Name { get; set; } = "";
         public string Path { get; set; } = "";
-        public string State { get; set; } = "";
+        
+        public string State 
+        { 
+            get => _state; 
+            set 
+            {
+                if (_state != value)
+                {
+                    _state = value;
+                    OnPropertyChanged();
+                }
+            } 
+        }
+
         public string Description { get; set; } = "";
         public string Author { get; set; } = "";
         public DateTime? LastRunTime { get; set; }
         public DateTime? NextRunTime { get; set; }
         public int LastTaskResult { get; set; }
         public string Triggers { get; set; } = "";
-        public bool IsEnabled { get; set; }
+
+        public bool IsEnabled 
+        { 
+            get => _isEnabled; 
+            set 
+            {
+                if (_isEnabled != value)
+                {
+                    _isEnabled = value;
+                    OnPropertyChanged();
+                }
+            } 
+        }
         public string ActionCommand { get; set; } = "";
         public string Arguments { get; set; } = "";
         public string ScheduleInfo { get; set; } = "";

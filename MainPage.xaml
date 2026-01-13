@@ -63,8 +63,8 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <FontIcon Glyph="{x:Bind State, Converter={StaticResource StateToIconConverter}}" 
-                                          Foreground="{x:Bind State, Converter={StaticResource StateToColorConverter}}" 
+                                <FontIcon Glyph="{x:Bind State, Mode=OneWay, Converter={StaticResource StateToIconConverter}}" 
+                                          Foreground="{x:Bind State, Mode=OneWay, Converter={StaticResource StateToColorConverter}}" 
                                           FontSize="24" Margin="0,0,16,0"/>
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                     <TextBlock Text="{x:Bind Name}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
