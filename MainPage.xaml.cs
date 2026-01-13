@@ -133,6 +133,10 @@ namespace FluentTaskScheduler
                     {
                         query = query.Where(t => t.State != "Disabled");
                     }
+                    else if (tag == "disabled")
+                    {
+                        query = query.Where(t => t.State == "Disabled");
+                    }
                 }
 
                 // Materialize query to list BEFORE modifying FilteredTasks

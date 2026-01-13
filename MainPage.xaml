@@ -31,6 +31,7 @@
                 <NavigationViewItem x:Name="NavAllTasks" x:Uid="NavAllTasks" Tag="all" Icon="List" Content="All Tasks" IsSelected="True"/>
                 <NavigationViewItem x:Name="NavRunning" x:Uid="NavRunning" Tag="running" Icon="Play" Content="Running"/>
                 <NavigationViewItem x:Uid="NavEnabled" Content="Enabled" Icon="Accept" Tag="enabled" />
+                <NavigationViewItem x:Name="NavDisabled" Content="Disabled" Icon="Cancel" Tag="disabled" />
             </NavigationView.MenuItems>
 
             <Grid>
