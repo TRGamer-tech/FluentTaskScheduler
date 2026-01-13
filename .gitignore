@@ -1,0 +1,29 @@
+## Visual Studio ##
+.vs/
+[Oo]bj/
+[Bb]in/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## OS X ##
+.DS_Store
+
+## Windows ##
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+## Logs ##
+*.log
+area.log
+
+## Project Specific ##
+# Custom logs
+build_log.txt
+crash_log.txt
+
+# Temporary JSON inputs
+fixed_input*.json
+input.json

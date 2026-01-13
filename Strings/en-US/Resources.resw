@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppHeader.Header" xml:space="preserve"><value>Scheduled Tasks</value></data>
+  <data name="NewTaskButton.Text" xml:space="preserve"><value>New Task</value></data>
+  <data name="NavAllTasks.Content" xml:space="preserve"><value>All Tasks</value></data>
+  <data name="NavRunning.Content" xml:space="preserve"><value>Running</value></data>
+  <data name="NavEnabled.Content" xml:space="preserve"><value>Enabled</value></data>
+  <data name="RefreshButton.Content" xml:space="preserve"><value>Refresh</value></data>
+  <data name="SearchBox.PlaceholderText" xml:space="preserve"><value>Search tasks...</value></data>
+  <data name="TaskNameHeader.Header" xml:space="preserve"><value>Task Name</value></data>
+  <data name="DescriptionHeader.Header" xml:space="preserve"><value>Description</value></data>
+  <data name="AuthorHeader.Header" xml:space="preserve"><value>Author</value></data>
+  <data name="EnabledSwitch.Header" xml:space="preserve"><value>Enabled</value></data>
+  <data name="ActionTitle.Text" xml:space="preserve"><value>Action</value></data>
+  <data name="ProgramScriptHeader.Header" xml:space="preserve"><value>Program/Script</value></data>
+  <data name="BrowseButton.Content" xml:space="preserve"><value>Browse...</value></data>
+  <data name="ArgumentsHeader.Header" xml:space="preserve"><value>Arguments (optional)</value></data>
+  <data name="TriggerTitle.Text" xml:space="preserve"><value>Trigger</value></data>
+  <data name="TriggerTypeHeader.Header" xml:space="preserve"><value>Trigger Type</value></data>
+  <data name="TimeHeader.Header" xml:space="preserve"><value>Time (HH:mm)</value></data>
+  <data name="RepetitionTitle.Text" xml:space="preserve"><value>Repetition</value></data>
+  <data name="RepetitionIntervalHeader.Header" xml:space="preserve"><value>Repeat task every</value></data>
+  <data name="RepetitionDurationHeader.Header" xml:space="preserve"><value>For a duration of</value></data>
+  <data name="ConditionsTitle.Text" xml:space="preserve"><value>Conditions</value></data>
+  <data name="ConditionIdle.Content" xml:space="preserve"><value>Computer is idle</value></data>
+  <data name="ConditionAC.Content" xml:space="preserve"><value>Computer is on AC power</value></data>
+  <data name="ConditionNetwork.Content" xml:space="preserve"><value>Network is available</value></data>
+  <data name="ConditionWake.Content" xml:space="preserve"><value>Wake the computer to run this task</value></data>
+  <data name="ConditionBattery.Content" xml:space="preserve"><value>Stop if switching to battery power</value></data>
+  <data name="SettingsTitle.Text" xml:space="preserve"><value>Settings</value></data>
+  <data name="StopIfRunsLongerHeader.Header" xml:space="preserve"><value>Stop task if it runs longer than</value></data>
+  <data name="RunIfMissed.Content" xml:space="preserve"><value>Run task as soon as possible after a scheduled start is missed</value></data>
+  <data name="RestartOnFailure.Content" xml:space="preserve"><value>If the task fails, restart every:</value></data>
+  <data name="RestartCountText1.Text" xml:space="preserve"><value>Attempt restart up to:</value></data>
+  <data name="RestartCountText2.Text" xml:space="preserve"><value>times</value></data>
+  <data name="CancelButton.CloseButtonText" xml:space="preserve"><value>Cancel</value></data>
+  <data name="SaveButton.PrimaryButtonText" xml:space="preserve"><value>Save</value></data>
+  <data name="CloseButton.CloseButtonText" xml:space="preserve"><value>Close</value></data>
+  <data name="RunNowButton.Content" xml:space="preserve"><value>Run Now</value></data>
+  <data name="StopButton.Content" xml:space="preserve"><value>Stop</value></data>
+  <data name="DeleteButton.Content" xml:space="preserve"><value>Delete</value></data>
+  <data name="ExportButton.Content" xml:space="preserve"><value>Export</value></data>
+  <data name="EditButton.Content" xml:space="preserve"><value>Edit</value></data>
+
+  <!-- Settings Page Strings -->
+  <data name="SettingsHeader.Text" xml:space="preserve"><value>Settings</value></data>
+  <data name="AppearanceHeader.Text" xml:space="preserve"><value>Appearance</value></data>
+  <data name="ThemeCombo.Header" xml:space="preserve"><value>App Theme</value></data>
+  <data name="ThemeDefault.Content" xml:space="preserve"><value>Use System Setting</value></data>
+  <data name="ThemeLight.Content" xml:space="preserve"><value>Light</value></data>
+  <data name="ThemeDark.Content" xml:space="preserve"><value>Dark</value></data>
+  <data name="OledToggle.Header" xml:space="preserve"><value>OLED Mode</value></data>
+  <data name="OledHint.Text" xml:space="preserve"><value>OLED mode is only available when Dark theme is active.</value></data>
+  <data name="LanguageHeader.Text" xml:space="preserve"><value>Language</value></data>
+  <data name="LanguageCombo.Header" xml:space="preserve"><value>Select Language</value></data>
+  <data name="LanguageHint.Text" xml:space="preserve"><value>Note: Language changes require a restart.</value></data>
+  <data name="GeneralHeader.Text" xml:space="preserve"><value>General</value></data>
+  <data name="ConfirmDelete.Header" xml:space="preserve"><value>Confirm Task Deletion</value></data>
+  <data name="AboutHeader.Text" xml:space="preserve"><value>About</value></data>
+  <data name="AboutTitle.Text" xml:space="preserve"><value>Fluent Task Scheduler</value></data>
+  <data name="AboutBuilt.Text" xml:space="preserve"><value>Built with WinUI 3</value></data>
+</root>

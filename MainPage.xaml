@@ -1,0 +1,345 @@
+<Page
+    x:Class="FluentTaskScheduler.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:FluentTaskScheduler"
+    xmlns:models="using:FluentTaskScheduler.Models"
+    xmlns:converters="using:FluentTaskScheduler.Converters">
+
+    <Page.Resources>
+        <converters:StateToIconConverter x:Key="StateToIconConverter"/>
+        <converters:StateToColorConverter x:Key="StateToColorConverter"/>
+        <converters:DateTimeConverter x:Key="DateTimeConverter"/>
+    </Page.Resources>
+
+    <Grid>
+        <NavigationView x:Name="NavView" x:Uid="AppHeader"
+                        PaneDisplayMode="Left"
+                        IsBackButtonVisible="Collapsed"
+                        IsSettingsVisible="True"
+                        SelectionChanged="NavView_SelectionChanged"
+                        ItemInvoked="NavView_ItemInvoked">
+            
+            <NavigationView.HeaderTemplate>
+                <DataTemplate>
+                    <TextBlock Text="Scheduled Tasks" Style="{StaticResource TitleTextBlockStyle}" Margin="0,0,0,0"/>
+                </DataTemplate>
+            </NavigationView.HeaderTemplate>
+
+            <NavigationView.MenuItems>
+                <NavigationViewItem x:Name="NavAdd" Tag="Add" Icon="Add" Content="New Task" SelectsOnInvoked="False"/>
+                <NavigationViewItem x:Name="NavAllTasks" x:Uid="NavAllTasks" Tag="all" Icon="List" Content="All Tasks" IsSelected="True"/>
+                <NavigationViewItem x:Name="NavRunning" x:Uid="NavRunning" Tag="running" Icon="Play" Content="Running"/>
+                <NavigationViewItem x:Uid="NavEnabled" Content="Enabled" Icon="Accept" Tag="enabled" />
+            </NavigationView.MenuItems>
+
+            <Grid>
+                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Loading Ring -->
+                <ProgressRing x:Name="LoadingRing" IsActive="False" Width="50" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" Canvas.ZIndex="100" Grid.RowSpan="2"/>
+                
+                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" Margin="16,24,0,12" Spacing="8">
+
+                    <AutoSuggestBox x:Name="SearchBox" x:Uid="SearchBox" QueryIcon="Find" PlaceholderText="Search tasks..." Width="300" TextChanged="SearchBox_TextChanged"/>
+                    <Button x:Uid="RefreshButton" Content="Refresh" Click="RefreshButton_Click" />
+                </StackPanel>
+
+                <ListView x:Name="TaskListView" 
+                          Grid.Row="1"
+                          SelectionMode="Single"
+                          IsItemClickEnabled="True"
+                          ItemClick="TaskListView_ItemClick"
+                          ItemsSource="{x:Bind FilteredTasks}"
+                          Padding="0">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="models:ScheduledTaskModel">
+                            <Grid Padding="12" Margin="0,4" CornerRadius="8" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <FontIcon Glyph="{x:Bind State, Converter={StaticResource StateToIconConverter}}" 
+                                          Foreground="{x:Bind State, Converter={StaticResource StateToColorConverter}}" 
+                                          FontSize="24" Margin="0,0,16,0"/>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="{x:Bind Name}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="{x:Bind Path}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                                    <TextBlock Text="{x:Bind NextRunTime, Converter={StaticResource DateTimeConverter}}" 
+                                               Style="{StaticResource CaptionTextBlockStyle}"/>
+                                </StackPanel>
+                                <ToggleSwitch Grid.Column="2" IsOn="{x:Bind IsEnabled, Mode=TwoWay}" Toggled="ToggleSwitch_Toggled"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+        </NavigationView>
+
+        <ContentDialog x:Name="TaskDetailsDialog"
+                       CloseButtonText="Close"
+                       DefaultButton="Close">
+            <ScrollViewer MaxHeight="500" VerticalScrollBarVisibility="Auto">
+                <StackPanel Spacing="12" MinWidth="400">
+                    <TextBlock x:Name="DialogTaskName" Style="{StaticResource TitleTextBlockStyle}"/>
+                    <TextBlock x:Name="DialogTaskDescription" TextWrapping="WrapWholeWords"/>
+                    <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Author:" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,0,12,0"/>
+                        <TextBlock x:Name="DialogTaskAuthor" Grid.Column="1"/>
+                    </Grid>
+                    
+                    <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,12,0,0">
+                        <Button x:Name="RunTaskButton" Content="Run Now" Click="RunTask_Click" Style="{StaticResource AccentButtonStyle}"/>
+                        <Button x:Name="StopTaskButton" Content="Stop" Click="StopTask_Click"/>
+                        <Button x:Name="EditTaskButton" Content="Edit" Click="EditTask_Click"/>
+                        <Button x:Name="ExportTaskButton" Content="Export" Click="ExportTask_Click"/>
+                        <Button x:Name="DeleteTaskButton" Content="Delete" Click="DeleteTask_Click" />
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </ContentDialog>
+
+        <ContentDialog x:Name="TaskEditDialog"
+                       PrimaryButtonText="Save"
+                       CloseButtonText="Cancel"
+                       DefaultButton="Primary"
+                       PrimaryButtonClick="TaskEditDialog_PrimaryButtonClick">
+            <ScrollViewer MaxHeight="600" VerticalScrollBarVisibility="Auto" IsTabStop="False">
+                <StackPanel Spacing="16" MaxWidth="500" Margin="0,8">
+                <TextBox x:Name="EditTaskName" x:Uid="TaskNameHeader" Header="Task Name" PlaceholderText="Enter task name"/>
+                <TextBox x:Name="EditTaskDescription" x:Uid="DescriptionHeader" Header="Description" AcceptsReturn="True" Height="80"/>
+                <TextBox x:Name="EditTaskAuthor" x:Uid="AuthorHeader" Header="Author"/>
+                <ToggleSwitch x:Name="EditTaskEnabled" x:Uid="EnabledSwitch" Header="Enabled" IsOn="True"/>
+                
+                <TextBlock x:Uid="ActionTitle" Text="Action" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="EditTaskActionCommand" x:Uid="ProgramScriptHeader" Header="Program/Script" PlaceholderText="e.g., notepad.exe or C:\Scripts\myscript.ps1" Grid.Column="0"/>
+                    <Button x:Name="BrowseActionButton" x:Uid="BrowseButton" Content="Browse..." Click="BrowseAction_Click" VerticalAlignment="Bottom" Margin="0,0,0,2" Grid.Column="1"/>
+                </Grid>
+                <TextBox x:Name="EditTaskArguments" x:Uid="ArgumentsHeader" Header="Arguments (optional)" PlaceholderText="e.g., /c echo hello or -File script.ps1"/>
+                
+                <TextBlock x:Uid="TriggerTitle" Text="Trigger" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
+                <ComboBox x:Name="EditTaskTriggerType" x:Uid="TriggerTypeHeader" Header="Trigger Type" SelectedIndex="0" SelectionChanged="EditTaskTriggerType_SelectionChanged" HorizontalAlignment="Stretch">
+                    <ComboBoxItem Content="Daily" Tag="Daily"/>
+                    <ComboBoxItem Content="Weekly" Tag="Weekly"/>
+                    <ComboBoxItem Content="Monthly" Tag="Monthly"/>
+                    <ComboBoxItem Content="At Logon" Tag="AtLogon"/>
+                    <ComboBoxItem Content="At Startup" Tag="AtStartup"/>
+                    <ComboBoxItem Content="One Time" Tag="Once"/>
+                </ComboBox>
+                <StackPanel Orientation="Vertical" Spacing="8">
+                     <StackPanel Orientation="Horizontal" Spacing="16">
+                         <TimePicker x:Name="EditTaskStartTime" Header="Start Time" ClockIdentifier="24HourClock"/>
+                         <DatePicker x:Name="EditTaskStartDate" Header="Start Date"/>
+                     </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <CheckBox x:Name="EditTaskRandomDelay" Content="Delay task for up to (random delay):" Click="EditTaskRandomDelay_Click"/>
+                        <TextBox x:Name="EditTaskRandomDelayVal" PlaceholderText="e.g. 1 hour" Width="120"/>
+                        <TextBlock Text="(e.g. 30s, 1m, 1h)" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                         <CheckBox x:Name="EditTaskStopAfter" Content="Stop task if runs longer than:" Click="EditTaskStopAfter_Click"/>
+                         <ComboBox x:Name="EditTaskStopAfterVal" IsEditable="True" Width="120">
+                             <ComboBoxItem Content="15 minutes" Tag="PT15M"/>
+                             <ComboBoxItem Content="30 minutes" Tag="PT30M"/>
+                             <ComboBoxItem Content="1 hour" Tag="PT1H"/>
+                             <ComboBoxItem Content="2 hours" Tag="PT2H"/>
+                             <ComboBoxItem Content="4 hours" Tag="PT4H"/>
+                             <ComboBoxItem Content="8 hours" Tag="PT8H"/>
+                             <ComboBoxItem Content="12 hours" Tag="PT12H"/>
+                             <ComboBoxItem Content="1 day" Tag="P1D"/>
+                             <ComboBoxItem Content="2 days" Tag="P2D"/>
+                             <ComboBoxItem Content="3 days" Tag="P3D"/>
+                             <ComboBoxItem Content="5 days" Tag="P5D"/>
+                         </ComboBox>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Daily Trigger -->
+                <StackPanel x:Name="PanelDaily" Visibility="Collapsed" Spacing="8" Margin="0,4,0,0">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="Recur every" VerticalAlignment="Center"/>
+                        <TextBox x:Name="DailyInterval" Text="1" InputScope="Number" Width="60"/>
+                        <TextBlock Text="days" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Weekly Trigger -->
+                <StackPanel x:Name="PanelWeekly" Visibility="Collapsed" Spacing="8" Margin="0,4,0,0">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="Recur every" VerticalAlignment="Center"/>
+                        <TextBox x:Name="WeeklyInterval" Text="1" InputScope="Number" Width="60"/>
+                        <TextBlock Text="weeks on:" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <CheckBox x:Name="WeeklyMon" Content="Mon"/>
+                        <CheckBox x:Name="WeeklyTue" Content="Tue"/>
+                        <CheckBox x:Name="WeeklyWed" Content="Wed"/>
+                        <CheckBox x:Name="WeeklyThu" Content="Thu"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                         <CheckBox x:Name="WeeklyFri" Content="Fri"/>
+                        <CheckBox x:Name="WeeklySat" Content="Sat"/>
+                        <CheckBox x:Name="WeeklySun" Content="Sun"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Monthly Trigger -->
+                <StackPanel x:Name="PanelMonthly" Visibility="Collapsed" Spacing="12" Margin="0,4,0,0">
+                    <TextBlock Text="Months:" Style="{StaticResource CaptionTextBlockStyle}"/>
+                    <Grid ColumnSpacing="8" RowSpacing="8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <CheckBox x:Name="MonthJan" Content="Jan" Grid.Row="0" Grid.Column="0"/>
+                        <CheckBox x:Name="MonthFeb" Content="Feb" Grid.Row="0" Grid.Column="1"/>
+                        <CheckBox x:Name="MonthMar" Content="Mar" Grid.Row="0" Grid.Column="2"/>
+                        <CheckBox x:Name="MonthApr" Content="Apr" Grid.Row="0" Grid.Column="3"/>
+                        <CheckBox x:Name="MonthMay" Content="May" Grid.Row="0" Grid.Column="4"/>
+                        <CheckBox x:Name="MonthJun" Content="Jun" Grid.Row="0" Grid.Column="5"/>
+                        
+                        <CheckBox x:Name="MonthJul" Content="Jul" Grid.Row="1" Grid.Column="0"/>
+                        <CheckBox x:Name="MonthAug" Content="Aug" Grid.Row="1" Grid.Column="1"/>
+                        <CheckBox x:Name="MonthSep" Content="Sep" Grid.Row="1" Grid.Column="2"/>
+                        <CheckBox x:Name="MonthOct" Content="Oct" Grid.Row="1" Grid.Column="3"/>
+                        <CheckBox x:Name="MonthNov" Content="Nov" Grid.Row="1" Grid.Column="4"/>
+                        <CheckBox x:Name="MonthDec" Content="Dec" Grid.Row="1" Grid.Column="5"/>
+                    </Grid>
+
+                    <RadioButton x:Name="MonthlyRadioDays" Content="Days" IsChecked="True" GroupName="MonthlyMode"/>
+                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
+                         <TextBox x:Name="MonthlyDaysInput" PlaceholderText="e.g. 1, 15, Last" Width="200"/>
+                         <TextBlock Text="(comma separated, use 'Last' for last day)" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                    </StackPanel>
+
+                    <RadioButton x:Name="MonthlyRadioOn" Content="On" GroupName="MonthlyMode"/>
+                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
+                        <ComboBox x:Name="MonthlyWeekCombo" SelectedIndex="0">
+                            <ComboBoxItem Content="First"/>
+                            <ComboBoxItem Content="Second"/>
+                            <ComboBoxItem Content="Third"/>
+                            <ComboBoxItem Content="Fourth"/>
+                            <ComboBoxItem Content="Last"/>
+                        </ComboBox>
+                        <ComboBox x:Name="MonthlyDayCombo" SelectedIndex="0">
+                            <ComboBoxItem Content="Monday"/>
+                            <ComboBoxItem Content="Tuesday"/>
+                            <ComboBoxItem Content="Wednesday"/>
+                            <ComboBoxItem Content="Thursday"/>
+                            <ComboBoxItem Content="Friday"/>
+                            <ComboBoxItem Content="Saturday"/>
+                            <ComboBoxItem Content="Sunday"/>
+                        </ComboBox>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Spacing="8" Margin="0,12,0,0">
+                     <CheckBox x:Name="EditTaskExpires" Content="Expire task on:" Click="EditTaskExpires_Click"/>
+                     <StackPanel Orientation="Horizontal" Spacing="8" Margin="28,0,0,0">
+                         <DatePicker x:Name="EditTaskExpirationDate"/>
+                         <TimePicker x:Name="EditTaskExpirationTime" ClockIdentifier="24HourClock"/>
+                     </StackPanel>
+                </StackPanel>
+                
+                <!-- Repetition Section -->
+                <!-- Repetition Section -->
+                <TextBlock Text="Repetition" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,12,0,4"/>
+                <StackPanel Spacing="12">
+                    <ComboBox x:Name="EditTaskRepetitionInterval" Header="Repeat task every" SelectedIndex="0">
+                        <ComboBoxItem Content="(No repetition)" Tag=""/>
+                        <ComboBoxItem Content="5 minutes" Tag="PT5M"/>
+                        <ComboBoxItem Content="10 minutes" Tag="PT10M"/>
+                        <ComboBoxItem Content="15 minutes" Tag="PT15M"/>
+                        <ComboBoxItem Content="30 minutes" Tag="PT30M"/>
+                        <ComboBoxItem Content="1 hour" Tag="PT1H"/>
+                        <ComboBoxItem Content="2 hours" Tag="PT2H"/>
+                        <ComboBoxItem Content="4 hours" Tag="PT4H"/>
+                        <ComboBoxItem Content="6 hours" Tag="PT6H"/>
+                        <ComboBoxItem Content="12 hours" Tag="PT12H"/>
+                    </ComboBox>
+                    <ComboBox x:Name="EditTaskRepetitionDuration" x:Uid="RepetitionDurationHeader" Header="For a duration of" SelectedIndex="0">
+                        <ComboBoxItem Content="Indefinitely" Tag=""/>
+                        <ComboBoxItem Content="1 hour" Tag="PT1H"/>
+                        <ComboBoxItem Content="2 hours" Tag="PT2H"/>
+                        <ComboBoxItem Content="4 hours" Tag="PT4H"/>
+                        <ComboBoxItem Content="6 hours" Tag="PT6H"/>
+                        <ComboBoxItem Content="12 hours" Tag="PT12H"/>
+                        <ComboBoxItem Content="24 hours" Tag="PT24H"/>
+                        <ComboBoxItem Content="1 day" Tag="P1D"/>
+                    </ComboBox>
+                </StackPanel>
+                
+                <!-- Conditions Section -->
+                <!-- Conditions Section -->
+                <TextBlock x:Uid="ConditionsTitle" Text="Conditions" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,12,0,4"/>
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Start the task only if:" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                    <CheckBox x:Name="EditTaskOnlyIfIdle" x:Uid="ConditionIdle" Content="Computer is idle"/>
+                    <CheckBox x:Name="EditTaskOnlyIfAC" x:Uid="ConditionAC" Content="Computer is on AC power"/>
+                    <CheckBox x:Name="EditTaskOnlyIfNetwork" x:Uid="ConditionNetwork" Content="Network is available"/>
+                    <CheckBox x:Name="EditTaskWakeToRun" x:Uid="ConditionWake" Content="Wake the computer to run this task"/>
+                    <CheckBox x:Name="EditTaskStopOnBattery" x:Uid="ConditionBattery" Content="Stop if switching to battery power"/>
+                </StackPanel>
+                
+                <!-- Settings Section -->
+                <TextBlock x:Uid="SettingsTitle" Text="Settings" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,12,0,4"/>
+                <StackPanel Spacing="12">
+                    <ComboBox x:Name="EditTaskStopIfRunsLongerThan" x:Uid="StopIfRunsLongerHeader" Header="Stop task if it runs longer than" SelectedIndex="3">
+                        <ComboBoxItem Content="15 minutes" Tag="PT15M"/>
+                        <ComboBoxItem Content="30 minutes" Tag="PT30M"/>
+                        <ComboBoxItem Content="1 hour" Tag="PT1H"/>
+                        <ComboBoxItem Content="2 hours" Tag="PT2H"/>
+                        <ComboBoxItem Content="4 hours" Tag="PT4H"/>
+                        <ComboBoxItem Content="6 hours" Tag="PT6H"/>
+                        <ComboBoxItem Content="12 hours" Tag="PT12H"/>
+                        <ComboBoxItem Content="1 day" Tag="P1D"/>
+                        <ComboBoxItem Content="3 days" Tag="PT72H"/>
+                    </ComboBox>
+                    <CheckBox x:Name="EditTaskRunIfMissed" x:Uid="RunIfMissed" Content="Run task as soon as possible after a scheduled start is missed"/>
+                    <CheckBox x:Name="EditTaskRestartOnFailure" x:Uid="RestartOnFailure" Content="If the task fails, restart every:"/>
+                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
+                        <TextBox x:Name="EditTaskRestartInterval" PlaceholderText="1" Width="60"/>
+                        <ComboBox x:Name="EditTaskRestartIntervalUnit" SelectedIndex="0" Width="100">
+                            <ComboBoxItem Content="minute(s)" Tag="M"/>
+                            <ComboBoxItem Content="hour(s)" Tag="H"/>
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
+                        <TextBlock x:Uid="RestartCountText1" Text="Attempt restart up to:" VerticalAlignment="Center"/>
+                        <TextBox x:Name="EditTaskRestartCount" PlaceholderText="3" Width="60"/>
+                        <TextBlock x:Uid="RestartCountText2" Text="times" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+                
+                <TextBlock Text="Tip: For PowerShell scripts, use 'powershell.exe' as Program and '-ExecutionPolicy Bypass -File &quot;C:\path\to\script.ps1&quot;' as Arguments" 
+                           Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" TextWrapping="Wrap"/>
+            </StackPanel>
+            </ScrollViewer>
+        </ContentDialog>
+    </Grid>
+</Page>
