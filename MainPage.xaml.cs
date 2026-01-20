@@ -304,7 +304,27 @@ namespace FluentTaskScheduler
             var file = await picker.PickSingleFileAsync();
             if (file != null)
             {
-                EditTaskActionCommand.Text = file.Path;
+                var path = file.Path;
+                var ext = System.IO.Path.GetExtension(path).ToLower();
+
+                if (ext == ".ps1")
+                {
+                    EditTaskActionCommand.Text = "powershell.exe";
+                    EditTaskArguments.Text = $"-ExecutionPolicy Bypass -File \"{path}\"";
+                }
+                else if (ext == ".bat" || ext == ".cmd")
+                {
+                    EditTaskActionCommand.Text = "cmd.exe";
+                    EditTaskArguments.Text = $"/c \"{path}\"";
+                }
+                else
+                {
+                    EditTaskActionCommand.Text = path;
+                    // Keep existing arguments if any, or clear? User didn't specify. 
+                    // Usually picking a new EXE implies new context, but let's leave arguments alone if it's just an exe replace? 
+                    // Actually, for consistency with the "smart" behavior which sets arguments, we should probably clear arguments if it's a standard EXE to avoid executing "notepad.exe -File script.ps1".
+                    EditTaskArguments.Text = ""; 
+                }
             }
         }
 

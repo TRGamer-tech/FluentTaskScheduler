@@ -56,6 +56,10 @@
                           ItemClick="TaskListView_ItemClick"
                           ItemsSource="{x:Bind FilteredTasks}"
                           Padding="0">
+                    <!-- Disable default animations for snappy filtering -->
+                    <ListView.ItemContainerTransitions>
+                        <TransitionCollection/>
+                    </ListView.ItemContainerTransitions>
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="models:ScheduledTaskModel">
                             <Grid Padding="12" Margin="0,4" CornerRadius="8" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
@@ -132,6 +136,8 @@
                 </Grid>
                 <TextBox x:Name="EditTaskArguments" x:Uid="ArgumentsHeader" Header="Arguments (optional)" PlaceholderText="e.g., /c echo hello or -File script.ps1"/>
                 <TextBox x:Name="EditTaskWorkingDirectory" x:Uid="WorkingDirectoryHeader" Header="Run in (optional)" PlaceholderText="e.g., C:\Scripts"/>
+                <TextBlock Text="Tip: For PowerShell scripts, use 'powershell.exe' as Program and '-ExecutionPolicy Bypass -File &quot;C:\path\to\script.ps1&quot;' as Arguments" 
+                           Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" TextWrapping="Wrap"/>
                 
                 <TextBlock x:Uid="TriggerTitle" Text="Trigger" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
                 <ComboBox x:Name="EditTaskTriggerType" x:Uid="TriggerTypeHeader" Header="Trigger Type" SelectedIndex="0" SelectionChanged="EditTaskTriggerType_SelectionChanged" HorizontalAlignment="Stretch">
@@ -269,7 +275,6 @@
                 </StackPanel>
                 
                 <!-- Repetition Section -->
-                <!-- Repetition Section -->
                 <TextBlock Text="Repetition" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,12,0,4"/>
                 <StackPanel Spacing="12">
                     <ComboBox x:Name="EditTaskRepetitionInterval" Header="Repeat task every" SelectedIndex="0">
@@ -326,9 +331,6 @@
                         <TextBlock x:Uid="RestartCountText2" Text="times" VerticalAlignment="Center"/>
                     </StackPanel>
                 </StackPanel>
-                
-                <TextBlock Text="Tip: For PowerShell scripts, use 'powershell.exe' as Program and '-ExecutionPolicy Bypass -File &quot;C:\path\to\script.ps1&quot;' as Arguments" 
-                           Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" TextWrapping="Wrap"/>
             </StackPanel>
             </ScrollViewer>
         </ContentDialog>
