@@ -24,156 +24,163 @@ namespace FluentTaskScheduler.Services
             {
                 try
                 {
+                    // Cache Definition to avoid repeated COM calls (EXTREMELY EXPENSIVE)
+                    var def = task.Definition;
+                    
+                    // Cache Triggers and Actions collections once
+                    var defTriggers = def.Triggers;
+                    var defActions = def.Actions;
+                    var defSettings = def.Settings;
+
                     var model = new ScheduledTaskModel
                     {
                         Name = task.Name,
                         Path = task.Path,
                         State = task.State.ToString(),
-                        Author = task.Definition.RegistrationInfo.Author ?? "",
-                        Description = task.Definition.RegistrationInfo.Description ?? "",
+                        Author = def.RegistrationInfo.Author ?? "",
+                        Description = def.RegistrationInfo.Description ?? "",
                         LastRunTime = task.LastRunTime == DateTime.MinValue ? null : (DateTime?)task.LastRunTime,
+                        NextRunTime = task.NextRunTime == DateTime.MinValue ? null : (DateTime?)task.NextRunTime,
                         IsEnabled = task.Enabled,
-                        Triggers = (task.Definition.Triggers != null) 
-                            ? string.Join(", ", task.Definition.Triggers.Cast<Trigger>().Select(t => t.ToString())) 
+                        Triggers = (defTriggers != null) 
+                            ? string.Join(", ", defTriggers.Cast<Trigger>().Select(t => t.ToString())) 
                             : ""
                     };
 
                     // Map Actions
-                    if (task.Definition.Actions != null)
+                    if (defActions != null)
                     {
-                        var execAction = task.Definition.Actions.FirstOrDefault() as ExecAction;
+                        var execAction = defActions.FirstOrDefault() as ExecAction;
                         if (execAction != null)
                         {
                             model.ActionCommand = execAction.Path;
                             model.Arguments = execAction.Arguments;
+                            model.WorkingDirectory = execAction.WorkingDirectory;
                         }
                     }
 
                     // Map Triggers and Repetition
-                    if (task.Definition.Triggers != null)
+                    if (defTriggers != null)
                     {
-                        var trigger = task.Definition.Triggers.FirstOrDefault();
-                    if (trigger != null)
-                    {
-                        // Simple type mapping
-                        if (trigger is DailyTrigger dt) 
+                        var trigger = defTriggers.FirstOrDefault();
+                        if (trigger != null)
                         {
-                            model.TriggerType = "Daily";
-                            model.DailyInterval = dt.DaysInterval;
-                        }
-                        else if (trigger is WeeklyTrigger wt) 
-                        {
-                            model.TriggerType = "Weekly";
-                            model.WeeklyInterval = wt.WeeksInterval;
-                            
-                            // Map DaysOfWeek
-                            if ((wt.DaysOfWeek & DaysOfTheWeek.Monday) != 0) model.WeeklyDays.Add("Monday");
-                            if ((wt.DaysOfWeek & DaysOfTheWeek.Tuesday) != 0) model.WeeklyDays.Add("Tuesday");
-                            if ((wt.DaysOfWeek & DaysOfTheWeek.Wednesday) != 0) model.WeeklyDays.Add("Wednesday");
-                            if ((wt.DaysOfWeek & DaysOfTheWeek.Thursday) != 0) model.WeeklyDays.Add("Thursday");
-                            if ((wt.DaysOfWeek & DaysOfTheWeek.Friday) != 0) model.WeeklyDays.Add("Friday");
-                            if ((wt.DaysOfWeek & DaysOfTheWeek.Saturday) != 0) model.WeeklyDays.Add("Saturday");
-                            if ((wt.DaysOfWeek & DaysOfTheWeek.Sunday) != 0) model.WeeklyDays.Add("Sunday");
-                        }
-                        else if (trigger is MonthlyTrigger mt) 
-                        {
-                            model.TriggerType = "Monthly";
-                            model.MonthlyIsDayOfWeek = false;
-                            
-                            // Map Months
-                            MapMonths(mt.MonthsOfYear, model.MonthlyMonths);
-                            
-                            // Map Days
-                            model.MonthlyDays.AddRange(mt.DaysOfMonth);
-                            if (mt.RunOnLastDayOfMonth) model.MonthlyDays.Add(32); // 32 = Last
-                        }
-                        else if (trigger is MonthlyDOWTrigger mdt)
-                        {
-                             model.TriggerType = "Monthly";
-                             model.MonthlyIsDayOfWeek = true;
-                             
-                             // Map Months
-                             MapMonths(mdt.MonthsOfYear, model.MonthlyMonths);
-                             
-                             // Map Week
-                             if (mdt.WeeksOfMonth == WhichWeek.FirstWeek) model.MonthlyWeek = "First";
-                             else if (mdt.WeeksOfMonth == WhichWeek.SecondWeek) model.MonthlyWeek = "Second";
-                             else if (mdt.WeeksOfMonth == WhichWeek.ThirdWeek) model.MonthlyWeek = "Third";
-                             else if (mdt.WeeksOfMonth == WhichWeek.FourthWeek) model.MonthlyWeek = "Fourth";
-                             else if (mdt.WeeksOfMonth == WhichWeek.LastWeek) model.MonthlyWeek = "Last";
-                             
-                             // Map DayOfWeek
-                             if (mdt.DaysOfWeek == DaysOfTheWeek.Monday) model.MonthlyDayOfWeek = "Monday";
-                             else if (mdt.DaysOfWeek == DaysOfTheWeek.Tuesday) model.MonthlyDayOfWeek = "Tuesday";
-                             else if (mdt.DaysOfWeek == DaysOfTheWeek.Wednesday) model.MonthlyDayOfWeek = "Wednesday";
-                             else if (mdt.DaysOfWeek == DaysOfTheWeek.Thursday) model.MonthlyDayOfWeek = "Thursday";
-                             else if (mdt.DaysOfWeek == DaysOfTheWeek.Friday) model.MonthlyDayOfWeek = "Friday";
-                             else if (mdt.DaysOfWeek == DaysOfTheWeek.Saturday) model.MonthlyDayOfWeek = "Saturday";
-                             else if (mdt.DaysOfWeek == DaysOfTheWeek.Sunday) model.MonthlyDayOfWeek = "Sunday";
-                        }
-                        else if (trigger is LogonTrigger) model.TriggerType = "AtLogon";
-                        else if (trigger is BootTrigger) model.TriggerType = "AtStartup";
-                        else if (trigger is TimeTrigger) model.TriggerType = "Once";
-
-                        // Map Start Boundary to ScheduleInfo
-                        if (trigger.StartBoundary != DateTime.MinValue)
-                        {
-                            model.ScheduleInfo = trigger.StartBoundary.ToString("yyyy-MM-dd HH:mm:ss");
-                        }
-                        
-                        // Expiration
-                        if (trigger.EndBoundary != DateTime.MaxValue)
-                        {
-                             model.ExpirationDate = trigger.EndBoundary;
-                        }
-
-                        // Repetition
-                        if (trigger.Repetition.Interval != TimeSpan.Zero)
-                        {
-                            try { model.RepetitionInterval = System.Xml.XmlConvert.ToString(trigger.Repetition.Interval); } catch {}
-                        }
-                        if (trigger.Repetition.Duration != TimeSpan.Zero)
-                        {
-                            try { model.RepetitionDuration = System.Xml.XmlConvert.ToString(trigger.Repetition.Duration); } catch {}
-                        }
-                        
-                        // Random Delay
-                        // Use reflection or cast to v2 trigger if available, but MS TaskScheduler wrapper exposes it on Trigger
-                        // It is available on Trigger (v2)
-                        // Random Delay
-                        try 
-                        { 
-                            // Use dynamic to access RandomDelay as it is not on the base Trigger class in this version
-                            var dTrigger = (dynamic)trigger;
-                            if (dTrigger.RandomDelay != TimeSpan.Zero)
+                            // Simple type mapping
+                            if (trigger is DailyTrigger dt) 
                             {
-                                model.RandomDelay = System.Xml.XmlConvert.ToString(dTrigger.RandomDelay); 
+                                model.TriggerType = "Daily";
+                                model.DailyInterval = dt.DaysInterval;
                             }
-                        } 
-                        catch {}
-                    }
+                            else if (trigger is WeeklyTrigger wt) 
+                            {
+                                model.TriggerType = "Weekly";
+                                model.WeeklyInterval = wt.WeeksInterval;
+                                
+                                // Map DaysOfWeek
+                                if ((wt.DaysOfWeek & DaysOfTheWeek.Monday) != 0) model.WeeklyDays.Add("Monday");
+                                if ((wt.DaysOfWeek & DaysOfTheWeek.Tuesday) != 0) model.WeeklyDays.Add("Tuesday");
+                                if ((wt.DaysOfWeek & DaysOfTheWeek.Wednesday) != 0) model.WeeklyDays.Add("Wednesday");
+                                if ((wt.DaysOfWeek & DaysOfTheWeek.Thursday) != 0) model.WeeklyDays.Add("Thursday");
+                                if ((wt.DaysOfWeek & DaysOfTheWeek.Friday) != 0) model.WeeklyDays.Add("Friday");
+                                if ((wt.DaysOfWeek & DaysOfTheWeek.Saturday) != 0) model.WeeklyDays.Add("Saturday");
+                                if ((wt.DaysOfWeek & DaysOfTheWeek.Sunday) != 0) model.WeeklyDays.Add("Sunday");
+                            }
+                            else if (trigger is MonthlyTrigger mt) 
+                            {
+                                model.TriggerType = "Monthly";
+                                model.MonthlyIsDayOfWeek = false;
+                                
+                                // Map Months
+                                MapMonths(mt.MonthsOfYear, model.MonthlyMonths);
+                                
+                                // Map Days
+                                model.MonthlyDays.AddRange(mt.DaysOfMonth);
+                                if (mt.RunOnLastDayOfMonth) model.MonthlyDays.Add(32); // 32 = Last
+                            }
+                            else if (trigger is MonthlyDOWTrigger mdt)
+                            {
+                                 model.TriggerType = "Monthly";
+                                 model.MonthlyIsDayOfWeek = true;
+                                 
+                                 // Map Months
+                                 MapMonths(mdt.MonthsOfYear, model.MonthlyMonths);
+                                 
+                                 // Map Week
+                                 if (mdt.WeeksOfMonth == WhichWeek.FirstWeek) model.MonthlyWeek = "First";
+                                 else if (mdt.WeeksOfMonth == WhichWeek.SecondWeek) model.MonthlyWeek = "Second";
+                                 else if (mdt.WeeksOfMonth == WhichWeek.ThirdWeek) model.MonthlyWeek = "Third";
+                                 else if (mdt.WeeksOfMonth == WhichWeek.FourthWeek) model.MonthlyWeek = "Fourth";
+                                 else if (mdt.WeeksOfMonth == WhichWeek.LastWeek) model.MonthlyWeek = "Last";
+                                 
+                                 // Map DayOfWeek
+                                 if (mdt.DaysOfWeek == DaysOfTheWeek.Monday) model.MonthlyDayOfWeek = "Monday";
+                                 else if (mdt.DaysOfWeek == DaysOfTheWeek.Tuesday) model.MonthlyDayOfWeek = "Tuesday";
+                                 else if (mdt.DaysOfWeek == DaysOfTheWeek.Wednesday) model.MonthlyDayOfWeek = "Wednesday";
+                                 else if (mdt.DaysOfWeek == DaysOfTheWeek.Thursday) model.MonthlyDayOfWeek = "Thursday";
+                                 else if (mdt.DaysOfWeek == DaysOfTheWeek.Friday) model.MonthlyDayOfWeek = "Friday";
+                                 else if (mdt.DaysOfWeek == DaysOfTheWeek.Saturday) model.MonthlyDayOfWeek = "Saturday";
+                                 else if (mdt.DaysOfWeek == DaysOfTheWeek.Sunday) model.MonthlyDayOfWeek = "Sunday";
+                            }
+                            else if (trigger is LogonTrigger) model.TriggerType = "AtLogon";
+                            else if (trigger is BootTrigger) model.TriggerType = "AtStartup";
+                            else if (trigger is TimeTrigger) model.TriggerType = "Once";
+
+                            // Map Start Boundary to ScheduleInfo
+                            if (trigger.StartBoundary != DateTime.MinValue)
+                            {
+                                model.ScheduleInfo = trigger.StartBoundary.ToString("yyyy-MM-dd HH:mm:ss");
+                            }
+                            
+                            // Expiration
+                            if (trigger.EndBoundary != DateTime.MaxValue)
+                            {
+                                 model.ExpirationDate = trigger.EndBoundary;
+                            }
+
+                            // Repetition
+                            if (trigger.Repetition.Interval != TimeSpan.Zero)
+                            {
+                                try { model.RepetitionInterval = System.Xml.XmlConvert.ToString(trigger.Repetition.Interval); } catch {}
+                            }
+                            if (trigger.Repetition.Duration != TimeSpan.Zero)
+                            {
+                                try { model.RepetitionDuration = System.Xml.XmlConvert.ToString(trigger.Repetition.Duration); } catch {}
+                            }
+                            
+                            // Random Delay
+                            try 
+                            { 
+                                // Use dynamic to access RandomDelay as it is not on the base Trigger class in this version
+                                var dTrigger = (dynamic)trigger;
+                                if (dTrigger.RandomDelay != TimeSpan.Zero)
+                                {
+                                    model.RandomDelay = System.Xml.XmlConvert.ToString(dTrigger.RandomDelay); 
+                                }
+                            } 
+                            catch {}
+                        }
                     }
 
                     // Map Settings & Conditions
-                    if (task.Definition.Settings != null)
+                    if (defSettings != null)
                     {
-                        model.OnlyIfIdle = task.Definition.Settings.RunOnlyIfIdle;
-                        model.OnlyIfAC = task.Definition.Settings.DisallowStartIfOnBatteries;
-                        model.OnlyIfNetwork = task.Definition.Settings.RunOnlyIfNetworkAvailable;
-                        model.WakeToRun = task.Definition.Settings.WakeToRun;
-                        model.StopOnBattery = task.Definition.Settings.StopIfGoingOnBatteries;
-                        model.RunIfMissed = task.Definition.Settings.StartWhenAvailable;
-                        model.RestartOnFailure = task.Definition.Settings.RestartCount > 0;
-                        model.RestartCount = task.Definition.Settings.RestartCount;
+                        model.OnlyIfIdle = defSettings.RunOnlyIfIdle;
+                        model.OnlyIfAC = defSettings.DisallowStartIfOnBatteries;
+                        model.OnlyIfNetwork = defSettings.RunOnlyIfNetworkAvailable;
+                        model.WakeToRun = defSettings.WakeToRun;
+                        model.StopOnBattery = defSettings.StopIfGoingOnBatteries;
+                        model.RunIfMissed = defSettings.StartWhenAvailable;
+                        model.RestartOnFailure = defSettings.RestartCount > 0;
+                        model.RestartCount = defSettings.RestartCount;
                         
-                        if (task.Definition.Settings.ExecutionTimeLimit != TimeSpan.Zero)
+                        if (defSettings.ExecutionTimeLimit != TimeSpan.Zero)
                         {
-                             try { model.StopIfRunsLongerThan = System.Xml.XmlConvert.ToString(task.Definition.Settings.ExecutionTimeLimit); } catch {}
+                             try { model.StopIfRunsLongerThan = System.Xml.XmlConvert.ToString(defSettings.ExecutionTimeLimit); } catch {}
                         }
                         
-                        if (task.Definition.Settings.RestartInterval != TimeSpan.Zero)
+                        if (defSettings.RestartInterval != TimeSpan.Zero)
                         {
-                             try { model.RestartInterval = System.Xml.XmlConvert.ToString(task.Definition.Settings.RestartInterval); } catch {}
+                             try { model.RestartInterval = System.Xml.XmlConvert.ToString(defSettings.RestartInterval); } catch {}
                         }
                     }
 
@@ -358,7 +365,7 @@ namespace FluentTaskScheduler.Services
                 // Action handling with arguments support
                 if (!string.IsNullOrWhiteSpace(model.ActionCommand))
                 {
-                    var action = new ExecAction(model.ActionCommand, model.Arguments);
+                    var action = new ExecAction(model.ActionCommand, model.Arguments, model.WorkingDirectory);
                     td.Actions.Add(action);
                 }
                 else

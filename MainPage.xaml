@@ -131,6 +131,7 @@
                     <Button x:Name="BrowseActionButton" x:Uid="BrowseButton" Content="Browse..." Click="BrowseAction_Click" VerticalAlignment="Bottom" Margin="0,0,0,2" Grid.Column="1"/>
                 </Grid>
                 <TextBox x:Name="EditTaskArguments" x:Uid="ArgumentsHeader" Header="Arguments (optional)" PlaceholderText="e.g., /c echo hello or -File script.ps1"/>
+                <TextBox x:Name="EditTaskWorkingDirectory" x:Uid="WorkingDirectoryHeader" Header="Run in (optional)" PlaceholderText="e.g., C:\Scripts"/>
                 
                 <TextBlock x:Uid="TriggerTitle" Text="Trigger" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
                 <ComboBox x:Name="EditTaskTriggerType" x:Uid="TriggerTypeHeader" Header="Trigger Type" SelectedIndex="0" SelectionChanged="EditTaskTriggerType_SelectionChanged" HorizontalAlignment="Stretch">

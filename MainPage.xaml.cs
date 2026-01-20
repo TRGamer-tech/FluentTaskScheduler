@@ -143,12 +143,28 @@ namespace FluentTaskScheduler
                 // This prevents "Collection modified" exceptions during enumeration
                 var results = query.ToList();
 
+                // Optimization: Handle initial load or empty state efficiently (O(N))
+                if (FilteredTasks.Count == 0)
+                {
+                    foreach (var taskModel in results)
+                    {
+                        FilteredTasks.Add(taskModel);
+                    }
+                    return;
+                }
+
+                // Optimization: Use HashSet for O(1) lookups instead of O(N) Linear Search
+                // This reduces the complexity from O(N^2) to O(N)
+                var resultsSet = new HashSet<ScheduledTaskModel>(results);
+                var currentSet = new HashSet<ScheduledTaskModel>(FilteredTasks);
+
                 // Synchronize FilteredTasks with results to preserve scroll position
                 // Removing items that are no longer in the filtered results
                 for (int i = FilteredTasks.Count - 1; i >= 0; i--)
                 {
-                    if (!results.Contains(FilteredTasks[i]))
+                    if (!resultsSet.Contains(FilteredTasks[i]))
                     {
+                        currentSet.Remove(FilteredTasks[i]);
                         FilteredTasks.RemoveAt(i);
                     }
                 }
@@ -156,13 +172,15 @@ namespace FluentTaskScheduler
                 // Inserting or moving items to match the results list
                 for (int i = 0; i < results.Count; i++)
                 {
-                    if (!FilteredTasks.Contains(results[i]))
+                    var taskModel = results[i];
+                    if (!currentSet.Contains(taskModel))
                     {
-                        FilteredTasks.Insert(i, results[i]);
+                        FilteredTasks.Insert(i, taskModel);
+                        currentSet.Add(taskModel);
                     }
                     else
                     {
-                        int oldIndex = FilteredTasks.IndexOf(results[i]);
+                        int oldIndex = FilteredTasks.IndexOf(taskModel);
                         if (oldIndex != i)
                         {
                             FilteredTasks.Move(oldIndex, i);
@@ -207,7 +225,9 @@ namespace FluentTaskScheduler
             EditTaskDescription.Text = "";
             EditTaskAuthor.Text = System.Environment.UserName;
             EditTaskEnabled.IsOn = true;
-            EditTaskEnabled.IsOn = true;
+            EditTaskActionCommand.Text = "";
+            EditTaskArguments.Text = "";
+            EditTaskWorkingDirectory.Text = "";
             
             // Reset granular triggers
             DailyInterval.Text = "1";
@@ -329,6 +349,7 @@ namespace FluentTaskScheduler
                 EditTaskEnabled.IsOn = _selectedTask.IsEnabled;
                 EditTaskActionCommand.Text = _selectedTask.ActionCommand;
                 EditTaskArguments.Text = _selectedTask.Arguments;
+                EditTaskWorkingDirectory.Text = _selectedTask.WorkingDirectory;
                 
                 // Parse Start Time/Date from ScheduleInfo if possible, else default
                 DateTime start = DateTime.Now;
@@ -528,6 +549,7 @@ namespace FluentTaskScheduler
                     IsEnabled = EditTaskEnabled.IsOn,
                     ActionCommand = EditTaskActionCommand.Text,
                     Arguments = EditTaskArguments.Text,
+                    WorkingDirectory = EditTaskWorkingDirectory.Text,
                     ScheduleInfo = startDateTime.ToString("yyyy-MM-dd HH:mm:ss"), // Store full start time
                     TriggerType = triggerTag,
                     

@@ -53,6 +53,7 @@ namespace FluentTaskScheduler.Models
         }
         public string ActionCommand { get; set; } = "";
         public string Arguments { get; set; } = "";
+        public string WorkingDirectory { get; set; } = "";
         public string ScheduleInfo { get; set; } = "";
         public string TriggerType { get; set; } = "Daily";
         
