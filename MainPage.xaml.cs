@@ -35,12 +35,24 @@ namespace FluentTaskScheduler
             };
         }
 
+        private void Page_PreviewKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+        {
+            // Handle F5 for refresh
+            if (e.Key == Windows.System.VirtualKey.F5)
+            {
+                e.Handled = true;
+                LoadTasks();
+            }
+        }
+
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
             LoadTasks();
         }
 
         private bool _isLoading = false;
+        private bool _isApplyingFilters = false; // Guard to prevent toggle events during filtering
+        private readonly Dictionary<string, bool> _userInteractedToggles = new Dictionary<string, bool>(); // Track which toggles user actually clicked
 
         private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
@@ -76,7 +88,12 @@ namespace FluentTaskScheduler
             
             try
             {
-                if (LoadingRing != null) LoadingRing.IsActive = true;
+                if (LoadingRing != null) 
+                {
+                    LoadingRing.IsActive = true;
+                    // Ensure UI updates before starting background work
+                    await Task.Delay(10);
+                }
                 
                 // Fetch on background thread
                 var tasks = await Task.Run(() => 
@@ -103,6 +120,7 @@ namespace FluentTaskScheduler
 
         private void ApplyFilters()
         {
+            _isApplyingFilters = true; // Set guard
             try
             {
                 if (_allTasks == null || _allTasks.Count == 0)
@@ -131,11 +149,13 @@ namespace FluentTaskScheduler
                     }
                     else if (tag == "enabled")
                     {
-                        query = query.Where(t => t.State != "Disabled");
+                        // Use Boolean IsEnabled instead of State string causing disconnects
+                        query = query.Where(t => t.IsEnabled);
                     }
                     else if (tag == "disabled")
                     {
-                        query = query.Where(t => t.State == "Disabled");
+                        // Use Boolean IsEnabled instead of State string causing disconnects
+                        query = query.Where(t => !t.IsEnabled);
                     }
                 }
 
@@ -191,6 +211,10 @@ namespace FluentTaskScheduler
             catch (Exception ex)
             {
                  System.Diagnostics.Debug.WriteLine($"Error applying filters: {ex.Message}");
+            }
+            finally
+            {
+                _isApplyingFilters = false; // Clear guard
             }
         }
 
@@ -310,12 +334,17 @@ namespace FluentTaskScheduler
                 if (ext == ".ps1")
                 {
                     EditTaskActionCommand.Text = "powershell.exe";
-                    EditTaskArguments.Text = $"-ExecutionPolicy Bypass -File \"{path}\"";
+                    EditTaskArguments.Text = $"-File \"{path}\"";
                 }
                 else if (ext == ".bat" || ext == ".cmd")
                 {
                     EditTaskActionCommand.Text = "cmd.exe";
                     EditTaskArguments.Text = $"/c \"{path}\"";
+                }
+                else if (ext == ".py")
+                {
+                    EditTaskActionCommand.Text = "python.exe";
+                    EditTaskArguments.Text = $"\"{path}\"";
                 }
                 else
                 {
@@ -494,8 +523,22 @@ namespace FluentTaskScheduler
             comboBox.SelectedIndex = 0;
         }
 
+        private void ToggleSwitch_PointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+        {
+            // Mark that user actually clicked this toggle
+            if (sender is ToggleSwitch toggle && toggle.DataContext is ScheduledTaskModel task)
+            {
+                _userInteractedToggles[task.Path] = true;
+                System.Diagnostics.Debug.WriteLine($"User clicked toggle for: {task.Name}");
+            }
+        }
+
         private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
     {
+        // CRITICAL: Don't process toggles during filtering - this was causing tasks to be enabled/disabled when changing filters!
+        if (_isApplyingFilters || _isLoading)
+            return;
+
         // Safety check for null sender
         if (sender is not ToggleSwitch toggle)
             return;
@@ -508,8 +551,22 @@ namespace FluentTaskScheduler
         if (task.IsEnabled == toggle.IsOn)
             return;
 
+        // CRITICAL: Only process if user actually interacted with this toggle
+        if (!_userInteractedToggles.ContainsKey(task.Path) || !_userInteractedToggles[task.Path])
+        {
+            System.Diagnostics.Debug.WriteLine($"Ignoring toggle for {task.Name} - no user interaction detected");
+            return;
+        }
+
+        // Clear the interaction flag
+        _userInteractedToggles[task.Path] = false;
+
         try
         {
+            // Update the model first
+            task.IsEnabled = toggle.IsOn;
+            
+            // Then update the service
             if (toggle.IsOn)
             {
                 _taskService.EnableTask(task.Path);
@@ -520,9 +577,6 @@ namespace FluentTaskScheduler
                 _taskService.DisableTask(task.Path);
                 task.State = "Disabled";
             }
-            
-            // Update the model without reloading entire list
-            task.IsEnabled = toggle.IsOn;
         }
         catch (System.Exception ex)
         {
