@@ -42,6 +42,7 @@ namespace FluentTaskScheduler.Services
                     // Detailed properties
                     Author = def.RegistrationInfo.Author ?? "",
                     Description = def.RegistrationInfo.Description ?? "",
+                    RunWithHighestPrivileges = def.Principal.RunLevel == TaskRunLevel.Highest,
                     Triggers = (defTriggers != null) 
                         ? string.Join(", ", defTriggers.Cast<Trigger>().Select(t => t.ToString())) 
                         : ""
@@ -212,6 +213,7 @@ namespace FluentTaskScheduler.Services
                         LastRunTime = task.LastRunTime == DateTime.MinValue ? null : (DateTime?)task.LastRunTime,
                         NextRunTime = task.NextRunTime == DateTime.MinValue ? null : (DateTime?)task.NextRunTime,
                         IsEnabled = task.Enabled,
+                        RunWithHighestPrivileges = def.Principal.RunLevel == TaskRunLevel.Highest,
                         Triggers = (defTriggers != null) 
                             ? string.Join(", ", defTriggers.Cast<Trigger>().Select(t => t.ToString())) 
                             : ""
@@ -435,6 +437,11 @@ namespace FluentTaskScheduler.Services
                 td.RegistrationInfo.Description = model.Description;
                 td.RegistrationInfo.Author = model.Author;
                 td.Settings.Enabled = model.IsEnabled;
+                
+                // Set privilege level
+                td.Principal.RunLevel = model.RunWithHighestPrivileges 
+                    ? TaskRunLevel.Highest 
+                    : TaskRunLevel.LUA;
 
                 // Trigger handling based on TriggerType
                 DateTime startTime = DateTime.Today.AddHours(9); // default 9am

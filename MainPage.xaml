@@ -320,19 +320,14 @@
                 <!-- Settings Section -->
                 <TextBlock x:Uid="SettingsTitle" Text="Settings" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,12,0,4"/>
                 <StackPanel Spacing="12">
+                    <CheckBox x:Name="EditTaskRunWithHighestPrivileges" Content="Run with highest privileges"/>
                     <CheckBox x:Name="EditTaskRunIfMissed" x:Uid="RunIfMissed" Content="Run task as soon as possible after a scheduled start is missed"/>
                     <CheckBox x:Name="EditTaskRestartOnFailure" x:Uid="RestartOnFailure" Content="If the task fails, restart every:"/>
                     <StackPanel Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
-                        <TextBox x:Name="EditTaskRestartInterval" PlaceholderText="1" Width="60"/>
-                        <ComboBox x:Name="EditTaskRestartIntervalUnit" SelectedIndex="0" Width="100">
-                            <ComboBoxItem Content="minute(s)" Tag="M"/>
-                            <ComboBoxItem Content="hour(s)" Tag="H"/>
-                        </ComboBox>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
-                        <TextBlock x:Uid="RestartCountText1" Text="Attempt restart up to:" VerticalAlignment="Center"/>
-                        <TextBox x:Name="EditTaskRestartCount" PlaceholderText="3" Width="60"/>
-                        <TextBlock x:Uid="RestartCountText2" Text="times" VerticalAlignment="Center"/>
+                        <TextBox x:Name="EditTaskRestartInterval" PlaceholderText="e.g. 1 minute" Width="120"/>
+                        <TextBlock Text="(e.g. 30s, 1m, 5m)" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                        <TextBlock Text="Attempt to restart up to:" VerticalAlignment="Center"/>
+                        <NumberBox x:Name="EditTaskRestartCount" Width="80" Value="3" Minimum="0" Maximum="999"/>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>

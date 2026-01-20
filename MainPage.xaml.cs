@@ -302,9 +302,8 @@ namespace FluentTaskScheduler
             EditTaskStopOnBattery.IsChecked = false;
             EditTaskRunIfMissed.IsChecked = false;
             EditTaskRestartOnFailure.IsChecked = false;
-            EditTaskRestartInterval.Text = "1";
-            EditTaskRestartIntervalUnit.SelectedIndex = 0;
-            EditTaskRestartCount.Text = "3";
+            EditTaskRestartInterval.Text = "1 minute";
+            EditTaskRestartCount.Value = 3;
 
             // Trigger visibility
             UpdateTriggerPanelVisibility();
@@ -819,11 +818,28 @@ namespace FluentTaskScheduler
         
         private string ParseRestartInterval()
         {
-            if (!int.TryParse(EditTaskRestartInterval.Text, out var value) || value <= 0)
+            // Parse interval from simple text like "1 minute", "5m", "2h"
+            var text = EditTaskRestartInterval.Text?.Trim() ?? "";
+            if (string.IsNullOrWhiteSpace(text))
                 return "PT1M";
-                
-            var unit = (EditTaskRestartIntervalUnit.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "M";
-            return unit == "H" ? $"PT{value}H" : $"PT{value}M";
+            
+            // Try to parse direct duration format first (e.g., "PT5M")
+            if (text.StartsWith("PT") || text.StartsWith("P"))
+                return text;
+            
+            // Simple parsing for common formats
+            if (int.TryParse(new string(text.Where(char.IsDigit).ToArray()), out var value))
+            {
+                var lowerText = text.ToLower();
+                if (lowerText.Contains("h"))
+                    return $"PT{value}H";
+                if (lowerText.Contains("m") || lowerText.Contains("min"))
+                    return $"PT{value}M";
+                if (lowerText.Contains("s") || lowerText.Contains("sec"))
+                    return $"PT{value}S";
+            }
+            
+            return "PT1M"; // Default fallback
         }
 
         private void EditTaskTriggerType_SelectionChanged(object sender, SelectionChangedEventArgs e)

@@ -56,6 +56,7 @@ namespace FluentTaskScheduler.Models
         public string WorkingDirectory { get; set; } = "";
         public string ScheduleInfo { get; set; } = "";
         public string TriggerType { get; set; } = "Daily";
+        public bool RunWithHighestPrivileges { get; set; } = false;
         
         // Trigger Specifics
         public short DailyInterval { get; set; } = 1;
