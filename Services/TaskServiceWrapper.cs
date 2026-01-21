@@ -125,6 +125,29 @@ namespace FluentTaskScheduler.Services
                         }
                         else if (trigger is LogonTrigger) model.TriggerType = "AtLogon";
                         else if (trigger is BootTrigger) model.TriggerType = "AtStartup";
+                        else if (trigger is EventTrigger et)
+                        {
+                            model.TriggerType = "Event";
+                            try
+                            {
+                                // Basic parsing of Subscription XML to extract Log, Source, EventID
+                                // <Select Path="Application">*[System[Provider[@Name='VSS'] and (EventID=8194)]]</Select>
+                                string sub = et.Subscription ?? "";
+                                
+                                // Extract Path (Log)
+                                var pathMatch = System.Text.RegularExpressions.Regex.Match(sub, "Path=\"([^\"]+)\"");
+                                if (pathMatch.Success) model.EventLog = pathMatch.Groups[1].Value;
+                                
+                                // Extract Source
+                                var sourceMatch = System.Text.RegularExpressions.Regex.Match(sub, "Provider\\[@Name='([^']+)'\\]");
+                                if (sourceMatch.Success) model.EventSource = sourceMatch.Groups[1].Value;
+                                
+                                // Extract EventID
+                                var idMatch = System.Text.RegularExpressions.Regex.Match(sub, "EventID=(\\d+)");
+                                if (idMatch.Success && int.TryParse(idMatch.Groups[1].Value, out int eid)) model.EventId = eid;
+                            }
+                            catch {}
+                        }
                         else if (trigger is TimeTrigger) model.TriggerType = "Once";
 
                         // Map Start Boundary to ScheduleInfo
@@ -498,8 +521,33 @@ namespace FluentTaskScheduler.Services
                     case "AtStartup":
                         td.Triggers.Add(new BootTrigger());
                         break;
+                    case "One Time": // Handle "One Time" from UI
                     case "Once":
                         td.Triggers.Add(new TimeTrigger { StartBoundary = startTime });
+                        break;
+                    case "Event":
+                        var et = new EventTrigger();
+                        string log = string.IsNullOrWhiteSpace(model.EventLog) ? "Application" : model.EventLog;
+                        string query = "*";
+                        
+                        // Construct the query: *[System[Provider[@Name='Source'] and (EventID=123)]]
+                        if (!string.IsNullOrWhiteSpace(model.EventSource) || model.EventId.HasValue)
+                        {
+                            string conditions = "";
+                            if (!string.IsNullOrWhiteSpace(model.EventSource))
+                                conditions += $"Provider[@Name='{model.EventSource}']";
+                                
+                            if (model.EventId.HasValue)
+                            {
+                                if (conditions.Length > 0) conditions += " and ";
+                                conditions += $"(EventID={model.EventId})";
+                            }
+                            
+                            query = $"*[System[{conditions}]]";
+                        }
+                        
+                        et.Subscription = $"<QueryList><Query Id=\"0\" Path=\"{log}\"><Select Path=\"{log}\">{query}</Select></Query></QueryList>";
+                        td.Triggers.Add(et);
                         break;
                     default:
                         td.Triggers.Add(new DailyTrigger { StartBoundary = startTime });

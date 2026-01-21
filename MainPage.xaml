@@ -194,9 +194,10 @@
                     <ComboBoxItem Content="At Logon" Tag="AtLogon"/>
                     <ComboBoxItem Content="At Startup" Tag="AtStartup"/>
                     <ComboBoxItem Content="One Time" Tag="Once"/>
+                    <ComboBoxItem Content="On an event" Tag="Event"/>
                 </ComboBox>
                 <StackPanel Spacing="8">
-                     <StackPanel Spacing="16">
+                     <StackPanel x:Name="PanelStartTime" Spacing="16">
                          <DatePicker x:Name="EditTaskStartDate" HorizontalAlignment="Left"/>
                          <TimePicker x:Name="EditTaskStartTime" HorizontalAlignment="Left" ClockIdentifier="24HourClock"/>
                      </StackPanel>
@@ -311,6 +312,13 @@
                             <ComboBoxItem Content="Sunday"/>
                         </ComboBox>
                     </StackPanel>
+                </StackPanel>
+
+                <!-- Event Log Trigger -->
+                <StackPanel x:Name="PanelEvent" Visibility="Collapsed" Spacing="8" Margin="0,4,0,0">
+                    <TextBox x:Name="EditTaskEventLog" Header="Log" PlaceholderText="Application, System, Security, etc." Text="Application"/>
+                    <TextBox x:Name="EditTaskEventSource" Header="Source" PlaceholderText="e.g., VSS, Outlook (Optional)"/>
+                    <TextBox x:Name="EditTaskEventId" Header="Event ID" PlaceholderText="e.g., 1000 (Optional)" InputScope="Number"/>
                 </StackPanel>
 
                 <StackPanel Spacing="8" Margin="0,12,0,0">

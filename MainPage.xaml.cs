@@ -606,22 +606,38 @@ namespace FluentTaskScheduler
                      EditTaskStopAfterVal.IsEnabled = false;
                 }
                 
+                // Event Trigger
+                if (_selectedTask.TriggerType == "Event")
+                {
+                    EditTaskEventLog.Text = _selectedTask.EventLog;
+                    EditTaskEventSource.Text = _selectedTask.EventSource;
+                    EditTaskEventId.Text = _selectedTask.EventId?.ToString() ?? "";
+                }
+            }
+            else
+            {
+                // New Task Defaults
+                _isEditMode = false;
+                EditTaskName.Text = "";
+                EditTaskDescription.Text = "";
+                EditTaskAuthor.Text = Environment.UserName;
+                EditTaskEnabled.IsOn = true;
+                EditTaskActionCommand.Text = "";
+                EditTaskArguments.Text = "";
+                EditTaskWorkingDirectory.Text = "";
+                
+                EditTaskStartDate.Date = DateTime.Now;
+                EditTaskStartTime.Time = DateTime.Now.TimeOfDay;
+                
+                EditTaskTriggerType.SelectedIndex = 0; // Daily
                 UpdateTriggerPanelVisibility();
                 
-                // Populate advanced settings
-                SetComboBoxByTag(EditTaskRepetitionInterval, _selectedTask.RepetitionInterval);
-                SetComboBoxByTag(EditTaskRepetitionDuration, _selectedTask.RepetitionDuration);
-                EditTaskOnlyIfIdle.IsChecked = _selectedTask.OnlyIfIdle;
-                EditTaskOnlyIfAC.IsChecked = _selectedTask.OnlyIfAC;
-                EditTaskOnlyIfNetwork.IsChecked = _selectedTask.OnlyIfNetwork;
-                EditTaskWakeToRun.IsChecked = _selectedTask.WakeToRun;
-                EditTaskStopOnBattery.IsChecked = _selectedTask.StopOnBattery;
-                EditTaskRunIfMissed.IsChecked = _selectedTask.RunIfMissed;
-                EditTaskRestartOnFailure.IsChecked = _selectedTask.RestartOnFailure;
-                
-                TaskDetailsDialog.Hide();
-                await TaskEditDialog.ShowAsync();
+                EditTaskEventLog.Text = "Application";
+                EditTaskEventSource.Text = "";
+                EditTaskEventId.Text = "";
             }
+            
+            var result = await TaskEditDialog.ShowAsync();
         }
         
         private void SetComboBoxByTag(ComboBox comboBox, string tag)
@@ -770,7 +786,12 @@ namespace FluentTaskScheduler
                     RunIfMissed = EditTaskRunIfMissed.IsChecked ?? false,
                     RestartOnFailure = EditTaskRestartOnFailure.IsChecked ?? false,
                     RestartInterval = ParseRestartInterval(),
-                    RestartCount = int.TryParse(EditTaskRestartCount.Text, out var count) ? count : 3
+                    RestartCount = int.TryParse(EditTaskRestartCount.Text, out var count) ? count : 3,
+                    
+                    // Event Log
+                    EventLog = EditTaskEventLog.Text,
+                    EventSource = EditTaskEventSource.Text,
+                    EventId = int.TryParse(EditTaskEventId.Text, out var eid) ? eid : null
                 };
 
                 if (_isEditMode && _selectedTask != null)
@@ -1023,11 +1044,20 @@ namespace FluentTaskScheduler
         private void UpdateTriggerPanelVisibility()
         {
             if (PanelDaily == null || PanelWeekly == null || PanelMonthly == null) return;
-
+            // PanelStartTime might be null if XAML hasn't processed it yet (though usually it is)
+            
             var tag = (EditTaskTriggerType.SelectedItem as ComboBoxItem)?.Tag?.ToString();
             PanelDaily.Visibility = tag == "Daily" ? Visibility.Visible : Visibility.Collapsed;
             PanelWeekly.Visibility = tag == "Weekly" ? Visibility.Visible : Visibility.Collapsed;
             PanelMonthly.Visibility = tag == "Monthly" ? Visibility.Visible : Visibility.Collapsed;
+            if (PanelEvent != null) PanelEvent.Visibility = tag == "Event" ? Visibility.Visible : Visibility.Collapsed;
+            
+            // Hide Start Date/Time for events that don't use it
+            if (PanelStartTime != null)
+            {
+                bool showStart = tag != "Event" && tag != "AtLogon" && tag != "AtStartup";
+                PanelStartTime.Visibility = showStart ? Visibility.Visible : Visibility.Collapsed;
+            }
         }
         
         private List<string> GetWeeklyDays()

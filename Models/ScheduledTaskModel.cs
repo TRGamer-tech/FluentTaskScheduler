@@ -74,6 +74,11 @@ namespace FluentTaskScheduler.Models
         public DateTime? ExpirationDate { get; set; }
         
         public string RandomDelay { get; set; } = ""; // e.g., "PT1M"
+        
+        // Event Log Trigger
+        public string EventLog { get; set; } = "Application";
+        public string EventSource { get; set; } = "";
+        public int? EventId { get; set; }
 
 
         // Repetition
