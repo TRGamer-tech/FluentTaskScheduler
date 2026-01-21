@@ -112,7 +112,7 @@ namespace FluentTaskScheduler
             
             // Set default window size
             var appWindow = m_window.AppWindow;
-            appWindow.Resize(new Windows.Graphics.SizeInt32 { Width = 1200, Height = 700 });
+            appWindow.Resize(new Windows.Graphics.SizeInt32 { Width = 1200, Height = 800 });
             
             Frame rootFrame = new Frame();
             rootFrame.NavigationFailed += OnNavigationFailed;

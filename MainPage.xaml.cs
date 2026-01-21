@@ -17,6 +17,7 @@ namespace FluentTaskScheduler
         private bool _isEditMode = false;
         private Microsoft.UI.Dispatching.DispatcherQueue _dispatcherQueue = null!;
         private Microsoft.UI.Dispatching.DispatcherQueueTimer _searchDebounceTimer = null!;
+        private List<TaskHistoryEntry> _fullHistory = new List<TaskHistoryEntry>();
 
         public MainPage()
         {
@@ -375,8 +376,122 @@ namespace FluentTaskScheduler
                 // Update button states based on task state
                 RunTaskButton.IsEnabled = task.IsEnabled;
                 
+                // Load history inline
+                await LoadTaskHistoryInline(task.Path);
+                
                 await TaskDetailsDialog.ShowAsync();
             }
+        }
+
+        private async Task LoadTaskHistoryInline(string taskPath)
+        {
+            try
+            {
+                List<TaskHistoryEntry> history = null;
+                await Task.Run(() =>
+                {
+                    history = _taskService.GetTaskHistory(taskPath);
+                });
+                
+                // Store full history and apply default filter (Today)
+                _fullHistory = history ?? new List<TaskHistoryEntry>();
+                
+                // Reset dropdown UI to match
+                if (HistoryFilterCombo != null) HistoryFilterCombo.SelectedIndex = 0;
+                
+                ApplyHistoryFilterByTag("Today");
+            }
+            catch
+            {
+                // Silently fail - history is optional
+                _fullHistory = new List<TaskHistoryEntry>();
+                InlineHistoryListView.ItemsSource = new List<TaskHistoryEntry>();
+            }
+        }
+
+        private void HistoryFilter_Changed(object sender, SelectionChangedEventArgs e)
+        {
+            if (_fullHistory == null || _fullHistory.Count == 0) return;
+            
+            var filter = (HistoryFilterCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "Today";
+            ApplyHistoryFilterByTag(filter);
+        }
+
+        private void HistoryList_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+        {
+            // Intercept Ctrl+C
+            var ctrlState = Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Control);
+            if (e.Key == Windows.System.VirtualKey.C && ctrlState.HasFlag(Windows.UI.Core.CoreVirtualKeyStates.Down))
+            {
+                e.Handled = true;
+                CopyHistory_Click(sender, null);
+            }
+        }
+
+        private async void CopyHistory_Click(object sender, RoutedEventArgs e)
+        {
+            if (InlineHistoryListView.SelectedItems.Count == 0) return;
+
+            var textToCopy = string.Join("\n", 
+                InlineHistoryListView.SelectedItems
+                    .Cast<TaskHistoryEntry>()
+                    .Select(h => $"{h.Time}\t{h.Result}\t{h.Message}"));
+
+            var dataPackage = new Windows.ApplicationModel.DataTransfer.DataPackage();
+            dataPackage.SetText(textToCopy);
+            Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dataPackage);
+
+            // Visual feedback
+            CopyHistoryBtn.Content = "✓ Copied!";
+            await Task.Delay(1500);
+            CopyHistoryBtn.Content = "📋 Copy";
+        }
+
+        private void ApplyHistoryFilterByTag(string selectedFilter)
+        {
+            if (_fullHistory == null) return;
+
+            var now = DateTime.Now;
+            List<TaskHistoryEntry> filtered;
+
+            switch (selectedFilter)
+            {
+                case "Today":
+                    filtered = _fullHistory.Where(h => 
+                    {
+                        if (DateTime.TryParse(h.Time, out var dt))
+                            return dt.Date == now.Date;
+                        return false;
+                    }).ToList();
+                    break;
+
+                case "Yesterday":
+                    var yesterday = now.AddDays(-1).Date;
+                    filtered = _fullHistory.Where(h => 
+                    {
+                        if (DateTime.TryParse(h.Time, out var dt))
+                            return dt.Date == yesterday;
+                        return false;
+                    }).ToList();
+                    break;
+
+                case "Week":
+                    var weekAgo = now.AddDays(-7);
+                    filtered = _fullHistory.Where(h => 
+                    {
+                        if (DateTime.TryParse(h.Time, out var dt))
+                            return dt >= weekAgo;
+                        return false;
+                    }).ToList();
+                    break;
+
+                case "All":
+                default:
+                    filtered = _fullHistory;
+                    break;
+            }
+
+            InlineHistoryListView.ItemsSource = filtered;
         }
 
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
@@ -941,6 +1056,18 @@ namespace FluentTaskScheduler
         {
             // Prevent the event from bubbling up which would cause focus to reset
             e.Handled = true;
+        }
+
+        private async void HistoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Simplest possible test - just show the dialog
+            TaskHistoryDialog.XamlRoot = this.XamlRoot;
+            HistoryTaskInfo.Text = "TEST: Button was clicked!";
+            HistoryListView.ItemsSource = new List<TaskHistoryEntry>
+            {
+                new TaskHistoryEntry { Time = "Test", Result = "Test", ExitCode = "0", Message = "This is a test entry" }
+            };
+            await TaskHistoryDialog.ShowAsync();
         }
     }
 }

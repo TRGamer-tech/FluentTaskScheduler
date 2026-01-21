@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics.Eventing.Reader;
 using Microsoft.Win32.TaskScheduler;
 using FluentTaskScheduler.Models;
 
@@ -614,6 +615,83 @@ namespace FluentTaskScheduler.Services
                 }
             }
         }
+
+        public List<TaskHistoryEntry> GetTaskHistory(string taskPath)
+        {
+            var history = new List<TaskHistoryEntry>();
+            
+            try
+            {
+                // Query the Task Scheduler Event Log
+                string query = $"*[System/Provider[@Name='Microsoft-Windows-TaskScheduler'] and EventData[Data[@Name='TaskName']='{taskPath}']]";
+                
+                EventLogQuery eventsQuery = new EventLogQuery("Microsoft-Windows-TaskScheduler/Operational", PathType.LogName, query);
+                EventLogReader logReader = new EventLogReader(eventsQuery);
+                
+                EventRecord record;
+                while ((record = logReader.ReadEvent()) != null)
+                {
+                    using (record)
+                    {
+                        var entry = new TaskHistoryEntry
+                        {
+                            Time = record.TimeCreated?.ToString("yyyy-MM-dd HH:mm:ss") ?? "Unknown",
+                            Result = GetEventResult(record.Id),
+                            ExitCode = GetEventExitCode(record),
+                            Message = record.FormatDescription() ?? record.LevelDisplayName ?? ""
+                        };
+                        history.Add(entry);
+                    }
+                }
+                
+                // Sort by time descending (newest first)
+                history = history.OrderByDescending(h => h.Time).ToList();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error reading task history: {ex.Message}");
+                // Return empty list on error
+            }
+            
+            return history;
+        }
+
+        private string GetEventResult(int eventId)
+        {
+            return eventId switch
+            {
+                100 => "Task Started",
+                102 => "Task Completed",
+                103 => "Task Failed",
+                107 => "Task Triggered",
+                110 => "Task Registered",
+                129 => "Action Started",
+                201 => "Action Completed",
+                _ => $"Event {eventId}"
+            };
+        }
+
+        private string GetEventExitCode(EventRecord record)
+        {
+            try
+            {
+                // Look for exit code in event properties
+                if (record.Properties != null && record.Properties.Count > 0)
+                {
+                    foreach (var prop in record.Properties)
+                    {
+                        if (prop.Value is int exitCode && exitCode != 0)
+                            return exitCode.ToString();
+                    }
+                }
+                return "0";
+            }
+            catch
+            {
+                return "-";
+            }
+        }
+
         private void MapMonths(MonthsOfTheYear moy, List<string> months)
         {
             if ((moy & MonthsOfTheYear.January) != 0) months.Add("January");

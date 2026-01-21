@@ -91,9 +91,14 @@
 
         <ContentDialog x:Name="TaskDetailsDialog"
                        CloseButtonText="Close"
-                       DefaultButton="Close">
-            <ScrollViewer MaxHeight="500" VerticalScrollBarVisibility="Auto">
-                <StackPanel Spacing="12" MinWidth="400">
+                       DefaultButton="Close"
+                       MinWidth="1000"
+                       MaxWidth="1000">
+            <ContentDialog.Resources>
+                <x:Double x:Key="ContentDialogMaxWidth">2000</x:Double>
+            </ContentDialog.Resources>
+            <ScrollViewer MaxHeight="600" VerticalScrollBarVisibility="Visible">
+                <StackPanel Spacing="12" Width="960">
                     <TextBlock x:Name="DialogTaskName" Style="{StaticResource TitleTextBlockStyle}"/>
                     <TextBlock x:Name="DialogTaskDescription" TextWrapping="WrapWholeWords"/>
                     <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}"/>
@@ -105,6 +110,43 @@
                         <TextBlock Text="Author:" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,0,12,0"/>
                         <TextBlock x:Name="DialogTaskAuthor" Grid.Column="1"/>
                     </Grid>
+                    
+                    <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,12,0,8"/>
+                    
+                    <!-- History Section -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Recent History" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                            <ComboBox x:Name="HistoryFilterCombo" SelectedIndex="0" SelectionChanged="HistoryFilter_Changed" MinWidth="150">
+                                <ComboBoxItem Content="Today" Tag="Today"/>
+                                <ComboBoxItem Content="Yesterday" Tag="Yesterday"/>
+                                <ComboBoxItem Content="This Week" Tag="Week"/>
+                                <ComboBoxItem Content="All Time" Tag="All"/>
+                            </ComboBox>
+                            <Button x:Name="CopyHistoryBtn" Content="📋 Copy" Click="CopyHistory_Click"/>
+                        </StackPanel>
+                    </Grid>
+                    
+                    <ListView x:Name="InlineHistoryListView" MaxHeight="300" SelectionMode="Extended" PreviewKeyDown="HistoryList_KeyDown">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="150"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Time}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Result}"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding Message}" TextWrapping="Wrap"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
                     
                     <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,12,0,0">
                         <Button x:Name="RunTaskButton" Content="Run Now" Click="RunTask_Click" Style="{StaticResource AccentButtonStyle}"/>
@@ -331,6 +373,51 @@
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
+            </ScrollViewer>
+        </ContentDialog>
+
+        <ContentDialog x:Name="TaskHistoryDialog"
+                       Title="Task History"
+                       CloseButtonText="Close"
+                       DefaultButton="Close">
+            <ScrollViewer MaxHeight="600" VerticalScrollBarVisibility="Auto">
+                <StackPanel Spacing="8" MinWidth="600">
+                    <TextBlock x:Name="HistoryTaskInfo" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"/>
+                    <ListView x:Name="HistoryListView" MaxHeight="500">
+                        <ListView.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid Padding="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="180"/>
+                                        <ColumnDefinition Width="120"/>
+                                        <ColumnDefinition Width="80"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Time" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Grid.Column="1" Text="Result" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Grid.Column="2" Text="Exit Code" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Grid.Column="3" Text="Message" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.HeaderTemplate>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="180"/>
+                                        <ColumnDefinition Width="120"/>
+                                        <ColumnDefinition Width="80"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Time}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Result}"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding ExitCode}"/>
+                                    <TextBlock Grid.Column="3" Text="{Binding Message}" TextWrapping="Wrap"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
             </ScrollViewer>
         </ContentDialog>
     </Grid>
