@@ -766,5 +766,21 @@ namespace FluentTaskScheduler.Services
                  _ => WhichWeek.FirstWeek
              };
         }
+        public string GetTaskXml(string path)
+        {
+            using (var ts = new TaskService())
+            {
+                var task = ts.GetTask(path);
+                return task?.Xml ?? "";
+            }
+        }
+
+        public void UpdateTaskXml(string path, string xml)
+        {
+            using (var ts = new TaskService())
+            {
+                ts.RootFolder.RegisterTask(path, xml, TaskCreation.CreateOrUpdate, null, null, TaskLogonType.InteractiveToken);
+            }
+        }
     }
 }

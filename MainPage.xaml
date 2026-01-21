@@ -153,6 +153,7 @@
                         <Button x:Name="StopTaskButton" Content="Stop" Click="StopTask_Click"/>
                         <Button x:Name="EditTaskButton" Content="Edit" Click="EditTask_Click"/>
                         <Button x:Name="ExportTaskButton" Content="Export" Click="ExportTask_Click"/>
+                        <Button x:Name="EditXmlButton" Content="Edit XML" Click="EditXml_Click"/>
                         <Button x:Name="DeleteTaskButton" Content="Delete" Click="DeleteTask_Click" />
                     </StackPanel>
                 </StackPanel>

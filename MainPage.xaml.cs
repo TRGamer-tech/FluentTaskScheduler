@@ -890,6 +890,64 @@ namespace FluentTaskScheduler
         }
     }
 
+        private async void EditXml_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedTask == null) return;
+
+            // Hide main dialog to show the editor (WinUI only allows one ContentDialog at a time)
+            TaskDetailsDialog.Hide();
+
+            try
+            {
+                string xml = await Task.Run(() => _taskService.GetTaskXml(_selectedTask.Path));
+                var dialog = new FluentTaskScheduler.Dialogs.XmlEditorDialog(xml);
+                dialog.XamlRoot = this.XamlRoot;
+                
+                var result = await dialog.ShowAsync();
+
+                if (result == ContentDialogResult.Primary)
+                {
+                     string newXml = dialog.XmlContent;
+                     try 
+                     {
+                        await Task.Run(() => _taskService.UpdateTaskXml(_selectedTask.Path, newXml));
+                        
+                        // Refresh task details to reflect potentially changed name/author/etc
+                        var updatedTask = await Task.Run(() => _taskService.GetTaskDetails(_selectedTask.Path));
+                        if (updatedTask != null)
+                        {
+                            _selectedTask = updatedTask;
+                            // Update UI fields
+                            DialogTaskName.Text = updatedTask.Name;
+                            DialogTaskDescription.Text = updatedTask.Description;
+                            DialogTaskAuthor.Text = updatedTask.Author;
+                            RunTaskButton.IsEnabled = updatedTask.IsEnabled;
+                        }
+                     }
+                     catch (Exception ex)
+                     {
+                         var errDialog = new ContentDialog
+                         {
+                             Title = "Error Saving XML",
+                             Content = ex.Message,
+                             CloseButtonText = "OK",
+                             XamlRoot = this.XamlRoot
+                         };
+                         await errDialog.ShowAsync();
+                     }
+                }
+            }
+            catch (Exception ex)
+            {
+                 // Handle errors getting XML
+            }
+            finally
+            {
+                // Re-show the details dialog
+                await TaskDetailsDialog.ShowAsync();
+            }
+        }
+
         private async void ExportTask_Click(object sender, RoutedEventArgs e)
         {
             if (_selectedTask == null) return;
