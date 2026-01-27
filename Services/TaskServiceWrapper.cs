@@ -4,6 +4,7 @@ using System.Linq;
 using System.Diagnostics.Eventing.Reader;
 using Microsoft.Win32.TaskScheduler;
 using FluentTaskScheduler.Models;
+using System.Security.Principal;
 
 namespace FluentTaskScheduler.Services
 {
@@ -506,7 +507,10 @@ namespace FluentTaskScheduler.Services
                             Time = record.TimeCreated?.ToString("yyyy-MM-dd HH:mm:ss") ?? "Unknown",
                             Result = GetEventResult(record.Id),
                             ExitCode = GetEventExitCode(record),
-                            Message = record.FormatDescription() ?? record.LevelDisplayName ?? ""
+                            Message = record.FormatDescription() ?? record.LevelDisplayName ?? "",
+                            EventId = record.Id,
+                            ActivityId = record.ActivityId,
+                            User = GetUserFromRecord(record)
                         };
                         history.Add(entry);
                     }
@@ -557,6 +561,20 @@ namespace FluentTaskScheduler.Services
             catch
             {
                 return "-";
+            }
+        }
+
+        private string GetUserFromRecord(EventRecord record)
+        {
+            try
+            {
+                var userId = record.UserId;
+                if (userId == null) return "";
+                return userId.Translate(typeof(NTAccount)).ToString();
+            }
+            catch
+            {
+                return record.UserId?.ToString() ?? "";
             }
         }
 

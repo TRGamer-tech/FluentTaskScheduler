@@ -134,18 +134,57 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Recent History" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,0,16,0">
                             <ComboBox x:Name="HistoryFilterCombo" SelectedIndex="0" SelectionChanged="HistoryFilter_Changed" MinWidth="150">
                                 <ComboBoxItem Content="Today" Tag="Today"/>
                                 <ComboBoxItem Content="Yesterday" Tag="Yesterday"/>
                                 <ComboBoxItem Content="This Week" Tag="Week"/>
                                 <ComboBoxItem Content="All Time" Tag="All"/>
                             </ComboBox>
+                            <Button x:Name="ExportHistoryCsvBtn" Content="Export CSV" Click="ExportHistoryCsv_Click" />
                             <Button x:Name="CopyHistoryBtn" Content="📋 Copy" Click="CopyHistory_Click"/>
                         </StackPanel>
                     </Grid>
                     
-                    <ListView x:Name="InlineHistoryListView" MaxHeight="300" SelectionMode="Extended" PreviewKeyDown="HistoryList_KeyDown">
+                    <!-- Stats Panel -->
+                    <Grid x:Name="HistoryStatsGrid" ColumnSpacing="12" Margin="0,0,0,8" Visibility="Collapsed">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <Grid Grid.Column="0" Padding="8,4" Background="Transparent" Tapped="StatTotal_Tapped" CornerRadius="4">
+                            <StackPanel>
+                                <TextBlock Text="Total Runs" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                                <TextBlock x:Name="StatTotalRuns" Text="-" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Grid>
+                        
+                        <Grid Grid.Column="1" Padding="8,4" Background="Transparent" Tapped="StatSuccess_Tapped" CornerRadius="4">
+                            <StackPanel>
+                                <TextBlock Text="Success" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                                <TextBlock x:Name="StatSuccess" Text="-" FontWeight="SemiBold" Foreground="LightGreen"/>
+                            </StackPanel>
+                        </Grid>
+                        
+                        <Grid Grid.Column="2" Padding="8,4" Background="Transparent" Tapped="StatFailed_Tapped" CornerRadius="4">
+                            <StackPanel>
+                                <TextBlock Text="Failed" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                                <TextBlock x:Name="StatFailed" Text="-" FontWeight="SemiBold" Foreground="LightSalmon"/>
+                            </StackPanel>
+                        </Grid>
+                        
+                        <Grid Grid.Column="3" Padding="8,4">
+                            <StackPanel>
+                                <TextBlock Text="Last Result" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                                <TextBlock x:Name="StatLastResult" Text="-" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                    
+                    <ListView x:Name="InlineHistoryListView" MaxHeight="300" SelectionMode="Extended" PreviewKeyDown="HistoryList_KeyDown" Margin="0,0,16,0">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Padding="8">

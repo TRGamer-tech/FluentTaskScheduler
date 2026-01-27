@@ -20,6 +20,7 @@ namespace FluentTaskScheduler
         private Microsoft.UI.Dispatching.DispatcherQueue _dispatcherQueue = null!;
         private Microsoft.UI.Dispatching.DispatcherQueueTimer _searchDebounceTimer = null!;
         private List<TaskHistoryEntry> _fullHistory = new List<TaskHistoryEntry>();
+        private string _historyStatusFilter = "Total";
 
         public MainPage()
         {
@@ -652,6 +653,7 @@ namespace FluentTaskScheduler
                 
                 // Store full history and apply default filter (Today)
                 _fullHistory = history ?? new List<TaskHistoryEntry>();
+                _historyStatusFilter = "Total"; // Reset status filter
                 
                 // Reset dropdown UI to match
                 if (HistoryFilterCombo != null) HistoryFilterCombo.SelectedIndex = 0;
@@ -672,6 +674,24 @@ namespace FluentTaskScheduler
             
             var filter = (HistoryFilterCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "Today";
             ApplyHistoryFilterByTag(filter);
+        }
+
+        private void StatTotal_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            _historyStatusFilter = "Total";
+            HistoryFilter_Changed(this, null!);
+        }
+
+        private void StatSuccess_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            _historyStatusFilter = "Success";
+            HistoryFilter_Changed(this, null!);
+        }
+
+        private void StatFailed_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            _historyStatusFilter = "Failed";
+            HistoryFilter_Changed(this, null!);
         }
 
         private void HistoryList_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
@@ -748,7 +768,111 @@ namespace FluentTaskScheduler
                     break;
             }
 
+            // Calculate stats based on time-filtered history (before status filter)
+            CalculateAndShowStats(filtered);
+
+            // Apply Status Filter
+            if (_historyStatusFilter == "Success")
+            {
+                filtered = filtered.Where(h => h.EventId == 102 || h.EventId == 201).ToList();
+            }
+            else if (_historyStatusFilter == "Failed")
+            {
+                filtered = filtered.Where(h => h.EventId == 103 || (int.TryParse(h.ExitCode, out int code) && code != 0)).ToList();
+            }
+
             InlineHistoryListView.ItemsSource = filtered;
+        }
+
+        private void CalculateAndShowStats(List<TaskHistoryEntry> history)
+        {
+            if (_fullHistory == null || _fullHistory.Count == 0)
+            {
+                HistoryStatsGrid.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            HistoryStatsGrid.Visibility = Visibility.Visible;
+
+            if (history == null || history.Count == 0)
+            {
+                StatTotalRuns.Text = "0";
+                StatSuccess.Text = "0";
+                StatFailed.Text = "0";
+                StatLastResult.Text = "-";
+                return;
+            }
+
+            // Stats calculation
+            int total = history.Count;
+            int success = history.Count(h => h.EventId == 102 || h.EventId == 201); // 102=Task Completed, 201=Action Completed
+            int failed = history.Count(h => h.EventId == 103 || (int.TryParse(h.ExitCode, out int code) && code != 0));
+            var last = history.FirstOrDefault();
+
+            StatTotalRuns.Text = total.ToString();
+            StatSuccess.Text = success.ToString();
+            StatFailed.Text = failed.ToString();
+
+            if (last != null)
+            {
+                bool lastOk = last.EventId == 102 || last.EventId == 201 || last.ExitCode == "0";
+                StatLastResult.Text = lastOk ? "Success" : "Failed";
+                StatLastResult.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(lastOk ? Microsoft.UI.Colors.LightGreen : Microsoft.UI.Colors.LightSalmon);
+            }
+            else
+            {
+                StatLastResult.Text = "-";
+                StatLastResult.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White);
+            }
+        }
+
+        private async void ExportHistoryCsv_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedTask == null || InlineHistoryListView.ItemsSource is not List<TaskHistoryEntry> history || history.Count == 0) return;
+
+            try
+            {
+                var savePicker = new Windows.Storage.Pickers.FileSavePicker();
+                var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.m_window);
+                WinRT.Interop.InitializeWithWindow.Initialize(savePicker, hwnd);
+
+                savePicker.SuggestedFileName = $"{_selectedTask.Name}_History";
+                savePicker.FileTypeChoices.Add("CSV File", new List<string> { ".csv" });
+
+                var file = await savePicker.PickSaveFileAsync();
+                if (file != null)
+                {
+                    var sb = new System.Text.StringBuilder();
+                    sb.AppendLine("Time,EventId,Result,User,ExitCode,Message");
+
+                    foreach (var h in history)
+                    {
+                        sb.AppendLine($"\"{h.Time}\",{h.EventId},\"{h.Result}\",\"{h.User}\",{h.ExitCode},\"{h.Message.Replace("\"", "\"\"")}\"");
+                    }
+
+                    await Windows.Storage.FileIO.WriteTextAsync(file, sb.ToString());
+
+                    var dlg = new ContentDialog
+                    {
+                        Title = "Export Successful",
+                        Content = $"History exported to {file.Name}",
+                        CloseButtonText = "OK",
+                        XamlRoot = this.XamlRoot
+                    };
+                    await dlg.ShowAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                var dlg = new ContentDialog
+                {
+                    Title = "Export Failed",
+                    Content = ex.Message,
+                    CloseButtonText = "OK",
+                    XamlRoot = this.XamlRoot
+                };
+                await dlg.ShowAsync();
+            }
         }
 
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
