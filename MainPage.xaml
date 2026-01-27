@@ -222,7 +222,35 @@
                 
                 <!-- Trigger Section -->
                 <Rectangle Height="2" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,12,0,4"/>
-                <TextBlock x:Uid="TriggerTitle" Text="Trigger" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
+                <TextBlock x:Uid="TriggerTitle" Text="Triggers" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
+                
+                <Grid ColumnSpacing="8" Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <ListView x:Name="TriggerList" Height="100" BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" SelectionMode="Single" SelectionChanged="TriggerList_SelectionChanged">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="{Binding TriggerType}" FontWeight="SemiBold"/>
+                                    <TextBlock Text="at" Opacity="0.7"/>
+                                    <TextBlock Text="{Binding ScheduleInfo}" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    
+                    <StackPanel Grid.Column="1" Spacing="4">
+                        <Button x:Name="BtnAddTrigger" Content="+" Width="32" Click="BtnAddTrigger_Click" ToolTipService.ToolTip="Add Trigger"/>
+                        <Button x:Name="BtnRemoveTrigger" Content="&#x2212;" Width="32" Click="BtnRemoveTrigger_Click" ToolTipService.ToolTip="Remove Trigger"/>
+                        <Button x:Name="BtnMoveTriggerUp" Content="^" Width="32" Click="BtnMoveTriggerUp_Click" ToolTipService.ToolTip="Move Up" FontSize="12"/>
+                        <Button x:Name="BtnMoveTriggerDown" Content="v" Width="32" Click="BtnMoveTriggerDown_Click" ToolTipService.ToolTip="Move Down" FontSize="11"/>
+                    </StackPanel>
+                </Grid>
+
+                <StackPanel x:Name="TriggerDetailsPanel" Spacing="0" Visibility="Collapsed">
                 <ComboBox x:Name="EditTaskTriggerType" x:Uid="TriggerTypeHeader" Header="Trigger Type" SelectedIndex="0" SelectionChanged="EditTaskTriggerType_SelectionChanged" HorizontalAlignment="Stretch">
                     <ComboBoxItem Content="Daily" Tag="Daily"/>
                     <ComboBoxItem Content="Weekly" Tag="Weekly"/>
@@ -232,7 +260,7 @@
                     <ComboBoxItem Content="One Time" Tag="Once"/>
                     <ComboBoxItem Content="On an event" Tag="Event"/>
                 </ComboBox>
-                <StackPanel Spacing="8">
+                <StackPanel Spacing="8" Margin="0,8,0,0">
                      <StackPanel x:Name="PanelStartTime" Spacing="16">
                          <DatePicker x:Name="EditTaskStartDate" HorizontalAlignment="Left"/>
                          <TimePicker x:Name="EditTaskStartTime" HorizontalAlignment="Left" ClockIdentifier="24HourClock"/>
@@ -364,6 +392,7 @@
                          <TimePicker x:Name="EditTaskExpirationTime" HorizontalAlignment="Left" ClockIdentifier="24HourClock"/>
                      </StackPanel>
                 </StackPanel>
+                </StackPanel> <!-- End TriggerDetailsPanel -->
                 
                 <!-- Repetition Section -->
                 <Rectangle Height="2" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,12,0,4"/>

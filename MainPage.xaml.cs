@@ -59,6 +59,10 @@ namespace FluentTaskScheduler
         private ObservableCollection<TaskActionModel> _tempActions = new();
         private bool _isPopulatingActionDetails = false;
 
+        // Multiple Triggers Support
+        private ObservableCollection<TaskTriggerModel> _tempTriggers = new();
+        private bool _isPopulatingTriggerDetails = false;
+
         private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
             if (args.InvokedItemContainer is NavigationViewItem item && item.Tag != null && item.Tag.ToString() == "Add")
@@ -263,6 +267,17 @@ namespace FluentTaskScheduler
             _tempActions.Add(new TaskActionModel { Command = "notepad.exe" });
             ActionList.ItemsSource = _tempActions;
             ActionList.SelectedIndex = 0;
+            
+            // Initialize Triggers List for New Task
+            _tempTriggers = new ObservableCollection<TaskTriggerModel>();
+            _tempTriggers.Add(new TaskTriggerModel 
+            { 
+                TriggerType = "Daily", 
+                ScheduleInfo = DateTime.Now.ToString("g"),
+                DailyInterval = 1
+            });
+            TriggerList.ItemsSource = _tempTriggers;
+            TriggerList.SelectedIndex = 0;
             
             // Reset granular triggers
             DailyInterval.Text = "1";
@@ -543,86 +558,62 @@ namespace FluentTaskScheduler
                     ActionList.ItemsSource = _tempActions;
                     if (_tempActions.Count > 0) ActionList.SelectedIndex = 0;
                     
-                    // Parse Start Time/Date from ScheduleInfo if possible, else default
-                    DateTime start = DateTime.Now;
-                    if (!string.IsNullOrWhiteSpace(_selectedTask.ScheduleInfo) && DateTime.TryParse(_selectedTask.ScheduleInfo, out var parsedStart))
+                    // Initialize Triggers List (Deep Copy)
+                    _tempTriggers = new ObservableCollection<TaskTriggerModel>();
+                    if (_selectedTask.TriggersList != null && _selectedTask.TriggersList.Count > 0)
                     {
-                        start = parsedStart;
-                    }
-                    EditTaskStartDate.Date = start;
-                    EditTaskStartTime.Time = start.TimeOfDay;
-
-                    // Set trigger type
-                    for (int i = 0; i < EditTaskTriggerType.Items.Count; i++)
-                    {
-                        if ((EditTaskTriggerType.Items[i] as ComboBoxItem)?.Tag?.ToString() == _selectedTask.TriggerType)
+                        foreach (var trig in _selectedTask.TriggersList)
                         {
-                            EditTaskTriggerType.SelectedIndex = i;
-                            break;
+                            _tempTriggers.Add(new TaskTriggerModel 
+                            { 
+                                TriggerType = trig.TriggerType,
+                                ScheduleInfo = trig.ScheduleInfo,
+                                DailyInterval = trig.DailyInterval,
+                                WeeklyInterval = trig.WeeklyInterval,
+                                WeeklyDays = new List<string>(trig.WeeklyDays),
+                                MonthlyIsDayOfWeek = trig.MonthlyIsDayOfWeek,
+                                MonthlyMonths = new List<string>(trig.MonthlyMonths),
+                                MonthlyDays = new List<int>(trig.MonthlyDays),
+                                MonthlyWeek = trig.MonthlyWeek,
+                                MonthlyDayOfWeek = trig.MonthlyDayOfWeek,
+                                ExpirationDate = trig.ExpirationDate,
+                                RandomDelay = trig.RandomDelay,
+                                EventLog = trig.EventLog,
+                                EventSource = trig.EventSource,
+                                EventId = trig.EventId,
+                                RepetitionInterval = trig.RepetitionInterval,
+                                RepetitionDuration = trig.RepetitionDuration
+                            });
                         }
                     }
-                    
-                    
-                    // Populate Granular Trigger Details
-                    DailyInterval.Text = (_selectedTask.DailyInterval > 0 ? _selectedTask.DailyInterval : 1).ToString();
-                    WeeklyInterval.Text = (_selectedTask.WeeklyInterval > 0 ? _selectedTask.WeeklyInterval : 1).ToString();
-                    
-                    // Weekly Days
-                    WeeklyMon.IsChecked = _selectedTask.WeeklyDays.Contains("Monday");
-                    WeeklyTue.IsChecked = _selectedTask.WeeklyDays.Contains("Tuesday");
-                    WeeklyWed.IsChecked = _selectedTask.WeeklyDays.Contains("Wednesday");
-                    WeeklyThu.IsChecked = _selectedTask.WeeklyDays.Contains("Thursday");
-                    WeeklyFri.IsChecked = _selectedTask.WeeklyDays.Contains("Friday");
-                    WeeklySat.IsChecked = _selectedTask.WeeklyDays.Contains("Saturday");
-                    WeeklySun.IsChecked = _selectedTask.WeeklyDays.Contains("Sunday");
-
-                    // Monthly
-                    SetMonthChecks(_selectedTask.MonthlyMonths);
-                    if (_selectedTask.MonthlyIsDayOfWeek)
-                    {
-                        MonthlyRadioOn.IsChecked = true;
-                        SetComboBoxText(MonthlyWeekCombo, _selectedTask.MonthlyWeek);
-                        SetComboBoxText(MonthlyDayCombo, _selectedTask.MonthlyDayOfWeek);
-                    }
                     else
                     {
-                        MonthlyRadioDays.IsChecked = true;
-                        // Format days list to string, e.g. "1, 15, Last"
-                        var daysList = _selectedTask.MonthlyDays.Select(d => d == 32 ? "Last" : d.ToString()).ToList();
-                        MonthlyDaysInput.Text = string.Join(", ", daysList);
+                        // Fallback: create a trigger from legacy properties
+                        _tempTriggers.Add(new TaskTriggerModel 
+                        { 
+                            TriggerType = _selectedTask.TriggerType,
+                            ScheduleInfo = _selectedTask.ScheduleInfo,
+                            DailyInterval = _selectedTask.DailyInterval,
+                            WeeklyInterval = _selectedTask.WeeklyInterval,
+                            WeeklyDays = new List<string>(_selectedTask.WeeklyDays),
+                            MonthlyIsDayOfWeek = _selectedTask.MonthlyIsDayOfWeek,
+                            MonthlyMonths = new List<string>(_selectedTask.MonthlyMonths),
+                            MonthlyDays = new List<int>(_selectedTask.MonthlyDays),
+                            MonthlyWeek = _selectedTask.MonthlyWeek,
+                            MonthlyDayOfWeek = _selectedTask.MonthlyDayOfWeek,
+                            ExpirationDate = _selectedTask.ExpirationDate,
+                            RandomDelay = _selectedTask.RandomDelay,
+                            EventLog = _selectedTask.EventLog,
+                            EventSource = _selectedTask.EventSource,
+                            EventId = _selectedTask.EventId,
+                            RepetitionInterval = _selectedTask.RepetitionInterval,
+                            RepetitionDuration = _selectedTask.RepetitionDuration
+                        });
                     }
+                    TriggerList.ItemsSource = _tempTriggers;
+                    if (_tempTriggers.Count > 0) TriggerList.SelectedIndex = 0;
 
-                    // Expiration
-                    if (_selectedTask.ExpirationDate.HasValue)
-                    {
-                        EditTaskExpires.IsChecked = true;
-                        EditTaskExpirationDate.Date = _selectedTask.ExpirationDate.Value;
-                        EditTaskExpirationTime.Time = _selectedTask.ExpirationDate.Value.TimeOfDay;
-                        EditTaskExpirationDate.IsEnabled = true;
-                        EditTaskExpirationTime.IsEnabled = true;
-                    }
-                    else
-                    {
-                        EditTaskExpires.IsChecked = false;
-                        EditTaskExpirationDate.IsEnabled = false;
-                        EditTaskExpirationTime.IsEnabled = false;
-                    }
-                    
-                    // Random Delay
-                    if (!string.IsNullOrEmpty(_selectedTask.RandomDelay))
-                    {
-                        EditTaskRandomDelay.IsChecked = true;
-                        EditTaskRandomDelayVal.IsEnabled = true;
-                        EditTaskRandomDelayVal.Text = _selectedTask.RandomDelay;
-                    }
-                    else
-                    {
-                         EditTaskRandomDelay.IsChecked = false;
-                         EditTaskRandomDelayVal.IsEnabled = false;
-                         EditTaskRandomDelayVal.Text = "";
-                    }
-
-                    // Stop If Runs Longer Than
+                    // Stop If Runs Longer Than (task level setting, not trigger level)
                     SetComboBoxByTag(EditTaskStopAfterVal, _selectedTask.StopIfRunsLongerThan);
                     if (!string.IsNullOrEmpty(_selectedTask.StopIfRunsLongerThan) && _selectedTask.StopIfRunsLongerThan != "PT0S")
                     {
@@ -633,14 +624,6 @@ namespace FluentTaskScheduler
                     {
                          EditTaskStopAfter.IsChecked = false;
                          EditTaskStopAfterVal.IsEnabled = false;
-                    }
-                    
-                    // Event Trigger
-                    if (_selectedTask.TriggerType == "Event")
-                    {
-                        EditTaskEventLog.Text = _selectedTask.EventLog;
-                        EditTaskEventSource.Text = _selectedTask.EventSource;
-                        EditTaskEventId.Text = _selectedTask.EventId?.ToString() ?? "";
                     }
                 }
                 else
@@ -801,6 +784,250 @@ namespace FluentTaskScheduler
             }
         }
 
+        // --- Multiple Triggers Event Handlers ---
+
+        private void TriggerList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var trigger = TriggerList.SelectedItem as TaskTriggerModel;
+            if (trigger == null)
+            {
+                TriggerDetailsPanel.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            _isPopulatingTriggerDetails = true;
+            TriggerDetailsPanel.Visibility = Visibility.Visible;
+            
+            // Populate trigger type
+            for (int i = 0; i < EditTaskTriggerType.Items.Count; i++)
+            {
+                if ((EditTaskTriggerType.Items[i] as ComboBoxItem)?.Tag?.ToString() == trigger.TriggerType)
+                {
+                    EditTaskTriggerType.SelectedIndex = i;
+                    break;
+                }
+            }
+            
+            // Populate start time
+            DateTime start = DateTime.Now;
+            if (!string.IsNullOrWhiteSpace(trigger.ScheduleInfo) && DateTime.TryParse(trigger.ScheduleInfo, out var parsedStart))
+            {
+                start = parsedStart;
+            }
+            EditTaskStartDate.Date = start;
+            EditTaskStartTime.Time = start.TimeOfDay;
+            
+            // Daily
+            DailyInterval.Text = (trigger.DailyInterval > 0 ? trigger.DailyInterval : 1).ToString();
+            
+            // Weekly
+            WeeklyInterval.Text = (trigger.WeeklyInterval > 0 ? trigger.WeeklyInterval : 1).ToString();
+            WeeklyMon.IsChecked = trigger.WeeklyDays.Contains("Monday");
+            WeeklyTue.IsChecked = trigger.WeeklyDays.Contains("Tuesday");
+            WeeklyWed.IsChecked = trigger.WeeklyDays.Contains("Wednesday");
+            WeeklyThu.IsChecked = trigger.WeeklyDays.Contains("Thursday");
+            WeeklyFri.IsChecked = trigger.WeeklyDays.Contains("Friday");
+            WeeklySat.IsChecked = trigger.WeeklyDays.Contains("Saturday");
+            WeeklySun.IsChecked = trigger.WeeklyDays.Contains("Sunday");
+            
+            // Monthly
+            SetMonthChecks(trigger.MonthlyMonths);
+            if (trigger.MonthlyIsDayOfWeek)
+            {
+                MonthlyRadioOn.IsChecked = true;
+                SetComboBoxText(MonthlyWeekCombo, trigger.MonthlyWeek);
+                SetComboBoxText(MonthlyDayCombo, trigger.MonthlyDayOfWeek);
+            }
+            else
+            {
+                MonthlyRadioDays.IsChecked = true;
+                var daysList = trigger.MonthlyDays.Select(d => d == 32 ? "Last" : d.ToString()).ToList();
+                MonthlyDaysInput.Text = string.Join(", ", daysList);
+            }
+            
+            // Expiration
+            if (trigger.ExpirationDate.HasValue)
+            {
+                EditTaskExpires.IsChecked = true;
+                EditTaskExpirationDate.Date = trigger.ExpirationDate.Value;
+                EditTaskExpirationTime.Time = trigger.ExpirationDate.Value.TimeOfDay;
+                EditTaskExpirationDate.IsEnabled = true;
+                EditTaskExpirationTime.IsEnabled = true;
+            }
+            else
+            {
+                EditTaskExpires.IsChecked = false;
+                EditTaskExpirationDate.IsEnabled = false;
+                EditTaskExpirationTime.IsEnabled = false;
+            }
+            
+            // Random Delay
+            if (!string.IsNullOrEmpty(trigger.RandomDelay))
+            {
+                EditTaskRandomDelay.IsChecked = true;
+                EditTaskRandomDelayVal.IsEnabled = true;
+                EditTaskRandomDelayVal.Text = trigger.RandomDelay;
+            }
+            else
+            {
+                EditTaskRandomDelay.IsChecked = false;
+                EditTaskRandomDelayVal.IsEnabled = false;
+                EditTaskRandomDelayVal.Text = "";
+            }
+            
+            // Event Trigger
+            if (trigger.TriggerType == "Event")
+            {
+                EditTaskEventLog.Text = trigger.EventLog;
+                EditTaskEventSource.Text = trigger.EventSource;
+                EditTaskEventId.Text = trigger.EventId?.ToString() ?? "";
+            }
+            
+            // Repetition
+            SetComboBoxByTag(EditTaskRepetitionInterval, trigger.RepetitionInterval);
+            SetComboBoxByTag(EditTaskRepetitionDuration, trigger.RepetitionDuration);
+
+            UpdateTriggerPanelVisibility();
+            
+            // Enable/Disable move buttons
+            int index = TriggerList.SelectedIndex;
+            BtnMoveTriggerUp.IsEnabled = index > 0;
+            BtnMoveTriggerDown.IsEnabled = index >= 0 && index < _tempTriggers.Count - 1;
+            
+            _isPopulatingTriggerDetails = false;
+        }
+
+        private void BtnAddTrigger_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var newTrigger = new TaskTriggerModel 
+                { 
+                    TriggerType = "Daily", 
+                    ScheduleInfo = DateTime.Now.ToString("g"),
+                    DailyInterval = 1
+                };
+                _tempTriggers.Add(newTrigger);
+                TriggerList.SelectedItem = newTrigger;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error adding trigger: {ex.Message}");
+            }
+        }
+
+        private void BtnRemoveTrigger_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var trigger = TriggerList.SelectedItem as TaskTriggerModel;
+                if (trigger != null && _tempTriggers.Count > 1) // Keep at least one trigger
+                {
+                    _tempTriggers.Remove(trigger);
+                    if (_tempTriggers.Count > 0) TriggerList.SelectedIndex = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error removing trigger: {ex.Message}");
+            }
+        }
+
+        private void BtnMoveTriggerUp_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                int index = TriggerList.SelectedIndex;
+                if (index > 0)
+                {
+                    _tempTriggers.Move(index, index - 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error moving trigger up: {ex.Message}");
+            }
+        }
+
+        private void BtnMoveTriggerDown_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                int index = TriggerList.SelectedIndex;
+                if (index >= 0 && index < _tempTriggers.Count - 1)
+                {
+                    _tempTriggers.Move(index, index + 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error moving trigger down: {ex.Message}");
+            }
+        }
+
+        private void SaveCurrentTriggerToModel()
+        {
+            if (_isPopulatingTriggerDetails) return;
+            if (TriggerList.SelectedItem is not TaskTriggerModel trigger) return;
+            
+            // Trigger type
+            trigger.TriggerType = (EditTaskTriggerType.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "Daily";
+            
+            // Start time
+            var startDate = EditTaskStartDate.Date.Date;
+            var startTime = EditTaskStartTime.Time;
+            trigger.ScheduleInfo = (startDate + startTime).ToString("g");
+            
+            // Daily
+            if (short.TryParse(DailyInterval.Text, out short dailyInt) && dailyInt > 0)
+                trigger.DailyInterval = dailyInt;
+            
+            // Weekly
+            if (short.TryParse(WeeklyInterval.Text, out short weeklyInt) && weeklyInt > 0)
+                trigger.WeeklyInterval = weeklyInt;
+            trigger.WeeklyDays = GetWeeklyDays();
+            
+            // Monthly
+            trigger.MonthlyMonths = GetSelectedMonths();
+            trigger.MonthlyIsDayOfWeek = MonthlyRadioOn.IsChecked == true;
+            if (trigger.MonthlyIsDayOfWeek)
+            {
+                trigger.MonthlyWeek = (MonthlyWeekCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "First";
+                trigger.MonthlyDayOfWeek = (MonthlyDayCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Monday";
+            }
+            else
+            {
+                trigger.MonthlyDays = ParseMonthlyDays(MonthlyDaysInput.Text);
+            }
+            
+            // Expiration
+            if (EditTaskExpires.IsChecked == true)
+            {
+                var expDate = EditTaskExpirationDate.Date.Date;
+                var expTime = EditTaskExpirationTime.Time;
+                trigger.ExpirationDate = expDate + expTime;
+            }
+            else
+            {
+                trigger.ExpirationDate = null;
+            }
+            
+            // Random Delay
+            trigger.RandomDelay = EditTaskRandomDelay.IsChecked == true ? EditTaskRandomDelayVal.Text : "";
+            
+            // Event
+            if (trigger.TriggerType == "Event")
+            {
+                trigger.EventLog = EditTaskEventLog.Text;
+                trigger.EventSource = EditTaskEventSource.Text;
+                trigger.EventId = int.TryParse(EditTaskEventId.Text, out int eid) ? eid : null;
+            }
+            
+            // Repetition
+            trigger.RepetitionInterval = (EditTaskRepetitionInterval.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "";
+            trigger.RepetitionDuration = (EditTaskRepetitionDuration.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "";
+        }
+
         private void SetComboBoxByTag(ComboBox comboBox, string tag)
         {
             for (int i = 0; i < comboBox.Items.Count; i++)
@@ -898,13 +1125,8 @@ namespace FluentTaskScheduler
 
             try
             {
-                var triggerTag = (EditTaskTriggerType.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "Daily";
-                
-                // Construct Start DateTime
-                // Construct Start DateTime
-                var startDate = EditTaskStartDate.Date.Date;
-                var startTime = EditTaskStartTime.Time;
-                var startDateTime = startDate + startTime;
+                // Save current trigger state before saving
+                SaveCurrentTriggerToModel();
                 
                 var newTask = new ScheduledTaskModel
                 {
@@ -912,45 +1134,23 @@ namespace FluentTaskScheduler
                     Description = EditTaskDescription.Text,
                     Author = EditTaskAuthor.Text,
                     IsEnabled = EditTaskEnabled.IsOn,
-                    Actions = new ObservableCollection<TaskActionModel>(_tempActions), // Save Actions
-                    ScheduleInfo = startDateTime.ToString("yyyy-MM-dd HH:mm:ss"), // Store full start time
-                    TriggerType = triggerTag,
+                    Actions = new ObservableCollection<TaskActionModel>(_tempActions),
+                    TriggersList = new ObservableCollection<TaskTriggerModel>(_tempTriggers),
+                    RunWithHighestPrivileges = EditTaskRunWithHighestPrivileges.IsChecked ?? false,
                     
-                    // Trigger Specifics
-                    DailyInterval = short.TryParse(DailyInterval.Text, out var daily) ? daily : (short)1,
-                    WeeklyInterval = short.TryParse(WeeklyInterval.Text, out var weekly) ? weekly : (short)1,
-                    WeeklyDays = GetWeeklyDays(),
-                    
-                    MonthlyIsDayOfWeek = MonthlyRadioOn.IsChecked == true,
-                    MonthlyMonths = GetSelectedMonths(),
-                    MonthlyDays = ParseMonthlyDays(MonthlyDaysInput.Text),
-                    MonthlyWeek = (MonthlyWeekCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "First",
-                    MonthlyDayOfWeek = (MonthlyDayCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Monday",
-
-                    ExpirationDate = EditTaskExpires.IsChecked == true 
-                        ? EditTaskExpirationDate.Date.Date + EditTaskExpirationTime.Time 
-                        : null,
-                    
-                    RandomDelay = EditTaskRandomDelay.IsChecked == true ? EditTaskRandomDelayVal.Text : "",
-                    
-                    // Advanced settings
-                    RepetitionInterval = (EditTaskRepetitionInterval.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "",
-                    RepetitionDuration = (EditTaskRepetitionDuration.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "",
+                    // Conditions
                     OnlyIfIdle = EditTaskOnlyIfIdle.IsChecked ?? false,
                     OnlyIfAC = EditTaskOnlyIfAC.IsChecked ?? false,
                     OnlyIfNetwork = EditTaskOnlyIfNetwork.IsChecked ?? false,
                     WakeToRun = EditTaskWakeToRun.IsChecked ?? false,
                     StopOnBattery = EditTaskStopOnBattery.IsChecked ?? false,
+                    
+                    // Settings
                     StopIfRunsLongerThan = EditTaskStopAfter.IsChecked == true ? ((EditTaskStopAfterVal.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "PT72H") : "",
                     RunIfMissed = EditTaskRunIfMissed.IsChecked ?? false,
                     RestartOnFailure = EditTaskRestartOnFailure.IsChecked ?? false,
                     RestartInterval = ParseRestartInterval(),
-                    RestartCount = int.TryParse(EditTaskRestartCount.Text, out var count) ? count : 3,
-                    
-                    // Event Log
-                    EventLog = EditTaskEventLog.Text,
-                    EventSource = EditTaskEventSource.Text,
-                    EventId = int.TryParse(EditTaskEventId.Text, out var eid) ? eid : null
+                    RestartCount = int.TryParse(EditTaskRestartCount.Text, out var count) ? count : 3
                 };
 
                 if (_isEditMode && _selectedTask != null)
