@@ -164,19 +164,6 @@
                         <Button x:Name="CloneTaskButton" Content="Clone" Click="CloneTask_Click"/>
                         <Button x:Name="ExportTaskButton" Content="Export" Click="ExportTask_Click"/>
                         <Button x:Name="EditXmlButton" Content="Edit XML" Click="EditXml_Click"/>
-                        <Button x:Name="DisableForButton" Content="Disable for...">
-                            <Button.Flyout>
-                                <MenuFlyout>
-                                    <MenuFlyoutItem Text="1 Hour" Tag="1" Click="DisableFor_Click"/>
-                                    <MenuFlyoutItem Text="2 Hours" Tag="2" Click="DisableFor_Click"/>
-                                    <MenuFlyoutItem Text="4 Hours" Tag="4" Click="DisableFor_Click"/>
-                                    <MenuFlyoutItem Text="8 Hours" Tag="8" Click="DisableFor_Click"/>
-                                    <MenuFlyoutItem Text="24 Hours" Tag="24" Click="DisableFor_Click"/>
-                                    <MenuFlyoutSeparator/>
-                                    <MenuFlyoutItem Text="Custom..." Click="DisableForCustom_Click"/>
-                                </MenuFlyout>
-                            </Button.Flyout>
-                        </Button>
                         <Button x:Name="DeleteTaskButton" Content="Delete" Click="DeleteTask_Click" />
                     </StackPanel>
                 </StackPanel>
