@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -37,7 +39,9 @@ namespace FluentTaskScheduler.Models
         public DateTime? LastRunTime { get; set; }
         public DateTime? NextRunTime { get; set; }
         public int LastTaskResult { get; set; }
-        public string Triggers { get; set; } = "";
+        public string Triggers { get; set; } = ""; // Label for display
+
+        public ObservableCollection<TaskTriggerModel> TriggersList { get; set; } = new();
 
         public bool IsEnabled 
         { 
@@ -85,36 +89,103 @@ namespace FluentTaskScheduler.Models
             }
         }
         
-        public string ScheduleInfo { get; set; } = "";
-        public string TriggerType { get; set; } = "Daily";
+        public string ScheduleInfo 
+        { 
+            get => TriggersList.Count > 0 ? TriggersList[0].ScheduleInfo : ""; 
+            set { if (TriggersList.Count == 0) TriggersList.Add(new TaskTriggerModel()); TriggersList[0].ScheduleInfo = value; OnPropertyChanged(); }
+        }
+        public string TriggerType 
+        { 
+            get => TriggersList.Count > 0 ? TriggersList[0].TriggerType : "Daily"; 
+            set { if (TriggersList.Count == 0) TriggersList.Add(new TaskTriggerModel()); TriggersList[0].TriggerType = value; OnPropertyChanged(); }
+        }
         public bool RunWithHighestPrivileges { get; set; } = false;
         
-        // Trigger Specifics
-        public short DailyInterval { get; set; } = 1;
-        public short WeeklyInterval { get; set; } = 1;
-        public System.Collections.Generic.List<string> WeeklyDays { get; set; } = new();
+        // Trigger Specifics Proxy
+        public short DailyInterval 
+        { 
+            get => TriggersList.Count > 0 ? TriggersList[0].DailyInterval : (short)1; 
+            set { if (TriggersList.Count == 0) TriggersList.Add(new TaskTriggerModel()); TriggersList[0].DailyInterval = value; OnPropertyChanged(); }
+        }
+        public short WeeklyInterval 
+        { 
+            get => TriggersList.Count > 0 ? TriggersList[0].WeeklyInterval : (short)1; 
+            set { if (TriggersList.Count == 0) TriggersList.Add(new TaskTriggerModel()); TriggersList[0].WeeklyInterval = value; OnPropertyChanged(); }
+        }
+        public List<string> WeeklyDays 
+        { 
+            get => TriggersList.Count > 0 ? TriggersList[0].WeeklyDays : new List<string>(); 
+            set { if (TriggersList.Count == 0) TriggersList.Add(new TaskTriggerModel()); TriggersList[0].WeeklyDays = value; OnPropertyChanged(); }
+        }
         
-        // Monthly
-        public bool MonthlyIsDayOfWeek { get; set; } // false=Days (1, 15), true=On (First Monday)
-        public System.Collections.Generic.List<string> MonthlyMonths { get; set; } = new();
-        public System.Collections.Generic.List<int> MonthlyDays { get; set; } = new();
-        public string MonthlyWeek { get; set; } = "First"; // First, Second, Third, Fourth, Last
-        public string MonthlyDayOfWeek { get; set; } = "Monday"; // Monday..Sunday
+        // Monthly Proxy
+        public bool MonthlyIsDayOfWeek 
+        { 
+            get => TriggersList.Count > 0 ? TriggersList[0].MonthlyIsDayOfWeek : false; 
+            set { if (TriggersList.Count == 0) TriggersList.Add(new TaskTriggerModel()); TriggersList[0].MonthlyIsDayOfWeek = value; OnPropertyChanged(); }
+        }
+        public List<string> MonthlyMonths 
+        { 
+            get => TriggersList.Count > 0 ? TriggersList[0].MonthlyMonths : new List<string>(); 
+            set { if (TriggersList.Count == 0) TriggersList.Add(new TaskTriggerModel()); TriggersList[0].MonthlyMonths = value; OnPropertyChanged(); }
+        }
+        public List<int> MonthlyDays 
+        { 
+            get => TriggersList.Count > 0 ? TriggersList[0].MonthlyDays : new List<int>(); 
+            set { if (TriggersList.Count == 0) TriggersList.Add(new TaskTriggerModel()); TriggersList[0].MonthlyDays = value; OnPropertyChanged(); }
+        }
+        public string MonthlyWeek 
+        { 
+            get => TriggersList.Count > 0 ? TriggersList[0].MonthlyWeek : "First"; 
+            set { if (TriggersList.Count == 0) TriggersList.Add(new TaskTriggerModel()); TriggersList[0].MonthlyWeek = value; OnPropertyChanged(); }
+        }
+        public string MonthlyDayOfWeek 
+        { 
+            get => TriggersList.Count > 0 ? TriggersList[0].MonthlyDayOfWeek : "Monday"; 
+            set { if (TriggersList.Count == 0) TriggersList.Add(new TaskTriggerModel()); TriggersList[0].MonthlyDayOfWeek = value; OnPropertyChanged(); }
+        }
 
-        // Expiration
-        public DateTime? ExpirationDate { get; set; }
+        // Expiration Proxy
+        public DateTime? ExpirationDate 
+        { 
+            get => TriggersList.Count > 0 ? TriggersList[0].ExpirationDate : null; 
+            set { if (TriggersList.Count == 0) TriggersList.Add(new TaskTriggerModel()); TriggersList[0].ExpirationDate = value; OnPropertyChanged(); }
+        }
         
-        public string RandomDelay { get; set; } = ""; // e.g., "PT1M"
+        public string RandomDelay 
+        { 
+            get => TriggersList.Count > 0 ? TriggersList[0].RandomDelay : ""; 
+            set { if (TriggersList.Count == 0) TriggersList.Add(new TaskTriggerModel()); TriggersList[0].RandomDelay = value; OnPropertyChanged(); }
+        }
         
-        // Event Log Trigger
-        public string EventLog { get; set; } = "Application";
-        public string EventSource { get; set; } = "";
-        public int? EventId { get; set; }
+        // Event Log Trigger Proxy
+        public string EventLog 
+        { 
+            get => TriggersList.Count > 0 ? TriggersList[0].EventLog : "Application"; 
+            set { if (TriggersList.Count == 0) TriggersList.Add(new TaskTriggerModel()); TriggersList[0].EventLog = value; OnPropertyChanged(); }
+        }
+        public string EventSource 
+        { 
+            get => TriggersList.Count > 0 ? TriggersList[0].EventSource : ""; 
+            set { if (TriggersList.Count == 0) TriggersList.Add(new TaskTriggerModel()); TriggersList[0].EventSource = value; OnPropertyChanged(); }
+        }
+        public int? EventId 
+        { 
+            get => TriggersList.Count > 0 ? TriggersList[0].EventId : null; 
+            set { if (TriggersList.Count == 0) TriggersList.Add(new TaskTriggerModel()); TriggersList[0].EventId = value; OnPropertyChanged(); }
+        }
 
-
-        // Repetition
-        public string RepetitionInterval { get; set; } = ""; // e.g., "PT15M" for 15 minutes
-        public string RepetitionDuration { get; set; } = ""; // e.g., "PT1H" for 1 hour, empty for indefinitely
+        // Repetition Proxy
+        public string RepetitionInterval 
+        { 
+            get => TriggersList.Count > 0 ? TriggersList[0].RepetitionInterval : ""; 
+            set { if (TriggersList.Count == 0) TriggersList.Add(new TaskTriggerModel()); TriggersList[0].RepetitionInterval = value; OnPropertyChanged(); }
+        }
+        public string RepetitionDuration 
+        { 
+            get => TriggersList.Count > 0 ? TriggersList[0].RepetitionDuration : ""; 
+            set { if (TriggersList.Count == 0) TriggersList.Add(new TaskTriggerModel()); TriggersList[0].RepetitionDuration = value; OnPropertyChanged(); }
+        }
         
         // Conditions
         public bool OnlyIfIdle { get; set; }

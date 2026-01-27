@@ -2,7 +2,6 @@
 .vs/
 [Oo]bj/
 [Bb]in/
-[Dd]ist/
 *.user
 *.suo
 *.userosscache
@@ -23,6 +22,7 @@ area.log
 ## Project Specific ##
 # Custom logs
 build_log.txt
+build_log_*.txt
 crash_log.txt
 
 # Temporary JSON inputs
@@ -30,4 +30,5 @@ fixed_input*.json
 input.json
 
 #publish directory
-publish
+[Pp]ublish/
+[Dd]ist/

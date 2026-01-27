@@ -2,7 +2,7 @@
 
 A modern, powerful, and intuitive Windows task scheduling application built with WinUI 3 and .NET 8.
 
-![App Icon](Assets/AppIcon.png)
+![App Icon](Assets/Logo.png)
 
 ## Overview
 
