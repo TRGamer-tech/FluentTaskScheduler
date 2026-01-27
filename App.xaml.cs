@@ -14,6 +14,7 @@ namespace FluentTaskScheduler
     public partial class App : Application
     {
         public static Window? m_window;
+        public Window? MainWindow => m_window;
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr GetModuleHandle(string? lpModuleName);

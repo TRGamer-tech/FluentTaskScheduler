@@ -61,6 +61,7 @@
 
                     <AutoSuggestBox x:Name="SearchBox" x:Uid="SearchBox" QueryIcon="Find" PlaceholderText="Search tasks..." Width="300" TextChanged="SearchBox_TextChanged"/>
                     <Button x:Uid="RefreshButton" Content="Refresh" Click="RefreshButton_Click" />
+                    <Button x:Name="ImportTaskButton" Content="Import Task" Click="ImportTask_Click" />
                 </StackPanel>
 
                 <ListView x:Name="TaskListView" 

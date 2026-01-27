@@ -1502,6 +1502,64 @@ namespace FluentTaskScheduler
         }
     }
 
+        private async void ImportTask_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // Create a file picker
+                var openPicker = new Windows.Storage.Pickers.FileOpenPicker();
+                
+                // Retrieve the window handle (HWND) of the current WinUI 3 window.
+                var window = (Application.Current as App)?.MainWindow;
+                var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
+                WinRT.Interop.InitializeWithWindow.Initialize(openPicker, hWnd);
+
+                openPicker.ViewMode = Windows.Storage.Pickers.PickerViewMode.List;
+                openPicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
+                openPicker.FileTypeFilter.Add(".xml");
+
+                var file = await openPicker.PickSingleFileAsync();
+                if (file != null)
+                {
+                    // Read file content
+                    var xmlContent = await Windows.Storage.FileIO.ReadTextAsync(file);
+                    
+                    // Use filename as default task name (without extension)
+                    var taskName = file.DisplayName;
+                    
+                    // Register task in current folder
+                    // Check if _currentFolderPath is valid
+                    var targetFolder = string.IsNullOrWhiteSpace(_currentFolderPath) ? "\\" : _currentFolderPath;
+                    
+                    // Optional: Ask for name confirm? 
+                    // For now, let's just try to import with filename. 
+                    _taskService.RegisterTaskFromXml(targetFolder, taskName, xmlContent);
+                    
+                    LoadTasks();
+                    
+                    var dialog = new ContentDialog
+                    {
+                         Title = "Import Successful",
+                         Content = $"Task '{taskName}' imported to '{targetFolder}'.",
+                         CloseButtonText = "OK",
+                         XamlRoot = this.XamlRoot
+                    };
+                    await dialog.ShowAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                var errorDialog = new ContentDialog
+                {
+                    Title = "Import Failed",
+                    Content = ex.Message,
+                    CloseButtonText = "OK",
+                    XamlRoot = this.XamlRoot
+                };
+                await errorDialog.ShowAsync();
+            }
+        }
+
         private async void EditXml_Click(object sender, RoutedEventArgs e)
         {
             if (_selectedTask == null) return;

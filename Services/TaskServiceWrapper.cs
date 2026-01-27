@@ -838,5 +838,16 @@ namespace FluentTaskScheduler.Services
                 }
             }
         }
+
+        public void RegisterTaskFromXml(string folderPath, string taskName, string xmlContent)
+        {
+            using (var ts = new TaskService())
+            {
+                var folder = ts.GetFolder(folderPath);
+                if (folder == null) throw new DirectoryNotFoundException($"Folder '{folderPath}' not found.");
+                
+                folder.RegisterTask(taskName, xmlContent, TaskCreation.CreateOrUpdate, null, null, TaskLogonType.InteractiveToken);
+            }
+        }
     }
 }
