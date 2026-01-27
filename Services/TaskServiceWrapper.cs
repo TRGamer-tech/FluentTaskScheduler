@@ -9,12 +9,16 @@ namespace FluentTaskScheduler.Services
 {
     public class TaskServiceWrapper
     {
-        public List<ScheduledTaskModel> GetAllTasks()
+        public List<ScheduledTaskModel> GetAllTasks(string? folderPath = null, bool recursive = true)
         {
             var tasks = new List<ScheduledTaskModel>();
             using (var ts = new TaskService())
             {
-                EnumFolderTasks(ts.RootFolder, tasks);
+                var folder = ts.GetFolder(folderPath ?? "\\");
+                if (folder != null)
+                {
+                    EnumFolderTasks(folder, tasks, recursive);
+                }
             }
             return tasks;
         }
@@ -107,7 +111,7 @@ namespace FluentTaskScheduler.Services
             }
         }
 
-        private void EnumFolderTasks(TaskFolder folder, List<ScheduledTaskModel> tasks)
+        private void EnumFolderTasks(TaskFolder folder, List<ScheduledTaskModel> tasks, bool recursive = true)
         {
             foreach (var task in folder.Tasks)
             {
@@ -202,13 +206,16 @@ namespace FluentTaskScheduler.Services
                 }
             }
 
-            foreach (var subFolder in folder.SubFolders)
+            if (recursive)
             {
-                try
+                foreach (var subFolder in folder.SubFolders)
                 {
-                    EnumFolderTasks(subFolder, tasks);
+                    try
+                    {
+                        EnumFolderTasks(subFolder, tasks, true);
+                    }
+                    catch {}
                 }
-                catch {}
             }
         }
 
@@ -763,6 +770,72 @@ namespace FluentTaskScheduler.Services
             using (var ts = new TaskService())
             {
                 ts.RootFolder.RegisterTask(path, xml, TaskCreation.CreateOrUpdate, null, null, TaskLogonType.InteractiveToken);
+            }
+        }
+        public TaskFolderModel GetFolderStructure()
+        {
+            using (var ts = new TaskService())
+            {
+                var root = new TaskFolderModel { Name = "Task Scheduler Library", Path = "\\" };
+                EnumFolders(ts.RootFolder, root);
+                return root;
+            }
+        }
+
+        private void EnumFolders(TaskFolder folder, TaskFolderModel model)
+        {
+            foreach (var subFolder in folder.SubFolders)
+            {
+                var subModel = new TaskFolderModel { Name = subFolder.Name, Path = subFolder.Path };
+                model.SubFolders.Add(subModel);
+                EnumFolders(subFolder, subModel);
+            }
+        }
+
+        public void CreateFolder(string path)
+        {
+            using (var ts = new TaskService())
+            {
+                // Ensure path starts with \
+                if (!path.StartsWith("\\")) path = "\\" + path;
+
+                // Check if already exists
+                try 
+                {
+                    if (ts.GetFolder(path) != null) return;
+                }
+                catch {}
+
+                // Split path to find parent
+                var parts = path.Split(new[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length == 0) return;
+
+                var folderName = parts.Last();
+                var parentPath = "\\" + string.Join("\\", parts.Take(parts.Length - 1));
+                
+                TaskFolder parentFolder;
+                if (string.IsNullOrWhiteSpace(parentPath) || parentPath == "\\")
+                    parentFolder = ts.RootFolder;
+                else
+                    parentFolder = ts.GetFolder(parentPath);
+                
+                if (parentFolder == null) 
+                    throw new Exception($"Parent folder '{parentPath}' not found. Please create parent folders first.");
+                
+                parentFolder.CreateFolder(folderName);
+            }
+        }
+
+        public void DeleteFolder(string path)
+        {
+            using (var ts = new TaskService())
+            {
+                var folder = ts.GetFolder(path);
+                if (folder != null && folder.Path != "\\")
+                {
+                   var parent = folder.Parent;
+                   parent?.DeleteFolder(folder.Name);
+                }
             }
         }
     }

@@ -97,10 +97,158 @@ namespace FluentTaskScheduler
 
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
+            LoadFolderStructure();
             LoadTasks();
             
             // Ensure focus is on list for immediate keyboard usage
             TaskListView.Focus(FocusState.Programmatic);
+        }
+
+        private string _currentFolderPath = "\\";
+
+        private void LoadFolderStructure()
+        {
+            try
+            {
+                var rootFolder = _taskService.GetFolderStructure();
+                NavView.MenuItems.Clear();
+                
+                // Add "Add New" button back
+                var addBtn = new NavigationViewItem { Tag = "Add", Content = "New Task", Icon = new SymbolIcon(Symbol.Add), SelectsOnInvoked = false };
+                NavView.MenuItems.Add(addBtn);
+                NavView.MenuItems.Add(new NavigationViewItemSeparator());
+
+                // Recursively add folders
+                AddFolderToNav(rootFolder, NavView.MenuItems);
+                
+                // Set default selection to root if nothing selected/matches
+                // Wait, NavView doesn't support binding SelectedItem easily to a manually created Item
+                // We'll rely on the default logic or set it later
+            }
+            catch (Exception ex)
+            {
+                 System.Diagnostics.Debug.WriteLine($"Error loading folder structure: {ex.Message}");
+            }
+        }
+
+        private void AddFolderToNav(TaskFolderModel folder, IList<object> menuItems)
+        {
+            var item = new NavigationViewItem
+            {
+                Content = folder.Name == "\\" ? "Task Scheduler Library" : folder.Name,
+                Tag = folder.Path,
+                Icon = new SymbolIcon(Symbol.Folder),
+                IsExpanded = folder.Path == "\\" // Expand root by default
+            };
+
+            // Context Menu
+            var menu = new MenuFlyout();
+            
+            var createItem = new MenuFlyoutItem { Text = "New Folder", Icon = new SymbolIcon(Symbol.NewFolder) };
+            createItem.Click += (s, e) => CreateFolder_Click(folder.Path);
+            menu.Items.Add(createItem);
+
+            if (folder.Path != "\\") // Root cannot be deleted
+            {
+                var deleteItem = new MenuFlyoutItem { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) };
+                deleteItem.Click += (s, e) => DeleteFolder_Click(folder.Path);
+                menu.Items.Add(deleteItem);
+            }
+
+            item.ContextFlyout = menu;
+
+            menuItems.Add(item);
+
+            if (folder.SubFolders.Count > 0)
+            {
+                foreach (var sub in folder.SubFolders)
+                {
+                    AddFolderToNav(sub, item.MenuItems);
+                }
+            }
+        }
+
+        private async void CreateFolder_Click(string parentPath)
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "Create New Folder",
+                PrimaryButtonText = "Create",
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Primary,
+                XamlRoot = this.XamlRoot
+            };
+
+            var input = new TextBox { PlaceholderText = "Folder Name" };
+            dialog.Content = input;
+
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(input.Text))
+            {
+                try
+                {
+                    // Construct new path
+                    var newPath = parentPath == "\\" ? "\\" + input.Text : parentPath + "\\" + input.Text;
+                    _taskService.CreateFolder(newPath);
+                    
+                    // Refresh
+                    LoadFolderStructure();
+                }
+                catch (Exception ex)
+                {
+                    var err = new ContentDialog
+                    {
+                        Title = "Error",
+                        Content = ex.Message,
+                        CloseButtonText = "OK",
+                        XamlRoot = this.XamlRoot
+                    };
+                    await err.ShowAsync();
+                }
+            }
+        }
+
+        private async void DeleteFolder_Click(string path)
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "Delete Folder",
+                Content = $"Are you sure you want to delete '{path}'? This will also delete all tasks inside it.",
+                PrimaryButtonText = "Delete",
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Close,
+                XamlRoot = this.XamlRoot
+            };
+
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                try
+                {
+                    _taskService.DeleteFolder(path);
+                    
+                    // Refresh
+                    LoadFolderStructure();
+                    
+                    // If we were viewing the deleted folder, go to root
+                    if (_currentFolderPath.StartsWith(path, StringComparison.OrdinalIgnoreCase))
+                    {
+                        NavView.SelectedItem = NavAllTasks;
+                        ApplyFilters(); // Will default to root due to "all" tag logic? No, NavAllTasks has tag "all" -> _currentFolderPath = "\"
+                    }
+                }
+                catch (Exception ex)
+                {
+                     var err = new ContentDialog
+                    {
+                        Title = "Error",
+                        Content = ex.Message,
+                        CloseButtonText = "OK",
+                        XamlRoot = this.XamlRoot
+                    };
+                    await err.ShowAsync();
+                }
+            }
         }
 
         private bool _isLoading = false;
@@ -204,6 +352,28 @@ namespace FluentTaskScheduler
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type
                     string tag = item.Tag.ToString();
 #pragma warning restore CS8600
+                    
+                    // Static filters (Footer items)
+                    if (tag == "all" || tag == "running" || tag == "enabled" || tag == "disabled")
+                    {
+                        // Footer items are "Global Views" -> clear folder restriction
+                        _currentFolderPath = "\\"; 
+                    }
+                    else if (!string.IsNullOrEmpty(tag) && tag != "Add")
+                    {
+                        // It's a folder path
+                        _currentFolderPath = tag;
+                        query = query.Where(t => 
+                        {
+                            // Exact match for folder check
+                            // Task Path: \Folder\TaskName
+                            // Folder Path: \Folder
+                            var taskDir = System.IO.Path.GetDirectoryName(t.Path);
+                            if (string.IsNullOrEmpty(taskDir)) taskDir = "\\";
+                            return taskDir.Equals(_currentFolderPath, StringComparison.OrdinalIgnoreCase);
+                        });
+                    }
+
                     if (tag == "running")
                     {
                         query = query.Where(t => t.State == "Running");
@@ -221,53 +391,9 @@ namespace FluentTaskScheduler
                 }
 
                 // Materialize query to list BEFORE modifying FilteredTasks
-                // This prevents "Collection modified" exceptions during enumeration
                 var results = query.ToList();
 
-                // Optimization: Handle initial load or empty state efficiently (O(N))
-                if (FilteredTasks.Count == 0)
-                {
-                    foreach (var taskModel in results)
-                    {
-                        FilteredTasks.Add(taskModel);
-                    }
-                    return;
-                }
-
-                // Optimization: Use HashSet for O(1) lookups instead of O(N) Linear Search
-                // This reduces the complexity from O(N^2) to O(N)
-                var resultsSet = new HashSet<ScheduledTaskModel>(results);
-                var currentSet = new HashSet<ScheduledTaskModel>(FilteredTasks);
-
-                // Synchronize FilteredTasks with results to preserve scroll position
-                // Removing items that are no longer in the filtered results
-                for (int i = FilteredTasks.Count - 1; i >= 0; i--)
-                {
-                    if (!resultsSet.Contains(FilteredTasks[i]))
-                    {
-                        currentSet.Remove(FilteredTasks[i]);
-                        FilteredTasks.RemoveAt(i);
-                    }
-                }
-
-                // Inserting or moving items to match the results list
-                for (int i = 0; i < results.Count; i++)
-                {
-                    var taskModel = results[i];
-                    if (!currentSet.Contains(taskModel))
-                    {
-                        FilteredTasks.Insert(i, taskModel);
-                        currentSet.Add(taskModel);
-                    }
-                    else
-                    {
-                        int oldIndex = FilteredTasks.IndexOf(taskModel);
-                        if (oldIndex != i)
-                        {
-                            FilteredTasks.Move(oldIndex, i);
-                        }
-                    }
-                }
+                UpdateFilteredTasksCollection(results);
             }
             catch (Exception ex)
             {
@@ -276,6 +402,53 @@ namespace FluentTaskScheduler
             finally
             {
                 _isApplyingFilters = false; // Clear guard
+            }
+        }
+
+        private void UpdateFilteredTasksCollection(List<ScheduledTaskModel> results)
+        {
+             // Optimization: Handle initial load or empty state efficiently (O(N))
+            if (FilteredTasks.Count == 0)
+            {
+                foreach (var taskModel in results)
+                {
+                    FilteredTasks.Add(taskModel);
+                }
+                return;
+            }
+
+            // Optimization: Use HashSet for O(1) lookups instead of O(N) Linear Search
+            var resultsSet = new HashSet<ScheduledTaskModel>(results);
+            var currentSet = new HashSet<ScheduledTaskModel>(FilteredTasks);
+
+            // Synchronize FilteredTasks with results to preserve scroll position
+            // Removing items that are no longer in the filtered results
+            for (int i = FilteredTasks.Count - 1; i >= 0; i--)
+            {
+                if (!resultsSet.Contains(FilteredTasks[i]))
+                {
+                    currentSet.Remove(FilteredTasks[i]);
+                    FilteredTasks.RemoveAt(i);
+                }
+            }
+
+            // Inserting or moving items to match the results list
+            for (int i = 0; i < results.Count; i++)
+            {
+                var taskModel = results[i];
+                if (!currentSet.Contains(taskModel))
+                {
+                    FilteredTasks.Insert(i, taskModel);
+                    currentSet.Add(taskModel);
+                }
+                else
+                {
+                    int oldIndex = FilteredTasks.IndexOf(taskModel);
+                    if (oldIndex != i)
+                    {
+                        FilteredTasks.Move(oldIndex, i);
+                    }
+                }
             }
         }
 

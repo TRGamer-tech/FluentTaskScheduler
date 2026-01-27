@@ -45,7 +45,7 @@
                 <StackPanel Spacing="8" Margin="0,24,0,0">
                     <TextBlock x:Uid="AboutHeader" Text="About" Style="{StaticResource SubtitleTextBlockStyle}"/>
                     <TextBlock x:Uid="AboutTitle" Text="Fluent Task Scheduler" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                    <TextBlock x:Uid="AboutVersion" Text="Version 1.1.0" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
+                    <TextBlock x:Uid="AboutVersion" Text="Version 1.2.0" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
                     <TextBlock x:Uid="AboutBuilt" Text="Built with WinUI 3" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
                 </StackPanel>
                 

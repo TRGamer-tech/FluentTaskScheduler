@@ -38,11 +38,15 @@
 
             <NavigationView.MenuItems>
                 <NavigationViewItem x:Name="NavAdd" Tag="Add" Icon="Add" Content="New Task" SelectsOnInvoked="False"/>
+                <NavigationViewItemSeparator/>
+            </NavigationView.MenuItems>
+
+            <NavigationView.FooterMenuItems>
                 <NavigationViewItem x:Name="NavAllTasks" x:Uid="NavAllTasks" Tag="all" Icon="List" Content="All Tasks" IsSelected="True"/>
                 <NavigationViewItem x:Name="NavRunning" x:Uid="NavRunning" Tag="running" Icon="Play" Content="Running"/>
                 <NavigationViewItem x:Uid="NavEnabled" Content="Enabled" Icon="Accept" Tag="enabled" />
                 <NavigationViewItem x:Name="NavDisabled" Content="Disabled" Icon="Cancel" Tag="disabled" />
-            </NavigationView.MenuItems>
+            </NavigationView.FooterMenuItems>
 
             <Grid>
                  <Grid.RowDefinitions>
