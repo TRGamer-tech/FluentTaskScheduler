@@ -50,14 +50,20 @@ namespace FluentTaskScheduler.Services
                 };
 
                 // Map Actions
+                // Map Actions
                 if (defActions != null)
                 {
-                    var execAction = defActions.FirstOrDefault() as ExecAction;
-                    if (execAction != null)
+                    foreach (var action in defActions)
                     {
-                        model.ActionCommand = execAction.Path;
-                        model.Arguments = execAction.Arguments;
-                        model.WorkingDirectory = execAction.WorkingDirectory;
+                        if (action is ExecAction execAction)
+                        {
+                            model.Actions.Add(new TaskActionModel 
+                            { 
+                                Command = execAction.Path, 
+                                Arguments = execAction.Arguments, 
+                                WorkingDirectory = execAction.WorkingDirectory 
+                            });
+                        }
                     }
                 }
 
@@ -244,14 +250,20 @@ namespace FluentTaskScheduler.Services
                     };
 
                     // Map Actions
+                    // Map Actions
                     if (defActions != null)
                     {
-                        var execAction = defActions.FirstOrDefault() as ExecAction;
-                        if (execAction != null)
+                        foreach (var action in defActions)
                         {
-                            model.ActionCommand = execAction.Path;
-                            model.Arguments = execAction.Arguments;
-                            model.WorkingDirectory = execAction.WorkingDirectory;
+                            if (action is ExecAction execAction)
+                            {
+                                model.Actions.Add(new TaskActionModel 
+                                { 
+                                    Command = execAction.Path, 
+                                    Arguments = execAction.Arguments, 
+                                    WorkingDirectory = execAction.WorkingDirectory 
+                                });
+                            }
                         }
                     }
 
@@ -589,10 +601,16 @@ namespace FluentTaskScheduler.Services
                 }
 
                 // Action handling with arguments support
-                if (!string.IsNullOrWhiteSpace(model.ActionCommand))
+                // Action handling with arguments support
+                if (model.Actions.Count > 0)
                 {
-                    var action = new ExecAction(model.ActionCommand, model.Arguments, model.WorkingDirectory);
-                    td.Actions.Add(action);
+                    foreach (var act in model.Actions)
+                    {
+                         if (!string.IsNullOrWhiteSpace(act.Command))
+                         {
+                             td.Actions.Add(new ExecAction(act.Command, act.Arguments, act.WorkingDirectory));
+                         }
+                    }
                 }
                 else
                 {

@@ -69,10 +69,11 @@
   <data name="DescriptionHeader.Header" xml:space="preserve"><value>Description</value></data>
   <data name="AuthorHeader.Header" xml:space="preserve"><value>Author</value></data>
   <data name="EnabledSwitch.Header" xml:space="preserve"><value>Enabled</value></data>
-  <data name="ActionTitle.Text" xml:space="preserve"><value>Action</value></data>
+  <data name="ActionTitle.Text" xml:space="preserve"><value>Actions</value></data>
   <data name="ProgramScriptHeader.Header" xml:space="preserve"><value>Program/Script</value></data>
   <data name="BrowseButton.Content" xml:space="preserve"><value>Browse...</value></data>
   <data name="ArgumentsHeader.Header" xml:space="preserve"><value>Arguments (optional)</value></data>
+  <data name="DialogTitle.Text" xml:space="preserve"><value>Add or edit task</value></data>
   <data name="TriggerTitle.Text" xml:space="preserve"><value>Trigger</value></data>
   <data name="TriggerTypeHeader.Header" xml:space="preserve"><value>Trigger Type</value></data>
   <data name="TimeHeader.Header" xml:space="preserve"><value>Time (HH:mm)</value></data>

@@ -51,9 +51,40 @@ namespace FluentTaskScheduler.Models
                 }
             } 
         }
-        public string ActionCommand { get; set; } = "";
-        public string Arguments { get; set; } = "";
-        public string WorkingDirectory { get; set; } = "";
+        public System.Collections.ObjectModel.ObservableCollection<TaskActionModel> Actions { get; set; } = new();
+
+        // Legacy properties for binding compatibility (synced with first action)
+        public string ActionCommand 
+        { 
+            get => Actions.Count > 0 ? Actions[0].Command : ""; 
+            set 
+            {
+                if (Actions.Count == 0) Actions.Add(new TaskActionModel());
+                Actions[0].Command = value;
+                OnPropertyChanged();
+            }
+        }
+        public string Arguments 
+        { 
+            get => Actions.Count > 0 ? Actions[0].Arguments : ""; 
+            set 
+            {
+                if (Actions.Count == 0) Actions.Add(new TaskActionModel());
+                Actions[0].Arguments = value;
+                OnPropertyChanged();
+            }
+        }
+        public string WorkingDirectory 
+        { 
+            get => Actions.Count > 0 ? Actions[0].WorkingDirectory : ""; 
+            set 
+            {
+                if (Actions.Count == 0) Actions.Add(new TaskActionModel());
+                Actions[0].WorkingDirectory = value;
+                OnPropertyChanged();
+            }
+        }
+        
         public string ScheduleInfo { get; set; } = "";
         public string TriggerType { get; set; } = "Daily";
         public bool RunWithHighestPrivileges { get; set; } = false;

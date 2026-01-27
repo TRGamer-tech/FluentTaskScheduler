@@ -2,6 +2,7 @@
 .vs/
 [Oo]bj/
 [Bb]in/
+[Dd]ist/
 *.user
 *.suo
 *.userosscache

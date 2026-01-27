@@ -54,6 +54,10 @@ namespace FluentTaskScheduler
         private bool _isLoading = false;
         private bool _isApplyingFilters = false; // Guard to prevent toggle events during filtering
         private readonly Dictionary<string, bool> _userInteractedToggles = new Dictionary<string, bool>(); // Track which toggles user actually clicked
+        
+        // Multiple Actions Support
+        private ObservableCollection<TaskActionModel> _tempActions = new();
+        private bool _isPopulatingActionDetails = false;
 
         private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
@@ -254,6 +258,12 @@ namespace FluentTaskScheduler
             EditTaskArguments.Text = "";
             EditTaskWorkingDirectory.Text = "";
             
+            // Initialize Actions List for New Task
+            _tempActions = new ObservableCollection<TaskActionModel>();
+            _tempActions.Add(new TaskActionModel { Command = "notepad.exe" });
+            ActionList.ItemsSource = _tempActions;
+            ActionList.SelectedIndex = 0;
+            
             // Reset granular triggers
             DailyInterval.Text = "1";
             WeeklyInterval.Text = "1";
@@ -387,7 +397,7 @@ namespace FluentTaskScheduler
         {
             try
             {
-                List<TaskHistoryEntry> history = null;
+                List<TaskHistoryEntry>? history = null;
                 await Task.Run(() =>
                 {
                     history = _taskService.GetTaskHistory(taskPath);
@@ -428,7 +438,7 @@ namespace FluentTaskScheduler
             }
         }
 
-        private async void CopyHistory_Click(object sender, RoutedEventArgs e)
+        private async void CopyHistory_Click(object sender, RoutedEventArgs? e)
         {
             if (InlineHistoryListView.SelectedItems.Count == 0) return;
 
@@ -501,145 +511,296 @@ namespace FluentTaskScheduler
 
         private async void EditTask_Click(object sender, RoutedEventArgs e)
         {
-            if (_selectedTask != null)
+            try
             {
-                _isEditMode = true;
+                // Close details dialog first to avoid conflict
+                TaskDetailsDialog.Hide();
                 
-                // Populate dialog with existing task data
-                EditTaskName.Text = _selectedTask.Name;
-                EditTaskDescription.Text = _selectedTask.Description;
-                EditTaskAuthor.Text = _selectedTask.Author;
-                EditTaskEnabled.IsOn = _selectedTask.IsEnabled;
-                EditTaskActionCommand.Text = _selectedTask.ActionCommand;
-                EditTaskArguments.Text = _selectedTask.Arguments;
-                EditTaskWorkingDirectory.Text = _selectedTask.WorkingDirectory;
-                
-                // Parse Start Time/Date from ScheduleInfo if possible, else default
-                DateTime start = DateTime.Now;
-                if (!string.IsNullOrWhiteSpace(_selectedTask.ScheduleInfo) && DateTime.TryParse(_selectedTask.ScheduleInfo, out var parsedStart))
+                if (_selectedTask != null)
                 {
-                    start = parsedStart;
-                }
-                EditTaskStartDate.Date = start;
-                EditTaskStartTime.Time = start.TimeOfDay;
-
-                // Set trigger type
-                for (int i = 0; i < EditTaskTriggerType.Items.Count; i++)
-                {
-                    if ((EditTaskTriggerType.Items[i] as ComboBoxItem)?.Tag?.ToString() == _selectedTask.TriggerType)
+                    _isEditMode = true;
+                    
+                    // Populate dialog with existing task data
+                    EditTaskName.Text = _selectedTask.Name;
+                    EditTaskDescription.Text = _selectedTask.Description;
+                    EditTaskAuthor.Text = _selectedTask.Author;
+                    EditTaskEnabled.IsOn = _selectedTask.IsEnabled;
+                    
+                    // Initialize Actions List (Deep Copy)
+                    _tempActions = new ObservableCollection<TaskActionModel>();
+                    if (_selectedTask.Actions != null)
                     {
-                        EditTaskTriggerType.SelectedIndex = i;
-                        break;
+                        foreach (var act in _selectedTask.Actions)
+                        {
+                            _tempActions.Add(new TaskActionModel 
+                            { 
+                                Command = act.Command, 
+                                Arguments = act.Arguments, 
+                                WorkingDirectory = act.WorkingDirectory 
+                            });
+                        }
+                    }
+                    ActionList.ItemsSource = _tempActions;
+                    if (_tempActions.Count > 0) ActionList.SelectedIndex = 0;
+                    
+                    // Parse Start Time/Date from ScheduleInfo if possible, else default
+                    DateTime start = DateTime.Now;
+                    if (!string.IsNullOrWhiteSpace(_selectedTask.ScheduleInfo) && DateTime.TryParse(_selectedTask.ScheduleInfo, out var parsedStart))
+                    {
+                        start = parsedStart;
+                    }
+                    EditTaskStartDate.Date = start;
+                    EditTaskStartTime.Time = start.TimeOfDay;
+
+                    // Set trigger type
+                    for (int i = 0; i < EditTaskTriggerType.Items.Count; i++)
+                    {
+                        if ((EditTaskTriggerType.Items[i] as ComboBoxItem)?.Tag?.ToString() == _selectedTask.TriggerType)
+                        {
+                            EditTaskTriggerType.SelectedIndex = i;
+                            break;
+                        }
+                    }
+                    
+                    
+                    // Populate Granular Trigger Details
+                    DailyInterval.Text = (_selectedTask.DailyInterval > 0 ? _selectedTask.DailyInterval : 1).ToString();
+                    WeeklyInterval.Text = (_selectedTask.WeeklyInterval > 0 ? _selectedTask.WeeklyInterval : 1).ToString();
+                    
+                    // Weekly Days
+                    WeeklyMon.IsChecked = _selectedTask.WeeklyDays.Contains("Monday");
+                    WeeklyTue.IsChecked = _selectedTask.WeeklyDays.Contains("Tuesday");
+                    WeeklyWed.IsChecked = _selectedTask.WeeklyDays.Contains("Wednesday");
+                    WeeklyThu.IsChecked = _selectedTask.WeeklyDays.Contains("Thursday");
+                    WeeklyFri.IsChecked = _selectedTask.WeeklyDays.Contains("Friday");
+                    WeeklySat.IsChecked = _selectedTask.WeeklyDays.Contains("Saturday");
+                    WeeklySun.IsChecked = _selectedTask.WeeklyDays.Contains("Sunday");
+
+                    // Monthly
+                    SetMonthChecks(_selectedTask.MonthlyMonths);
+                    if (_selectedTask.MonthlyIsDayOfWeek)
+                    {
+                        MonthlyRadioOn.IsChecked = true;
+                        SetComboBoxText(MonthlyWeekCombo, _selectedTask.MonthlyWeek);
+                        SetComboBoxText(MonthlyDayCombo, _selectedTask.MonthlyDayOfWeek);
+                    }
+                    else
+                    {
+                        MonthlyRadioDays.IsChecked = true;
+                        // Format days list to string, e.g. "1, 15, Last"
+                        var daysList = _selectedTask.MonthlyDays.Select(d => d == 32 ? "Last" : d.ToString()).ToList();
+                        MonthlyDaysInput.Text = string.Join(", ", daysList);
+                    }
+
+                    // Expiration
+                    if (_selectedTask.ExpirationDate.HasValue)
+                    {
+                        EditTaskExpires.IsChecked = true;
+                        EditTaskExpirationDate.Date = _selectedTask.ExpirationDate.Value;
+                        EditTaskExpirationTime.Time = _selectedTask.ExpirationDate.Value.TimeOfDay;
+                        EditTaskExpirationDate.IsEnabled = true;
+                        EditTaskExpirationTime.IsEnabled = true;
+                    }
+                    else
+                    {
+                        EditTaskExpires.IsChecked = false;
+                        EditTaskExpirationDate.IsEnabled = false;
+                        EditTaskExpirationTime.IsEnabled = false;
+                    }
+                    
+                    // Random Delay
+                    if (!string.IsNullOrEmpty(_selectedTask.RandomDelay))
+                    {
+                        EditTaskRandomDelay.IsChecked = true;
+                        EditTaskRandomDelayVal.IsEnabled = true;
+                        EditTaskRandomDelayVal.Text = _selectedTask.RandomDelay;
+                    }
+                    else
+                    {
+                         EditTaskRandomDelay.IsChecked = false;
+                         EditTaskRandomDelayVal.IsEnabled = false;
+                         EditTaskRandomDelayVal.Text = "";
+                    }
+
+                    // Stop If Runs Longer Than
+                    SetComboBoxByTag(EditTaskStopAfterVal, _selectedTask.StopIfRunsLongerThan);
+                    if (!string.IsNullOrEmpty(_selectedTask.StopIfRunsLongerThan) && _selectedTask.StopIfRunsLongerThan != "PT0S")
+                    {
+                         EditTaskStopAfter.IsChecked = true;
+                         EditTaskStopAfterVal.IsEnabled = true;
+                    }
+                    else
+                    {
+                         EditTaskStopAfter.IsChecked = false;
+                         EditTaskStopAfterVal.IsEnabled = false;
+                    }
+                    
+                    // Event Trigger
+                    if (_selectedTask.TriggerType == "Event")
+                    {
+                        EditTaskEventLog.Text = _selectedTask.EventLog;
+                        EditTaskEventSource.Text = _selectedTask.EventSource;
+                        EditTaskEventId.Text = _selectedTask.EventId?.ToString() ?? "";
                     }
                 }
-                
-                
-                // Populate Granular Trigger Details
-                DailyInterval.Text = (_selectedTask.DailyInterval > 0 ? _selectedTask.DailyInterval : 1).ToString();
-                WeeklyInterval.Text = (_selectedTask.WeeklyInterval > 0 ? _selectedTask.WeeklyInterval : 1).ToString();
-                
-                // Weekly Days
-                WeeklyMon.IsChecked = _selectedTask.WeeklyDays.Contains("Monday");
-                WeeklyTue.IsChecked = _selectedTask.WeeklyDays.Contains("Tuesday");
-                WeeklyWed.IsChecked = _selectedTask.WeeklyDays.Contains("Wednesday");
-                WeeklyThu.IsChecked = _selectedTask.WeeklyDays.Contains("Thursday");
-                WeeklyFri.IsChecked = _selectedTask.WeeklyDays.Contains("Friday");
-                WeeklySat.IsChecked = _selectedTask.WeeklyDays.Contains("Saturday");
-                WeeklySun.IsChecked = _selectedTask.WeeklyDays.Contains("Sunday");
-
-                // Monthly
-                SetMonthChecks(_selectedTask.MonthlyMonths);
-                if (_selectedTask.MonthlyIsDayOfWeek)
-                {
-                    MonthlyRadioOn.IsChecked = true;
-                    SetComboBoxText(MonthlyWeekCombo, _selectedTask.MonthlyWeek);
-                    SetComboBoxText(MonthlyDayCombo, _selectedTask.MonthlyDayOfWeek);
-                }
                 else
                 {
-                    MonthlyRadioDays.IsChecked = true;
-                    // Format days list to string, e.g. "1, 15, Last"
-                    var daysList = _selectedTask.MonthlyDays.Select(d => d == 32 ? "Last" : d.ToString()).ToList();
-                    MonthlyDaysInput.Text = string.Join(", ", daysList);
-                }
-
-                // Expiration
-                if (_selectedTask.ExpirationDate.HasValue)
-                {
-                    EditTaskExpires.IsChecked = true;
-                    EditTaskExpirationDate.Date = _selectedTask.ExpirationDate.Value;
-                    EditTaskExpirationTime.Time = _selectedTask.ExpirationDate.Value.TimeOfDay;
-                    EditTaskExpirationDate.IsEnabled = true;
-                    EditTaskExpirationTime.IsEnabled = true;
-                }
-                else
-                {
-                    EditTaskExpires.IsChecked = false;
-                    EditTaskExpirationDate.IsEnabled = false;
-                    EditTaskExpirationTime.IsEnabled = false;
-                }
-                
-                // Random Delay
-                if (!string.IsNullOrEmpty(_selectedTask.RandomDelay))
-                {
-                    EditTaskRandomDelay.IsChecked = true;
-                    EditTaskRandomDelayVal.IsEnabled = true;
-                    EditTaskRandomDelayVal.Text = _selectedTask.RandomDelay;
-                }
-                else
-                {
-                     EditTaskRandomDelay.IsChecked = false;
-                     EditTaskRandomDelayVal.IsEnabled = false;
-                     EditTaskRandomDelayVal.Text = "";
-                }
-
-                // Stop If Runs Longer Than
-                SetComboBoxByTag(EditTaskStopAfterVal, _selectedTask.StopIfRunsLongerThan);
-                if (!string.IsNullOrEmpty(_selectedTask.StopIfRunsLongerThan) && _selectedTask.StopIfRunsLongerThan != "PT0S")
-                {
-                     EditTaskStopAfter.IsChecked = true;
-                     EditTaskStopAfterVal.IsEnabled = true;
-                }
-                else
-                {
-                     EditTaskStopAfter.IsChecked = false;
-                     EditTaskStopAfterVal.IsEnabled = false;
+                    // New Task Defaults
+                    _isEditMode = false;
+                    EditTaskName.Text = "";
+                    EditTaskDescription.Text = "";
+                    EditTaskAuthor.Text = Environment.UserName;
+                    EditTaskEnabled.IsOn = true;
+                    //EditTaskActionCommand.Text = ""; // Removed in phase 5
+                    //EditTaskArguments.Text = "";    // Removed in phase 5
+                    //EditTaskWorkingDirectory.Text = ""; // Removed in phase 5
+                    
+                    EditTaskStartDate.Date = DateTime.Now;
+                    EditTaskStartTime.Time = DateTime.Now.TimeOfDay;
+                    
+                    EditTaskTriggerType.SelectedIndex = 0; // Daily
+                    UpdateTriggerPanelVisibility();
+                    
+                    EditTaskEventLog.Text = "Application";
+                    EditTaskEventSource.Text = "";
+                    EditTaskEventId.Text = "";
+                    
+                    // Default Action
+                    _tempActions = new ObservableCollection<TaskActionModel>();
+                    _tempActions.Add(new TaskActionModel { Command = "notepad.exe" });
+                    ActionList.ItemsSource = _tempActions;
+                    ActionList.SelectedIndex = 0;
                 }
                 
-                // Event Trigger
-                if (_selectedTask.TriggerType == "Event")
-                {
-                    EditTaskEventLog.Text = _selectedTask.EventLog;
-                    EditTaskEventSource.Text = _selectedTask.EventSource;
-                    EditTaskEventId.Text = _selectedTask.EventId?.ToString() ?? "";
-                }
+                var result = await TaskEditDialog.ShowAsync();
             }
-            else
+            catch (Exception ex)
             {
-                // New Task Defaults
-                _isEditMode = false;
-                EditTaskName.Text = "";
-                EditTaskDescription.Text = "";
-                EditTaskAuthor.Text = Environment.UserName;
-                EditTaskEnabled.IsOn = true;
-                EditTaskActionCommand.Text = "";
-                EditTaskArguments.Text = "";
-                EditTaskWorkingDirectory.Text = "";
-                
-                EditTaskStartDate.Date = DateTime.Now;
-                EditTaskStartTime.Time = DateTime.Now.TimeOfDay;
-                
-                EditTaskTriggerType.SelectedIndex = 0; // Daily
-                UpdateTriggerPanelVisibility();
-                
-                EditTaskEventLog.Text = "Application";
-                EditTaskEventSource.Text = "";
-                EditTaskEventId.Text = "";
+                var dialog = new ContentDialog
+                {
+                    Title = "Error Opening Task",
+                    Content = $"An error occurred: {ex.Message}\n{ex.StackTrace}",
+                    CloseButtonText = "OK",
+                    XamlRoot = this.XamlRoot
+                };
+                await dialog.ShowAsync();
             }
-            
-            var result = await TaskEditDialog.ShowAsync();
         }
         
+        // --- Multiple Actions Event Handlers ---
+
+        private void ActionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var action = ActionList.SelectedItem as TaskActionModel;
+            if (action == null)
+            {
+                ActionDetailsPanel.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            _isPopulatingActionDetails = true;
+            ActionDetailsPanel.Visibility = Visibility.Visible;
+            EditTaskActionCommand.Text = action.Command;
+            EditTaskArguments.Text = action.Arguments;
+            EditTaskWorkingDirectory.Text = action.WorkingDirectory;
+            _isPopulatingActionDetails = false;
+            
+            // Enable/Disable move buttons
+            int index = ActionList.SelectedIndex;
+            BtnMoveActionUp.IsEnabled = index > 0;
+            BtnMoveActionDown.IsEnabled = index >= 0 && index < _tempActions.Count - 1;
+        }
+
+        private void BtnAddAction_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var newAction = new TaskActionModel { Command = "New Program" };
+                _tempActions.Add(newAction);
+                ActionList.SelectedItem = newAction;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error adding action: {ex.Message}");
+            }
+        }
+
+        private void BtnRemoveAction_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var action = ActionList.SelectedItem as TaskActionModel;
+                if (action != null)
+                {
+                    _tempActions.Remove(action);
+                    if (_tempActions.Count > 0) ActionList.SelectedIndex = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error removing action: {ex.Message}");
+            }
+        }
+
+        private void BtnMoveActionUp_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                int index = ActionList.SelectedIndex;
+                if (index > 0)
+                {
+                    _tempActions.Move(index, index - 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error moving action up: {ex.Message}");
+            }
+        }
+
+        private void BtnMoveActionDown_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                int index = ActionList.SelectedIndex;
+                if (index >= 0 && index < _tempActions.Count - 1)
+                {
+                    _tempActions.Move(index, index + 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error moving action down: {ex.Message}");
+            }
+        }
+
+        private void EditTaskActionCommand_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_isPopulatingActionDetails) return;
+            if (ActionList.SelectedItem is TaskActionModel action)
+            {
+                action.Command = EditTaskActionCommand.Text;
+            }
+        }
+
+        private void EditTaskArguments_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_isPopulatingActionDetails) return;
+            if (ActionList.SelectedItem is TaskActionModel action)
+            {
+                action.Arguments = EditTaskArguments.Text;
+            }
+        }
+
+        private void EditTaskWorkingDirectory_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_isPopulatingActionDetails) return;
+            if (ActionList.SelectedItem is TaskActionModel action)
+            {
+                action.WorkingDirectory = EditTaskWorkingDirectory.Text;
+            }
+        }
+
         private void SetComboBoxByTag(ComboBox comboBox, string tag)
         {
             for (int i = 0; i < comboBox.Items.Count; i++)
@@ -751,9 +912,7 @@ namespace FluentTaskScheduler
                     Description = EditTaskDescription.Text,
                     Author = EditTaskAuthor.Text,
                     IsEnabled = EditTaskEnabled.IsOn,
-                    ActionCommand = EditTaskActionCommand.Text,
-                    Arguments = EditTaskArguments.Text,
-                    WorkingDirectory = EditTaskWorkingDirectory.Text,
+                    Actions = new ObservableCollection<TaskActionModel>(_tempActions), // Save Actions
                     ScheduleInfo = startDateTime.ToString("yyyy-MM-dd HH:mm:ss"), // Store full start time
                     TriggerType = triggerTag,
                     
@@ -958,7 +1117,7 @@ namespace FluentTaskScheduler
                      }
                 }
             }
-            catch (Exception ex)
+            catch
             {
                  // Handle errors getting XML
             }
