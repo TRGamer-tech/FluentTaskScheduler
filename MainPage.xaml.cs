@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
@@ -36,19 +37,69 @@ namespace FluentTaskScheduler
             };
         }
 
-        private void Page_PreviewKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+        // Keyboard Accelerators
+        private void RefreshAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
         {
-            // Handle F5 for refresh
-            if (e.Key == Windows.System.VirtualKey.F5)
+            args.Handled = true;
+            LoadTasks();
+        }
+
+        private void NewTaskAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+        {
+            args.Handled = true;
+            NewTaskButton_Click(this, new RoutedEventArgs());
+        }
+
+        private void EditTaskAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+        {
+            args.Handled = true;
+            if (TaskListHasSelection())
+                EditTask_Click(this, new RoutedEventArgs());
+        }
+
+        private void RunTaskAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+        {
+            args.Handled = true;
+            if (TaskListHasSelection())
+                RunTask_Click(this, new RoutedEventArgs());
+        }
+
+        private void DeleteTaskAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+        {
+            // Only handle if not editing text
+            if (FocusManager.GetFocusedElement() is TextBox) return;
+            
+            args.Handled = true;
+            if (TaskListHasSelection())
+                DeleteTask_Click(this, new RoutedEventArgs());
+        }
+
+        private void EscapeAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+        {
+            args.Handled = true;
+            if (TaskDetailsDialog.Visibility == Visibility.Visible)
+                TaskDetailsDialog.Hide();
+            else if (TaskEditDialog.Visibility == Visibility.Visible)
+                TaskEditDialog.Hide();
+        }
+
+        private bool TaskListHasSelection()
+        {
+            if (_selectedTask != null) return true;
+            if (TaskListView.SelectedItem is ScheduledTaskModel task)
             {
-                e.Handled = true;
-                LoadTasks();
+                _selectedTask = task;
+                return true;
             }
+            return false;
         }
 
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
             LoadTasks();
+            
+            // Ensure focus is on list for immediate keyboard usage
+            TaskListView.Focus(FocusState.Programmatic);
         }
 
         private bool _isLoading = false;
@@ -394,18 +445,25 @@ namespace FluentTaskScheduler
             if (e.ClickedItem is ScheduledTaskModel task)
             {
                 _selectedTask = task;
-                DialogTaskName.Text = task.Name;
-                DialogTaskDescription.Text = task.Description;
-                DialogTaskAuthor.Text = task.Author;
-                
-                // Update button states based on task state
-                RunTaskButton.IsEnabled = task.IsEnabled;
-                
-                // Load history inline
-                await LoadTaskHistoryInline(task.Path);
-                
-                await TaskDetailsDialog.ShowAsync();
+                await ShowTaskDetails();
             }
+        }
+
+        private async Task ShowTaskDetails()
+        {
+            if (_selectedTask == null) return;
+            
+            DialogTaskName.Text = _selectedTask.Name;
+            DialogTaskDescription.Text = _selectedTask.Description;
+            DialogTaskAuthor.Text = _selectedTask.Author;
+            
+            // Update button states based on task state
+            RunTaskButton.IsEnabled = _selectedTask.IsEnabled;
+            
+            // Load history inline
+            await LoadTaskHistoryInline(_selectedTask.Path);
+            
+            await TaskDetailsDialog.ShowAsync();
         }
 
         private async Task LoadTaskHistoryInline(string taskPath)
@@ -1362,6 +1420,234 @@ namespace FluentTaskScheduler
                 {
                     Title = "Error",
                     Content = $"Failed to export task: {ex.Message}",
+                    CloseButtonText = "OK",
+                    XamlRoot = this.XamlRoot
+                };
+                await errorDialog.ShowAsync();
+            }
+        }
+
+        private async void CloneTask_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedTask == null) return;
+
+            try
+            {
+                TaskDetailsDialog.Hide();
+
+                _isEditMode = false; // New task mode
+
+                // Pre-fill with cloned data
+                EditTaskName.Text = _selectedTask.Name + " (Copy)";
+                EditTaskDescription.Text = _selectedTask.Description;
+                EditTaskAuthor.Text = _selectedTask.Author;
+                EditTaskEnabled.IsOn = _selectedTask.IsEnabled;
+                EditTaskRunWithHighestPrivileges.IsChecked = _selectedTask.RunWithHighestPrivileges;
+
+                // Clone Actions
+                _tempActions = new ObservableCollection<TaskActionModel>();
+                foreach (var act in _selectedTask.Actions)
+                {
+                    _tempActions.Add(new TaskActionModel
+                    {
+                        Command = act.Command,
+                        Arguments = act.Arguments,
+                        WorkingDirectory = act.WorkingDirectory
+                    });
+                }
+                ActionList.ItemsSource = _tempActions;
+                if (_tempActions.Count > 0) ActionList.SelectedIndex = 0;
+
+                // Clone Triggers
+                _tempTriggers = new ObservableCollection<TaskTriggerModel>();
+                foreach (var trig in _selectedTask.TriggersList)
+                {
+                    _tempTriggers.Add(new TaskTriggerModel
+                    {
+                        TriggerType = trig.TriggerType,
+                        ScheduleInfo = trig.ScheduleInfo,
+                        DailyInterval = trig.DailyInterval,
+                        WeeklyInterval = trig.WeeklyInterval,
+                        WeeklyDays = new List<string>(trig.WeeklyDays),
+                        MonthlyIsDayOfWeek = trig.MonthlyIsDayOfWeek,
+                        MonthlyMonths = new List<string>(trig.MonthlyMonths),
+                        MonthlyDays = new List<int>(trig.MonthlyDays),
+                        MonthlyWeek = trig.MonthlyWeek,
+                        MonthlyDayOfWeek = trig.MonthlyDayOfWeek,
+                        ExpirationDate = trig.ExpirationDate,
+                        RandomDelay = trig.RandomDelay,
+                        EventLog = trig.EventLog,
+                        EventSource = trig.EventSource,
+                        EventId = trig.EventId,
+                        RepetitionInterval = trig.RepetitionInterval,
+                        RepetitionDuration = trig.RepetitionDuration
+                    });
+                }
+                TriggerList.ItemsSource = _tempTriggers;
+                if (_tempTriggers.Count > 0) TriggerList.SelectedIndex = 0;
+
+                // Clone Conditions
+                EditTaskOnlyIfIdle.IsChecked = _selectedTask.OnlyIfIdle;
+                EditTaskOnlyIfAC.IsChecked = _selectedTask.OnlyIfAC;
+                EditTaskOnlyIfNetwork.IsChecked = _selectedTask.OnlyIfNetwork;
+                EditTaskWakeToRun.IsChecked = _selectedTask.WakeToRun;
+                EditTaskStopOnBattery.IsChecked = _selectedTask.StopOnBattery;
+
+                // Clone Settings
+                SetComboBoxByTag(EditTaskStopAfterVal, _selectedTask.StopIfRunsLongerThan);
+                EditTaskStopAfter.IsChecked = !string.IsNullOrEmpty(_selectedTask.StopIfRunsLongerThan) && _selectedTask.StopIfRunsLongerThan != "PT0S";
+                EditTaskStopAfterVal.IsEnabled = EditTaskStopAfter.IsChecked ?? false;
+                EditTaskRunIfMissed.IsChecked = _selectedTask.RunIfMissed;
+                EditTaskRestartOnFailure.IsChecked = _selectedTask.RestartOnFailure;
+                EditTaskRestartInterval.Text = _selectedTask.RestartInterval;
+                EditTaskRestartCount.Value = _selectedTask.RestartCount;
+
+                await TaskEditDialog.ShowAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error cloning task: {ex.Message}");
+            }
+        }
+
+        // Dictionary to track temporarily disabled tasks and their re-enable times
+        private Dictionary<string, (DateTime ReEnableTime, Microsoft.UI.Dispatching.DispatcherQueueTimer Timer)> _disabledTasks = new();
+
+        private async void DisableFor_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedTask == null) return;
+
+            var menuItem = sender as MenuFlyoutItem;
+            if (menuItem?.Tag == null) return;
+
+            if (int.TryParse(menuItem.Tag.ToString(), out int hours))
+            {
+                await DisableTaskForDuration(TimeSpan.FromHours(hours));
+            }
+        }
+
+        private async void DisableForCustom_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_selectedTask == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("DisableForCustom_Click: No task selected.");
+                    return;
+                }
+
+                // Must hide the current dialog first before showing another
+                try { TaskDetailsDialog.Hide(); } catch {}
+            
+                // Wait for dialog to close
+                await Task.Delay(300);
+
+                var inputDialog = new ContentDialog
+                {
+                    Title = "Disable for Custom Duration",
+                    PrimaryButtonText = "Disable",
+                    CloseButtonText = "Cancel",
+                    XamlRoot = this.XamlRoot
+                };
+
+                var panel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 15 };
+                
+                var hoursInput = new NumberBox
+                {
+                    Header = "Hours",
+                    Minimum = 0,
+                    Maximum = 168,
+                    Value = 1,
+                    SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline
+                };
+                
+                var minutesInput = new NumberBox
+                {
+                    Header = "Minutes",
+                    Minimum = 0,
+                    Maximum = 59,
+                    Value = 0,
+                    SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline
+                };
+
+                panel.Children.Add(hoursInput);
+                panel.Children.Add(minutesInput);
+
+                inputDialog.Content = panel;
+
+                var result = await inputDialog.ShowAsync();
+                if (result == ContentDialogResult.Primary)
+                {
+                    var duration = TimeSpan.FromHours(hoursInput.Value).Add(TimeSpan.FromMinutes(minutesInput.Value));
+                    await DisableTaskForDuration(duration);
+                }
+            }
+            catch (Exception ex)
+            {
+                 System.Diagnostics.Debug.WriteLine($"DisableForCustom_Click Error: {ex.Message}");
+            }
+        }
+
+        private async Task DisableTaskForDuration(TimeSpan duration)
+        {
+            if (_selectedTask == null) return;
+
+            try
+            {
+                // Disable the task
+                _taskService.DisableTask(_selectedTask.Path);
+                _selectedTask.IsEnabled = false;
+                _selectedTask.State = "Disabled";
+
+                // Calculate re-enable time
+                var reEnableTime = DateTime.Now.Add(duration);
+
+                // Cancel existing timer if any
+                if (_disabledTasks.ContainsKey(_selectedTask.Path))
+                {
+                    _disabledTasks[_selectedTask.Path].Timer.Stop();
+                    _disabledTasks.Remove(_selectedTask.Path);
+                }
+
+                // Create timer to re-enable
+                var timer = _dispatcherQueue.CreateTimer();
+                timer.Interval = duration;
+                timer.IsRepeating = false;
+
+                var taskPath = _selectedTask.Path; // Capture for closure
+                timer.Tick += (s, args) =>
+                {
+                    try
+                    {
+                        _taskService.EnableTask(taskPath);
+                        _disabledTasks.Remove(taskPath);
+                        LoadTasks(); // Refresh list
+                    }
+                    catch { }
+                };
+
+                _disabledTasks[_selectedTask.Path] = (reEnableTime, timer);
+                timer.Start();
+
+                // Show confirmation
+                try { TaskDetailsDialog.Hide(); } catch {}
+                var confirmDialog = new ContentDialog
+                {
+                    Title = "Task Disabled",
+                    Content = $"'{_selectedTask.Name}' will be re-enabled at {reEnableTime:HH:mm}",
+                    CloseButtonText = "OK",
+                    XamlRoot = this.XamlRoot
+                };
+                await confirmDialog.ShowAsync();
+
+                LoadTasks();
+            }
+            catch (Exception ex)
+            {
+                var errorDialog = new ContentDialog
+                {
+                    Title = "Error",
+                    Content = $"Failed to disable task: {ex.Message}",
                     CloseButtonText = "OK",
                     XamlRoot = this.XamlRoot
                 };

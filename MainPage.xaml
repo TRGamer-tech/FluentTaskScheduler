@@ -5,7 +5,16 @@
     xmlns:local="using:FluentTaskScheduler"
     xmlns:models="using:FluentTaskScheduler.Models"
     xmlns:converters="using:FluentTaskScheduler.Converters"
-    PreviewKeyDown="Page_PreviewKeyDown">
+    Loaded="MainPage_Loaded">
+
+    <Page.KeyboardAccelerators>
+        <KeyboardAccelerator Key="F5" Invoked="RefreshAccelerator_Invoked"/>
+        <KeyboardAccelerator Key="N" Modifiers="Control" Invoked="NewTaskAccelerator_Invoked"/>
+        <KeyboardAccelerator Key="E" Modifiers="Control" Invoked="EditTaskAccelerator_Invoked"/>
+        <KeyboardAccelerator Key="R" Modifiers="Control" Invoked="RunTaskAccelerator_Invoked"/>
+        <KeyboardAccelerator Key="Delete" Invoked="DeleteTaskAccelerator_Invoked"/>
+        <KeyboardAccelerator Key="Escape" Invoked="EscapeAccelerator_Invoked"/>
+    </Page.KeyboardAccelerators>
 
     <Page.Resources>
         <converters:StateToIconConverter x:Key="StateToIconConverter"/>
@@ -152,8 +161,22 @@
                         <Button x:Name="RunTaskButton" Content="Run Now" Click="RunTask_Click" Style="{StaticResource AccentButtonStyle}"/>
                         <Button x:Name="StopTaskButton" Content="Stop" Click="StopTask_Click"/>
                         <Button x:Name="EditTaskButton" Content="Edit" Click="EditTask_Click"/>
+                        <Button x:Name="CloneTaskButton" Content="Clone" Click="CloneTask_Click"/>
                         <Button x:Name="ExportTaskButton" Content="Export" Click="ExportTask_Click"/>
                         <Button x:Name="EditXmlButton" Content="Edit XML" Click="EditXml_Click"/>
+                        <Button x:Name="DisableForButton" Content="Disable for...">
+                            <Button.Flyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Text="1 Hour" Tag="1" Click="DisableFor_Click"/>
+                                    <MenuFlyoutItem Text="2 Hours" Tag="2" Click="DisableFor_Click"/>
+                                    <MenuFlyoutItem Text="4 Hours" Tag="4" Click="DisableFor_Click"/>
+                                    <MenuFlyoutItem Text="8 Hours" Tag="8" Click="DisableFor_Click"/>
+                                    <MenuFlyoutItem Text="24 Hours" Tag="24" Click="DisableFor_Click"/>
+                                    <MenuFlyoutSeparator/>
+                                    <MenuFlyoutItem Text="Custom..." Click="DisableForCustom_Click"/>
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
                         <Button x:Name="DeleteTaskButton" Content="Delete" Click="DeleteTask_Click" />
                     </StackPanel>
                 </StackPanel>
