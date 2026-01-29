@@ -184,7 +184,7 @@
                         </Grid>
                     </Grid>
                     
-                    <ListView x:Name="InlineHistoryListView" MaxHeight="300" SelectionMode="Extended" PreviewKeyDown="HistoryList_KeyDown" Margin="0,0,16,0">
+                    <ListView x:Name="InlineHistoryListView" MaxHeight="170" SelectionMode="Extended" PreviewKeyDown="HistoryList_KeyDown" Margin="0,0,16,0">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Padding="8">
@@ -229,50 +229,6 @@
                 <TextBox x:Name="EditTaskDescription" x:Uid="DescriptionHeader" Header="Description" AcceptsReturn="True" Height="80"/>
                 <TextBox x:Name="EditTaskAuthor" x:Uid="AuthorHeader" Header="Author"/>
                 <ToggleSwitch x:Name="EditTaskEnabled" x:Uid="EnabledSwitch" Header="Enabled" IsOn="True"/>
-                
-                <!-- Action Section -->
-                <Rectangle Height="2" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,12,0,4"/>
-                <TextBlock x:Uid="ActionTitle" Text="Actions" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
-                
-                <Grid ColumnSpacing="8" Margin="0,0,0,8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <ListView x:Name="ActionList" Height="100" BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" SelectionMode="Single" SelectionChanged="ActionList_SelectionChanged">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <TextBlock Text="Run:" FontWeight="SemiBold"/>
-                                    <TextBlock Text="{Binding Command}" TextTrimming="CharacterEllipsis"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                    
-                    <StackPanel Grid.Column="1" Spacing="4">
-                        <Button x:Name="BtnAddAction" Content="+" Width="32" Click="BtnAddAction_Click" ToolTipService.ToolTip="Add Action"/>
-                        <Button x:Name="BtnRemoveAction" Content="-" Width="32" Click="BtnRemoveAction_Click" ToolTipService.ToolTip="Remove Action"/>
-                        <Button x:Name="BtnMoveActionUp" Content="^" Width="32" Click="BtnMoveActionUp_Click" ToolTipService.ToolTip="Move Up" FontSize="12"/>
-                        <Button x:Name="BtnMoveActionDown" Content="v" Width="32" Click="BtnMoveActionDown_Click" ToolTipService.ToolTip="Move Down" FontSize="11"/>
-                    </StackPanel>
-                </Grid>
-
-                <StackPanel x:Name="ActionDetailsPanel" Spacing="0" Visibility="Collapsed">
-                    <Grid ColumnSpacing="8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox x:Name="EditTaskActionCommand" x:Uid="ProgramScriptHeader" Header="Program/Script" PlaceholderText="e.g., notepad.exe or C:\Scripts\myscript.ps1" Grid.Column="0" TextChanged="EditTaskActionCommand_TextChanged"/>
-                        <Button x:Name="BrowseActionButton" x:Uid="BrowseButton" Content="Browse..." Click="BrowseAction_Click" VerticalAlignment="Bottom" Margin="0,0,0,6" Grid.Column="1"/>
-                    </Grid>
-                    <TextBox x:Name="EditTaskArguments" x:Uid="ArgumentsHeader" Header="Arguments (optional)" PlaceholderText="e.g., /c echo hello or -File script.ps1" TextChanged="EditTaskArguments_TextChanged" Margin="0,8,0,0"/>
-                    <TextBox x:Name="EditTaskWorkingDirectory" x:Uid="WorkingDirectoryHeader" Header="Run in (optional)" PlaceholderText="e.g., C:\Scripts" TextChanged="EditTaskWorkingDirectory_TextChanged" Margin="0,8,0,0"/>
-                    <TextBlock Text="Tip: For PowerShell scripts, use 'powershell.exe' as Program and '-ExecutionPolicy Bypass -File &quot;C:\path\to\script.ps1&quot;' as Arguments" 
-                               Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" TextWrapping="Wrap" Margin="0,4,0,0"/>
-                </StackPanel>
                 
                 <!-- Trigger Section -->
                 <Rectangle Height="2" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,12,0,4"/>
@@ -447,6 +403,50 @@
                      </StackPanel>
                 </StackPanel>
                 </StackPanel> <!-- End TriggerDetailsPanel -->
+                
+                <!-- Action Section -->
+                <Rectangle Height="2" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,12,0,4"/>
+                <TextBlock x:Uid="ActionTitle" Text="Actions" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
+                
+                <Grid ColumnSpacing="8" Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <ListView x:Name="ActionList" Height="100" BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" SelectionMode="Single" SelectionChanged="ActionList_SelectionChanged">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="Run:" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding Command}" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    
+                    <StackPanel Grid.Column="1" Spacing="4">
+                        <Button x:Name="BtnAddAction" Content="+" Width="32" Click="BtnAddAction_Click" ToolTipService.ToolTip="Add Action"/>
+                        <Button x:Name="BtnRemoveAction" Content="-" Width="32" Click="BtnRemoveAction_Click" ToolTipService.ToolTip="Remove Action"/>
+                        <Button x:Name="BtnMoveActionUp" Content="^" Width="32" Click="BtnMoveActionUp_Click" ToolTipService.ToolTip="Move Up" FontSize="12"/>
+                        <Button x:Name="BtnMoveActionDown" Content="v" Width="32" Click="BtnMoveActionDown_Click" ToolTipService.ToolTip="Move Down" FontSize="11"/>
+                    </StackPanel>
+                </Grid>
+
+                <StackPanel x:Name="ActionDetailsPanel" Spacing="0" Visibility="Collapsed">
+                    <Grid ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="EditTaskActionCommand" x:Uid="ProgramScriptHeader" Header="Program/Script" PlaceholderText="e.g., notepad.exe or C:\Scripts\myscript.ps1" Grid.Column="0" TextChanged="EditTaskActionCommand_TextChanged"/>
+                        <Button x:Name="BrowseActionButton" x:Uid="BrowseButton" Content="Browse..." Click="BrowseAction_Click" VerticalAlignment="Bottom" Margin="0,0,0,6" Grid.Column="1"/>
+                    </Grid>
+                    <TextBox x:Name="EditTaskArguments" x:Uid="ArgumentsHeader" Header="Arguments (optional)" PlaceholderText="e.g., /c echo hello or -File script.ps1" TextChanged="EditTaskArguments_TextChanged" Margin="0,8,0,0"/>
+                    <TextBox x:Name="EditTaskWorkingDirectory" x:Uid="WorkingDirectoryHeader" Header="Run in (optional)" PlaceholderText="e.g., C:\Scripts" TextChanged="EditTaskWorkingDirectory_TextChanged" Margin="0,8,0,0"/>
+                    <TextBlock Text="Tip: For PowerShell scripts, use 'powershell.exe' as Program and '-ExecutionPolicy Bypass -File &quot;C:\path\to\script.ps1&quot;' as Arguments" 
+                               Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                </StackPanel>
                 
                 <!-- Repetition Section -->
                 <Rectangle Height="2" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,12,0,4"/>
