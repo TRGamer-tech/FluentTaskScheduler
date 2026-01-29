@@ -32,6 +32,14 @@ namespace FluentTaskScheduler
         private static readonly IntPtr ICON_SMALL = IntPtr.Zero;
         private static readonly IntPtr ICON_BIG = new IntPtr(1);
 
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr GetConsoleWindow();
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        private const int SW_HIDE = 0;
+
         public App()
         {
             // Force English language
@@ -84,47 +92,133 @@ namespace FluentTaskScheduler
 
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            m_window = new Window();
-            m_window.Title = "FluentTaskScheduler";
+            var args = Environment.GetCommandLineArgs();
             
-            // Try to set icon from file first (works when icon is copied to output)
+            // GUI Mode: No arguments or just the executable path
+            if (args.Length <= 1)
+            {
+                // Hide the console window immediately
+                var handle = GetConsoleWindow();
+                ShowWindow(handle, SW_HIDE);
+
+                m_window = new Window();
+                m_window.Title = "FluentTaskScheduler";
+                
+                // Try to set icon... (existing icon code)
+                try 
+                {
+                    string iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "AppIcon.ico");
+                    if (System.IO.File.Exists(iconPath))
+                    {
+                        m_window.AppWindow.SetIcon(iconPath);
+                    }
+                    else
+                    {
+                        // Fallback: Try Win32 API
+                        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(m_window);
+                        IntPtr hModule = GetModuleHandle(null);
+                        IntPtr hIcon = LoadImage(hModule, new IntPtr(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
+                        
+                        if (hIcon != IntPtr.Zero)
+                        {
+                            SendMessage(hwnd, WM_SETICON, ICON_SMALL, hIcon);
+                            SendMessage(hwnd, WM_SETICON, ICON_BIG, hIcon);
+                        }
+                    }
+                } 
+                catch { }
+                
+                var appWindow = m_window.AppWindow;
+                appWindow.Resize(new Windows.Graphics.SizeInt32 { Width = 1200, Height = 800 });
+                
+                Frame rootFrame = new Frame();
+                rootFrame.NavigationFailed += OnNavigationFailed;
+                m_window.Content = rootFrame;
+                
+                ApplyTheme(ElementTheme.Dark);
+
+                rootFrame.Navigate(typeof(MainPage), e.Arguments);
+                
+                m_window.Activate();
+                return;
+            }
+
+            // CLI Mode
+            // usage: FluentTaskScheduler.exe --run "Path"
+            string command = args[1].ToLower();
+            string? param = args.Length > 2 ? args[2] : null; 
+            bool jsonOutput = args.Contains("--json");
+
+            var service = new global::FluentTaskScheduler.Services.TaskServiceWrapper();
+            
             try 
             {
-                string iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "AppIcon.ico");
-                if (System.IO.File.Exists(iconPath))
+                if (command == "--list")
                 {
-                    m_window.AppWindow.SetIcon(iconPath);
-                }
-                else
-                {
-                    // Fallback: Try Win32 API to load from embedded resources
-                    var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(m_window);
-                    IntPtr hModule = GetModuleHandle(null);
-                    IntPtr hIcon = LoadImage(hModule, new IntPtr(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-                    
-                    if (hIcon != IntPtr.Zero)
+                    var tasks = service.GetAllTasks();
+                    var simpleList = new System.Collections.Generic.List<object>();
+                    foreach(var t in tasks)
                     {
-                        SendMessage(hwnd, WM_SETICON, ICON_SMALL, hIcon);
-                        SendMessage(hwnd, WM_SETICON, ICON_BIG, hIcon);
+                            simpleList.Add(new { 
+                            Name = t.Name, 
+                            Path = t.Path, 
+                            State = t.State, 
+                            LastRun = t.LastRunTime, 
+                            NextRun = t.NextRunTime 
+                            });
+                    }
+                    string json = System.Text.Json.JsonSerializer.Serialize(simpleList, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+                    Console.WriteLine(json);
+                }
+                else if (command == "--run" && !string.IsNullOrEmpty(param))
+                {
+                    Console.WriteLine($"Running task: {param}");
+                    service.RunTask(param);
+                    Console.WriteLine("Task started.");
+                }
+                else if (command == "--enable" && !string.IsNullOrEmpty(param))
+                {
+                        Console.WriteLine($"Enabling task: {param}");
+                        service.EnableTask(param);
+                        Console.WriteLine("Task enabled.");
+                }
+                else if (command == "--disable" && !string.IsNullOrEmpty(param))
+                {
+                        Console.WriteLine($"Disabling task: {param}");
+                        service.DisableTask(param);
+                        Console.WriteLine("Task disabled.");
+                }
+                    else if (command == "--export-history" && !string.IsNullOrEmpty(param))
+                {
+                    string output = args.Length > 4 && args[3] == "--output" ? args[4] : "history.csv";
+                    Console.WriteLine($"Exporting history for {param} to {output}...");
+                    
+                    var history = service.GetTaskHistory(param);
+                    if (history != null && history.Count > 0)
+                    {
+                        var sb = new System.Text.StringBuilder();
+                        sb.AppendLine("Time,EventId,Result,User,ExitCode,Message");
+                        foreach (var h in history)
+                        {
+                            sb.AppendLine($"\"{h.Time}\",{h.EventId},\"{h.Result}\",\"{h.User}\",{h.ExitCode},\"{h.Message.Replace("\"", "\"\"")}\"");
+                        }
+                        System.IO.File.WriteAllText(output, sb.ToString());
+                        Console.WriteLine("Export complete.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("No history found or task does not exist.");
                     }
                 }
-            } 
-            catch { }
-            
-            // Set default window size
-            var appWindow = m_window.AppWindow;
-            appWindow.Resize(new Windows.Graphics.SizeInt32 { Width = 1200, Height = 800 });
-            
-            Frame rootFrame = new Frame();
-            rootFrame.NavigationFailed += OnNavigationFailed;
-            m_window.Content = rootFrame;
-            
-            // Force Dark Theme always
-            ApplyTheme(ElementTheme.Dark);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
 
-            rootFrame.Navigate(typeof(MainPage), e.Arguments);
-            
-            m_window.Activate();
+            // Flush and Exit
+            Console.Out.Flush();
+            Environment.Exit(0);
         }
 
         public void ApplyTheme(ElementTheme theme)
