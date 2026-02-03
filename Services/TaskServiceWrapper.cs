@@ -244,6 +244,18 @@ namespace FluentTaskScheduler.Services
             }
         }
 
+        public void SetTaskEnabled(string path, bool enabled)
+        {
+            using (var ts = new TaskService())
+            {
+                var task = ts.GetTask(path);
+                if (task != null)
+                {
+                    task.Enabled = enabled;
+                }
+            }
+        }
+
         public void RunTask(string path)
         {
             using (var ts = new TaskService())

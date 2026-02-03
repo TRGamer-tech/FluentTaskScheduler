@@ -75,15 +75,41 @@ namespace FluentTaskScheduler
 
         private void LogCrash(Exception? ex, string source)
         {
+            string errorMessage = $"[{DateTime.Now}] [{source}] Error: {ex?.Message}\r\nStack Trace: {ex?.StackTrace ?? "No stack"}\r\n\r\n";
             try 
             {
-                // Write to local folder to avoid permission issues
                 string logPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "crash_log.txt");
-                string logContent = $"[{DateTime.Now}] [{source}] Error: {ex?.Message}\r\nStack Trace: {ex?.StackTrace ?? "No stack"}\r\n\r\n";
-                System.IO.File.AppendAllText(logPath, logContent);
+                System.IO.File.AppendAllText(logPath, errorMessage);
             }
             catch { }
             System.Diagnostics.Debug.WriteLine($"[{source}] Error: {ex?.Message}");
+
+            // Attempt to show dialog if window exists
+            if (m_window != null)
+            {
+                try
+                {
+                    var dispatcher = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+                    if (dispatcher != null)
+                    {
+                        // Fire and forget, we just want to see it
+                        dispatcher.TryEnqueue(async () =>
+                        {
+                            var dialog = new ContentDialog
+                            {
+                                Title = "Unhandled Exception",
+                                Content = errorMessage,
+                                CloseButtonText = "Close",
+                                XamlRoot = m_window.Content.XamlRoot
+                            };
+                            await dialog.ShowAsync();
+                        });
+                        // Keep process alive briefly?
+                        System.Threading.Thread.Sleep(5000); 
+                    }
+                }
+                catch { }
+            }
         }
 
         protected override void OnLaunched(LaunchActivatedEventArgs e)

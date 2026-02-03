@@ -57,6 +57,58 @@
                 <!-- Loading Ring -->
                 <ProgressRing x:Name="LoadingRing" IsActive="False" Width="50" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" Canvas.ZIndex="100" Grid.RowSpan="2"/>
                 
+                <!-- Batch Action Bar (Appears when multiple items selected) -->
+                <Grid x:Name="BatchActionBar" Grid.Row="0" Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" 
+                      VerticalAlignment="Top" Height="60" Margin="16,16,16,0" CornerRadius="8" Visibility="Collapsed" Canvas.ZIndex="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center" Margin="16,0,0,0">
+                        <TextBlock x:Name="BatchCountText" Text="0 selected" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <Rectangle Width="1" Height="24" Fill="{ThemeResource DividerStrokeColorDefaultBrush}"/>
+                        <Button x:Name="BatchRunBtn" Click="BatchRun_Click" ToolTipService.ToolTip="Run Selected">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <SymbolIcon Symbol="Play"/>
+                                <TextBlock Text="Run"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="BatchStopBtn" Click="BatchStop_Click" ToolTipService.ToolTip="Stop Selected">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <SymbolIcon Symbol="Stop"/>
+                                <TextBlock Text="Stop"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="0,0,16,0">
+                       <Button x:Name="BatchEnableBtn" Click="BatchEnable_Click" ToolTipService.ToolTip="Enable Selected">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <SymbolIcon Symbol="Accept"/>
+                                <TextBlock Text="Enable"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="BatchDisableBtn" Click="BatchDisable_Click" ToolTipService.ToolTip="Disable Selected">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <SymbolIcon Symbol="Cancel"/>
+                                <TextBlock Text="Disable"/>
+                            </StackPanel>
+                        </Button>
+                        <Rectangle Width="1" Height="24" Fill="{ThemeResource DividerStrokeColorDefaultBrush}"/>
+                        <Button x:Name="BatchDeleteBtn" Click="BatchDelete_Click" Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}" Foreground="White" ToolTipService.ToolTip="Delete Selected">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <SymbolIcon Symbol="Delete"/>
+                                <TextBlock Text="Delete"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="BatchCancelBtn" Click="BatchCancel_Click" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Clear Selection">
+                            <SymbolIcon Symbol="Cancel"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
                 <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" Margin="16,24,0,12" Spacing="8">
 
                     <AutoSuggestBox x:Name="SearchBox" x:Uid="SearchBox" QueryIcon="Find" PlaceholderText="Search tasks..." Width="300" TextChanged="SearchBox_TextChanged"/>
@@ -66,9 +118,10 @@
 
                 <ListView x:Name="TaskListView" 
                           Grid.Row="1"
-                          SelectionMode="Single"
+                          SelectionMode="Extended"
                           IsItemClickEnabled="True"
                           ItemClick="TaskListView_ItemClick"
+                          SelectionChanged="TaskListView_SelectionChanged"
                           ItemsSource="{x:Bind FilteredTasks}"
                           Padding="0">
                     <!-- Disable default animations for snappy filtering -->
@@ -83,9 +136,12 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <FontIcon Glyph="{x:Bind State, Mode=OneWay, Converter={StaticResource StateToIconConverter}}" 
-                                          Foreground="{x:Bind State, Mode=OneWay, Converter={StaticResource StateToColorConverter}}" 
-                                          FontSize="24" Margin="0,0,16,0"/>
+                                <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,0,16,0">
+                                    <CheckBox IsChecked="{x:Bind IsSelected, Mode=OneWay}" MinWidth="0" Margin="0,0,4,0" Click="TaskCheckBox_Click" VerticalAlignment="Center"/>
+                                    <FontIcon Glyph="{x:Bind State, Mode=OneWay, Converter={StaticResource StateToIconConverter}}" 
+                                            Foreground="{x:Bind State, Mode=OneWay, Converter={StaticResource StateToColorConverter}}" 
+                                            FontSize="24"/>
+                                </StackPanel>
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                     <TextBlock Text="{x:Bind Name}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                                     <TextBlock Text="{x:Bind Path}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>

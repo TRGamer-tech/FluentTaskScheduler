@@ -17,6 +17,20 @@ namespace FluentTaskScheduler.Models
 
         private string _state = "";
         private bool _isEnabled;
+        private bool _isSelected;
+
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                if (_isSelected != value)
+                {
+                    _isSelected = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public string Name { get; set; } = "";
         public string Path { get; set; } = "";
@@ -51,7 +65,9 @@ namespace FluentTaskScheduler.Models
                 if (_isEnabled != value)
                 {
                     _isEnabled = value;
+                    State = value ? "Ready" : "Disabled";
                     OnPropertyChanged();
+                    OnPropertyChanged(nameof(State));
                 }
             } 
         }

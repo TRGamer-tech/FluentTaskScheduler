@@ -617,10 +617,207 @@ namespace FluentTaskScheduler
 
         private async void TaskListView_ItemClick(object sender, ItemClickEventArgs e)
         {
+            // If multiple items are selected or modifiers are used, don't show details
+            var ctrl = Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Control);
+            var shift = Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Shift);
+            
+            if (TaskListView.SelectedItems.Count > 1 || 
+                ctrl.HasFlag(Windows.UI.Core.CoreVirtualKeyStates.Down) || 
+                shift.HasFlag(Windows.UI.Core.CoreVirtualKeyStates.Down))
+            {
+                return;
+            }
+
             if (e.ClickedItem is ScheduledTaskModel task)
             {
                 _selectedTask = task;
                 await ShowTaskDetails();
+            }
+        }
+
+        private void UpdateBatchActionsState()
+        {
+            if (TaskListView.SelectedItems.Count > 1)
+            {
+                var tasks = TaskListView.SelectedItems.Cast<ScheduledTaskModel>();
+                // If ANY task is disabled, Run/Stop should be disabled (?)
+                // User said: "Disable the run and stop buttons when the task is deactivated on any tasks of the multiple."
+                bool anyDisabled = tasks.Any(t => !t.IsEnabled);
+                
+                if (BatchRunBtn != null) BatchRunBtn.IsEnabled = !anyDisabled;
+                if (BatchStopBtn != null) BatchStopBtn.IsEnabled = !anyDisabled;
+            }
+        }
+
+        private void TaskListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Sync IsSelected property for binding
+            foreach (ScheduledTaskModel added in e.AddedItems) added.IsSelected = true;
+            foreach (ScheduledTaskModel removed in e.RemovedItems) removed.IsSelected = false;
+
+            if (BatchActionBar == null || BatchCountText == null) return;
+
+            int count = TaskListView.SelectedItems.Count;
+            if (count > 1)
+            {
+                BatchActionBar.Visibility = Visibility.Visible;
+                BatchCountText.Text = $"{count} selected";
+                
+                UpdateBatchActionsState();
+            }
+            else
+            {
+                BatchActionBar.Visibility = Visibility.Collapsed;
+            }
+            
+            // Update _selectedTask if single selection
+            if (count == 1)
+            {
+                _selectedTask = (ScheduledTaskModel)TaskListView.SelectedItem;
+            }
+        }
+
+        private void BatchCancel_Click(object sender, RoutedEventArgs e)
+        {
+            TaskListView.SelectedItems.Clear();
+        }
+
+        private void BatchRun_Click(object sender, RoutedEventArgs e)
+        {
+            var tasks = TaskListView.SelectedItems.Cast<ScheduledTaskModel>().ToList();
+            foreach (var task in tasks)
+            {
+                try 
+                { 
+                    _taskService.RunTask(task.Path); 
+                    task.State = "Running"; // Optimistic update
+                } 
+                catch { }
+            }
+        }
+
+        private void BatchStop_Click(object sender, RoutedEventArgs e)
+        {
+            var tasks = TaskListView.SelectedItems.Cast<ScheduledTaskModel>().ToList();
+            foreach (var task in tasks)
+            {
+                try 
+                { 
+                    _taskService.StopTask(task.Path); 
+                    task.State = "Ready"; // Optimistic update
+                } 
+                catch { }
+            }
+        }
+
+        private void BatchEnable_Click(object sender, RoutedEventArgs e)
+        {
+            var tasks = TaskListView.SelectedItems.Cast<ScheduledTaskModel>().ToList();
+            foreach (var task in tasks)
+            {
+                if (!task.IsEnabled)
+                {
+                    try 
+                    { 
+                        _taskService.SetTaskEnabled(task.Path, true); 
+                        task.IsEnabled = true; // Update UI model immediately
+                    } catch { }
+                }
+            }
+            UpdateBatchActionsState();
+        }
+
+        private void BatchDisable_Click(object sender, RoutedEventArgs e)
+        {
+            var tasks = TaskListView.SelectedItems.Cast<ScheduledTaskModel>().ToList();
+            foreach (var task in tasks)
+            {
+                if (task.IsEnabled)
+                {
+                    try 
+                    { 
+                        _taskService.SetTaskEnabled(task.Path, false); 
+                        task.IsEnabled = false; // Update UI model
+                    } catch { }
+                }
+            }
+            UpdateBatchActionsState();
+        }
+
+        private void TaskCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is CheckBox cb && cb.DataContext is ScheduledTaskModel task)
+            {
+                var shift = Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Shift);
+                bool isShiftHeld = shift.HasFlag(Windows.UI.Core.CoreVirtualKeyStates.Down);
+
+                if (isShiftHeld && _selectedTask != null && _selectedTask != task)
+                {
+                    // Handle Range Selection
+                    var list = FilteredTasks; // Use the visible list
+                    int start = list.IndexOf(_selectedTask);
+                    int end = list.IndexOf(task);
+
+                    if (start > -1 && end > -1)
+                    {
+                        int min = Math.Min(start, end);
+                        int max = Math.Max(start, end);
+
+                        // Select everything in range
+                        for (int i = min; i <= max; i++)
+                        {
+                            var item = list[i];
+                            if (!TaskListView.SelectedItems.Contains(item))
+                            {
+                                TaskListView.SelectedItems.Add(item);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // Normal Toggle
+                    if (cb.IsChecked == true)
+                    {
+                       TaskListView.SelectedItems.Add(task);
+                       _selectedTask = task; // Update anchor
+                    }
+                    else
+                    {
+                       TaskListView.SelectedItems.Remove(task);
+                    }
+                }
+            }
+        }
+
+        private async void BatchDelete_Click(object sender, RoutedEventArgs e)
+        {
+            var tasks = TaskListView.SelectedItems.Cast<ScheduledTaskModel>().ToList();
+            int count = tasks.Count;
+            
+            var dialog = new ContentDialog
+            {
+                Title = "Delete Tasks?",
+                Content = $"Are you sure you want to delete these {count} tasks?",
+                PrimaryButtonText = "Delete",
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Close,
+                XamlRoot = this.XamlRoot
+            };
+
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                foreach (var task in tasks)
+                {
+                    try 
+                    { 
+                        _taskService.DeleteTask(task.Path); 
+                        FilteredTasks.Remove(task);
+                        _allTasks.Remove(task);
+                    } catch { }
+                }
+                BatchActionBar.Visibility = Visibility.Collapsed; // Selection cleared implicitly
             }
         }
 

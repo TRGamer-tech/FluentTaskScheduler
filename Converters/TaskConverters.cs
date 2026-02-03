@@ -14,7 +14,7 @@ namespace FluentTaskScheduler.Converters
             {
                 "Running" => "\uE768", // Play
                 "Ready" => "\uE73E",   // Accept
-                "Disabled" => "\uE71A", // Cancel
+                "Disabled" => "\uE711", // X (Cancel)
                 _ => "\uE9CE"          // Help
             };
         }
