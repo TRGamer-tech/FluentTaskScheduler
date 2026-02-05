@@ -216,14 +216,18 @@ namespace FluentTaskScheduler
                 else
                 {
                     // Fallback: Try Win32 API to load from embedded resources
+                    // Ensure window handle is valid
                     var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(m_window);
-                    IntPtr hModule = GetModuleHandle(null);
-                    IntPtr hIcon = LoadImage(hModule, new IntPtr(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-                    
-                    if (hIcon != IntPtr.Zero)
+                    if (hwnd != IntPtr.Zero)
                     {
-                        SendMessage(hwnd, WM_SETICON, ICON_SMALL, hIcon);
-                        SendMessage(hwnd, WM_SETICON, ICON_BIG, hIcon);
+                        IntPtr hModule = GetModuleHandle(null);
+                        IntPtr hIcon = LoadImage(hModule, new IntPtr(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
+                        
+                        if (hIcon != IntPtr.Zero)
+                        {
+                            SendMessage(hwnd, WM_SETICON, ICON_SMALL, hIcon);
+                            SendMessage(hwnd, WM_SETICON, ICON_BIG, hIcon);
+                        }
                     }
                 }
             } 

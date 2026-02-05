@@ -18,6 +18,13 @@
         <Platforms>x64</Platforms>
         <XamlCompilerSkipSavedState>true</XamlCompilerSkipSavedState>
         <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
+        <PublishReadyToRun>false</PublishReadyToRun>
+        <DebugType>none</DebugType>
+        <DebugSymbols>false</DebugSymbols>
+        <PublishSingleFile>true</PublishSingleFile>
+        <SelfContained>true</SelfContained>
+        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+        <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
     </PropertyGroup>
 
     <ItemGroup>
