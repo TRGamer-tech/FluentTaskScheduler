@@ -21,6 +21,7 @@ FluentTaskScheduler is a professional-grade wrapper for the Windows Task Schedul
   - **At Logon**: Trigger when a user logs in.
   - **At Startup**: Trigger when the system boots.
   - **On Event**: Trigger based on specific Windows Event Log entries (Log, Source, Event ID).
+  - **Session State Change**: Trigger on Lock, Unlock, Remote Connect, or Remote Disconnect.
 - **Advanced Options**:
   - **Random Delay**: Add a random delay to execution times to prevent thundering herds.
   - **Expiration**: Set task expiration dates.
@@ -43,9 +44,16 @@ FluentTaskScheduler is a professional-grade wrapper for the Windows Task Schedul
   - **Network**: Start only if a network connection is available.
   - **Wake to Run**: enhance reliability by waking the computer to execute the task.
 
+### 🎨 Customization
+
+- **Themes**: Standard Dark Mode and specialized **OLED Mode** (Pure Black) for display longevity.
+- **Languages**: Native English (en-US) support.
+
 ### ⚙️ Robust Settings
 
-- **Privileges**: Run tasks with highest privileges (Admin).
+- **Privileges**: Run tasks with highest privileges (Admin) or as System/Specific User.
+- **Priority**: Configurable task priority (Realtime to Idle).
+- **Concurrency**: Define behavior for multiple instances (Parallel, Queue, Ignore New, Stop Existing).
 - **Fail-Safe**:
   - **Restart on Failure**: Automatically attempt to restart failed tasks up to a configured limit.
   - **Run if Missed**: Execute the task as soon as possible if a scheduled start was missed (e.g., computer was off).
@@ -55,7 +63,39 @@ FluentTaskScheduler is a professional-grade wrapper for the Windows Task Schedul
 - **Task History**: View recent task execution history within the app (Today, Yesterday, This Week, All Time).
 - **Search & Filter**: Instantly find tasks by name, status, or path.
 - **XML Editing**: Direct access to the underlying Task XML for advanced configuration.
-- **Import/Export**: Easily backup or migrate task definitions.
+- **Import/Export**: Easily backup or migrate task definitions, including CSV export for history.
+- **Batch Operations**: Select and manage multiple tasks simultaneously.
+- **CLI Support**: Full command-line interface for automation and headless management.
+
+### ⌨️ Keyboard Shortcuts
+
+| Shortcut   | Action                          |
+| :--------- | :------------------------------ |
+| `Ctrl + N` | New Task                        |
+| `Ctrl + E` | Edit Selected Task              |
+| `Ctrl + R` | Run Selected Task               |
+| `Delete`   | Delete Selected Task            |
+| `F5`       | Refresh Task List               |
+| `Esc`      | Close Dialogs / Clear Selection |
+
+## 💻 CLI Reference
+
+FluentTaskScheduler supports command-line arguments for integration with scripts and external tools.
+
+```powershell
+# List all tasks as JSON
+FluentTaskScheduler.exe --list
+
+# Run a specific task
+FluentTaskScheduler.exe --run "MyTaskName"
+
+# Enable or Disable a task
+FluentTaskScheduler.exe --enable "MyTaskName"
+FluentTaskScheduler.exe --disable "MyTaskName"
+
+# Export task history to CSV
+FluentTaskScheduler.exe --export-history "MyTaskName" --output "C:\logs\history.csv"
+```
 
 ## Technology Stack
 
@@ -77,6 +117,11 @@ FluentTaskScheduler is a professional-grade wrapper for the Windows Task Schedul
    cd FluentTaskScheduler
    dotnet build -c Release
    ```
+
+## 🛠️ Troubleshooting
+
+- **Crash Logs**: If the application encounters a critical error, a `crash_log.txt` file is generated in the application directory.
+- **Admin Rights**: Some features (like "Run as SYSTEM") require the application to be run as Administrator.
 
 3. **Single File Deployment**:
    The project supports publishing as a single, self-contained executable for easy distribution.
