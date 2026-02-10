@@ -58,6 +58,9 @@ namespace FluentTaskScheduler.ViewModels
         {
         }
 
+        public bool IsTrayIconVisible => Services.SettingsService.EnableTrayIcon;
+        public void RefreshTrayIconVisibility() => OnPropertyChanged(nameof(IsTrayIconVisible));
+
         public async Task LoadTasksAsync()
         {
             if (IsLoading) return;

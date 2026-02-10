@@ -209,6 +209,7 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </Grid>
+            
         </NavigationView>
 
         <ContentDialog x:Name="TaskDetailsDialog"

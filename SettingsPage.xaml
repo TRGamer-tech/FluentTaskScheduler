@@ -39,6 +39,17 @@
                     <TextBlock x:Uid="OledHint" Text="OLED mode uses pure black backgrounds for power saving." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="0,-4,0,0"/>
                 </StackPanel>
 
+                <!-- Behaviors -->
+                <StackPanel Spacing="8">
+                    <TextBlock x:Uid="BehaviorsHeader" Text="Behaviors" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                    
+                    <ToggleSwitch x:Name="NotificationsToggle" x:Uid="NotificationsToggle" Header="Task Notifications" OnContent="On" OffContent="Off" IsOn="True"/>
+                    <TextBlock Text="Show a toast notification when a task starts or fails." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="0,-4,0,0"/>
+
+                    <ToggleSwitch x:Name="TrayIconToggle" x:Uid="TrayIconToggle" Header="System Tray" OnContent="On" OffContent="Off" IsOn="True" Margin="0,8,0,0"/>
+                    <CheckBox x:Name="MinimizeToTrayCheck" Content="Minimize to tray instead of closing" IsChecked="True" Margin="0,-4,0,0"/>
+                </StackPanel>
+
                 <!-- General -->
                 <StackPanel Spacing="8">
                     <TextBlock x:Uid="GeneralHeader" Text="General" Style="{StaticResource SubtitleTextBlockStyle}"/>
@@ -49,7 +60,7 @@
                 <StackPanel Spacing="8" Margin="0,24,0,0">
                     <TextBlock x:Uid="AboutHeader" Text="About" Style="{StaticResource SubtitleTextBlockStyle}"/>
                     <TextBlock x:Uid="AboutTitle" Text="Fluent Task Scheduler" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                    <TextBlock x:Uid="AboutVersion" Text="Version 1.3.1" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
+                    <TextBlock x:Uid="AboutVersion" Text="Version 1.4.0" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
                     <TextBlock x:Uid="AboutBuilt" Text="Built with WinUI 3" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
                 </StackPanel>
                 

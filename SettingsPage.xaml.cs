@@ -33,6 +33,22 @@ namespace FluentTaskScheduler
             // Confirm Delete
             ConfirmDeleteToggle.IsOn = SettingsService.ConfirmDelete;
 
+            // Notifications
+            NotificationsToggle.IsOn = SettingsService.ShowNotifications;
+            
+            // System Tray
+            TrayIconToggle.IsOn = SettingsService.EnableTrayIcon;
+            MinimizeToTrayCheck.IsChecked = SettingsService.MinimizeToTray;
+            MinimizeToTrayCheck.IsEnabled = SettingsService.EnableTrayIcon;
+
+            // Events for checkboxes (since they don't have Toggled in XAML yet, or we need to add handlers)
+            // Actually, in XAML I didn't add Toggled/Click handlers for these new controls yet.
+            // I should have. But I can assign them here or in XAML.
+            // Since I am already editing code behind, I can subscribe here.
+            NotificationsToggle.Toggled += NotificationsToggle_Toggled;
+            TrayIconToggle.Toggled += TrayIconToggle_Toggled;
+            MinimizeToTrayCheck.Click += MinimizeToTrayCheck_Click;
+
             _isLoaded = true;
         }
 
@@ -70,6 +86,26 @@ namespace FluentTaskScheduler
         {
             if (!_isLoaded) return;
             SettingsService.ConfirmDelete = ConfirmDeleteToggle.IsOn;
+        }
+
+        private void NotificationsToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!_isLoaded) return;
+            SettingsService.ShowNotifications = NotificationsToggle.IsOn;
+        }
+
+        private void TrayIconToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!_isLoaded) return;
+            SettingsService.EnableTrayIcon = TrayIconToggle.IsOn;
+            MinimizeToTrayCheck.IsEnabled = TrayIconToggle.IsOn;
+            TrayIconService.UpdateVisibility();
+        }
+
+        private void MinimizeToTrayCheck_Click(object sender, RoutedEventArgs e)
+        {
+            if (!_isLoaded) return;
+            SettingsService.MinimizeToTray = MinimizeToTrayCheck.IsChecked ?? false;
         }
 
         private void UpdateOledToggleState()

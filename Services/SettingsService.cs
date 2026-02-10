@@ -12,6 +12,9 @@ namespace FluentTaskScheduler.Services
         public bool IsMicaEnabled { get; set; } = true;
         public string Language { get; set; } = "en-US";
         public bool ConfirmDelete { get; set; } = true;
+        public bool ShowNotifications { get; set; } = true;
+        public bool EnableTrayIcon { get; set; } = true;
+        public bool MinimizeToTray { get; set; } = true;
     }
 
     public static class SettingsService
@@ -102,6 +105,36 @@ namespace FluentTaskScheduler.Services
             set
             {
                 _settings.ConfirmDelete = value;
+                Save();
+            }
+        }
+
+        public static bool ShowNotifications
+        {
+            get => _settings.ShowNotifications;
+            set
+            {
+                _settings.ShowNotifications = value;
+                Save();
+            }
+        }
+
+        public static bool EnableTrayIcon
+        {
+            get => _settings.EnableTrayIcon;
+            set
+            {
+                _settings.EnableTrayIcon = value;
+                Save();
+            }
+        }
+
+        public static bool MinimizeToTray
+        {
+            get => _settings.MinimizeToTray;
+            set
+            {
+                _settings.MinimizeToTray = value;
                 Save();
             }
         }

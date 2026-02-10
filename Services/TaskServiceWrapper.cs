@@ -228,10 +228,22 @@ namespace FluentTaskScheduler.Services
 
         public void RunTask(string path)
         {
-            using (var ts = new TaskService())
+            try
             {
-                var task = ts.GetTask(path);
-                task?.Run();
+                using (var ts = new TaskService())
+                {
+                    var task = ts.GetTask(path);
+                    if (task != null)
+                    {
+                        task.Run();
+                        NotificationService.ShowTaskStarted(task.Name);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                NotificationService.ShowTaskError(System.IO.Path.GetFileName(path), ex.Message);
+                throw;
             }
         }
 

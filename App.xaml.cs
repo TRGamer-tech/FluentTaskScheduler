@@ -246,7 +246,29 @@ namespace FluentTaskScheduler
 
             rootFrame.Navigate(typeof(MainPage), e.Arguments);
             
+            m_window.AppWindow.Closing += AppWindow_Closing;
             m_window.Activate();
+
+            // Initialize tray icon
+            var trayHwnd = WinRT.Interop.WindowNative.GetWindowHandle(m_window);
+            Services.TrayIconService.Initialize(trayHwnd);
+            Services.TrayIconService.ShowRequested += () =>
+            {
+                m_window.AppWindow.Show();
+                m_window.Activate();
+            };
+            Services.TrayIconService.ExitRequested += () => Environment.Exit(0);
+            Services.TrayIconService.UpdateVisibility();
+        }
+
+        private void AppWindow_Closing(Microsoft.UI.Windowing.AppWindow sender, Microsoft.UI.Windowing.AppWindowClosingEventArgs args)
+        {
+            // If Minimize to Tray is enabled AND Tray Icon is enabled
+            if (SS.MinimizeToTray && SS.EnableTrayIcon)
+            {
+                args.Cancel = true;
+                sender.Hide();
+            }
         }
 
         Microsoft.UI.Xaml.Media.SystemBackdrop? _backdrop;
@@ -291,5 +313,6 @@ namespace FluentTaskScheduler
         {
             throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
         }
+
     }
 }

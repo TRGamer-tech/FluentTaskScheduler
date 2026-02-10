@@ -695,5 +695,6 @@ namespace FluentTaskScheduler
             try { await new ContentDialog { Title = "Error", Content = message, CloseButtonText = "OK", XamlRoot = this.XamlRoot }.ShowAsync(); }
             finally { _isDialogOpen = false; }
         }
+
     }
 }
