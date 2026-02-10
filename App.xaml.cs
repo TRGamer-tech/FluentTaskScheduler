@@ -259,6 +259,8 @@ namespace FluentTaskScheduler
             };
             Services.TrayIconService.ExitRequested += () => Environment.Exit(0);
             Services.TrayIconService.UpdateVisibility();
+
+            Services.LogService.Info("Application started");
         }
 
         private void AppWindow_Closing(Microsoft.UI.Windowing.AppWindow sender, Microsoft.UI.Windowing.AppWindowClosingEventArgs args)

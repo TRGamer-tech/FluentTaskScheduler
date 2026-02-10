@@ -15,6 +15,8 @@ namespace FluentTaskScheduler.Services
         public bool ShowNotifications { get; set; } = true;
         public bool EnableTrayIcon { get; set; } = true;
         public bool MinimizeToTray { get; set; } = true;
+        public bool EnableLogging { get; set; } = true;
+        public bool RunOnStartup { get; set; } = false;
     }
 
     public static class SettingsService
@@ -28,7 +30,7 @@ namespace FluentTaskScheduler.Services
             Load();
         }
 
-        private static void Load()
+        public static void Load()
         {
             try
             {
@@ -136,6 +138,62 @@ namespace FluentTaskScheduler.Services
             {
                 _settings.MinimizeToTray = value;
                 Save();
+            }
+        }
+
+        public static bool EnableLogging
+        {
+            get => _settings.EnableLogging;
+            set
+            {
+                _settings.EnableLogging = value;
+                Save();
+            }
+        }
+
+        public static bool RunOnStartup
+        {
+            get => _settings.RunOnStartup;
+            set
+            {
+                _settings.RunOnStartup = value;
+                Save();
+            }
+        }
+
+        public static void ExportSettings(string targetPath)
+        {
+            try
+            {
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string json = JsonSerializer.Serialize(_settings, options);
+                File.WriteAllText(targetPath, json);
+                LogService.Info($"Settings exported to {targetPath}");
+            }
+            catch (Exception ex)
+            {
+                LogService.Error("Failed to export settings", ex);
+                throw;
+            }
+        }
+
+        public static void ImportSettings(string sourcePath)
+        {
+            try
+            {
+                string json = File.ReadAllText(sourcePath);
+                var imported = JsonSerializer.Deserialize<AppSettings>(json);
+                if (imported != null)
+                {
+                    _settings = imported;
+                    Save();
+                    LogService.Info($"Settings imported from {sourcePath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogService.Error("Failed to import settings", ex);
+                throw;
             }
         }
     }

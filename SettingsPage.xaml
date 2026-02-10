@@ -16,7 +16,7 @@
         <!-- Header -->
         <StackPanel Grid.Row="0" Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" Padding="24,12,24,12">
             <StackPanel Orientation="Horizontal" Spacing="16">
-                <Button x:Name="BackButton" Click="BackButton_Click" Background="Transparent" BorderThickness="0" Width="40" Height="40" CornerRadius="20" ToolTipService.ToolTip="Go Back">
+                <Button x:Name="BackButton" Click="BackButton_Click" Background="Transparent" BorderThickness="0" Width="40" Height="40" CornerRadius="5" ToolTipService.ToolTip="Go Back">
                     <FontIcon Glyph="&#xE72B;"/>
                 </Button>
                 <TextBlock x:Uid="SettingsHeader" Text="Settings" Style="{StaticResource TitleTextBlockStyle}" VerticalAlignment="Center"/>
@@ -48,12 +48,33 @@
 
                     <ToggleSwitch x:Name="TrayIconToggle" x:Uid="TrayIconToggle" Header="System Tray" OnContent="On" OffContent="Off" IsOn="True" Margin="0,8,0,0"/>
                     <CheckBox x:Name="MinimizeToTrayCheck" Content="Minimize to tray instead of closing" IsChecked="True" Margin="0,-4,0,0"/>
+
+                    <ToggleSwitch x:Name="RunOnStartupToggle" Header="Run on Startup" OnContent="On" OffContent="Off" IsOn="False" Margin="0,8,0,0"/>
+                    <TextBlock Text="Automatically start the app when you log in to Windows." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="0,-4,0,0"/>
+                </StackPanel>
+
+                <!-- Logging -->
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Logging" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                    <ToggleSwitch x:Name="LoggingToggle" Header="Application Logging" OnContent="On" OffContent="Off" IsOn="True"/>
+                    <TextBlock Text="Write internal events and errors to a log file for troubleshooting." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="0,-4,0,0"/>
+                    <Button x:Name="OpenLogButton" Content="Open Log File" Click="OpenLogButton_Click" Margin="0,4,0,0"/>
                 </StackPanel>
 
                 <!-- General -->
                 <StackPanel Spacing="8">
                     <TextBlock x:Uid="GeneralHeader" Text="General" Style="{StaticResource SubtitleTextBlockStyle}"/>
                     <ToggleSwitch x:Name="ConfirmDeleteToggle" x:Uid="ConfirmDelete" Header="Confirm Task Deletion" OnContent="On" OffContent="Off" Toggled="ConfirmDeleteToggle_Toggled"/>
+                </StackPanel>
+
+                <!-- Backup & Restore -->
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Backup &amp; Restore" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                    <TextBlock Text="Export your current settings to a file, or restore from a backup." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="ExportSettingsButton" Content="Export Settings" Click="ExportSettings_Click"/>
+                        <Button x:Name="ImportSettingsButton" Content="Import Settings" Click="ImportSettings_Click"/>
+                    </StackPanel>
                 </StackPanel>
 
                 <!-- About -->
