@@ -10,6 +10,11 @@ FluentTaskScheduler is a professional-grade wrapper for the Windows Task Schedul
 
 ## Key Features
 
+### 🕹️ Dashboard & Monitoring
+
+- **Activity Stream**: A live feed of task activity. Click any entry to jump directly to the task details.
+- **Task History**: Comprehensive history of all task executions, keeping you informed of every run.
+
 ### 🕒 Comprehensive Triggers
 
 - **Time-Based**:
@@ -32,6 +37,11 @@ FluentTaskScheduler is a professional-grade wrapper for the Windows Task Schedul
 - Configure tasks to repeat every few minutes or hours.
 - Set a duration for the repetition pattern (e.g., repeat every 15 minutes for 12 hours).
 
+### 📜 Script Library
+
+- **Centralized Management**: A dedicated space for pr-written PowerShell scripts, separating logic from task configuration.
+- **Reusable Code**: Use scripts in multiple tasks.
+
 ### 🛡️ Actions & Conditions
 
 - **Actions**:
@@ -49,6 +59,12 @@ FluentTaskScheduler is a professional-grade wrapper for the Windows Task Schedul
 - **Themes**: Standard Dark Mode and specialized **OLED Mode** (Pure Black) for display longevity.
 - **Languages**: Native English (en-US) support.
 
+### 🧬 System Integration
+
+- **System Tray**: Minimize the app to the tray to keep your taskbar clean while the scheduler hums in the background.
+- **Run on Startup**: Option to launch automatically with Windows.
+- **Notifications**: Get native toast notifications when tasks complete or fail.
+
 ### ⚙️ Robust Settings
 
 - **Privileges**: Run tasks with highest privileges (Admin) or as System/Specific User.
@@ -57,6 +73,7 @@ FluentTaskScheduler is a professional-grade wrapper for the Windows Task Schedul
 - **Fail-Safe**:
   - **Restart on Failure**: Automatically attempt to restart failed tasks up to a configured limit.
   - **Run if Missed**: Execute the task as soon as possible if a scheduled start was missed (e.g., computer was off).
+- **Settings Backup**: Backup and restore your application settings to ensure your configuration is safe.
 
 ### 📊 Management & History
 
