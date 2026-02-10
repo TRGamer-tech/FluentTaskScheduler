@@ -32,27 +32,18 @@
                         SelectionChanged="NavView_SelectionChanged"
                         ItemInvoked="NavView_ItemInvoked"
                         Background="Transparent">
-            
+
             <NavigationView.PaneCustomContent>
                 <StackPanel>
-                    <NavigationViewItem x:Name="NavAdd" 
-                                       Tag="Add" 
-                                       Icon="Add" 
-                                       Content="New Task" 
-                                       SelectsOnInvoked="False"
-                                       Tapped="NavAdd_Tapped"
-                                       Margin="0,0,0,8"/>
-                    <NavigationViewItemSeparator Margin="0,0,0,8"/>
-                    
                     <StackPanel x:Name="FolderSection" Visibility="{x:Bind NavView.IsPaneOpen, Mode=OneWay}">
                         <TextBlock Text="Folders" 
                                   FontWeight="SemiBold" 
-                                  Margin="16,8,0,4"
+                                  Margin="10,5,0,4"
                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         <TreeView x:Name="FolderTreeView" 
-                                 SelectionMode="Single"
-                                 ItemInvoked="FolderTreeView_ItemInvoked"
-                                 Margin="4,0,0,8">
+                                  SelectionMode="Single"
+                                  ItemInvoked="FolderTreeView_ItemInvoked"
+                                  Margin="4,0,0,8">
                             <TreeView.ItemContainerTransitions>
                                 <TransitionCollection>
                                     <ContentThemeTransition/>
@@ -62,7 +53,7 @@
                             </TreeView.ItemContainerTransitions>
                             <TreeView.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Height="32" Padding="0">
+                                    <Grid Height="27" Padding="0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
@@ -84,14 +75,20 @@
                     </StackPanel>
                 </StackPanel>
             </NavigationView.PaneCustomContent>
-            
+
+            <NavigationView.MenuItems>
+                <NavigationViewItemSeparator />
+                <NavigationViewItem x:Name="NavDashboard" Tag="Dashboard" Icon="ViewAll" Content="Dashboard" />
+                <NavigationViewItem x:Name="NavScriptLibrary" Tag="ScriptLibrary" Icon="Library" Content="Script Library" />
+                <NavigationViewItem x:Name="NavAdd" Tag="Add" Icon="Add" Content="New Task" SelectsOnInvoked="False" />
+                <NavigationViewItemSeparator />
+            </NavigationView.MenuItems>
+
             <NavigationView.HeaderTemplate>
                 <DataTemplate>
-                    <TextBlock Text="Scheduled Tasks" Style="{StaticResource TitleTextBlockStyle}" Margin="0,0,0,0"/>
+                    <TextBlock Text="{Binding}" Style="{StaticResource TitleTextBlockStyle}" Margin="-24,0,0,0" VerticalAlignment="Center"/>
                 </DataTemplate>
             </NavigationView.HeaderTemplate>
-
-
 
             <NavigationView.FooterMenuItems>
                 <NavigationViewItem x:Name="NavAllTasks" x:Uid="NavAllTasks" Tag="all" Icon="List" Content="All Tasks" IsSelected="True"/>
@@ -101,10 +98,11 @@
             </NavigationView.FooterMenuItems>
 
             <Grid>
-                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+                <Grid x:Name="TasksViewGrid">
+                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
                 
                 <!-- Loading Ring -->
                 <ProgressRing x:Name="LoadingRing" IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}" Width="50" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" Canvas.ZIndex="100" Grid.RowSpan="2"/>
@@ -208,6 +206,9 @@
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
+                </Grid> <!-- End TasksViewGrid -->
+                
+                <Frame x:Name="ContentFrame" Visibility="Collapsed"/>
             </Grid>
             
         </NavigationView>
@@ -553,7 +554,15 @@
                     </ListView>
                     
                     <StackPanel Grid.Column="1" Spacing="4">
-                        <Button x:Name="BtnAddAction" Content="+" Width="32" Click="BtnAddAction_Click" ToolTipService.ToolTip="Add Action"/>
+                        <Button x:Name="BtnAddAction" Content="+" Width="32" ToolTipService.ToolTip="Add Action">
+                            <Button.Flyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Text="Run Program" Click="BtnAddAction_Click" />
+                                    <MenuFlyoutItem Text="Send Email" Click="AddAction_SendEmail_Click" />
+                                    <MenuFlyoutItem Text="Show Notification" Click="AddAction_ShowNotification_Click" />
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
                         <Button x:Name="BtnRemoveAction" Content="-" Width="32" Click="BtnRemoveAction_Click" ToolTipService.ToolTip="Remove Action"/>
                         <Button x:Name="BtnMoveActionUp" Content="^" Width="32" Click="BtnMoveActionUp_Click" ToolTipService.ToolTip="Move Up" FontSize="12"/>
                         <Button x:Name="BtnMoveActionDown" Content="v" Width="32" Click="BtnMoveActionDown_Click" ToolTipService.ToolTip="Move Down" FontSize="11"/>

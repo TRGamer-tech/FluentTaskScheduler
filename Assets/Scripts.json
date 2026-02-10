@@ -1,0 +1,51 @@
+[
+  {
+    "Name": "Flush DNS Cache",
+    "Description": "Clears the DNS client resolver cache. Useful for fixing connection issues.",
+    "Command": "ipconfig",
+    "Arguments": "/flushdns",
+    "RunAsAdmin": true
+  },
+  {
+    "Name": "Clear Temp Folder",
+    "Description": "Deletes all files in the current user's Temp folder to free up space.",
+    "Command": "powershell.exe",
+    "Arguments": "-ExecutionPolicy Bypass -Command \"Remove-Item -Path $env:TEMP\\* -Recurse -Force -ErrorAction SilentlyContinue\"",
+    "RunAsAdmin": false
+  },
+  {
+    "Name": "Restart Print Spooler",
+    "Description": "Restarts the Print Spooler service to fix stuck print jobs.",
+    "Command": "powershell.exe",
+    "Arguments": "-ExecutionPolicy Bypass -Command \"Restart-Service -Name Spooler -Force\"",
+    "RunAsAdmin": true
+  },
+  {
+    "Name": "Backup Drivers",
+    "Description": "Exports all third-party drivers to C:\\DriversBackup.",
+    "Command": "dism",
+    "Arguments": "/online /export-driver /destination:C:\\DriversBackup",
+    "RunAsAdmin": true
+  },
+  {
+    "Name": "System File Checker",
+    "Description": "Scans for and restores corrupted system files.",
+    "Command": "sfc",
+    "Arguments": "/scannow",
+    "RunAsAdmin": true
+  },
+  {
+    "Name": "Shutdown in 1 Hour",
+    "Description": "Schedules a system shutdown in 60 minutes.",
+    "Command": "shutdown",
+    "Arguments": "/s /t 3600",
+    "RunAsAdmin": false
+  },
+  {
+    "Name": "Abort Shutdown",
+    "Description": "Aborts a pending system shutdown.",
+    "Command": "shutdown",
+    "Arguments": "/a",
+    "RunAsAdmin": false
+  }
+]

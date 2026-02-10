@@ -35,8 +35,11 @@ namespace FluentTaskScheduler
         private string _currentFolderPath = "\\";
         private Dictionary<string, bool> _folderExpandedState = new();
 
+        public static MainPage? Current { get; private set; }
+
         public MainPage()
         {
+            Current = this;
             this.InitializeComponent();
             this.Loaded += MainPage_Loaded;
             
@@ -51,6 +54,44 @@ namespace FluentTaskScheduler
             NavView.SelectedItem = NavView.FooterMenuItems[0];  // Select "All Tasks" 
         }
 
+        public void OpenCreateTaskFromTemplate(ViewModels.ScriptTemplateModel template) => OpenCreateTaskDialog(template);
+        private void NewTaskButton_Click(object sender, RoutedEventArgs e) => OpenCreateTaskDialog(null);
+
+        private async void OpenCreateTaskDialog(ViewModels.ScriptTemplateModel? template)
+        {
+            if (this.Content?.XamlRoot == null) return;
+            _isEditMode = false;
+            
+            EditTaskName.Text = template?.Name ?? "";
+            EditTaskDescription.Text = template?.Description ?? "";
+            EditTaskAuthor.Text = Environment.UserName;
+            EditTaskEnabled.IsOn = true;
+            
+            _tempActions = new ObservableCollection<TaskActionModel>();
+            if (template != null)
+            {
+                _tempActions.Add(new TaskActionModel { Command = template.Command, Arguments = template.Arguments });
+            }
+            else
+            {
+                _tempActions.Add(new TaskActionModel { Command = "notepad.exe" });
+            }
+
+            _tempTriggers = new ObservableCollection<TaskTriggerModel> { new TaskTriggerModel { TriggerType = "Daily", ScheduleInfo = DateTime.Now.ToString("g"), DailyInterval = 1 } };
+            
+            ActionList.ItemsSource = _tempActions;
+            TriggerList.ItemsSource = _tempTriggers;
+            ActionList.SelectedIndex = 0;
+            TriggerList.SelectedIndex = 0;
+            
+            // Settings defaults
+            EditTaskRunWithHighestPrivileges.IsChecked = template?.RunAsAdmin ?? false;
+
+            PopulateNetworkList();
+            TaskEditDialog.XamlRoot = this.Content.XamlRoot;
+            await TaskEditDialog.ShowAsync();
+        }
+
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
             LoadFolderStructure();
@@ -61,12 +102,18 @@ namespace FluentTaskScheduler
 
         private void Page_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateFolderTreeMaxHeight();
 
+
         private void UpdateFolderTreeMaxHeight()
         {
             if (NavView == null || FolderTreeView == null) return;
             // Estimated height of Footer Items (4 items + Settings) + Header ("New Task") + Margins
-            // Footer: ~200px, Header: ~60px, "Folders" Label: ~30px, Buffer: ~50px => ~340px
-            double availableHeight = NavView.ActualHeight - 380; 
+            // Footer: ~200px
+            // Header (PaneCustomContent top part): 
+            //   Dashboard (40) + ScriptLib (40) + NewTask (40) + Separator (10) + Margins (~20) = ~150px
+            // "Folders" Label: ~30px
+            // Buffer: ~50px 
+            // Total deduction: ~430px
+            double availableHeight = NavView.ActualHeight - 430; 
             if (availableHeight < 100) availableHeight = 100;
             FolderTreeView.MaxHeight = availableHeight;
         }
@@ -93,7 +140,7 @@ namespace FluentTaskScheduler
             var displayName = folder.Name == "\\" ? "Task Scheduler Library" : folder.Name;
             var treeNode = new TreeViewNode
             {
-                Content = displayName,  // Display string
+                Content = displayName,  
                 IsExpanded = _folderExpandedState.ContainsKey(folder.Path) ? _folderExpandedState[folder.Path] : (folder.Path == "\\")
             };
 
@@ -106,9 +153,6 @@ namespace FluentTaskScheduler
                 if (sender is TreeViewNode node && _treeNodeFolderMap.TryGetValue(node, out var f))
                     _folderExpandedState[f.Path] = node.IsExpanded;
             });
-
-            // Add context menu (note: TreeView doesn't support ContextFlyout on nodes directly)
-            // We'll need to handle this differently if needed
             
             // Add to parent or root
             if (parentNode != null)
@@ -127,32 +171,66 @@ namespace FluentTaskScheduler
             {
                 _currentFolderPath = folder.Path;
                 ViewModel.SetFilter(folder.Path);
+                
+                // Restore Task View
+                NavView.Header = "Scheduled Tasks";
+                TasksViewGrid.Visibility = Visibility.Visible;
+                ContentFrame.Visibility = Visibility.Collapsed;
+                
+                NavView.SelectedItem = null; // Native indicator for Dashboard/ScriptLib disappears
+                FolderTreeView.SelectedItem = node; 
             }
         }
 
         private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            if (args.IsSettingsSelected) Frame.Navigate(typeof(SettingsPage));
+            if (args.IsSettingsSelected) 
+            {
+                 NavView.Header = "Settings";
+                 Frame.Navigate(typeof(SettingsPage));
+            }
             else if (args.SelectedItem is NavigationViewItem item && item.Tag != null)
             {
                 var tag = item.Tag.ToString() ?? "";
-                
-                // If it's a folder path (starts with \), update current folder
-                if (tag.StartsWith("\\"))
-                    _currentFolderPath = tag;
+
+                if (tag == "Dashboard")
+                {
+                    NavView.Header = "Dashboard";
+                    TasksViewGrid.Visibility = Visibility.Collapsed;
+                    ContentFrame.Visibility = Visibility.Visible;
+                    ContentFrame.Navigate(typeof(DashboardPage));
+                    FolderTreeView.SelectedItem = null;
+                }
+                else if (tag == "ScriptLibrary")
+                {
+                    NavView.Header = "Script Library";
+                    TasksViewGrid.Visibility = Visibility.Collapsed;
+                    ContentFrame.Visibility = Visibility.Visible;
+                    ContentFrame.Navigate(typeof(ScriptLibraryPage));
+                    FolderTreeView.SelectedItem = null;
+                }
+                else
+                {
+                    // Standard Task Views (if any)
+                    NavView.Header = "Scheduled Tasks";
+                    TasksViewGrid.Visibility = Visibility.Visible;
+                    ContentFrame.Visibility = Visibility.Collapsed;
+                    FolderTreeView.SelectedItem = null;
+
+                    if (tag.StartsWith("\\"))
+                        _currentFolderPath = tag;
                     
-                ViewModel.SetFilter(tag);
+                    ViewModel.SetFilter(tag);
+                }
             }
         }
 
         private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
-            if (args.InvokedItemContainer is NavigationViewItem item && item.Tag?.ToString() == "Add") NewTaskButton_Click(sender, new RoutedEventArgs());
-        }
-
-        private void NavAdd_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            NewTaskButton_Click(sender, new RoutedEventArgs());
+            if (args.InvokedItemContainer is NavigationViewItem item && item.Tag?.ToString() == "Add") 
+            {
+                NewTaskButton_Click(sender, new RoutedEventArgs());
+            }
         }
 
         private void SearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
@@ -435,28 +513,7 @@ namespace FluentTaskScheduler
             await TaskEditDialog.ShowAsync();
         }
 
-        private async void NewTaskButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.Content?.XamlRoot == null) return;
-            _isEditMode = false;
-            
-            EditTaskName.Text = "";
-            EditTaskDescription.Text = "";
-            EditTaskAuthor.Text = Environment.UserName;
-            EditTaskEnabled.IsOn = true;
-            
-            _tempActions = new ObservableCollection<TaskActionModel> { new TaskActionModel { Command = "notepad.exe" } };
-            _tempTriggers = new ObservableCollection<TaskTriggerModel> { new TaskTriggerModel { TriggerType = "Daily", ScheduleInfo = DateTime.Now.ToString("g"), DailyInterval = 1 } };
-            
-            ActionList.ItemsSource = _tempActions;
-            TriggerList.ItemsSource = _tempTriggers;
-            ActionList.SelectedIndex = 0;
-            TriggerList.SelectedIndex = 0;
 
-            PopulateNetworkList();
-            TaskEditDialog.XamlRoot = this.Content.XamlRoot;
-            await TaskEditDialog.ShowAsync();
-        }
 
         private async void TaskEditDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
@@ -620,6 +677,23 @@ namespace FluentTaskScheduler
         private void BtnMoveTriggerDown_Click(object sender, RoutedEventArgs e) { /* ... */ }
 
         private void BtnAddAction_Click(object sender, RoutedEventArgs e) { _tempActions.Add(new TaskActionModel { Command="notepad.exe" }); ActionList.SelectedIndex = _tempActions.Count - 1; }
+        
+        private void AddAction_SendEmail_Click(object sender, RoutedEventArgs e) 
+        {
+            string ps = "powershell.exe";
+            string args = "-ExecutionPolicy Bypass -Command \"Send-MailMessage -To 'recipient@example.com' -From 'scheduler@example.com' -Subject 'Task Started' -Body 'The task has started.' -SmtpServer 'smtp.example.com'\"";
+            _tempActions.Add(new TaskActionModel { Command = ps, Arguments = args });
+            ActionList.SelectedIndex = _tempActions.Count - 1;
+        }
+
+        private void AddAction_ShowNotification_Click(object sender, RoutedEventArgs e)
+        {
+            string ps = "powershell.exe";
+            string args = "-WindowStyle Hidden -Command \"& {Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show('Task Notification', 'Fluent Launcher')}\"";
+            _tempActions.Add(new TaskActionModel { Command = ps, Arguments = args });
+            ActionList.SelectedIndex = _tempActions.Count - 1;
+        }
+
         private void BtnRemoveAction_Click(object sender, RoutedEventArgs e) { if (ActionList.SelectedItem is TaskActionModel t) _tempActions.Remove(t); }
         private void BtnMoveActionUp_Click(object sender, RoutedEventArgs e) { /* ... */ }
         private void BtnMoveActionDown_Click(object sender, RoutedEventArgs e) { /* ... */ }
