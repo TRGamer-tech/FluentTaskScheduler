@@ -485,13 +485,58 @@ namespace FluentTaskScheduler
         private void RunTask_Click(object sender, RoutedEventArgs e)
         {
             if (ViewModel.SelectedTask == null) return;
-            try { ViewModel.TaskService.RunTask(ViewModel.SelectedTask.Path); ViewModel.SelectedTask.State = "Running"; } catch (Exception ex) { _ = ShowErrorDialog(ex.Message); }
+            try
+            {
+                ViewModel.TaskService.RunTask(ViewModel.SelectedTask.Path);
+                ViewModel.SelectedTask.IsRunning = true;
+                _ = WatchTaskUntilFinished(ViewModel.SelectedTask);
+            }
+            catch (Exception ex) { _ = ShowErrorDialog(ex.Message); }
         }
 
         private void StopTask_Click(object sender, RoutedEventArgs e)
         {
             if (ViewModel.SelectedTask == null) return;
-            try { ViewModel.TaskService.StopTask(ViewModel.SelectedTask.Path); ViewModel.SelectedTask.State = "Ready"; } catch (Exception ex) { _ = ShowErrorDialog(ex.Message); }
+            try
+            {
+                ViewModel.TaskService.StopTask(ViewModel.SelectedTask.Path);
+                ViewModel.SelectedTask.State = "Ready";
+                ViewModel.SelectedTask.IsRunning = false;
+            }
+            catch (Exception ex) { _ = ShowErrorDialog(ex.Message); }
+        }
+
+        /// <summary>
+        /// Polls Task Scheduler every 2 s until the task leaves the Running state,
+        /// then writes the real state back to the model on the UI thread.
+        /// </summary>
+        private async System.Threading.Tasks.Task WatchTaskUntilFinished(ScheduledTaskModel task)
+        {
+            const int pollIntervalMs = 2000;
+            const int maxPolls = 300; // 10 minutes max
+            for (int i = 0; i < maxPolls; i++)
+            {
+                await System.Threading.Tasks.Task.Delay(pollIntervalMs);
+                try
+                {
+                    string? liveState = await System.Threading.Tasks.Task.Run(
+                        () => ViewModel.TaskService.GetTaskDetails(task.Path)?.State);
+
+                    if (liveState == null) break; // task was deleted
+
+                    DispatcherQueue.TryEnqueue(() =>
+                    {
+                        task.State = liveState;
+                        if (liveState != "Running")
+                            task.IsRunning = false;  // hide the ring
+                    });
+
+                    if (liveState != "Running") break;
+                }
+                catch { break; }
+            }
+            // Safety net: ensure the ring is cleared even if we exit via maxPolls or exception
+            DispatcherQueue.TryEnqueue(() => task.IsRunning = false);
         }
 
         private async void DeleteTask_Click(object sender, RoutedEventArgs e)
@@ -815,7 +860,23 @@ namespace FluentTaskScheduler
             if (BatchStopBtn != null) BatchStopBtn.IsEnabled = !anyDisabled;
         }
         private void BatchCancel_Click(object sender, RoutedEventArgs e) => TaskListView.SelectedItems.Clear();
-        private void BatchRun_Click(object sender, RoutedEventArgs e) => PerformBatchAction(t => { ViewModel.TaskService.RunTask(t.Path); t.State = "Running"; });
+        private void BatchRun_Click(object sender, RoutedEventArgs e)
+        {
+            // Snapshot selection before anything changes.
+            // Set IsRunning=true BEFORE calling RunTask so the ring appears immediately,
+            // independently of the volatile State string.
+            var tasks = TaskListView.SelectedItems.Cast<ScheduledTaskModel>().ToList();
+            foreach (var t in tasks)
+            {
+                t.IsRunning = true;           // show the ring immediately
+                try
+                {
+                    ViewModel.TaskService.RunTask(t.Path);
+                }
+                catch { /* RunTask failed – watcher will correct IsRunning */ }
+                _ = WatchTaskUntilFinished(t);
+            }
+        }
         private void BatchStop_Click(object sender, RoutedEventArgs e) => PerformBatchAction(t => { ViewModel.TaskService.StopTask(t.Path); t.State = "Ready"; });
         private void BatchEnable_Click(object sender, RoutedEventArgs e) { PerformBatchAction(t => { if (!t.IsEnabled) { ViewModel.TaskService.SetTaskEnabled(t.Path, true); t.IsEnabled = true; } }); UpdateBatchActionsState(); }
         private void BatchDisable_Click(object sender, RoutedEventArgs e) { PerformBatchAction(t => { if (t.IsEnabled) { ViewModel.TaskService.SetTaskEnabled(t.Path, false); t.IsEnabled = false; } }); UpdateBatchActionsState(); }

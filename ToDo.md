@@ -1,9 +1,8 @@
 # To Do:
 
-1. Animated status indicator for currently-running tasks
-2. "What's New" changelog popup after update
-3. Onboarding walkthrough for first launch
-4. Folder management UI (create, rename, delete task folders)
+1. "What's New" changelog popup after update
+2. Onboarding walkthrough for first launch
+3. Folder management UI (create, rename, delete task folders)
    **_More TBD_**
 
 # Done for next release:
@@ -19,3 +18,4 @@
 9. Tray icon badge showing how many tasks are currently running
 10. Task templates you can save yourself (not just the pre-built Script Library ones)
 11. Task run history chart on the Dashboard (graph of successes vs. failures over time)
+12. Animated status indicator for currently-running tasks

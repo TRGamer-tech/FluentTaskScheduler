@@ -48,6 +48,22 @@ namespace FluentTaskScheduler.Models
             } 
         }
 
+        private bool _isRunning;
+        /// <summary>True while this task was manually started and has not yet finished.
+        /// Drives the animated ProgressRing independently of the volatile Task Scheduler state string.</summary>
+        public bool IsRunning
+        {
+            get => _isRunning;
+            set
+            {
+                if (_isRunning != value)
+                {
+                    _isRunning = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public string Description { get; set; } = "";
         public string Author { get; set; } = "";
         public DateTime? LastRunTime { get; set; }

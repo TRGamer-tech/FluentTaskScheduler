@@ -23,6 +23,8 @@
         <converters:StateToIconConverter x:Key="StateToIconConverter"/>
         <converters:StateToColorConverter x:Key="StateToColorConverter"/>
         <converters:DateTimeConverter x:Key="DateTimeConverter"/>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
     </Page.Resources>
 
     <Grid>
@@ -191,9 +193,17 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,0,16,0">
                                     <CheckBox IsChecked="{x:Bind IsSelected, Mode=OneWay}" MinWidth="0" Margin="0,0,4,0" Click="TaskCheckBox_Click" VerticalAlignment="Center"/>
-                                    <FontIcon Glyph="{x:Bind State, Mode=OneWay, Converter={StaticResource StateToIconConverter}}" 
-                                            Foreground="{x:Bind State, Mode=OneWay, Converter={StaticResource StateToColorConverter}}" 
-                                            FontSize="24"/>
+                                    <!-- Status icon: animated ring when IsRunning, static icon otherwise -->
+                                    <Grid Width="24" Height="24" VerticalAlignment="Center">
+                                        <ProgressRing IsActive="True"
+                                                      Width="22" Height="22"
+                                                      Visibility="{x:Bind IsRunning, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                      Foreground="{x:Bind State, Mode=OneWay, Converter={StaticResource StateToColorConverter}}"/>
+                                        <FontIcon Glyph="{x:Bind State, Mode=OneWay, Converter={StaticResource StateToIconConverter}}"
+                                                  Foreground="{x:Bind State, Mode=OneWay, Converter={StaticResource StateToColorConverter}}"
+                                                  FontSize="20"
+                                                  Visibility="{x:Bind IsRunning, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                    </Grid>
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                     <TextBlock Text="{x:Bind Name}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
