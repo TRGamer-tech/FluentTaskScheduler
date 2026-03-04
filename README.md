@@ -14,6 +14,8 @@ FluentTaskScheduler is a professional-grade wrapper for the Windows Task Schedul
 
 - **Activity Stream**: A live feed of task activity. Click any entry to jump directly to the task details.
 - **Task History**: Comprehensive history of all task executions, keeping you informed of every run.
+- **Visual Analytics**: A dynamic task run history chart on the dashboard showing successes vs. failures over time.
+- **Animated Status**: Clearly identify running tasks at a glance with animated status indicators.
 
 ### 🕒 Comprehensive Triggers
 
@@ -41,6 +43,7 @@ FluentTaskScheduler is a professional-grade wrapper for the Windows Task Schedul
 
 - **Centralized Management**: A dedicated space for pr-written PowerShell scripts, separating logic from task configuration.
 - **Reusable Code**: Use scripts in multiple tasks.
+- **Custom Templates**: Save and reuse your own task templates, going beyond just the pre-built scripts.
 
 ### 🛡️ Actions & Conditions
 
@@ -64,11 +67,14 @@ FluentTaskScheduler is a professional-grade wrapper for the Windows Task Schedul
 ### 🧬 System Integration
 
 - **System Tray**: Minimize the app to the tray to keep your taskbar clean while the scheduler hums in the background. Disabled by default.
+- **Tray Badge**: See the number of currently running tasks at a glance directly on the tray icon.
 - **Multi-Window Tray Management**: Open multiple windows and manage them independently from the tray right-click menu — restore or close individual windows, or open a new one, all from a single tray icon.
 - **Tray Notification**: A toast notification appears the first time the app is minimized to tray, with a click action to restore the window instantly.
 - **Single Instance**: Launching the app a second time brings the existing window to the front instead of opening a duplicate.
 - **Run on Startup**: Option to launch automatically with Windows.
 - **Notifications**: Get native toast notifications when tasks complete or fail.
+- **Onboarding Walkthrough**: Step-by-step onboarding for first launch to guide new users through key features.
+- **Changelog Popup**: A "What's New" popup highlighting application updates the first time you run a new version.
 
 ### ⚙️ Robust Settings
 
@@ -83,6 +89,9 @@ FluentTaskScheduler is a professional-grade wrapper for the Windows Task Schedul
 ### 📊 Management & History
 
 - **Task History**: View recent task execution history within the app (Today, Yesterday, This Week, All Time).
+- **Folder Management**: Organize your tasks logically by creating, renaming, and deleting custom folders.
+- **Smart Navigation**: The application remembers your last-used folder on restart.
+- **Sortable Lists**: Sort tasks easily by clicking column headers directly in the task list (by name, status, next run, etc.).
 - **Search & Filter**: Instantly find tasks by name, status, or path.
 - **Import/Export**: Easily backup or migrate task definitions, including CSV export for history.
 - **Batch Operations**: Select and manage multiple tasks simultaneously.
@@ -98,6 +107,7 @@ FluentTaskScheduler is a professional-grade wrapper for the Windows Task Schedul
 | `Delete`   | Delete Selected Task            |
 | `F5`       | Refresh Task List               |
 | `Esc`      | Close Dialogs / Clear Selection |
+| `?` / `F1` | Keyboard Shortcut Cheat Sheet   |
 
 ## 💻 CLI Reference
 
@@ -143,6 +153,7 @@ FluentTaskScheduler.exe --export-history "MyTaskName" --output "C:\logs\history.
 
 - **Crash Logs**: If the application encounters a critical error, a `crash_log.txt` file is generated in the application directory.
 - **Admin Rights**: Some features (like "Run as SYSTEM") require the application to be run as Administrator.
+- **Preferences storage**: The application stores its preferences as well as the log and custom script files in a JSON file in "%localappdata%\FluentTaskScheduler".
 
 3. **Single File Deployment**:
    The project supports publishing as a single, self-contained executable for easy distribution.
