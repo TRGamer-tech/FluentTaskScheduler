@@ -46,13 +46,17 @@
                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
                                 <Button x:Name="FolderRefreshBtn" Padding="4" Background="Transparent" BorderThickness="0" Click="ReloadFolders_Click" ToolTipService.ToolTip="Reload Folders">
-                                    <Grid Width="16" Height="16">
-                                        <SymbolIcon x:Name="FolderRefreshIcon" Symbol="Refresh" />
-                                        <ProgressRing x:Name="FolderRefreshRing" Width="14" Height="14" IsActive="False" Visibility="Collapsed" />
+                                    <Grid Width="14" Height="14">
+                                        <Viewbox>
+                                            <SymbolIcon x:Name="FolderRefreshIcon" Symbol="Refresh" />
+                                        </Viewbox>
+                                        <ProgressRing x:Name="FolderRefreshRing" IsActive="False" Visibility="Collapsed" />
                                     </Grid>
                                 </Button>
                                 <Button x:Name="FolderCreateBtn" Padding="4" Background="Transparent" BorderThickness="0" Click="CreateRootFolder_Click" ToolTipService.ToolTip="New Folder">
-                                    <SymbolIcon Symbol="Add" />
+                                    <Viewbox Width="14" Height="14">
+                                        <SymbolIcon Symbol="Add" />
+                                    </Viewbox>
                                 </Button>
                             </StackPanel>
                         </Grid>
