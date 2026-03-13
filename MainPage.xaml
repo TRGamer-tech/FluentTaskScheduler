@@ -401,7 +401,7 @@
                 <x:Double x:Key="ContentDialogMaxWidth">1000</x:Double>
             </ContentDialog.Resources>
             <ScrollViewer x:Name="EditScrollViewer" MaxHeight="600" VerticalScrollBarVisibility="Auto" IsTabStop="False" Background="Transparent" PointerPressed="DialogScrollViewer_PointerPressed" IsScrollInertiaEnabled="False">
-                <StackPanel Spacing="16" Width="750" Margin="0,8,12,8">
+                <StackPanel Spacing="16" Width="750" Margin="0,8,12,8" AllowFocusOnInteraction="False">
                 <TextBlock x:Uid="DialogTitle" Text="Add or edit task" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
                 <TextBox x:Name="EditTaskName" x:Uid="TaskNameHeader" Header="Task Name" PlaceholderText="Enter task name"/>
                 <TextBox x:Name="EditTaskDescription" x:Uid="DescriptionHeader" Header="Description" AcceptsReturn="True" Height="80"/>
@@ -480,10 +480,10 @@
                 </StackPanel>
 
                 <!-- Daily Trigger -->
-                <StackPanel x:Name="PanelDaily" Visibility="Collapsed" Spacing="8">
+                <StackPanel x:Name="PanelDaily" Visibility="Collapsed" Spacing="8" Margin="0,4,0,0">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <CheckBox x:Name="EditTaskDailyRecurrence" Content="Recur every" IsChecked="True" Checked="EditTaskDailyRecurrence_Checked" Unchecked="EditTaskDailyRecurrence_Checked"/>
-                        <TextBox x:Name="DailyInterval" Width="80" Text="1"/>
+                        <CheckBox x:Name="EditTaskDailyRecurrence" Content="Recur every" IsChecked="True" Checked="EditTaskDailyRecurrence_Checked" Unchecked="EditTaskDailyRecurrence_Checked" VerticalAlignment="Center"/>
+                        <TextBox x:Name="DailyInterval" Width="80" Text="1" VerticalAlignment="Center"/>
                         <TextBlock Text="day(s)" VerticalAlignment="Center"/>
                     </StackPanel>
                 </StackPanel>
@@ -658,7 +658,7 @@
                 <Rectangle Height="2" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,12,0,4"/>
                 <TextBlock Text="Repetition" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,4"/>
                 <StackPanel Spacing="12">
-                    <ComboBox x:Name="EditTaskRepetitionInterval" Header="Repeat task every" SelectedIndex="0">
+                    <ComboBox x:Name="EditTaskRepetitionInterval" Header="Repeat task every" SelectedIndex="0" SelectionChanged="EditTaskRepetitionInterval_SelectionChanged">
                         <ComboBoxItem Content="(No repetition)" Tag=""/>
                         <ComboBoxItem Content="5 minutes" Tag="PT5M"/>
                         <ComboBoxItem Content="10 minutes" Tag="PT10M"/>
@@ -670,7 +670,7 @@
                         <ComboBoxItem Content="6 hours" Tag="PT6H"/>
                         <ComboBoxItem Content="12 hours" Tag="PT12H"/>
                     </ComboBox>
-                    <ComboBox x:Name="EditTaskRepetitionDuration" x:Uid="RepetitionDurationHeader" Header="For a duration of" SelectedIndex="0">
+                    <ComboBox x:Name="EditTaskRepetitionDuration" x:Uid="RepetitionDurationHeader" Header="For a duration of" SelectedIndex="0" SelectionChanged="EditTaskRepetitionDuration_SelectionChanged">
                         <ComboBoxItem Content="Indefinitely" Tag=""/>
                         <ComboBoxItem Content="1 hour" Tag="PT1H"/>
                         <ComboBoxItem Content="2 hours" Tag="PT2H"/>

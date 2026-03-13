@@ -815,6 +815,12 @@ namespace FluentTaskScheduler
                     if (item.Tag?.ToString() == tr.SessionStateChangeType) EditTaskSessionStateType.SelectedItem = item;
                 }
 
+                // Repetition mapping
+                foreach (var item in EditTaskRepetitionInterval.Items.Cast<ComboBoxItem>())
+                    if (item.Tag?.ToString() == (tr.RepetitionInterval ?? "")) { EditTaskRepetitionInterval.SelectedItem = item; break; }
+                foreach (var item in EditTaskRepetitionDuration.Items.Cast<ComboBoxItem>())
+                    if (item.Tag?.ToString() == (tr.RepetitionDuration ?? "")) { EditTaskRepetitionDuration.SelectedItem = item; break; }
+
                 UpdateTriggerPanelVisibility();
                 _isPopulatingDetails = false;
             }
@@ -940,6 +946,18 @@ namespace FluentTaskScheduler
             EditTaskExpirationTime.IsEnabled = enabled;
         }
         private void EditTaskRandomDelay_Click(object sender, RoutedEventArgs e) { if (EditTaskRandomDelayVal != null) EditTaskRandomDelayVal.IsEnabled = EditTaskRandomDelay.IsChecked == true; }
+        private void EditTaskRepetitionInterval_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_isPopulatingDetails) return;
+            if (TriggerList.SelectedItem is TaskTriggerModel tr && EditTaskRepetitionInterval.SelectedItem is ComboBoxItem item)
+                tr.RepetitionInterval = item.Tag?.ToString() ?? "";
+        }
+        private void EditTaskRepetitionDuration_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_isPopulatingDetails) return;
+            if (TriggerList.SelectedItem is TaskTriggerModel tr && EditTaskRepetitionDuration.SelectedItem is ComboBoxItem item)
+                tr.RepetitionDuration = item.Tag?.ToString() ?? "";
+        }
         private void EditTaskStopAfter_Click(object sender, RoutedEventArgs e) { if (EditTaskStopAfterVal != null) EditTaskStopAfterVal.IsEnabled = EditTaskStopAfter.IsChecked == true; }
         private void EditTaskDailyRecurrence_Checked(object sender, RoutedEventArgs e) { if (DailyInterval != null) DailyInterval.IsEnabled = EditTaskDailyRecurrence.IsChecked == true; }
         private void UserContextRadio_Checked(object sender, RoutedEventArgs e) 
