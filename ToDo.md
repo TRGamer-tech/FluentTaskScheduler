@@ -1,6 +1,7 @@
 # To Do:
 
-1. **_More TBD_**
+1. Add ability to import to any selected folder, not just root.
+2. **_More TBD_**
 
 # Done for next release:
 
