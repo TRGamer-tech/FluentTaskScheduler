@@ -662,12 +662,40 @@ namespace FluentTaskScheduler
             var file = await picker.PickSingleFileAsync();
             if (file != null)
             {
-                // Simple import flow
-                var folder = NavView.SelectedItem is NavigationViewItem item && item.Tag?.ToString()?.StartsWith("\\") == true ? item.Tag.ToString() : "\\";
+                var folderList = _treeNodeFolderMap.Values.Select(f => f.Path).Distinct().OrderBy(p => p).ToList();
+                if (folderList.Count == 0) folderList.Add("\\");
+
+                var comboBox = new ComboBox
+                {
+                    ItemsSource = folderList,
+                    SelectedItem = _currentFolderPath ?? "\\",
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    Margin = new Thickness(0, 10, 0, 0)
+                };
+
+                var panel = new StackPanel();
+                panel.Children.Add(new TextBlock { Text = "Select the folder to import this task into:" });
+                panel.Children.Add(comboBox);
+
+                var dialog = new ContentDialog
+                {
+                    Title = "Import Task",
+                    Content = panel,
+                    PrimaryButtonText = "Import",
+                    CloseButtonText = "Cancel",
+                    DefaultButton = ContentDialogButton.Primary,
+                    XamlRoot = this.XamlRoot
+                };
+
+                var result = await dialog.ShowAsync();
+                if (result != ContentDialogResult.Primary) return;
+
+                var folder = comboBox.SelectedItem?.ToString() ?? "\\";
+                
                 try
                 {
                     string xml = await Windows.Storage.FileIO.ReadTextAsync(file);
-                    ViewModel.TaskService.RegisterTaskFromXml(folder ?? "\\", System.IO.Path.GetFileNameWithoutExtension(file.Name), xml);
+                    ViewModel.TaskService.RegisterTaskFromXml(folder, System.IO.Path.GetFileNameWithoutExtension(file.Name), xml);
                     _ = ViewModel.LoadTasksAsync();
                 }
                 catch (Exception ex) { await ShowErrorDialog(ex.Message); }
