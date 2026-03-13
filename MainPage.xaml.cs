@@ -113,6 +113,9 @@ namespace FluentTaskScheduler
             DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
             {
                 ApplySmoothScrollingSelf(Services.SettingsService.SmoothScrolling);
+                
+                // Set custom title bar drag region
+                App.m_window?.SetTitleBar(AppTitleBarDragArea);
             });
 
             // Show startup dialogs in order: onboarding first, then changelog

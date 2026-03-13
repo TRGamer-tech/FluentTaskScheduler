@@ -7,122 +7,329 @@
     mc:Ignorable="d"
     Background="Transparent">
 
+    <Page.Resources>
+        <Style x:Key="SettingsCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}"/>
+            <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="16,14"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+            <Setter Property="MinHeight" Value="64"/>
+        </Style>
+    </Page.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <!-- Custom Title Bar Drag Region -->
+        <Grid x:Name="AppTitleBar" Height="32" VerticalAlignment="Top" Grid.RowSpan="2" Canvas.ZIndex="100">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48"/> <!-- Back button area -->
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="140"/> <!-- Caption buttons area -->
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="1" Background="Transparent" x:Name="AppTitleBarDragArea"/>
+        </Grid>
+
         <!-- Header -->
-        <StackPanel Grid.Row="0" Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" Padding="24,12,24,12">
+        <StackPanel Grid.Row="0" Margin="16,12,16,12">
             <StackPanel Orientation="Horizontal" Spacing="16">
                 <Button x:Name="BackButton" Click="BackButton_Click" Background="Transparent" BorderThickness="0" Width="40" Height="40" CornerRadius="5" ToolTipService.ToolTip="Go Back">
                     <FontIcon Glyph="&#xE72B;"/>
                 </Button>
-                <TextBlock x:Uid="SettingsHeader" Text="Settings" Style="{StaticResource TitleTextBlockStyle}" VerticalAlignment="Center"/>
+                <TextBlock Text="Settings" Style="{StaticResource TitleTextBlockStyle}" VerticalAlignment="Center"/>
             </StackPanel>
         </StackPanel>
 
-        <!-- Content -->
-        <ScrollViewer x:Name="PageScrollViewer" Grid.Row="1" Padding="24" IsScrollInertiaEnabled="False">
-            <StackPanel Spacing="24" MaxWidth="600" HorizontalAlignment="Left">
-                
-                <!-- Appearance -->
-                <StackPanel Spacing="8">
-                    <TextBlock x:Uid="AppearanceHeader" Text="Appearance" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                    
-                    <ComboBox x:Name="ThemeComboBox" x:Uid="ThemeComboBox" Header="App Theme" SelectionChanged="ThemeComboBox_SelectionChanged" Margin="0,8,0,0" Width="200">
-                        <ComboBoxItem Content="Light"/>
-                        <ComboBoxItem Content="Dark"/>
-                        <ComboBoxItem Content="System Default"/>
-                    </ComboBox>
+        <!-- Body: NavigationView for Sidebar + Content -->
+        <NavigationView x:Name="SettingsNav"
+                        Grid.Row="1"
+                        PaneDisplayMode="Left"
+                        IsBackButtonVisible="Collapsed"
+                        IsSettingsVisible="False"
+                        SelectionChanged="SettingsNav_SelectionChanged"
+                        Padding="0">
+            
+            <NavigationView.MenuItems>
+                <NavigationViewItem Tag="Appearance" Content="Appearance" IsSelected="True">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE790;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="Notifications" Content="Notifications">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE7E7;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="System" Content="System">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE770;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="Advanced" Content="Advanced">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE90F;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="Data" Content="Data">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8B5;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="About" Content="About">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE946;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
 
-                    <ToggleSwitch x:Name="MicaModeToggle" Header="Mica Effect" OffContent="Off" OnContent="On" Toggled="MicaModeToggle_Toggled" IsOn="True" Margin="0,8,0,0"/>
+            <NavigationView.Content>
+                <!-- Content area -->
+                <ScrollViewer x:Name="PageScrollViewer" Padding="28,24,28,24"
+                              IsScrollInertiaEnabled="False" VerticalScrollBarVisibility="Auto">
+                    <Grid MaxWidth="580" HorizontalAlignment="Left">
 
-                    <ToggleSwitch x:Name="OledModeToggle" x:Uid="OledToggle" Header="OLED Mode" OffContent="Standard Dark" OnContent="Pure Black (Power Saving)" Toggled="OledModeToggle_Toggled" IsOn="True" Margin="0,8,0,0"/>
-                    <TextBlock x:Uid="OledHint" Text="OLED mode uses pure black backgrounds for power saving." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="0,-4,0,0"/>
-                </StackPanel>
+                    <!-- ── Appearance ── -->
+                    <StackPanel x:Name="PanelAppearance" Spacing="4">
+                        <TextBlock Text="Appearance" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
 
-                <!-- Behaviors -->
-                <StackPanel Spacing="8">
-                    <TextBlock x:Uid="BehaviorsHeader" Text="Behaviors" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                    
-                    <ToggleSwitch x:Name="NotificationsToggle" x:Uid="NotificationsToggle" Header="Task Notifications" OnContent="On" OffContent="Off" IsOn="True"/>
-                    <TextBlock Text="Show a toast notification when a task starts or fails." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="0,-4,0,0"/>
-
-                    <ToggleSwitch x:Name="UpcomingRemindersToggle" Header="Upcoming Task Reminders" OnContent="On" OffContent="Off" IsOn="True" Margin="0,8,0,0"/>
-                    <TextBlock Text="Remind you before a scheduled task is about to run (default: 5 minutes ahead)." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="0,-4,0,0"/>
-
-                    <ToggleSwitch x:Name="TrayIconToggle" x:Uid="TrayIconToggle" Header="Minimize to Tray" OnContent="On" OffContent="Off" IsOn="True" Margin="0,8,0,0"/>
-                    <TextBlock Text="Hides the window to the system tray instead of closing." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="0,-4,0,0"/>
-
-                    <ToggleSwitch x:Name="RunOnStartupToggle" Header="Run on Startup" OnContent="On" OffContent="Off" IsOn="False" Margin="0,8,0,0"/>
-                    <TextBlock Text="Automatically start the app when you log in to Windows." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="0,-4,0,0"/>
-
-                    <ToggleSwitch x:Name="SmoothScrollingToggle" Header="Smooth Scrolling" OnContent="On" OffContent="Off" IsOn="False" Margin="0,8,0,0"/>
-                    <TextBlock Text="Enable smooth inertia-based scrolling throughout the app." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="0,-4,0,0"/>
-                </StackPanel>
-
-                <!-- Logging -->
-                <StackPanel Spacing="8">
-                    <TextBlock Text="Logging" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                    <ToggleSwitch x:Name="LoggingToggle" Header="Application Logging" OnContent="On" OffContent="Off" IsOn="True"/>
-                    <TextBlock Text="Write internal events and errors to a log file for troubleshooting." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="0,-4,0,0"/>
-                    <Button x:Name="OpenLogButton" Content="Open Log File" Click="OpenLogButton_Click" Margin="0,4,0,0"/>
-                </StackPanel>
-
-                <!-- General -->
-                <StackPanel Spacing="8">
-                    <TextBlock x:Uid="GeneralHeader" Text="General" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                    <ToggleSwitch x:Name="ConfirmDeleteToggle" x:Uid="ConfirmDelete" Header="Confirm Task Deletion" OnContent="On" OffContent="Off" Toggled="ConfirmDeleteToggle_Toggled"/>
-
-                    <!-- Replay onboarding -->
-                    <TextBlock Text="Onboarding" FontWeight="SemiBold" Margin="0,12,0,0"/>
-                    <TextBlock Text="Replay the welcome walkthrough that appeared on first launch." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="0,-4,0,0"/>
-                    <Button x:Name="ReplayOnboardingButton" Content="View Onboarding Again" Click="ReplayOnboardingButton_Click" Margin="0,4,0,0">
-                        <Button.ContentTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xE7C3;" FontSize="14" VerticalAlignment="Center"/>
-                                    <TextBlock Text="View Onboarding Again" VerticalAlignment="Center"/>
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock Text="App Theme" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="Choose Light, Dark, or follow the system setting." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
-                            </DataTemplate>
-                        </Button.ContentTemplate>
-                    </Button>
-                </StackPanel>
+                                <ComboBox x:Name="ThemeComboBox" Grid.Column="1" VerticalAlignment="Center"
+                                          SelectionChanged="ThemeComboBox_SelectionChanged" Width="160">
+                                    <ComboBoxItem Content="Light"/>
+                                    <ComboBoxItem Content="Dark"/>
+                                    <ComboBoxItem Content="System Default"/>
+                                </ComboBox>
+                            </Grid>
+                        </Border>
 
-                <!-- Backup & Restore -->
-                <StackPanel Spacing="8">
-                    <TextBlock Text="Backup &amp; Restore" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                    <TextBlock Text="Export your current settings to a file, or restore from a backup." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Button x:Name="ExportSettingsButton" Content="Export Settings" Click="ExportSettings_Click"/>
-                        <Button x:Name="ImportSettingsButton" Content="Import Settings" Click="ImportSettings_Click"/>
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock Text="Mica Effect" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="Apply the Mica translucent background material." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <ToggleSwitch x:Name="MicaModeToggle" Grid.Column="1" VerticalAlignment="Center"
+                                             OffContent="" OnContent="" IsOn="True" Toggled="MicaModeToggle_Toggled"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock Text="OLED Mode" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="Pure black background to save power on OLED displays. Requires Dark theme." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <ToggleSwitch x:Name="OledModeToggle" Grid.Column="1" VerticalAlignment="Center"
+                                             OffContent="" OnContent="" Toggled="OledModeToggle_Toggled"/>
+                            </Grid>
+                        </Border>
                     </StackPanel>
-                </StackPanel>
 
-                <!-- About -->
-                <StackPanel Spacing="8" Margin="0,24,0,0">
-                    <TextBlock x:Uid="AboutHeader" Text="About" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                    <TextBlock x:Uid="AboutTitle" Text="Fluent Task Scheduler" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                    <Button x:Name="VersionButton"
-                            Click="VersionButton_Click"
-                            Background="Transparent" BorderThickness="0"
-                            Padding="0" Margin="0"
-                            ToolTipService.ToolTip="See What's New">
-                        <StackPanel Orientation="Horizontal" Spacing="5">
-                            <TextBlock x:Uid="AboutVersion" Text="Version 1.5.0"
-                                       Style="{StaticResource CaptionTextBlockStyle}"
-                                       Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                       FontWeight="SemiBold"/>
-                            <FontIcon Glyph="&#xE946;" FontSize="11" Opacity="0.5"
-                                      VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                    <TextBlock x:Uid="AboutBuilt" Text="Built with WinUI 3" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
-                </StackPanel>
-                
-            </StackPanel>
-        </ScrollViewer>
+                    <!-- ── Notifications ── -->
+                    <StackPanel x:Name="PanelNotifications" Spacing="4" Visibility="Collapsed">
+                        <TextBlock Text="Notifications" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
+
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock Text="Task Notifications" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="Show a toast when a task starts or fails." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <ToggleSwitch x:Name="NotificationsToggle" Grid.Column="1" VerticalAlignment="Center"
+                                             OffContent="" OnContent="" IsOn="True" Toggled="NotificationsToggle_Toggled"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock Text="Upcoming Task Reminders" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="Show a reminder toast before a scheduled task is about to run." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <ToggleSwitch x:Name="UpcomingRemindersToggle" Grid.Column="1" VerticalAlignment="Center"
+                                             OffContent="" OnContent="" IsOn="True" Toggled="UpcomingRemindersToggle_Toggled"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock Text="Reminder Timing" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="How far in advance to send the reminder." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <ComboBox x:Name="ReminderLeadTimeComboBox" Grid.Column="1" VerticalAlignment="Center"
+                                          SelectionChanged="ReminderLeadTimeComboBox_SelectionChanged" Width="160">
+                                    <ComboBoxItem Content="1 minute before"/>
+                                    <ComboBoxItem Content="5 minutes before"/>
+                                    <ComboBoxItem Content="10 minutes before"/>
+                                    <ComboBoxItem Content="15 minutes before"/>
+                                    <ComboBoxItem Content="30 minutes before"/>
+                                </ComboBox>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- ── System ── -->
+                    <StackPanel x:Name="PanelSystem" Spacing="4" Visibility="Collapsed">
+                        <TextBlock Text="System" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
+
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock Text="Run on Startup" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="Automatically launch the app when you sign in to Windows." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <ToggleSwitch x:Name="RunOnStartupToggle" Grid.Column="1" VerticalAlignment="Center"
+                                             OffContent="" OnContent="" IsOn="False" Toggled="RunOnStartupToggle_Toggled"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock Text="Minimize to Tray" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="Hide the window to the system tray instead of closing." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <ToggleSwitch x:Name="TrayIconToggle" Grid.Column="1" VerticalAlignment="Center"
+                                             OffContent="" OnContent="" IsOn="True" Toggled="TrayIconToggle_Toggled"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock Text="Smooth Scrolling" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="Enable inertia-based scrolling throughout the app." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <ToggleSwitch x:Name="SmoothScrollingToggle" Grid.Column="1" VerticalAlignment="Center"
+                                             OffContent="" OnContent="" IsOn="False" Toggled="SmoothScrollingToggle_Toggled"/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- ── Advanced ── -->
+                    <StackPanel x:Name="PanelAdvanced" Spacing="4" Visibility="Collapsed">
+                        <TextBlock Text="Advanced" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
+
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock Text="Confirm Before Deleting" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="Show a confirmation dialog before removing a task." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <ToggleSwitch x:Name="ConfirmDeleteToggle" Grid.Column="1" VerticalAlignment="Center"
+                                             OffContent="" OnContent="" Toggled="ConfirmDeleteToggle_Toggled"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock Text="Application Logging" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="Write internal events and errors to a log file for troubleshooting." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                                    <Button x:Name="OpenLogButton" Content="Open Log" Click="OpenLogButton_Click"/>
+                                    <ToggleSwitch x:Name="LoggingToggle" OffContent="" OnContent="" IsOn="True" Toggled="LoggingToggle_Toggled"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- ── Data ── -->
+                    <StackPanel x:Name="PanelData" Spacing="4" Visibility="Collapsed">
+                        <TextBlock Text="Data" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
+
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock Text="Export Settings" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="Save your current settings to a JSON file." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <Button x:Name="ExportSettingsButton" Grid.Column="1" Content="Export" VerticalAlignment="Center" Click="ExportSettings_Click"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock Text="Import Settings" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="Restore settings from a previously exported file." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <Button x:Name="ImportSettingsButton" Grid.Column="1" Content="Import" VerticalAlignment="Center" Click="ImportSettings_Click"/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- ── About ── -->
+                    <StackPanel x:Name="PanelAbout" Spacing="4" Visibility="Collapsed">
+                        <TextBlock Text="About" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
+
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Fluent Task Scheduler" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="Built with WinUI 3 · Windows App SDK" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
+                                </StackPanel>
+                                <Button x:Name="VersionButton" Grid.Column="1" Click="VersionButton_Click"
+                                        Background="Transparent" BorderThickness="0" Padding="8,6"
+                                        VerticalAlignment="Center" ToolTipService.ToolTip="See What's New">
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <TextBlock x:Uid="AboutVersion" Text="Version 1.5.0"
+                                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                                   Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                                   FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <FontIcon Glyph="&#xE946;" FontSize="11" Opacity="0.5" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock Text="Onboarding" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="Replay the welcome walkthrough from first launch." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <Button x:Name="ReplayOnboardingButton" Grid.Column="1" VerticalAlignment="Center"
+                                        Click="ReplayOnboardingButton_Click">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE7C3;" FontSize="13"/>
+                                        <TextBlock Text="View Again"/>
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    </Grid>
+                </ScrollViewer>
+            </NavigationView.Content>
+        </NavigationView>
     </Grid>
 </Page>

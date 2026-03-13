@@ -10,6 +10,9 @@ namespace FluentTaskScheduler
     public sealed partial class SettingsPage : Page
     {
         private bool _isLoaded = false;
+        private StackPanel[]? _panels;
+
+        private static readonly int[] _leadMinuteOptions = { 1, 5, 10, 15, 30 };
 
         public SettingsPage()
         {
@@ -28,51 +31,74 @@ namespace FluentTaskScheduler
                 ElementTheme.Dark => 1,
                 _ => 2
             };
-
             OledModeToggle.IsOn = SettingsService.IsOledMode;
             MicaModeToggle.IsOn = SettingsService.IsMicaEnabled;
-            MicaModeToggle.IsEnabled = !SettingsService.IsOledMode;
             UpdateOledToggleState();
-
-            // General
-            ConfirmDeleteToggle.IsOn = SettingsService.ConfirmDelete;
 
             // Notifications
             NotificationsToggle.IsOn = SettingsService.ShowNotifications;
             UpcomingRemindersToggle.IsOn = SettingsService.EnableUpcomingReminders;
             UpcomingRemindersToggle.IsEnabled = SettingsService.ShowNotifications;
-            
-            // Minimize to Tray (single toggle now controls both)
-            TrayIconToggle.IsOn = SettingsService.EnableTrayIcon;
 
-            // Run on Startup
+            int leadIdx = Array.IndexOf(_leadMinuteOptions, SettingsService.ReminderLeadMinutes);
+            ReminderLeadTimeComboBox.SelectedIndex = leadIdx >= 0 ? leadIdx : 1;
+            ReminderLeadTimeComboBox.IsEnabled = SettingsService.ShowNotifications && SettingsService.EnableUpcomingReminders;
+
+            // System
             RunOnStartupToggle.IsOn = SettingsService.RunOnStartup;
-
-            // Smooth Scrolling
+            TrayIconToggle.IsOn = SettingsService.EnableTrayIcon;
             SmoothScrollingToggle.IsOn = SettingsService.SmoothScrolling;
 
-            // Logging
+            // Advanced
+            ConfirmDeleteToggle.IsOn = SettingsService.ConfirmDelete;
             LoggingToggle.IsOn = SettingsService.EnableLogging;
 
-            // Subscribe events
-            NotificationsToggle.Toggled += NotificationsToggle_Toggled;
-            UpcomingRemindersToggle.Toggled += UpcomingRemindersToggle_Toggled;
-            TrayIconToggle.Toggled += TrayIconToggle_Toggled;
-            RunOnStartupToggle.Toggled += RunOnStartupToggle_Toggled;
-            LoggingToggle.Toggled += LoggingToggle_Toggled;
-            SmoothScrollingToggle.Toggled += SmoothScrollingToggle_Toggled;
+            // Init sidebar panels — sync visibility with current selection
+            _panels = new[] { PanelAppearance, PanelNotifications, PanelSystem, PanelAdvanced, PanelData, PanelAbout };
+            SyncPanelVisibility();
 
             _isLoaded = true;
-
-            // Apply current smooth scrolling setting to this page's ScrollViewer
             PageScrollViewer.IsScrollInertiaEnabled = SettingsService.SmoothScrolling;
+
+            // Set custom title bar drag region
+            App.m_window?.SetTitleBar(AppTitleBarDragArea);
         }
+
+        // ── Sidebar ────────────────────────────────────────────────────────────
+        
+        private void SettingsNav_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+        {
+            if (_panels == null || args.SelectedItem == null) return;
+            SyncPanelVisibility();
+            PageScrollViewer.ScrollToVerticalOffset(0);
+        }
+
+        private void SyncPanelVisibility()
+        {
+            if (_panels == null) return;
+            
+            var selectedItem = SettingsNav.SelectedItem as NavigationViewItem;
+            if (selectedItem == null) return;
+
+            string tag = selectedItem.Tag?.ToString() ?? "";
+            
+            PanelAppearance.Visibility = tag == "Appearance" ? Visibility.Visible : Visibility.Collapsed;
+            PanelNotifications.Visibility = tag == "Notifications" ? Visibility.Visible : Visibility.Collapsed;
+            PanelSystem.Visibility = tag == "System" ? Visibility.Visible : Visibility.Collapsed;
+            PanelAdvanced.Visibility = tag == "Advanced" ? Visibility.Visible : Visibility.Collapsed;
+            PanelData.Visibility = tag == "Data" ? Visibility.Visible : Visibility.Collapsed;
+            PanelAbout.Visibility = tag == "About" ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        // ── Navigation ─────────────────────────────────────────────────────────
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             if (Frame.CanGoBack)
                 Frame.GoBack();
         }
+
+        // ── Appearance ─────────────────────────────────────────────────────────
 
         private void ThemeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -88,6 +114,14 @@ namespace FluentTaskScheduler
             LogService.Info($"App Theme: {SettingsService.Theme}");
         }
 
+        private void MicaModeToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!_isLoaded) return;
+            SettingsService.IsMicaEnabled = MicaModeToggle.IsOn;
+            (Application.Current as App)?.ApplyTheme(SettingsService.Theme);
+            LogService.Info($"Mica Effect: {(MicaModeToggle.IsOn ? "enabled" : "disabled")}");
+        }
+
         private void OledModeToggle_Toggled(object sender, RoutedEventArgs e)
         {
             if (!_isLoaded) return;
@@ -97,26 +131,21 @@ namespace FluentTaskScheduler
             LogService.Info($"OLED Mode: {(OledModeToggle.IsOn ? "enabled" : "disabled")}");
         }
 
-        private void MicaModeToggle_Toggled(object sender, RoutedEventArgs e)
+        private void UpdateOledToggleState()
         {
-            if (!_isLoaded) return;
-            SettingsService.IsMicaEnabled = MicaModeToggle.IsOn;
-            (Application.Current as App)?.ApplyTheme(SettingsService.Theme);
-            LogService.Info($"Mica Effect: {(MicaModeToggle.IsOn ? "enabled" : "disabled")}");
+            bool isDark = SettingsService.Theme == ElementTheme.Dark;
+            OledModeToggle.IsEnabled = isDark;
+            MicaModeToggle.IsEnabled = !isDark || !SettingsService.IsOledMode;
         }
 
-        private void ConfirmDeleteToggle_Toggled(object sender, RoutedEventArgs e)
-        {
-            if (!_isLoaded) return;
-            SettingsService.ConfirmDelete = ConfirmDeleteToggle.IsOn;
-            LogService.Info($"Confirm Task Deletion: {(ConfirmDeleteToggle.IsOn ? "enabled" : "disabled")}");
-        }
+        // ── Notifications ──────────────────────────────────────────────────────
 
         private void NotificationsToggle_Toggled(object sender, RoutedEventArgs e)
         {
             if (!_isLoaded) return;
             SettingsService.ShowNotifications = NotificationsToggle.IsOn;
             UpcomingRemindersToggle.IsEnabled = NotificationsToggle.IsOn;
+            ReminderLeadTimeComboBox.IsEnabled = NotificationsToggle.IsOn && UpcomingRemindersToggle.IsOn;
             LogService.Info($"Task Notifications: {(NotificationsToggle.IsOn ? "enabled" : "disabled")}");
         }
 
@@ -124,7 +153,28 @@ namespace FluentTaskScheduler
         {
             if (!_isLoaded) return;
             SettingsService.EnableUpcomingReminders = UpcomingRemindersToggle.IsOn;
+            ReminderLeadTimeComboBox.IsEnabled = UpcomingRemindersToggle.IsOn;
             LogService.Info($"Upcoming Task Reminders: {(UpcomingRemindersToggle.IsOn ? "enabled" : "disabled")}");
+        }
+
+        private void ReminderLeadTimeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!_isLoaded) return;
+            int idx = ReminderLeadTimeComboBox.SelectedIndex;
+            if (idx >= 0 && idx < _leadMinuteOptions.Length)
+            {
+                SettingsService.ReminderLeadMinutes = _leadMinuteOptions[idx];
+                LogService.Info($"Reminder lead time: {_leadMinuteOptions[idx]} min");
+            }
+        }
+
+        // ── System ─────────────────────────────────────────────────────────────
+
+        private void RunOnStartupToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!_isLoaded) return;
+            SettingsService.RunOnStartup = RunOnStartupToggle.IsOn;
+            StartupService.UpdateFromSettings();
         }
 
         private void TrayIconToggle_Toggled(object sender, RoutedEventArgs e)
@@ -136,11 +186,24 @@ namespace FluentTaskScheduler
             LogService.Info($"Minimize to Tray: {(TrayIconToggle.IsOn ? "enabled" : "disabled")}");
         }
 
-        private void RunOnStartupToggle_Toggled(object sender, RoutedEventArgs e)
+        private void SmoothScrollingToggle_Toggled(object sender, RoutedEventArgs e)
         {
             if (!_isLoaded) return;
-            SettingsService.RunOnStartup = RunOnStartupToggle.IsOn;
-            StartupService.UpdateFromSettings();
+            bool enable = SmoothScrollingToggle.IsOn;
+            SettingsService.SmoothScrolling = enable;
+            LogService.Info($"Smooth Scrolling: {(enable ? "enabled" : "disabled")}");
+            PageScrollViewer.IsScrollInertiaEnabled = enable;
+            (Application.Current as App)?.ApplySmoothScrolling(enable);
+            MainPage.Current?.ApplySmoothScrollingSelf(enable);
+        }
+
+        // ── Advanced ───────────────────────────────────────────────────────────
+
+        private void ConfirmDeleteToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!_isLoaded) return;
+            SettingsService.ConfirmDelete = ConfirmDeleteToggle.IsOn;
+            LogService.Info($"Confirm Task Deletion: {(ConfirmDeleteToggle.IsOn ? "enabled" : "disabled")}");
         }
 
         private void LoggingToggle_Toggled(object sender, RoutedEventArgs e)
@@ -151,45 +214,12 @@ namespace FluentTaskScheduler
                 LogService.Info("Application Logging: enabled");
         }
 
-        private void SmoothScrollingToggle_Toggled(object sender, RoutedEventArgs e)
-        {
-            if (!_isLoaded) return;
-            bool enable = SmoothScrollingToggle.IsOn;
-            SettingsService.SmoothScrolling = enable;
-            LogService.Info($"Smooth Scrolling: {(enable ? "enabled" : "disabled")}");
-            // Apply to this page's own ScrollViewer immediately
-            PageScrollViewer.IsScrollInertiaEnabled = enable;
-            // Apply to the rest of the live visual tree (MainPage dialogs etc.)
-            (Application.Current as App)?.ApplySmoothScrolling(enable);
-            MainPage.Current?.ApplySmoothScrollingSelf(enable);
-        }
-
-        private async void VersionButton_Click(object sender, RoutedEventArgs e)
-        {
-            // Fetch on demand — reuse the same service as the startup check
-            var release = await Services.GitHubReleaseService.GetLatestReleaseAsync();
-            if (release == null)
-            {
-                await ShowDialog("What's New", "Could not fetch release notes. Check your internet connection and try again.");
-                return;
-            }
-            var dialog = new Dialogs.WhatsNewDialog(release) { XamlRoot = this.XamlRoot };
-            await dialog.ShowAsync();
-        }
-
-        private async void ReplayOnboardingButton_Click(object sender, RoutedEventArgs e)
-        {
-            // Reset flag so the walkthrough can be shown again on next launch too
-            Services.SettingsService.HasCompletedOnboarding = false;
-
-            var dialog = new Dialogs.OnboardingDialog { XamlRoot = this.XamlRoot, RequestedTheme = SettingsService.Theme };
-            await dialog.ShowAsync();
-        }
-
         private void OpenLogButton_Click(object sender, RoutedEventArgs e)
         {
             LogService.OpenLogFile();
         }
+
+        // ── Data ───────────────────────────────────────────────────────────────
 
         private async void ExportSettings_Click(object sender, RoutedEventArgs e)
         {
@@ -232,11 +262,9 @@ namespace FluentTaskScheduler
                 {
                     SettingsService.ImportSettings(file.Path);
 
-                    // Reload UI
                     _isLoaded = false;
                     SettingsPage_Loaded(this, new RoutedEventArgs());
 
-                    // Re-apply theme and tray
                     (Application.Current as App)?.ApplyTheme(SettingsService.Theme);
                     TrayIconService.UpdateVisibility();
                     StartupService.UpdateFromSettings();
@@ -250,6 +278,29 @@ namespace FluentTaskScheduler
             }
         }
 
+        // ── About ──────────────────────────────────────────────────────────────
+
+        private async void VersionButton_Click(object sender, RoutedEventArgs e)
+        {
+            var release = await Services.GitHubReleaseService.GetLatestReleaseAsync();
+            if (release == null)
+            {
+                await ShowDialog("What's New", "Could not fetch release notes. Check your internet connection and try again.");
+                return;
+            }
+            var dialog = new Dialogs.WhatsNewDialog(release) { XamlRoot = this.XamlRoot };
+            await dialog.ShowAsync();
+        }
+
+        private async void ReplayOnboardingButton_Click(object sender, RoutedEventArgs e)
+        {
+            Services.SettingsService.HasCompletedOnboarding = false;
+            var dialog = new Dialogs.OnboardingDialog { XamlRoot = this.XamlRoot, RequestedTheme = SettingsService.Theme };
+            await dialog.ShowAsync();
+        }
+
+        // ── Helpers ────────────────────────────────────────────────────────────
+
         private async System.Threading.Tasks.Task ShowDialog(string title, string message)
         {
             var dialog = new ContentDialog
@@ -261,15 +312,6 @@ namespace FluentTaskScheduler
                 RequestedTheme = SettingsService.Theme
             };
             await dialog.ShowAsync();
-        }
-
-        private void UpdateOledToggleState()
-        {
-            var currentTheme = SettingsService.Theme;
-            bool isDark = currentTheme == ElementTheme.Dark;
-            OledModeToggle.IsEnabled = isDark;
-            // When not in explicit dark mode, OLED cannot apply — Mica must always be freely toggleable
-            MicaModeToggle.IsEnabled = !isDark || !SettingsService.IsOledMode;
         }
     }
 }

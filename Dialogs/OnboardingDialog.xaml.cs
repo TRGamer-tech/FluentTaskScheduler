@@ -107,9 +107,17 @@ namespace FluentTaskScheduler.Dialogs
             // Highlight active dot
             for (int i = 0; i < _dots.Length; i++)
             {
-                _dots[i].Fill = i == _currentStep
-                    ? (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"]
-                    : new SolidColorBrush(Color.FromArgb(80, 255, 255, 255));
+                if (i == _currentStep)
+                {
+                    _dots[i].Fill = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"];
+                    _dots[i].Opacity = 1.0;
+                }
+                else
+                {
+                    // Use a brush that works in both themes
+                    _dots[i].Fill = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"];
+                    _dots[i].Opacity = 0.3;
+                }
             }
         }
 

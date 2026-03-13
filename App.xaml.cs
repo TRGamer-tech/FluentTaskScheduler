@@ -340,6 +340,10 @@ namespace FluentTaskScheduler
             Frame rootFrame = new Frame();
             rootFrame.NavigationFailed += OnNavigationFailed;
             win.Content = rootFrame;
+            
+            // Extend into title bar
+            win.ExtendsContentIntoTitleBar = true;
+            
             ApplyThemeToWindow(win);
             rootFrame.Navigate(typeof(MainPage));
 
@@ -439,6 +443,45 @@ namespace FluentTaskScheduler
                                : Windows.UI.Color.FromArgb(255, 243, 243, 243));
                     root.Background = bg;
                     SetNavigationViewBackgrounds(bg);
+                }
+
+                // Title bar customization
+                UpdateTitleBarTheme(win, root.ActualTheme);
+            }
+        }
+
+        private void UpdateTitleBarTheme(Window win, ElementTheme theme)
+        {
+            var appWindow = win.AppWindow;
+            if (appWindow == null) return;
+
+            if (Microsoft.UI.Windowing.AppWindowTitleBar.IsCustomizationSupported())
+            {
+                var titleBar = appWindow.TitleBar;
+                bool isDark = theme == ElementTheme.Dark;
+
+                // Set colors for the title bar buttons to match theme
+                if (isDark)
+                {
+                    titleBar.ButtonBackgroundColor = Microsoft.UI.Colors.Transparent;
+                    titleBar.ButtonForegroundColor = Microsoft.UI.Colors.White;
+                    titleBar.ButtonHoverBackgroundColor = Windows.UI.Color.FromArgb(25, 255, 255, 255);
+                    titleBar.ButtonHoverForegroundColor = Microsoft.UI.Colors.White;
+                    titleBar.ButtonPressedBackgroundColor = Windows.UI.Color.FromArgb(40, 255, 255, 255);
+                    titleBar.ButtonPressedForegroundColor = Microsoft.UI.Colors.White;
+                    titleBar.ButtonInactiveBackgroundColor = Microsoft.UI.Colors.Transparent;
+                    titleBar.ButtonInactiveForegroundColor = Windows.UI.Color.FromArgb(100, 255, 255, 255);
+                }
+                else
+                {
+                    titleBar.ButtonBackgroundColor = Microsoft.UI.Colors.Transparent;
+                    titleBar.ButtonForegroundColor = Microsoft.UI.Colors.Black;
+                    titleBar.ButtonHoverBackgroundColor = Windows.UI.Color.FromArgb(25, 0, 0, 0);
+                    titleBar.ButtonHoverForegroundColor = Microsoft.UI.Colors.Black;
+                    titleBar.ButtonPressedBackgroundColor = Windows.UI.Color.FromArgb(40, 0, 0, 0);
+                    titleBar.ButtonPressedForegroundColor = Microsoft.UI.Colors.Black;
+                    titleBar.ButtonInactiveBackgroundColor = Microsoft.UI.Colors.Transparent;
+                    titleBar.ButtonInactiveForegroundColor = Windows.UI.Color.FromArgb(100, 0, 0, 0);
                 }
             }
         }

@@ -28,6 +28,17 @@
     </Page.Resources>
 
     <Grid>
+        <!-- Custom Title Bar Drag Region -->
+        <Grid x:Name="AppTitleBar" Height="32" VerticalAlignment="Top" Canvas.ZIndex="100">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48"/> <!-- PaneToggle button area -->
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="140"/> <!-- Caption buttons area -->
+            </Grid.ColumnDefinitions>
+            <!-- The middle part is draggable -->
+            <Border Grid.Column="1" Background="Transparent" x:Name="AppTitleBarDragArea"/>
+        </Grid>
+
         <NavigationView x:Name="NavView" x:Uid="AppHeader"
                         PaneDisplayMode="Left"
                         IsBackButtonVisible="Collapsed"
