@@ -24,6 +24,18 @@ namespace FluentTaskScheduler.Services
                 .AddText(error)
                 .Show();
         }
+        public static void ShowUpcomingTask(string taskName, int minutesUntilRun)
+        {
+            if (!SettingsService.ShowNotifications || !SettingsService.EnableUpcomingReminders) return;
+
+            string timeLabel = minutesUntilRun <= 1 ? "less than a minute" : $"{minutesUntilRun} minutes";
+            new ToastContentBuilder()
+                .AddArgument("action", "show")
+                .AddText($"Upcoming Task: {taskName}")
+                .AddText($"Scheduled to run in {timeLabel}.")
+                .Show();
+        }
+
         private static bool _trayNotificationShown = false;
 
         public static void ShowMinimizedToTray()

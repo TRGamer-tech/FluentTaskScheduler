@@ -50,6 +50,9 @@
                     <ToggleSwitch x:Name="NotificationsToggle" x:Uid="NotificationsToggle" Header="Task Notifications" OnContent="On" OffContent="Off" IsOn="True"/>
                     <TextBlock Text="Show a toast notification when a task starts or fails." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="0,-4,0,0"/>
 
+                    <ToggleSwitch x:Name="UpcomingRemindersToggle" Header="Upcoming Task Reminders" OnContent="On" OffContent="Off" IsOn="True" Margin="0,8,0,0"/>
+                    <TextBlock Text="Remind you before a scheduled task is about to run (default: 5 minutes ahead)." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="0,-4,0,0"/>
+
                     <ToggleSwitch x:Name="TrayIconToggle" x:Uid="TrayIconToggle" Header="Minimize to Tray" OnContent="On" OffContent="Off" IsOn="True" Margin="0,8,0,0"/>
                     <TextBlock Text="Hides the window to the system tray instead of closing." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="0,-4,0,0"/>
 

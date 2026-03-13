@@ -280,6 +280,7 @@ namespace FluentTaskScheduler
             Services.TrayIconService.UpdateVisibility();
 
             Services.LogService.Info("Application started");
+            Services.ReminderService.Start();
 
             // Defer smooth scrolling until visual tree is built
             _windows[0].Win.DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>

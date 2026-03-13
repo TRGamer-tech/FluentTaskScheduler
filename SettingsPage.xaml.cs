@@ -39,6 +39,8 @@ namespace FluentTaskScheduler
 
             // Notifications
             NotificationsToggle.IsOn = SettingsService.ShowNotifications;
+            UpcomingRemindersToggle.IsOn = SettingsService.EnableUpcomingReminders;
+            UpcomingRemindersToggle.IsEnabled = SettingsService.ShowNotifications;
             
             // Minimize to Tray (single toggle now controls both)
             TrayIconToggle.IsOn = SettingsService.EnableTrayIcon;
@@ -54,6 +56,7 @@ namespace FluentTaskScheduler
 
             // Subscribe events
             NotificationsToggle.Toggled += NotificationsToggle_Toggled;
+            UpcomingRemindersToggle.Toggled += UpcomingRemindersToggle_Toggled;
             TrayIconToggle.Toggled += TrayIconToggle_Toggled;
             RunOnStartupToggle.Toggled += RunOnStartupToggle_Toggled;
             LoggingToggle.Toggled += LoggingToggle_Toggled;
@@ -113,7 +116,15 @@ namespace FluentTaskScheduler
         {
             if (!_isLoaded) return;
             SettingsService.ShowNotifications = NotificationsToggle.IsOn;
+            UpcomingRemindersToggle.IsEnabled = NotificationsToggle.IsOn;
             LogService.Info($"Task Notifications: {(NotificationsToggle.IsOn ? "enabled" : "disabled")}");
+        }
+
+        private void UpcomingRemindersToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!_isLoaded) return;
+            SettingsService.EnableUpcomingReminders = UpcomingRemindersToggle.IsOn;
+            LogService.Info($"Upcoming Task Reminders: {(UpcomingRemindersToggle.IsOn ? "enabled" : "disabled")}");
         }
 
         private void TrayIconToggle_Toggled(object sender, RoutedEventArgs e)

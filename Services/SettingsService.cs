@@ -23,6 +23,8 @@ namespace FluentTaskScheduler.Services
         public string LastFolderPath { get; set; } = "\\";
         public string LastSeenVersion { get; set; } = "";
         public bool HasCompletedOnboarding { get; set; } = false;
+        public bool EnableUpcomingReminders { get; set; } = true;
+        public int ReminderLeadMinutes { get; set; } = 5;
     }
 
     public static class SettingsService
@@ -205,6 +207,18 @@ namespace FluentTaskScheduler.Services
         {
             get => _settings.HasCompletedOnboarding;
             set { _settings.HasCompletedOnboarding = value; Save(); }
+        }
+
+        public static bool EnableUpcomingReminders
+        {
+            get => _settings.EnableUpcomingReminders;
+            set { _settings.EnableUpcomingReminders = value; Save(); }
+        }
+
+        public static int ReminderLeadMinutes
+        {
+            get => _settings.ReminderLeadMinutes;
+            set { _settings.ReminderLeadMinutes = value; Save(); }
         }
 
         public static void ExportSettings(string targetPath)
