@@ -1,0 +1,47 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - platform: x64
+            rid: win-x64
+            runner: windows-latest
+          - platform: ARM64
+            rid: win-arm64
+            runner: windows-11-arm
+
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Publish
+        run: >
+          dotnet publish
+          -c Release
+          -p:Platform=${{ matrix.platform }}
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:IncludeAllContentForSelfExtract=true
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: FluentTaskScheduler-${{ matrix.rid }}
+          path: bin/${{ matrix.platform }}/Release/net8.0-windows10.0.19041.0/${{ matrix.rid }}/
