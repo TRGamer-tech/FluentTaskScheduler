@@ -138,7 +138,7 @@ namespace FluentTaskScheduler
             {
                 try
                 {
-                    var dialog = new Dialogs.OnboardingDialog { XamlRoot = this.XamlRoot };
+                    var dialog = new Dialogs.OnboardingDialog { XamlRoot = this.XamlRoot, RequestedTheme = Services.SettingsService.Theme };
                     await dialog.ShowAsync();
                 }
                 catch { /* XamlRoot not ready or dialog already open — skip silently */ }
@@ -165,7 +165,8 @@ namespace FluentTaskScheduler
                     {
                         var dialog = new Dialogs.WhatsNewDialog(release)
                         {
-                            XamlRoot = this.XamlRoot
+                            XamlRoot = this.XamlRoot,
+                            RequestedTheme = Services.SettingsService.Theme
                         };
                         await dialog.ShowAsync();
                         // Only persist after the user has actually seen the dialog
@@ -1110,7 +1111,7 @@ namespace FluentTaskScheduler
 
         private async void CreateFolder_Click(string parentPath)
         {
-            var dialog = new ContentDialog { Title="New Folder", Content=new TextBox{PlaceholderText="Name"}, PrimaryButtonText="Create", CloseButtonText="Cancel", DefaultButton=ContentDialogButton.Primary, XamlRoot=this.XamlRoot };
+            var dialog = new ContentDialog { Title="New Folder", Content=new TextBox{PlaceholderText="Name"}, PrimaryButtonText="Create", CloseButtonText="Cancel", DefaultButton=ContentDialogButton.Primary, XamlRoot=this.XamlRoot, RequestedTheme=Services.SettingsService.Theme };
             if (await dialog.ShowAsync() == ContentDialogResult.Primary && dialog.Content is TextBox tb && !string.IsNullOrWhiteSpace(tb.Text)) 
             { 
                 try 
@@ -1130,14 +1131,15 @@ namespace FluentTaskScheduler
             var tb = new TextBox { Text = oldName, PlaceholderText = "New Name" };
             tb.SelectAll();
             
-            var dialog = new ContentDialog 
-            { 
-                Title = "Rename Folder", 
-                Content = tb, 
-                PrimaryButtonText = "Rename", 
-                CloseButtonText = "Cancel", 
-                DefaultButton = ContentDialogButton.Primary, 
-                XamlRoot = this.XamlRoot 
+            var dialog = new ContentDialog
+            {
+                Title = "Rename Folder",
+                Content = tb,
+                PrimaryButtonText = "Rename",
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Primary,
+                XamlRoot = this.XamlRoot,
+                RequestedTheme = Services.SettingsService.Theme
             };
             
             if (await dialog.ShowAsync() == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(tb.Text) && tb.Text != oldName) 
@@ -1163,7 +1165,7 @@ namespace FluentTaskScheduler
 
         private async void DeleteFolder_Click(string path)
         {
-            var dialog = new ContentDialog { Title="Delete Folder", Content=$"Delete '{path}' and ALL tasks in it?", PrimaryButtonText="Delete", CloseButtonText="Cancel", DefaultButton=ContentDialogButton.Close, XamlRoot=this.XamlRoot };
+            var dialog = new ContentDialog { Title="Delete Folder", Content=$"Delete '{path}' and ALL tasks in it?", PrimaryButtonText="Delete", CloseButtonText="Cancel", DefaultButton=ContentDialogButton.Close, XamlRoot=this.XamlRoot, RequestedTheme=Services.SettingsService.Theme };
             if (await dialog.ShowAsync() == ContentDialogResult.Primary) 
             { 
                 try 
@@ -1185,7 +1187,7 @@ namespace FluentTaskScheduler
         {
             if (_isDialogOpen) return;
             _isDialogOpen = true;
-            try { await new ContentDialog { Title = "Error", Content = message, CloseButtonText = "OK", XamlRoot = this.XamlRoot }.ShowAsync(); }
+            try { await new ContentDialog { Title = "Error", Content = message, CloseButtonText = "OK", XamlRoot = this.XamlRoot, RequestedTheme = Services.SettingsService.Theme }.ShowAsync(); }
             finally { _isDialogOpen = false; }
         }
 

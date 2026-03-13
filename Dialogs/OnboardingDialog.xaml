@@ -2,8 +2,7 @@
     x:Class="FluentTaskScheduler.Dialogs.OnboardingDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    CornerRadius="16"
-    RequestedTheme="Dark">
+    CornerRadius="16">
 
     <ContentDialog.Resources>
         <x:Double x:Key="ContentDialogMaxWidth">600</x:Double>

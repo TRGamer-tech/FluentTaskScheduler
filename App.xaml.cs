@@ -408,32 +408,45 @@ namespace FluentTaskScheduler
         {
             if (win?.Content is Control root)
             {
-                root.RequestedTheme = ElementTheme.Dark;
+                root.RequestedTheme = SS.Theme;
                 win.SystemBackdrop = null;
 
-                if (SS.IsOledMode)
+                Application.Current.Resources["TaskCardBackground"] = Application.Current.Resources["CardBackgroundFillColorDefaultBrush"];
+                Application.Current.Resources["TaskCardBorder"] = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+
+                if (SS.IsOledMode && SS.Theme == ElementTheme.Dark)
                 {
-                    root.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Black);
-                    Application.Current.Resources["TaskCardBackground"] = Application.Current.Resources["CardBackgroundFillColorDefaultBrush"];
-                    Application.Current.Resources["TaskCardBorder"] = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+                    var black = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Black);
+                    root.Background = black;
+                    SetNavigationViewBackgrounds(black);
                 }
                 else if (SS.IsMicaEnabled && Microsoft.UI.Composition.SystemBackdrops.MicaController.IsSupported())
                 {
-                    root.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(2, 32, 32, 32));
+                    var transparent = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+                    root.Background = transparent;
                     if (_backdrop == null) _backdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop();
                     win.SystemBackdrop = _backdrop;
-                    Application.Current.Resources["TaskCardBackground"] = new Microsoft.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(25, 16, 16, 16));
-                    Application.Current.Resources["TaskCardBorder"] = new Microsoft.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(48, 255, 255, 255));
+                    SetNavigationViewBackgrounds(transparent);
                 }
                 else
                 {
-                    win.SystemBackdrop = null;
                     _backdrop = null;
-                    root.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(255, 32, 32, 32));
-                    Application.Current.Resources["TaskCardBackground"] = Application.Current.Resources["CardBackgroundFillColorDefaultBrush"];
-                    Application.Current.Resources["TaskCardBorder"] = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+                    // Use ActualTheme so the colour matches the requested theme even when the OS theme differs
+                    bool isDark = root.ActualTheme == ElementTheme.Dark;
+                    var bg = new Microsoft.UI.Xaml.Media.SolidColorBrush(
+                        isDark ? Windows.UI.Color.FromArgb(255, 32, 32, 32)
+                               : Windows.UI.Color.FromArgb(255, 243, 243, 243));
+                    root.Background = bg;
+                    SetNavigationViewBackgrounds(bg);
                 }
             }
+        }
+
+        private static void SetNavigationViewBackgrounds(Microsoft.UI.Xaml.Media.Brush brush)
+        {
+            Application.Current.Resources["NavigationViewContentBackground"] = brush;
+            Application.Current.Resources["NavigationViewExpandedPaneBackground"] = brush;
+            Application.Current.Resources["NavigationViewTopPaneBackground"] = brush;
         }
 
         public void ApplyTheme(ElementTheme theme)

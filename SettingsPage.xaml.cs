@@ -22,9 +22,17 @@ namespace FluentTaskScheduler
             if (_isLoaded) return;
 
             // Appearance
+            ThemeComboBox.SelectedIndex = SettingsService.Theme switch
+            {
+                ElementTheme.Light => 0,
+                ElementTheme.Dark => 1,
+                _ => 2
+            };
+
             OledModeToggle.IsOn = SettingsService.IsOledMode;
             MicaModeToggle.IsOn = SettingsService.IsMicaEnabled;
             MicaModeToggle.IsEnabled = !SettingsService.IsOledMode;
+            UpdateOledToggleState();
 
             // General
             ConfirmDeleteToggle.IsOn = SettingsService.ConfirmDelete;
@@ -63,12 +71,26 @@ namespace FluentTaskScheduler
                 Frame.GoBack();
         }
 
+        private void ThemeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!_isLoaded) return;
+            SettingsService.Theme = ThemeComboBox.SelectedIndex switch
+            {
+                0 => ElementTheme.Light,
+                1 => ElementTheme.Dark,
+                _ => ElementTheme.Default
+            };
+            (Application.Current as App)?.ApplyTheme(SettingsService.Theme);
+            UpdateOledToggleState();
+            LogService.Info($"App Theme: {SettingsService.Theme}");
+        }
+
         private void OledModeToggle_Toggled(object sender, RoutedEventArgs e)
         {
             if (!_isLoaded) return;
             SettingsService.IsOledMode = OledModeToggle.IsOn;
             MicaModeToggle.IsEnabled = !OledModeToggle.IsOn;
-            (Application.Current as App)?.ApplyTheme(ElementTheme.Dark);
+            (Application.Current as App)?.ApplyTheme(SettingsService.Theme);
             LogService.Info($"OLED Mode: {(OledModeToggle.IsOn ? "enabled" : "disabled")}");
         }
 
@@ -76,7 +98,7 @@ namespace FluentTaskScheduler
         {
             if (!_isLoaded) return;
             SettingsService.IsMicaEnabled = MicaModeToggle.IsOn;
-            (Application.Current as App)?.ApplyTheme(ElementTheme.Dark);
+            (Application.Current as App)?.ApplyTheme(SettingsService.Theme);
             LogService.Info($"Mica Effect: {(MicaModeToggle.IsOn ? "enabled" : "disabled")}");
         }
 
@@ -149,7 +171,7 @@ namespace FluentTaskScheduler
             // Reset flag so the walkthrough can be shown again on next launch too
             Services.SettingsService.HasCompletedOnboarding = false;
 
-            var dialog = new Dialogs.OnboardingDialog { XamlRoot = this.XamlRoot };
+            var dialog = new Dialogs.OnboardingDialog { XamlRoot = this.XamlRoot, RequestedTheme = SettingsService.Theme };
             await dialog.ShowAsync();
         }
 
@@ -204,7 +226,7 @@ namespace FluentTaskScheduler
                     SettingsPage_Loaded(this, new RoutedEventArgs());
 
                     // Re-apply theme and tray
-                    (Application.Current as App)?.ApplyTheme(ElementTheme.Dark);
+                    (Application.Current as App)?.ApplyTheme(SettingsService.Theme);
                     TrayIconService.UpdateVisibility();
                     StartupService.UpdateFromSettings();
 
@@ -224,7 +246,8 @@ namespace FluentTaskScheduler
                 Title = title,
                 Content = message,
                 CloseButtonText = "OK",
-                XamlRoot = this.XamlRoot
+                XamlRoot = this.XamlRoot,
+                RequestedTheme = SettingsService.Theme
             };
             await dialog.ShowAsync();
         }
@@ -233,8 +256,9 @@ namespace FluentTaskScheduler
         {
             var currentTheme = SettingsService.Theme;
             bool isDark = currentTheme == ElementTheme.Dark;
-            if (currentTheme == ElementTheme.Default) isDark = false;
             OledModeToggle.IsEnabled = isDark;
+            // When not in explicit dark mode, OLED cannot apply — Mica must always be freely toggleable
+            MicaModeToggle.IsEnabled = !isDark || !SettingsService.IsOledMode;
         }
     }
 }

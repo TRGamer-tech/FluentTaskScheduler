@@ -31,7 +31,7 @@
                             </StackPanel>
                             <TextBlock Text="{x:Bind ViewModel.TotalTasks, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
                             <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0" Opacity="0.7">
-                                <TextBlock Text="{x:Bind ViewModel.EnabledTasks, Mode=OneWay}" Foreground="LightGreen"/>
+                                <TextBlock Text="{x:Bind ViewModel.EnabledTasks, Mode=OneWay}" Foreground="{ThemeResource SystemFillColorSuccessBrush}"/>
                                 <TextBlock Text="Active"/>
                                 <TextBlock Text="|" Opacity="0.3"/>
                                 <TextBlock Text="{x:Bind ViewModel.DisabledTasks, Mode=OneWay}" Foreground="LightGray"/>
@@ -56,7 +56,7 @@
                     <Grid Grid.Column="2" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="&#xE73E;" FontSize="16" Opacity="0.7" Foreground="LightGreen"/>
+                                <FontIcon Glyph="&#xE73E;" FontSize="16" Opacity="0.7" Foreground="{ThemeResource SystemFillColorSuccessBrush}"/>
                                 <TextBlock Text="Recent Success" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                             </StackPanel>
                             <TextBlock Text="{x:Bind ViewModel.LastRunSuccess, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
@@ -68,10 +68,10 @@
                     <Grid Grid.Column="3" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="&#xE711;" FontSize="16" Opacity="0.7" Foreground="LightSalmon"/>
+                                <FontIcon Glyph="&#xE711;" FontSize="16" Opacity="0.7" Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
                                 <TextBlock Text="Recent Failures" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                             </StackPanel>
-                            <TextBlock Text="{x:Bind ViewModel.LastRunFailed, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0" Foreground="LightSalmon"/>
+                            <TextBlock Text="{x:Bind ViewModel.LastRunFailed, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0" Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
                             <TextBlock Text="Attention needed" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Grid>
@@ -151,9 +151,9 @@
                     <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
                         <TextBlock Text="Run History — Last 7 Days" Style="{StaticResource SubtitleTextBlockStyle}"/>
                         <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                            <Rectangle Width="12" Height="12" Fill="#4CAF50" RadiusX="2" RadiusY="2"/>
+                            <Rectangle Width="12" Height="12" Fill="{ThemeResource SystemFillColorSuccessBrush}" RadiusX="2" RadiusY="2"/>
                             <TextBlock Text="Success" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" VerticalAlignment="Center"/>
-                            <Rectangle Width="12" Height="12" Fill="#FF6B6B" RadiusX="2" RadiusY="2" Margin="8,0,0,0"/>
+                            <Rectangle Width="12" Height="12" Fill="{ThemeResource SystemFillColorCriticalBrush}" RadiusX="2" RadiusY="2" Margin="8,0,0,0"/>
                             <TextBlock Text="Failure" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" VerticalAlignment="Center"/>
                         </StackPanel>
                     </StackPanel>
@@ -174,10 +174,10 @@
                                         <Grid Height="110" Width="36">
                                             <StackPanel Orientation="Horizontal" Spacing="3"
                                                         VerticalAlignment="Bottom" HorizontalAlignment="Center">
-                                                <Rectangle Fill="#4CAF50" Width="14"
+                                                <Rectangle Fill="{ThemeResource SystemFillColorSuccessBrush}" Width="14"
                                                            Height="{x:Bind SuccessHeight}"
                                                            VerticalAlignment="Bottom" RadiusX="3" RadiusY="3"/>
-                                                <Rectangle Fill="#FF6B6B" Width="14"
+                                                <Rectangle Fill="{ThemeResource SystemFillColorCriticalBrush}" Width="14"
                                                            Height="{x:Bind FailureHeight}"
                                                            VerticalAlignment="Bottom" RadiusX="3" RadiusY="3"/>
                                             </StackPanel>
@@ -186,10 +186,10 @@
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
                                                     Spacing="2" Margin="0,5,0,0">
                                             <TextBlock Text="{x:Bind Successes}" FontSize="10"
-                                                       Foreground="#4CAF50" HorizontalAlignment="Center"/>
+                                                       Foreground="{ThemeResource SystemFillColorSuccessBrush}" HorizontalAlignment="Center"/>
                                             <TextBlock Text="/" FontSize="10" Opacity="0.4"/>
                                             <TextBlock Text="{x:Bind Failures}" FontSize="10"
-                                                       Foreground="#FF6B6B" HorizontalAlignment="Center"/>
+                                                       Foreground="{ThemeResource SystemFillColorCriticalBrush}" HorizontalAlignment="Center"/>
                                         </StackPanel>
                                         <!-- Day label -->
                                         <TextBlock Text="{x:Bind Label}" HorizontalAlignment="Center"

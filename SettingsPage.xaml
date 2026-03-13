@@ -31,7 +31,11 @@
                 <StackPanel Spacing="8">
                     <TextBlock x:Uid="AppearanceHeader" Text="Appearance" Style="{StaticResource SubtitleTextBlockStyle}"/>
                     
-                    <TextBlock Text="App Theme: Dark (Fixed)" Style="{StaticResource BodyTextBlockStyle}" Margin="0,8,0,0"/>
+                    <ComboBox x:Name="ThemeComboBox" x:Uid="ThemeComboBox" Header="App Theme" SelectionChanged="ThemeComboBox_SelectionChanged" Margin="0,8,0,0" Width="200">
+                        <ComboBoxItem Content="Light"/>
+                        <ComboBoxItem Content="Dark"/>
+                        <ComboBoxItem Content="System Default"/>
+                    </ComboBox>
 
                     <ToggleSwitch x:Name="MicaModeToggle" Header="Mica Effect" OffContent="Off" OnContent="On" Toggled="MicaModeToggle_Toggled" IsOn="True" Margin="0,8,0,0"/>
 
