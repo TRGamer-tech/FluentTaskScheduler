@@ -383,7 +383,7 @@
                                         Background="Transparent" BorderThickness="0" Padding="8,6"
                                         VerticalAlignment="Center" ToolTipService.ToolTip="See What's New">
                                     <StackPanel Orientation="Horizontal" Spacing="4">
-                                        <TextBlock x:Uid="AboutVersion" Text="Version 1.5.0"
+                                        <TextBlock x:Uid="AboutVersion" Text="Version 1.6.0"
                                                    Style="{StaticResource CaptionTextBlockStyle}"
                                                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
                                                    FontWeight="SemiBold" VerticalAlignment="Center"/>
