@@ -36,8 +36,9 @@ FluentTaskScheduler is a professional-grade wrapper for the Windows Task Schedul
 
 ### 🔄 Advanced Repetition
 
-- Configure tasks to repeat every few minutes or hours.
-- Set a duration for the repetition pattern (e.g., repeat every 15 minutes for 12 hours).
+- **Task Repetition**: Configure tasks to repeat every few minutes or hours.
+- **Recurring Tasks Support**: Set a repetition interval and duration per trigger for flexible automation.
+- **Task Duration**: Set a duration for the repetition pattern (e.g., repeat every 15 minutes for 12 hours).
 
 ### 📜 Script Library
 
@@ -59,25 +60,29 @@ FluentTaskScheduler is a professional-grade wrapper for the Windows Task Schedul
 
 ### 🎨 Customization
 
-- **Themes**: Standard Dark Mode and specialized **OLED Mode** (Pure Black) for display longevity.
+- **Themes**: Choose between **Light Mode** and **Dark Mode** for a standard look, or go full stealth with **OLED Mode** (Pure Black) if you actually care about your display longevity.
+- **Mica Effect**: Enable or disable the Mica effect for a more premium look.
+- **Title Bar Integration**: Modern, customized title bar with proper drag regions that actually work (unlike some other apps we won't mention).
 - **Languages**: Native English (en-US) support.
 - **Smooth Scrolling**: Optional smooth/inertia scrolling throughout the app, disabled by default for a snappier feel.
 - **Window Size Memory**: The app remembers your last window size and restores it on next launch.
 
 ### 🧬 System Integration
 
+- **ARM64 Support**: Native support for ARM64 devices.
 - **System Tray**: Minimize the app to the tray to keep your taskbar clean while the scheduler hums in the background. Disabled by default.
 - **Tray Badge**: See the number of currently running tasks at a glance directly on the tray icon.
 - **Multi-Window Tray Management**: Open multiple windows and manage them independently from the tray right-click menu — restore or close individual windows, or open a new one, all from a single tray icon.
 - **Tray Notification**: A toast notification appears the first time the app is minimized to tray, with a click action to restore the window instantly.
 - **Single Instance**: Launching the app a second time brings the existing window to the front instead of opening a duplicate.
 - **Run on Startup**: Option to launch automatically with Windows.
-- **Notifications**: Get native toast notifications when tasks complete or fail.
+- **Notifications & Reminders**: Get native toast notifications and reminders for pending tasks, completions, or those annoying failures.
 - **Onboarding Walkthrough**: Step-by-step onboarding for first launch to guide new users through key features.
 - **Changelog Popup**: A "What's New" popup highlighting application updates the first time you run a new version.
 
 ### ⚙️ Robust Settings
 
+- **Modern Navigation**: A reworked settings page utilizing `NavigationView` for that premium feeling you didn't know you needed.
 - **Privileges**: Run tasks with highest privileges (Admin) or as System/Specific User.
 - **Priority**: Configurable task priority (Realtime to Idle).
 - **Concurrency**: Define behavior for multiple instances (Parallel, Queue, Ignore New, Stop Existing).
@@ -89,11 +94,12 @@ FluentTaskScheduler is a professional-grade wrapper for the Windows Task Schedul
 ### 📊 Management & History
 
 - **Task History**: View recent task execution history within the app (Today, Yesterday, This Week, All Time).
+- **Categorization & Tags**: Organize tasks with custom tags and categories.
+- **Smart Search**: Instantly find tasks by name, status, path, or those tags you just added.
 - **Folder Management**: Organize your tasks logically by creating, renaming, and deleting custom folders.
 - **Smart Navigation**: The application remembers your last-used folder on restart.
 - **Sortable Lists**: Sort tasks easily by clicking column headers directly in the task list (by name, status, next run, etc.).
-- **Search & Filter**: Instantly find tasks by name, status, or path.
-- **Import/Export**: Easily backup or migrate task definitions, including CSV export for history.
+- **Import/Export**: Easily backup or migrate task definitions. Supports importing to any selected folder.
 - **Batch Operations**: Select and manage multiple tasks simultaneously.
 - **CLI Support**: Full command-line interface for automation and headless management.
 
@@ -133,6 +139,8 @@ FluentTaskScheduler.exe --export-history "MyTaskName" --output "C:\logs\history.
 - **Framework**: [.NET 8](https://dotnet.microsoft.com/download/dotnet/8.0)
 - **UI Architecture**: [WinUI 3](https://learn.microsoft.com/en-us/windows/apps/winui/winui3/) (Windows App SDK)
 - **Core Logic**: [TaskScheduler Managed Wrapper](https://github.com/dahall/TaskScheduler)
+- **CI/CD**: Fully automated GitHub Actions for x86 and ARM64 builds (thanks, TalyNone).
+- **Architectures**: Support for x64 and ARM64.
 - **Language**: C#
 
 ## Building from Source
