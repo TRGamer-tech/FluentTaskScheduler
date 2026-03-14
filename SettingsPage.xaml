@@ -80,6 +80,11 @@
                         <FontIcon Glyph="&#xE8B5;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
+                <NavigationViewItem Tag="Categories" Content="Categories &amp; Tags">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8EC;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
                 <NavigationViewItem Tag="About" Content="About">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE946;"/>
@@ -281,6 +286,85 @@
                                 </StackPanel>
                                 <Button x:Name="ImportSettingsButton" Grid.Column="1" Content="Import" VerticalAlignment="Center" Click="ImportSettings_Click"/>
                             </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- ── Categories & Tags ── -->
+                    <StackPanel x:Name="PanelCategories" Spacing="16" Visibility="Collapsed">
+                        <TextBlock Text="Categories &amp; Tags" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
+
+                        <!-- Categories Section -->
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="Manage Categories" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBlock Text="Predefined categories for your tasks." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
+                                <Grid ColumnSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="NewCategoryBox" PlaceholderText="New category name..." KeyDown="NewCategoryBox_KeyDown"/>
+                                    <Button x:Name="AddCategoryBtn" Grid.Column="1" Content="Add" Click="AddCategory_Click"/>
+                                </Grid>
+                                <ItemsControl x:Name="CategoriesItemsControl">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <VariableSizedWrapGrid Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" CornerRadius="4" Padding="8,4" Margin="0,0,8,8" MaxWidth="280">
+                                                <Grid ColumnSpacing="8">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                                    <Button Grid.Column="1" Content="&#xE711;" FontFamily="Segoe MDL2 Assets" FontSize="10" Background="Transparent" BorderThickness="0" Padding="4" Click="RemoveCategory_Click" Tag="{Binding}" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Tags Section -->
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="Manage Tags" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBlock Text="Predefined tags for your tasks." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
+                                <Grid ColumnSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="NewTagBox" PlaceholderText="New tag name..." KeyDown="NewTagBox_KeyDown"/>
+                                    <Button x:Name="AddTagBtn" Grid.Column="1" Content="Add" Click="AddTag_Click"/>
+                                </Grid>
+                                <ItemsControl x:Name="TagsItemsControl">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <VariableSizedWrapGrid Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" CornerRadius="4" Padding="8,4" Margin="0,0,8,8" MaxWidth="280">
+                                                <Grid ColumnSpacing="8">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                                    <Button Grid.Column="1" Content="&#xE711;" FontFamily="Segoe MDL2 Assets" FontSize="10" Background="Transparent" BorderThickness="0" Padding="4" Click="RemoveTag_Click" Tag="{Binding}" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
                         </Border>
                     </StackPanel>
 

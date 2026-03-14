@@ -25,6 +25,8 @@
         <converters:DateTimeConverter x:Key="DateTimeConverter"/>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+        <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+        <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
     </Page.Resources>
 
     <Grid>
@@ -235,7 +237,16 @@
                                     </Grid>
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <TextBlock Text="{x:Bind Name}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="{x:Bind Name}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                        <Border Background="{ThemeResource SystemControlBackgroundAccentBrush}" 
+                                                CornerRadius="4" Padding="4,0" 
+                                                Visibility="{x:Bind Category, Converter={StaticResource StringToVisibilityConverter}, Mode=OneWay}"
+                                                Tapped="CategoryBadge_Tapped" ToolTipService.ToolTip="Filter by this category"
+                                                MaxWidth="150">
+                                            <TextBlock Text="{x:Bind Category}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="White" FontSize="10" TextTrimming="CharacterEllipsis"/>
+                                        </Border>
+                                    </StackPanel>
                                     <TextBlock Text="{x:Bind Path}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
                                     <TextBlock Text="{x:Bind NextRunTime, Converter={StaticResource DateTimeConverter}}" 
                                                Style="{StaticResource CaptionTextBlockStyle}"/>
@@ -315,6 +326,38 @@
                         <TextBlock Text="Author:" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,0,12,0"/>
                         <TextBlock x:Name="DialogTaskAuthor" Grid.Column="1"/>
                     </Grid>
+
+                    <Grid Tapped="CategoryBadge_Tapped" ToolTipService.ToolTip="Filter by this category">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Category:" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                        <Border Grid.Column="1" Background="{ThemeResource SystemControlBackgroundAccentBrush}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" MaxWidth="300">
+                             <TextBlock x:Name="DialogTaskCategory" TextTrimming="CharacterEllipsis" Foreground="White" FontSize="12"/>
+                        </Border>
+                    </Grid>
+
+                    <StackPanel x:Name="DialogTaskTagsPanel" Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="Tags:" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,0,12,0"/>
+                        <ItemsControl x:Name="DialogTaskTagsItems">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VariableSizedWrapGrid Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" 
+                                            CornerRadius="4" Padding="6,2" Margin="0,0,4,4" 
+                                            Tapped="TagBadge_Tapped" ToolTipService.ToolTip="Filter by this tag"
+                                            MaxWidth="200">
+                                        <TextBlock Text="{Binding}" Style="{StaticResource CaptionTextBlockStyle}" TextTrimming="CharacterEllipsis"/>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
                     
                     <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,12,0,8"/>
                     
@@ -412,11 +455,32 @@
                 <x:Double x:Key="ContentDialogMaxWidth">1000</x:Double>
             </ContentDialog.Resources>
             <ScrollViewer x:Name="EditScrollViewer" MaxHeight="600" VerticalScrollBarVisibility="Auto" IsTabStop="False" Background="Transparent" PointerPressed="DialogScrollViewer_PointerPressed" IsScrollInertiaEnabled="False">
-                <StackPanel Spacing="16" Width="750" Margin="0,8,12,8" AllowFocusOnInteraction="False">
+                <StackPanel Spacing="16" Width="750" Margin="0,8,12,8">
                 <TextBlock x:Uid="DialogTitle" Text="Add or edit task" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
                 <TextBox x:Name="EditTaskName" x:Uid="TaskNameHeader" Header="Task Name" PlaceholderText="Enter task name"/>
                 <TextBox x:Name="EditTaskDescription" x:Uid="DescriptionHeader" Header="Description" AcceptsReturn="True" Height="80"/>
                 <TextBox x:Name="EditTaskAuthor" x:Uid="AuthorHeader" Header="Author"/>
+                
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <AutoSuggestBox x:Name="EditTaskCategory" Header="Category" PlaceholderText="e.g. Work" 
+                                   ItemsSource="{x:Bind ViewModel.SavedCategories}"
+                                   QueryIcon="Find" 
+                                   GotFocus="EditTaskCategory_GotFocus"
+                                   Tapped="EditTaskCategory_GotFocus"
+                                   TextChanged="EditTaskCategory_TextChanged"
+                                   SuggestionChosen="EditTaskCategory_SuggestionChosen" />
+                    <AutoSuggestBox x:Name="EditTaskTags" Grid.Column="1" Header="Tags" PlaceholderText="e.g. urgent, sync (comma separated)"
+                                   QueryIcon="Find"
+                                   GotFocus="EditTaskTags_GotFocus"
+                                   Tapped="EditTaskTags_GotFocus"
+                                   TextChanged="EditTaskTags_TextChanged"
+                                   SuggestionChosen="EditTaskTags_SuggestionChosen" />
+                </Grid>
+
                 <ToggleSwitch x:Name="EditTaskEnabled" x:Uid="EnabledSwitch" Header="Enabled" IsOn="True"/>
                 
                 <!-- Trigger Section -->

@@ -1,10 +1,6 @@
 # To Do:
-1. Add categorization and tags for tasks
-2. Export tasks to CSV/PDF
-3. Add a system tray widget
-4. Task prioritization (High, Medium, "Whenever")
-5. Drag and drop reordering of tasks
-6. **_More TBD_**
+
+1. **_More TBD_**
 
 # Done for next release:
 
@@ -14,5 +10,8 @@
 4. Add Dark/Light Mode toggle
 5. Add recurring tasks support (repetition interval/duration per trigger)
 6. Add notifications/reminders for pending tasks
-7. Rework the settings page
-8. Let's see what we can do to make it even better.
+7. Rework the settings page to use `NavigationView`
+8. Fix Title Bar customization and drag regions (interactivity fix)
+9. Add categorization and tags for tasks
+10. Add search functionality for tags and categories
+11. Let's see what we can do to make it even better.

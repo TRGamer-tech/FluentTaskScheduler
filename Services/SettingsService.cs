@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.UI.Xaml;
 
@@ -25,6 +26,8 @@ namespace FluentTaskScheduler.Services
         public bool HasCompletedOnboarding { get; set; } = false;
         public bool EnableUpcomingReminders { get; set; } = true;
         public int ReminderLeadMinutes { get; set; } = 5;
+        public List<string> SavedCategories { get; set; } = new() { "Work", "Personal", "Maintenance", "System" };
+        public List<string> SavedTags { get; set; } = new() { "urgent", "sync", "database", "cleanup" };
     }
 
     public static class SettingsService
@@ -219,6 +222,18 @@ namespace FluentTaskScheduler.Services
         {
             get => _settings.ReminderLeadMinutes;
             set { _settings.ReminderLeadMinutes = value; Save(); }
+        }
+
+        public static List<string> SavedCategories
+        {
+            get => _settings.SavedCategories;
+            set { _settings.SavedCategories = value; Save(); }
+        }
+
+        public static List<string> SavedTags
+        {
+            get => _settings.SavedTags;
+            set { _settings.SavedTags = value; Save(); }
         }
 
         public static void ExportSettings(string targetPath)

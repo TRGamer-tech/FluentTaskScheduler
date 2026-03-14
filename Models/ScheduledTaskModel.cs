@@ -66,6 +66,16 @@ namespace FluentTaskScheduler.Models
 
         public string Description { get; set; } = "";
         public string Author { get; set; } = "";
+
+        private string _category = "";
+        public string Category
+        {
+            get => _category;
+            set { if (_category != value) { _category = value; OnPropertyChanged(); } }
+        }
+
+        public ObservableCollection<string> Tags { get; set; } = new();
+
         public DateTime? LastRunTime { get; set; }
         public DateTime? NextRunTime { get; set; }
         public int LastTaskResult { get; set; }

@@ -67,6 +67,8 @@ namespace FluentTaskScheduler
             EditTaskName.Text = template?.Name ?? "";
             EditTaskDescription.Text = template?.Description ?? "";
             EditTaskAuthor.Text = Environment.UserName;
+            EditTaskCategory.Text = "";
+            EditTaskTags.Text = "";
             EditTaskEnabled.IsOn = true;
             
             _tempActions = new ObservableCollection<TaskActionModel>();
@@ -124,7 +126,7 @@ namespace FluentTaskScheduler
 
         private async System.Threading.Tasks.Task CheckStartupDialogsAsync()
         {
-            // Await onboarding first — on a fresh install the user must finish the
+            // Await onboarding first â€” on a fresh install the user must finish the
             // walkthrough before the "What's New" popup is shown on top.
             await CheckAndShowOnboardingAsync();
 
@@ -144,7 +146,7 @@ namespace FluentTaskScheduler
                     var dialog = new Dialogs.OnboardingDialog { XamlRoot = this.XamlRoot, RequestedTheme = Services.SettingsService.Theme };
                     await dialog.ShowAsync();
                 }
-                catch { /* XamlRoot not ready or dialog already open — skip silently */ }
+                catch { /* XamlRoot not ready or dialog already open â€” skip silently */ }
                 finally { tcs.TrySetResult(); }
             });
             await tcs.Task;
@@ -160,7 +162,7 @@ namespace FluentTaskScheduler
                 string lastSeen = Services.SettingsService.LastSeenVersion;
                 if (string.Equals(release.TagName, lastSeen, StringComparison.OrdinalIgnoreCase)) return;
 
-                // New version — marshal back to UI thread via TCS
+                // New version â€” marshal back to UI thread via TCS
                 var tcs = new System.Threading.Tasks.TaskCompletionSource();
                 DispatcherQueue.TryEnqueue(async () =>
                 {
@@ -175,12 +177,12 @@ namespace FluentTaskScheduler
                         // Only persist after the user has actually seen the dialog
                         Services.SettingsService.LastSeenVersion = release.TagName;
                     }
-                    catch { /* dialog already open or XamlRoot not ready — skip silently */ }
+                    catch { /* dialog already open or XamlRoot not ready â€” skip silently */ }
                     finally { tcs.TrySetResult(); }
                 });
                 await tcs.Task;
             }
-            catch { /* network unavailable or any other error — fail silently */ }
+            catch { /* network unavailable or any other error â€” fail silently */ }
         }
 
         /// <summary>Directly applies smooth scrolling to all ScrollViewers owned by MainPage,
@@ -505,6 +507,10 @@ namespace FluentTaskScheduler
             DialogTaskName.Text = task.Name;
             DialogTaskDescription.Text = task.Description;
             DialogTaskAuthor.Text = task.Author;
+            DialogTaskCategory.Text = task.Category;
+            DialogTaskTagsItems.ItemsSource = task.Tags;
+            DialogTaskTagsPanel.Visibility = task.Tags.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            DialogTaskCategory.Visibility = !string.IsNullOrEmpty(task.Category) ? Visibility.Visible : Visibility.Collapsed;
             
             // Load History
             _fullHistory = await Task.Run(() => ViewModel.TaskService.GetTaskHistory(task.Path));
@@ -513,6 +519,28 @@ namespace FluentTaskScheduler
             
             TaskDetailsDialog.XamlRoot = this.Content.XamlRoot;
             await TaskDetailsDialog.ShowAsync();
+        }
+
+        private void CategoryBadge_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
+        {
+            string cat = "";
+            if (sender is Border b && b.Child is TextBlock tb) cat = tb.Text;
+            else if (sender is Grid g && g.Children.LastOrDefault() is TextBlock tbg) cat = tbg.Text;
+
+            if (!string.IsNullOrEmpty(cat))
+            {
+                SearchBox.Text = cat;
+                TaskDetailsDialog.Hide();
+            }
+        }
+
+        private void TagBadge_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
+        {
+            if (sender is Border b && b.Child is TextBlock tb)
+            {
+                SearchBox.Text = tb.Text;
+                TaskDetailsDialog.Hide();
+            }
         }
 
         private void UpdateHistoryList()
@@ -723,6 +751,8 @@ namespace FluentTaskScheduler
             EditTaskName.Text = ViewModel.SelectedTask.Name;
             EditTaskDescription.Text = ViewModel.SelectedTask.Description;
             EditTaskAuthor.Text = ViewModel.SelectedTask.Author;
+            EditTaskCategory.Text = ViewModel.SelectedTask.Category;
+            EditTaskTags.Text = ViewModel.SelectedTask.Tags != null ? string.Join(", ", ViewModel.SelectedTask.Tags) : "";
             EditTaskEnabled.IsOn = ViewModel.SelectedTask.IsEnabled;
             
             // Triggers
@@ -760,6 +790,8 @@ namespace FluentTaskScheduler
                 Description = EditTaskDescription.Text,
                 Author = EditTaskAuthor.Text,
                 IsEnabled = EditTaskEnabled.IsOn,
+                Category = EditTaskCategory.Text,
+                Tags = new ObservableCollection<string>(EditTaskTags.Text.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)),
                 Actions = new ObservableCollection<TaskActionModel>(_tempActions),
                 TriggersList = new ObservableCollection<TaskTriggerModel>(_tempTriggers),
                 // Map Settings
@@ -994,7 +1026,7 @@ namespace FluentTaskScheduler
                 {
                     ViewModel.TaskService.RunTask(t.Path);
                 }
-                catch { /* RunTask failed – watcher will correct IsRunning */ }
+                catch { /* RunTask failed â€“ watcher will correct IsRunning */ }
                 _ = WatchTaskUntilFinished(t);
             }
         }
@@ -1040,7 +1072,7 @@ namespace FluentTaskScheduler
         {
             var flyout = new MenuFlyout();
             string arrow(string col) =>
-                ViewModel.SortColumn == col ? (ViewModel.SortAscending ? " ▲" : " ▼") : "";
+                ViewModel.SortColumn == col ? (ViewModel.SortAscending ? " â–²" : " â–¼") : "";
 
             void AddItem(string label, string col)
             {
@@ -1063,7 +1095,7 @@ namespace FluentTaskScheduler
 
         private void UpdateSortButtonText()
         {
-            string arrow = ViewModel.SortAscending ? "▲" : "▼";
+            string arrow = ViewModel.SortAscending ? "â–²" : "â–¼";
             SortButton.Content = string.IsNullOrEmpty(ViewModel.SortColumn)
                 ? "Sort \u2195"
                 : $"Sort {arrow} {ViewModel.SortColumn}";
@@ -1212,5 +1244,152 @@ namespace FluentTaskScheduler
             finally { _isDialogOpen = false; }
         }
 
+        // --- AutoSuggest Interactivity ---
+
+        private void EditTaskCategory_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is AutoSuggestBox asb) asb.IsSuggestionListOpen = true;
+        }
+
+        private void EditTaskCategory_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                var query = sender.Text.Trim();
+                var suggestions = new List<string>();
+
+                if (string.IsNullOrEmpty(query))
+                {
+                    suggestions.AddRange(ViewModel.SavedCategories);
+                }
+                else
+                {
+                    suggestions.AddRange(ViewModel.SavedCategories
+                        .Where(c => c.Contains(query, StringComparison.OrdinalIgnoreCase))
+                        .ToList());
+
+                    if (!ViewModel.SavedCategories.Any(c => c.Equals(query, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        suggestions.Add($"Add \"{query}\"");
+                    }
+                }
+                sender.ItemsSource = suggestions;
+            }
+        }
+
+        private void EditTaskCategory_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            var selected = args.SelectedItem.ToString() ?? "";
+            if (selected.StartsWith("Add \"") && selected.EndsWith("\""))
+            {
+                var newCat = selected.Substring(5, selected.Length - 6);
+                if (!ViewModel.SavedCategories.Any(c => c.Equals(newCat, StringComparison.OrdinalIgnoreCase)))
+                {
+                    var cats = new List<string>(ViewModel.SavedCategories);
+                    cats.Add(newCat);
+                    Services.SettingsService.SavedCategories = cats;
+                    ViewModel.RefreshSavedCategories();
+                }
+                sender.Text = newCat;
+            }
+            else
+            {
+                sender.Text = selected;
+            }
+        }
+
+        private void EditTaskTags_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is AutoSuggestBox asb)
+            {
+                RefreshTagSuggestions(asb);
+                asb.IsSuggestionListOpen = true;
+            }
+        }
+
+        private void EditTaskTags_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                RefreshTagSuggestions(sender);
+            }
+        }
+
+        private void RefreshTagSuggestions(AutoSuggestBox sender)
+        {
+            var currentText = sender.Text ?? "";
+            var parts = currentText.Split(',').Select(p => p.Trim()).ToList();
+            var lastPart = parts.LastOrDefault() ?? "";
+            var existingTags = (parts.Count > 1) ? parts.Take(parts.Count - 1).ToList() : new List<string>();
+
+            var availableTags = ViewModel.SavedTags
+                .Where(t => !existingTags.Any(et => et.Equals(t, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+
+            var suggestions = new List<string>();
+            bool isExactMatch = ViewModel.SavedTags.Any(t => t.Equals(lastPart, StringComparison.OrdinalIgnoreCase));
+
+            if (string.IsNullOrEmpty(lastPart))
+            {
+                suggestions.AddRange(availableTags);
+            }
+            else if (isExactMatch)
+            {
+                // If the last part is a complete tag, show all other available tags
+                suggestions.AddRange(availableTags.Where(t => !t.Equals(lastPart, StringComparison.OrdinalIgnoreCase)));
+            }
+            else
+            {
+                var filtered = availableTags
+                    .Where(t => t.Contains(lastPart, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+                suggestions.AddRange(filtered);
+
+                if (!ViewModel.SavedTags.Any(t => t.Equals(lastPart, StringComparison.OrdinalIgnoreCase)))
+                {
+                    suggestions.Add($"Add \"{lastPart}\"");
+                }
+            }
+            sender.ItemsSource = suggestions;
+        }
+
+        private void EditTaskTags_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            if (args.SelectedItem is not string selected) return;
+            
+            var currentText = sender.Text ?? "";
+            var parts = currentText.Split(',').Select(p => p.Trim()).ToList();
+            var lastPart = parts.LastOrDefault() ?? "";
+            if (parts.Count > 0) parts.RemoveAt(parts.Count - 1);
+
+            string finalTag = selected;
+            if (selected.StartsWith("Add \"") && selected.EndsWith("\""))
+            {
+                finalTag = selected.Substring(5, selected.Length - 6);
+                if (!ViewModel.SavedTags.Any(t => t.Equals(finalTag, StringComparison.OrdinalIgnoreCase)))
+                {
+                    var tags = new List<string>(ViewModel.SavedTags);
+                    tags.Add(finalTag);
+                    Services.SettingsService.SavedTags = tags;
+                    ViewModel.RefreshSavedCategories();
+                }
+            }
+
+            // If the last part was already a complete tag and we chose something else, restore it.
+            if (ViewModel.SavedTags.Any(t => t.Equals(lastPart, StringComparison.OrdinalIgnoreCase)) && 
+                !lastPart.Equals(finalTag, StringComparison.OrdinalIgnoreCase))
+            {
+                parts.Add(lastPart);
+            }
+
+            if (!parts.Any(p => p.Equals(finalTag, StringComparison.OrdinalIgnoreCase)))
+            {
+                parts.Add(finalTag);
+            }
+
+            sender.Text = string.Join(", ", parts.Where(p => !string.IsNullOrEmpty(p))) + ", ";
+        }
     }
 }
+

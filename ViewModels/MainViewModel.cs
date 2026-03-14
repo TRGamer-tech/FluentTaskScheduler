@@ -58,6 +58,14 @@ namespace FluentTaskScheduler.ViewModels
             set { _selectedTask = value; OnPropertyChanged(); }
         }
 
+        public List<string> SavedCategories => Services.SettingsService.SavedCategories;
+        public List<string> SavedTags => Services.SettingsService.SavedTags;
+        public void RefreshSavedCategories() 
+        { 
+            OnPropertyChanged(nameof(SavedCategories)); 
+            OnPropertyChanged(nameof(SavedTags)); 
+        }
+
         public MainViewModel()
         {
         }
@@ -133,7 +141,11 @@ namespace FluentTaskScheduler.ViewModels
             // Search Filter
             if (!string.IsNullOrWhiteSpace(SearchText))
             {
-                query = query.Where(t => t.Name != null && t.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+                query = query.Where(t => 
+                    (t.Name != null && t.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase)) ||
+                    (t.Category != null && t.Category.Contains(SearchText, StringComparison.OrdinalIgnoreCase)) ||
+                    (t.Tags != null && t.Tags.Any(tag => tag.Contains(SearchText, StringComparison.OrdinalIgnoreCase)))
+                );
             }
 
             // Tag/Folder Filter

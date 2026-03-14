@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Security.Principal;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using FluentTaskScheduler.Models;
 using Microsoft.Win32.TaskScheduler;
+using System.Collections.ObjectModel;
 
 namespace FluentTaskScheduler.Services
 {
@@ -80,6 +82,9 @@ namespace FluentTaskScheduler.Services
                     ? string.Join(", ", def.Triggers.Cast<Trigger>().Select(t => t.ToString()))
                     : ""
             };
+
+            // Parse Metadata from Description
+            ParseMetadata(model);
 
             // Map Actions
             if (def.Actions != null)
@@ -376,7 +381,7 @@ namespace FluentTaskScheduler.Services
 
         private void ConfigureTaskDefinition(TaskDefinition td, ScheduledTaskModel model)
         {
-            td.RegistrationInfo.Description = model.Description;
+            td.RegistrationInfo.Description = UpdateDescriptionWithMetadata(model.Description, model.Category, model.Tags.ToList());
             td.RegistrationInfo.Author = model.Author;
             td.Settings.Enabled = model.IsEnabled;
             td.Principal.RunLevel = model.RunWithHighestPrivileges ? TaskRunLevel.Highest : TaskRunLevel.LUA;
@@ -797,6 +802,60 @@ namespace FluentTaskScheduler.Services
             {
                  if (m != MonthsOfTheYear.AllMonths && (moy & m) != 0) target.Add(m.ToString());
             }
+        }
+
+        private const string MetadataPrefix = "<!-- FTS_METADATA:";
+        private const string MetadataSuffix = " -->";
+
+        private void ParseMetadata(ScheduledTaskModel model)
+        {
+            if (string.IsNullOrEmpty(model.Description)) return;
+
+            int startIndex = model.Description.IndexOf(MetadataPrefix);
+            if (startIndex == -1) return;
+
+            int endIndex = model.Description.IndexOf(MetadataSuffix, startIndex);
+            if (endIndex == -1) return;
+
+            string json = model.Description.Substring(startIndex + MetadataPrefix.Length, endIndex - (startIndex + MetadataPrefix.Length));
+            try
+            {
+                var metadata = JsonSerializer.Deserialize<TaskMetadata>(json);
+                if (metadata != null)
+                {
+                    model.Category = metadata.Category ?? "";
+                    model.Tags = new ObservableCollection<string>(metadata.Tags ?? new List<string>());
+                    
+                    // Clean description for UI
+                    model.Description = model.Description.Remove(startIndex).Trim();
+                }
+            }
+            catch { /* Ignore malformed metadata */ }
+        }
+
+        private string UpdateDescriptionWithMetadata(string description, string category, List<string> tags)
+        {
+            string cleanDescription = description;
+            int startIndex = description.IndexOf(MetadataPrefix);
+            if (startIndex != -1)
+            {
+                cleanDescription = description.Remove(startIndex).Trim();
+            }
+
+            if (string.IsNullOrEmpty(category) && (tags == null || tags.Count == 0))
+            {
+                return cleanDescription;
+            }
+
+            var metadata = new TaskMetadata { Category = category, Tags = tags };
+            string json = JsonSerializer.Serialize(metadata);
+            return $"{cleanDescription}\n\n{MetadataPrefix}{json}{MetadataSuffix}".Trim();
+        }
+
+        private class TaskMetadata
+        {
+            public string? Category { get; set; }
+            public List<string>? Tags { get; set; }
         }
 
         // Helpers

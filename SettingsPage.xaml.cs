@@ -4,6 +4,8 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using FluentTaskScheduler.Services;
 using Windows.Storage.Pickers;
+using Microsoft.UI.Xaml.Input;
+using System.Linq;
 
 namespace FluentTaskScheduler
 {
@@ -54,8 +56,12 @@ namespace FluentTaskScheduler
             LoggingToggle.IsOn = SettingsService.EnableLogging;
 
             // Init sidebar panels — sync visibility with current selection
-            _panels = new[] { PanelAppearance, PanelNotifications, PanelSystem, PanelAdvanced, PanelData, PanelAbout };
+            _panels = new[] { PanelAppearance, PanelNotifications, PanelSystem, PanelAdvanced, PanelData, PanelCategories, PanelAbout };
             SyncPanelVisibility();
+
+            // Categories & Tags initial load
+            RefreshCategoriesList();
+            RefreshTagsList();
 
             _isLoaded = true;
             PageScrollViewer.IsScrollInertiaEnabled = SettingsService.SmoothScrolling;
@@ -87,6 +93,7 @@ namespace FluentTaskScheduler
             PanelSystem.Visibility = tag == "System" ? Visibility.Visible : Visibility.Collapsed;
             PanelAdvanced.Visibility = tag == "Advanced" ? Visibility.Visible : Visibility.Collapsed;
             PanelData.Visibility = tag == "Data" ? Visibility.Visible : Visibility.Collapsed;
+            PanelCategories.Visibility = tag == "Categories" ? Visibility.Visible : Visibility.Collapsed;
             PanelAbout.Visibility = tag == "About" ? Visibility.Visible : Visibility.Collapsed;
         }
 
@@ -312,6 +319,76 @@ namespace FluentTaskScheduler
                 RequestedTheme = SettingsService.Theme
             };
             await dialog.ShowAsync();
+        }
+
+        // ── Categories & Tags ──────────────────────────────────────────────────
+
+        private void RefreshCategoriesList()
+        {
+            CategoriesItemsControl.ItemsSource = null;
+            CategoriesItemsControl.ItemsSource = SettingsService.SavedCategories;
+        }
+
+        private void RefreshTagsList()
+        {
+            TagsItemsControl.ItemsSource = null;
+            TagsItemsControl.ItemsSource = SettingsService.SavedTags;
+        }
+
+        private void AddCategory_Click(object sender, RoutedEventArgs e) => AddCategory();
+        private void NewCategoryBox_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if (e.Key == Windows.System.VirtualKey.Enter) AddCategory();
+        }
+
+        private void AddCategory()
+        {
+            string cat = NewCategoryBox.Text.Trim();
+            if (!string.IsNullOrEmpty(cat) && !SettingsService.SavedCategories.Contains(cat))
+            {
+                SettingsService.SavedCategories.Add(cat);
+                SettingsService.SavedCategories = SettingsService.SavedCategories; // Trigger save
+                NewCategoryBox.Text = "";
+                RefreshCategoriesList();
+            }
+        }
+
+        private void RemoveCategory_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is string cat)
+            {
+                SettingsService.SavedCategories.Remove(cat);
+                SettingsService.SavedCategories = SettingsService.SavedCategories; // Trigger save
+                RefreshCategoriesList();
+            }
+        }
+
+        private void AddTag_Click(object sender, RoutedEventArgs e) => AddTag();
+        private void NewTagBox_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if (e.Key == Windows.System.VirtualKey.Enter) AddTag();
+        }
+
+        private void AddTag()
+        {
+            string tag = NewTagBox.Text.Trim();
+            if (!string.IsNullOrEmpty(tag) && !SettingsService.SavedTags.Contains(tag))
+            {
+                SettingsService.SavedTags.Add(tag);
+                SettingsService.SavedTags = SettingsService.SavedTags; // Trigger save
+                NewTagBox.Text = "";
+                RefreshTagsList();
+            }
+        }
+
+        private void RemoveTag_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is string tag)
+            {
+                SettingsService.SavedTags.Remove(tag);
+                SettingsService.SavedTags = SettingsService.SavedTags; // Trigger save
+                RefreshTagsList();
+            }
         }
     }
 }
