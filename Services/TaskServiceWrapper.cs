@@ -47,7 +47,7 @@ namespace FluentTaskScheduler.Services
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Error reading task {task.Name}: {ex.Message}");
+                    LogService.Error($"Could not read task '{task.Name}': {ex.Message}");
                 }
             }
 
@@ -59,7 +59,10 @@ namespace FluentTaskScheduler.Services
                     {
                         EnumFolderTasks(subFolder, tasks, true);
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        LogService.Error($"Could not enumerate folder '{subFolder.Path}': {ex.Message}");
+                    }
                 }
             }
         }
@@ -224,10 +227,20 @@ namespace FluentTaskScheduler.Services
 
         public void SetTaskEnabled(string path, bool enabled)
         {
-            using (var ts = new TaskService())
+            try
             {
-                var task = ts.GetTask(path);
-                if (task != null) task.Enabled = enabled;
+                using (var ts = new TaskService())
+                {
+                    var task = ts.GetTask(path);
+                    if (task != null) task.Enabled = enabled;
+                }
+            }
+            catch (Exception ex) when (IsAccessDenied(ex))
+            {
+                LogService.Error($"Access denied: Cannot {(enabled ? "enable" : "disable")} task '{path}'.");
+                throw new UnauthorizedAccessException(
+                    $"The user account under which you are performing this action does not have permission to {(enabled ? "enable" : "disable")} the task \"{System.IO.Path.GetFileName(path)}\".\n\n" +
+                    "This task is protected and cannot be modified, even with administrator privileges.", ex);
             }
         }
 
@@ -247,6 +260,8 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
+                var level = IsAccessDenied(ex) ? "Access denied" : "Error";
+                LogService.Error($"{level}: Cannot run task '{path}': {ex.Message}");
                 NotificationService.ShowTaskError(System.IO.Path.GetFileName(path), ex.Message);
                 throw;
             }
@@ -304,18 +319,18 @@ namespace FluentTaskScheduler.Services
                         password,
                         logonType
                     );
-                    System.Diagnostics.Debug.WriteLine($"Successfully registered task: {model.Name}");
+                    LogService.Info($"Registered task '{model.Name}'.");
                 }
                 catch (Exception ex)
                 {
                     if (IsAccessDenied(ex))
                     {
-                        System.Diagnostics.Debug.WriteLine("Access Denied. Attempting fallback registration with current user context...");
+                        LogService.Warn($"Access denied registering task '{model.Name}' with elevated privileges; falling back to current user context.");
                         RegisterSafeTask(ts, targetFolder, model, td);
                     }
                     else
                     {
-                        System.Diagnostics.Debug.WriteLine($"Failed to register task {model.Name}: {ex.Message}");
+                        LogService.Error($"Failed to register task '{model.Name}': {ex.Message}");
                         throw;
                     }
                 }
@@ -376,7 +391,7 @@ namespace FluentTaskScheduler.Services
                 TaskLogonType.InteractiveToken
             );
             
-            System.Diagnostics.Debug.WriteLine($"Successfully registered task (Fallback): {model.Name}");
+            LogService.Info($"Registered task '{model.Name}' via fallback (InteractiveToken).");
         }
 
         private void ConfigureTaskDefinition(TaskDefinition td, ScheduledTaskModel model)
@@ -663,7 +678,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error reading task history: {ex.Message}");
+                LogService.Error($"Could not read task history: {ex.Message}");
             }
             return history;
         }
@@ -994,7 +1009,7 @@ namespace FluentTaskScheduler.Services
                     }
                     else
                     {
-                        System.Diagnostics.Debug.WriteLine($"Error copying task '{task.Name}': {ex.Message}");
+                        LogService.Error($"Failed to copy task '{task.Name}': {ex.Message}");
                     }
                 }
             }

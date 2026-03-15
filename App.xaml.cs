@@ -96,13 +96,7 @@ namespace FluentTaskScheduler
         private void LogCrash(Exception? ex, string source)
         {
             string errorMessage = $"[{DateTime.Now}] [{source}] Error: {ex?.Message}\r\nStack Trace: {ex?.StackTrace ?? "No stack"}\r\n\r\n";
-            try 
-            {
-                string logPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "crash_log.txt");
-                System.IO.File.AppendAllText(logPath, errorMessage);
-            }
-            catch { }
-            System.Diagnostics.Debug.WriteLine($"[{source}] Error: {ex?.Message}");
+            Services.LogService.WriteCrash(ex, source);
 
             // Attempt to show dialog if window exists
             if (m_window != null)

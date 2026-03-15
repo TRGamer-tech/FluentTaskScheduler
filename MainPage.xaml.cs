@@ -1031,8 +1031,8 @@ namespace FluentTaskScheduler
             }
         }
         private void BatchStop_Click(object sender, RoutedEventArgs e) => PerformBatchAction(t => { ViewModel.TaskService.StopTask(t.Path); t.State = "Ready"; });
-        private void BatchEnable_Click(object sender, RoutedEventArgs e) { PerformBatchAction(t => { if (!t.IsEnabled) { ViewModel.TaskService.SetTaskEnabled(t.Path, true); t.IsEnabled = true; } }); UpdateBatchActionsState(); }
-        private void BatchDisable_Click(object sender, RoutedEventArgs e) { PerformBatchAction(t => { if (t.IsEnabled) { ViewModel.TaskService.SetTaskEnabled(t.Path, false); t.IsEnabled = false; } }); UpdateBatchActionsState(); }
+        private async void BatchEnable_Click(object sender, RoutedEventArgs e) { var denied = PerformBatchActionWithErrors(t => { if (!t.IsEnabled) { ViewModel.TaskService.SetTaskEnabled(t.Path, true); t.IsEnabled = true; } }); UpdateBatchActionsState(); if (denied.Count > 0) await ShowErrorDialog($"The user account under which you are performing this action does not have permission to enable the following task(s):\n\n{string.Join("\n", denied)}\n\nThese tasks are protected and cannot be modified, even with administrator privileges."); }
+        private async void BatchDisable_Click(object sender, RoutedEventArgs e) { var denied = PerformBatchActionWithErrors(t => { if (t.IsEnabled) { ViewModel.TaskService.SetTaskEnabled(t.Path, false); t.IsEnabled = false; } }); UpdateBatchActionsState(); if (denied.Count > 0) await ShowErrorDialog($"The user account under which you are performing this action does not have permission to disable the following task(s):\n\n{string.Join("\n", denied)}\n\nThese tasks are protected and cannot be modified, even with administrator privileges."); }
         private async void BatchDelete_Click(object sender, RoutedEventArgs e) 
         { 
              var tasks = TaskListView.SelectedItems.Cast<ScheduledTaskModel>().ToList();
@@ -1044,6 +1044,7 @@ namespace FluentTaskScheduler
              }
         }
         private void PerformBatchAction(System.Action<ScheduledTaskModel> action) { foreach (var task in TaskListView.SelectedItems.Cast<ScheduledTaskModel>().ToList()) try { action(task); } catch { } }
+        private List<string> PerformBatchActionWithErrors(System.Action<ScheduledTaskModel> action) { var denied = new List<string>(); foreach (var task in TaskListView.SelectedItems.Cast<ScheduledTaskModel>().ToList()) try { action(task); } catch (UnauthorizedAccessException) { denied.Add(task.Name); } catch { } return denied; }
 
         // Keyboard Accelerators
         protected override void OnKeyDown(Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
