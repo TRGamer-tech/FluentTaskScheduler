@@ -132,11 +132,17 @@ namespace FluentTaskScheduler.ViewModels
             ApplyFilters();
         }
 
-        private void ApplyFilters()
+        public void ApplyFilters()
         {
             if (_allTasks == null) return;
 
             var query = _allTasks.AsEnumerable();
+
+            // Hidden Visibility Filter
+            if (!Services.SettingsService.ShowHiddenTasks)
+            {
+                query = query.Where(t => !t.IsHidden);
+            }
 
             // Search Filter
             if (!string.IsNullOrWhiteSpace(SearchText))

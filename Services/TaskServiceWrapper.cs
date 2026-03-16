@@ -39,30 +39,27 @@ namespace FluentTaskScheduler.Services
 
         private void EnumFolderTasks(TaskFolder folder, List<ScheduledTaskModel> tasks, bool recursive = true)
         {
-            foreach (var task in folder.Tasks)
+            // Use AllTasks to include hidden tasks
+            var sourceTasks = folder.AllTasks;
+            
+            foreach (var task in sourceTasks)
             {
                 try
                 {
+                    // If not recursive, we only want tasks directly in this folder
+                    if (!recursive)
+                    {
+                        var taskDir = System.IO.Path.GetDirectoryName(task.Path);
+                        if (string.IsNullOrEmpty(taskDir)) taskDir = "\\";
+                        if (!taskDir.Equals(folder.Path, StringComparison.OrdinalIgnoreCase))
+                            continue;
+                    }
+
                     tasks.Add(MapTaskToModel(task));
                 }
                 catch (Exception ex)
                 {
                     LogService.Error($"Could not read task '{task.Name}': {ex.Message}");
-                }
-            }
-
-            if (recursive)
-            {
-                foreach (var subFolder in folder.SubFolders)
-                {
-                    try
-                    {
-                        EnumFolderTasks(subFolder, tasks, true);
-                    }
-                    catch (Exception ex)
-                    {
-                        LogService.Error($"Could not enumerate folder '{subFolder.Path}': {ex.Message}");
-                    }
                 }
             }
         }
@@ -80,6 +77,7 @@ namespace FluentTaskScheduler.Services
                 NextRunTime = task.NextRunTime == DateTime.MinValue ? null : (DateTime?)task.NextRunTime,
                 Author = def.RegistrationInfo.Author ?? "",
                 Description = def.RegistrationInfo.Description ?? "",
+                IsHidden = def.Settings.Hidden,
                 RunWithHighestPrivileges = def.Principal.RunLevel == TaskRunLevel.Highest,
                 Triggers = def.Triggers != null
                     ? string.Join(", ", def.Triggers.Cast<Trigger>().Select(t => t.ToString()))
@@ -399,6 +397,7 @@ namespace FluentTaskScheduler.Services
             td.RegistrationInfo.Description = UpdateDescriptionWithMetadata(model.Description, model.Category, model.Tags.ToList());
             td.RegistrationInfo.Author = model.Author;
             td.Settings.Enabled = model.IsEnabled;
+            td.Settings.Hidden = model.IsHidden;
             td.Principal.RunLevel = model.RunWithHighestPrivileges ? TaskRunLevel.Highest : TaskRunLevel.LUA;
 
             foreach (var triggerModel in model.TriggersList)

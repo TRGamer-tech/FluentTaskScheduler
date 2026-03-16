@@ -255,5 +255,12 @@ namespace FluentTaskScheduler.Models
         // User Context
         public string RunAsUser { get; set; } = ""; // Empty = current user
         public bool RunAsSystem { get; set; } = false;
+
+        private bool _isHidden;
+        public bool IsHidden
+        {
+            get => _isHidden;
+            set { if (_isHidden != value) { _isHidden = value; OnPropertyChanged(); } }
+        }
     }
 }

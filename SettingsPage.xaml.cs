@@ -50,6 +50,7 @@ namespace FluentTaskScheduler
             RunOnStartupToggle.IsOn = SettingsService.RunOnStartup;
             TrayIconToggle.IsOn = SettingsService.EnableTrayIcon;
             SmoothScrollingToggle.IsOn = SettingsService.SmoothScrolling;
+            ShowHiddenTasksToggle.IsOn = SettingsService.ShowHiddenTasks;
 
             // Advanced
             ConfirmDeleteToggle.IsOn = SettingsService.ConfirmDelete;
@@ -204,6 +205,15 @@ namespace FluentTaskScheduler
             PageScrollViewer.IsScrollInertiaEnabled = enable;
             (Application.Current as App)?.ApplySmoothScrolling(enable);
             MainPage.Current?.ApplySmoothScrollingSelf(enable);
+        }
+
+        private void ShowHiddenTasksToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!_isLoaded) return;
+            SettingsService.ShowHiddenTasks = ShowHiddenTasksToggle.IsOn;
+            LogService.Info($"Show Hidden Tasks: {(ShowHiddenTasksToggle.IsOn ? "enabled" : "disabled")}");
+            // Trigger refresh in main view if it exists
+            MainPage.Current?.ViewModel.ApplyFilters();
         }
 
         // ── Advanced ───────────────────────────────────────────────────────────

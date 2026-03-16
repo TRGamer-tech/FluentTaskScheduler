@@ -216,7 +216,8 @@
                     </ListView.ItemContainerTransitions>
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="models:ScheduledTaskModel">
-                            <Grid Padding="12" Margin="0,4" CornerRadius="8" Background="{ThemeResource TaskCardBackground}" BorderThickness="1" BorderBrush="{ThemeResource TaskCardBorder}">
+                            <Grid Padding="12" Margin="0,4" CornerRadius="8" Background="{ThemeResource TaskCardBackground}" BorderThickness="1" BorderBrush="{ThemeResource TaskCardBorder}"
+                                  Opacity="{x:Bind IsHidden, Mode=OneWay, Converter={StaticResource BoolToOpacityConverter}}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
@@ -245,6 +246,11 @@
                                                 Tapped="CategoryBadge_Tapped" ToolTipService.ToolTip="Filter by this category"
                                                 MaxWidth="150">
                                             <TextBlock Text="{x:Bind Category}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="White" FontSize="10" TextTrimming="CharacterEllipsis"/>
+                                        </Border>
+                                        <Border Background="{ThemeResource SystemFillColorNeutralBrush}" 
+                                                CornerRadius="4" Padding="4,0" 
+                                                Visibility="{x:Bind IsHidden, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
+                                            <TextBlock Text="Hidden" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="10"/>
                                         </Border>
                                     </StackPanel>
                                     <TextBlock Text="{x:Bind Path}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
@@ -792,6 +798,7 @@
                 <TextBlock x:Uid="SettingsTitle" Text="Settings" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,12,0,4"/>
                 <StackPanel Spacing="12">
                     <CheckBox x:Name="EditTaskRunWithHighestPrivileges" Content="Run with highest privileges"/>
+                    <CheckBox x:Name="EditTaskIsHidden" Content="Hidden task"/>
                     <CheckBox x:Name="EditTaskRunIfMissed" x:Uid="RunIfMissed" Content="Run task as soon as possible after a scheduled start is missed"/>
                     
                     <ComboBox x:Name="EditTaskMultipleInstances" Header="If the task is already running:">

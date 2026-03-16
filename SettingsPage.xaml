@@ -229,6 +229,18 @@
                                              OffContent="" OnContent="" IsOn="False" Toggled="SmoothScrollingToggle_Toggled"/>
                             </Grid>
                         </Border>
+
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock Text="Show Hidden Tasks" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="Display tasks that are marked as hidden in the Windows Task Scheduler." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <ToggleSwitch x:Name="ShowHiddenTasksToggle" Grid.Column="1" VerticalAlignment="Center"
+                                             OffContent="" OnContent="" IsOn="True" Toggled="ShowHiddenTasksToggle_Toggled"/>
+                            </Grid>
+                        </Border>
                     </StackPanel>
 
                     <!-- ── Advanced ── -->

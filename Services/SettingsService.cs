@@ -27,6 +27,7 @@ namespace FluentTaskScheduler.Services
         public bool HasCompletedOnboarding { get; set; } = false;
         public bool EnableUpcomingReminders { get; set; } = true;
         public int ReminderLeadMinutes { get; set; } = 5;
+        public bool ShowHiddenTasks { get; set; } = true;
         public List<string> SavedCategories { get; set; } = new() { "Work", "Personal", "Maintenance", "System" };
         public List<string> SavedTags { get; set; } = new() { "urgent", "sync", "database", "cleanup" };
     }
@@ -245,6 +246,12 @@ namespace FluentTaskScheduler.Services
         {
             get => _settings.SavedTags;
             set { _settings.SavedTags = value; Save(); }
+        }
+
+        public static bool ShowHiddenTasks
+        {
+            get => _settings.ShowHiddenTasks;
+            set { _settings.ShowHiddenTasks = value; Save(); }
         }
 
         public static void ExportSettings(string targetPath)

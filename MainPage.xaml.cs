@@ -769,6 +769,7 @@ namespace FluentTaskScheduler
             // This is hard to "Refactor Cleanly" without binding everything.
             // For now, retaining basic load logic manually.
             EditTaskOnlyIfIdle.IsChecked = ViewModel.SelectedTask.OnlyIfIdle;
+            EditTaskIsHidden.IsChecked = ViewModel.SelectedTask.IsHidden;
             // ... (Other settings would act similarly)
             
             PopulateNetworkList(); // TODO: Select correct network
@@ -802,6 +803,7 @@ namespace FluentTaskScheduler
                 OnlyIfAC = EditTaskOnlyIfAC.IsChecked == true,
                 OnlyIfNetwork = EditTaskOnlyIfNetwork.IsChecked == true,
                 WakeToRun = EditTaskWakeToRun.IsChecked == true,
+                IsHidden = EditTaskIsHidden.IsChecked == true,
                 // ...
             };
             
