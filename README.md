@@ -140,6 +140,7 @@ FluentTaskScheduler.exe --export-history "MyTaskName" --output "C:\logs\history.
 - **UI Architecture**: [WinUI 3](https://learn.microsoft.com/en-us/windows/apps/winui/winui3/) (Windows App SDK)
 - **Core Logic**: [TaskScheduler Managed Wrapper](https://github.com/dahall/TaskScheduler)
 - **CI/CD**: Fully automated GitHub Actions for x86 and ARM64 builds (thanks, TalyNone).
+- **Auto-Update**: [VeloPack](https://velopack.io/) for seamless in-app updates via GitHub Releases.
 - **Architectures**: Support for x64 and ARM64.
 - **Language**: C#
 
@@ -163,8 +164,32 @@ FluentTaskScheduler.exe --export-history "MyTaskName" --output "C:\logs\history.
 - **Admin Rights**: Some features (like "Run as SYSTEM") require the application to be run as Administrator.
 - **Preferences storage**: The application stores its preferences as well as the log and custom script files in a JSON file in "%localappdata%\FluentTaskScheduler".
 
-3. **Single File Deployment**:
-   The project supports publishing as a single, self-contained executable for easy distribution.
+3. **Publishing with VeloPack**:
+
+   The project uses [VeloPack](https://velopack.io/) for packaging and auto-updates. To create a release:
+
+   ```bash
+   # Install the VeloPack CLI (one-time setup)
+   dotnet tool install -g vpk
+
+   # Publish the app
+   dotnet publish -c Release -r win-x64 --self-contained
+
+   # Package with VeloPack
+   vpk pack -u FluentTaskScheduler -v 1.X.X -p bin/x64/Release/net8.0-windows10.0.19041.0/win-x64/publish -e FluentTaskScheduler.exe
+   ```
+
+   For ARM64:
+
+   ```bash
+   dotnet publish -c Release -r win-arm64 --self-contained
+   vpk pack -u FluentTaskScheduler -v 1.X.X -p bin/ARM64/Release/net8.0-windows10.0.19041.0/win-arm64/publish -e FluentTaskScheduler.exe
+   ```
+
+   This generates a `Setup.exe` installer and delta/full `.nupkg` files in the `Releases` folder. Upload these to a GitHub Release and the app will auto-update for users.
+
+4. **Single File Deployment**:
+   The project also supports publishing as a single, self-contained executable for portable distribution.
 
 ## Star History
 
