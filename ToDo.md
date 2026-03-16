@@ -11,12 +11,12 @@
    > at FluentTaskScheduler.Program.XamlCheckProcessRequirements()
    > at FluentTaskScheduler.Program.Main(String[] args)
    > The folder version doesn't crash so there is no "crash_log.txt". But here's some extra information If I place "FluentTaskScheduler-arm64.exe" inside the unzipped folder version it works, so whatever .dll it's missing it finds in the folder version.
-4. Fix All Tasks not being displayed on App Start -> Disable "Remembering last selected folder" for now.
+4. Fix [Issue #4](https://github.com/TRGamer-tech/FluentTaskScheduler/issues/4): Hidden Tasks are not displayed
 5. **_More TBD_**
 
 # Done for next release:
 
 1. Fix "Access Denied" errors on specific tasks
-2. Fix [Issue #4](https://github.com/TRGamer-tech/FluentTaskScheduler/issues/4): Tasks in Subfolder "\GoogleSystem\GoogleUpdater" are not displayed, "\Microsoft\Windows\.NET Framework" works.
-3. Add Error Logging on Access Denied or similar (not the same as crash log)
+2. Add Error Logging on Access Denied or similar (not the same as crash log)
+3. Fix All Tasks not being displayed on App Start -> Disable "Remembering last selected folder" for now.
 4. Let's see what we can do to make it even better.

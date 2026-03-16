@@ -255,8 +255,34 @@
                                     <TextBlock Text="Write internal events and errors to a log file for troubleshooting." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                                    <Button x:Name="OpenLogButton" Content="Open Log" Click="OpenLogButton_Click"/>
                                     <ToggleSwitch x:Name="LoggingToggle" OffContent="" OnContent="" IsOn="True" Toggled="LoggingToggle_Toggled"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock Text="Separate Log Files" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="Store error and crash logs in dedicated files instead of the main log." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <ToggleSwitch x:Name="SeparateLogsToggle" Grid.Column="1" VerticalAlignment="Center"
+                                             OffContent="" OnContent="" IsOn="True" Toggled="SeparateLogsToggle_Toggled"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsCardStyle}" x:Name="SpecificLogsCard">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock Text="Specific Logs" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="Direct access to error and crash records." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                    <Button x:Name="OpenLogButton" Content="Open Log" Click="OpenLogButton_Click"/>
+                                    <Button x:Name="OpenErrorLogButton" Content="Open Error Log" Click="OpenErrorLogButton_Click"/>
+                                    <Button x:Name="OpenCrashLogButton" Content="Open Crash Log" Click="OpenCrashLogButton_Click"/>
                                 </StackPanel>
                             </Grid>
                         </Border>

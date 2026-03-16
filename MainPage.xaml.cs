@@ -104,12 +104,14 @@ namespace FluentTaskScheduler
             UpdateFolderTreeMaxHeight();
 
             // Feature 3: restore last-used folder
+            /*
             string saved = Services.SettingsService.LastFolderPath;
             if (!string.IsNullOrEmpty(saved) && saved != "\\")
             {
                 _currentFolderPath = saved;
                 ViewModel.SetFilter(saved);
             }
+            */
 
             // Defer one frame so the ListView control template is fully applied before we set its internal ScrollViewer
             DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
@@ -289,7 +291,7 @@ namespace FluentTaskScheduler
             if (args.InvokedItem is TreeViewNode node && _treeNodeFolderMap.TryGetValue(node, out var folder))
             {
                 _currentFolderPath = folder.Path;
-                Services.SettingsService.LastFolderPath = folder.Path; // Feature 3: persist
+                // Services.SettingsService.LastFolderPath = folder.Path; // Feature 3: persist
                 ViewModel.SetFilter(folder.Path);
                 
                 // Restore Task View

@@ -54,6 +54,8 @@ namespace FluentTaskScheduler
             // Advanced
             ConfirmDeleteToggle.IsOn = SettingsService.ConfirmDelete;
             LoggingToggle.IsOn = SettingsService.EnableLogging;
+            SeparateLogsToggle.IsOn = SettingsService.SeparateLogFiles;
+            SpecificLogsCard.Visibility = SettingsService.EnableLogging ? Visibility.Visible : Visibility.Collapsed;
 
             // Init sidebar panels — sync visibility with current selection
             _panels = new[] { PanelAppearance, PanelNotifications, PanelSystem, PanelAdvanced, PanelData, PanelCategories, PanelAbout };
@@ -217,13 +219,31 @@ namespace FluentTaskScheduler
         {
             if (!_isLoaded) return;
             SettingsService.EnableLogging = LoggingToggle.IsOn;
+            SpecificLogsCard.Visibility = LoggingToggle.IsOn ? Visibility.Visible : Visibility.Collapsed;
             if (LoggingToggle.IsOn)
                 LogService.Info("Application Logging: enabled");
+        }
+
+        private void SeparateLogsToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!_isLoaded) return;
+            SettingsService.SeparateLogFiles = SeparateLogsToggle.IsOn;
+            LogService.Info($"Separate Log Files: {(SeparateLogsToggle.IsOn ? "enabled" : "disabled")}");
         }
 
         private void OpenLogButton_Click(object sender, RoutedEventArgs e)
         {
             LogService.OpenLogFile();
+        }
+
+        private void OpenErrorLogButton_Click(object sender, RoutedEventArgs e)
+        {
+            LogService.OpenErrorLog();
+        }
+
+        private void OpenCrashLogButton_Click(object sender, RoutedEventArgs e)
+        {
+            LogService.OpenCrashLog();
         }
 
         // ── Data ───────────────────────────────────────────────────────────────

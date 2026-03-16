@@ -17,6 +17,7 @@ namespace FluentTaskScheduler.Services
         public bool EnableTrayIcon { get; set; } = true;
         public bool MinimizeToTray { get; set; } = false;
         public bool EnableLogging { get; set; } = true;
+        public bool SeparateLogFiles { get; set; } = false;
         public bool RunOnStartup { get; set; } = false;
         public bool SmoothScrolling { get; set; } = false;
         public int WindowWidth { get; set; } = 1200;
@@ -158,6 +159,16 @@ namespace FluentTaskScheduler.Services
             set
             {
                 _settings.EnableLogging = value;
+                Save();
+            }
+        }
+        
+        public static bool SeparateLogFiles
+        {
+            get => _settings.SeparateLogFiles;
+            set
+            {
+                _settings.SeparateLogFiles = value;
                 Save();
             }
         }

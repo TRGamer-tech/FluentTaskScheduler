@@ -10,7 +10,7 @@ namespace FluentTaskScheduler.Services
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "FluentTaskScheduler");
 
-        public static readonly string LogPath      = Path.Combine(LogFolder, "app.log");
+        public static readonly string LogPath      = Path.Combine(LogFolder, "App_Log.txt");
         public static readonly string ErrorLogPath = Path.Combine(LogFolder, "Error_Log.txt");
         public static readonly string CrashLogPath = Path.Combine(LogFolder, "Crash_Log.txt");
 
@@ -27,7 +27,7 @@ namespace FluentTaskScheduler.Services
             var text = ex != null ? $"{message} | {ex.GetType().Name}: {ex.Message}" : message;
             Write("ERROR", text);
             AppendToFile(ErrorLogPath, FormatLine("ERROR", text));
-            WriteToEventLog(text, EventLogEntryType.Error);
+            WriteToEventLog(text, EventLogEntryType.Warning);
         }
 
         /// <summary>Logs an unhandled exception to Crash_Log.txt and the Windows Event Log.</summary>
@@ -44,6 +44,9 @@ namespace FluentTaskScheduler.Services
         private static void Write(string level, string message)
         {
             if (!SettingsService.EnableLogging) return;
+
+            // If separate logs are enabled, errors don't go into App_Log.txt
+            if (SettingsService.SeparateLogFiles && (level == "ERROR" || level == "CRASH")) return;
 
             try
             {
@@ -108,15 +111,19 @@ namespace FluentTaskScheduler.Services
             catch { }
         }
 
-        public static void OpenLogFile()
+        public static void OpenLogFile() => OpenFileInternal(LogPath);
+        public static void OpenErrorLog() => OpenFileInternal(ErrorLogPath);
+        public static void OpenCrashLog() => OpenFileInternal(CrashLogPath);
+
+        private static void OpenFileInternal(string path)
         {
             try
             {
-                if (File.Exists(LogPath))
+                if (File.Exists(path))
                 {
                     System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
                     {
-                        FileName = LogPath,
+                        FileName = path,
                         UseShellExecute = true
                     });
                 }
