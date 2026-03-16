@@ -262,5 +262,19 @@ namespace FluentTaskScheduler.Models
             get => _isHidden;
             set { if (_isHidden != value) { _isHidden = value; OnPropertyChanged(); } }
         }
+
+        private bool _isFromEventLog;
+        public bool IsFromEventLog
+        {
+            get => _isFromEventLog;
+            set { if (_isFromEventLog != value) { _isFromEventLog = value; OnPropertyChanged(); } }
+        }
+
+        private bool _isReadOnlyFallback;
+        public bool IsReadOnlyFallback
+        {
+            get => _isReadOnlyFallback;
+            set { if (_isReadOnlyFallback != value) { _isReadOnlyFallback = value; OnPropertyChanged(); } }
+        }
     }
 }

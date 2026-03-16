@@ -13,4 +13,5 @@
 4. Fix [Issue #5](https://github.com/TRGamer-tech/FluentTaskScheduler/issues/5): v1.60 ARM 64 single exe crashes on startup
 5. Fix [Issue #6](https://github.com/TRGamer-tech/FluentTaskScheduler/issues/6): Unhandled exception on 'Add or edit task' add tag, save
 6. Fix [Issue #4](https://github.com/TRGamer-tech/FluentTaskScheduler/issues/4): Hidden Tasks are not displayed
-7. Let's see what we can do to make it even better.
+7. Add Task Discovery via Event Log
+8. Let's see what we can do to make it even better.

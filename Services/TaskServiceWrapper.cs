@@ -24,6 +24,21 @@ namespace FluentTaskScheduler.Services
                     EnumFolderTasks(folder, tasks, recursive);
                 }
             }
+
+            // Merge discovered tasks from event log if they aren't already present
+            var discovered = DiscoverTasksFromEventLog();
+            foreach (var d in discovered)
+            {
+                if (!tasks.Any(t => t.Path.Equals(d.Path, StringComparison.OrdinalIgnoreCase)))
+                {
+                    // Filter by folder if requested
+                    if (folderPath != null && folderPath != "\\" && !d.Path.StartsWith(folderPath, StringComparison.OrdinalIgnoreCase))
+                        continue;
+                        
+                    tasks.Add(d);
+                }
+            }
+
             return tasks;
         }
 
@@ -645,6 +660,94 @@ namespace FluentTaskScheduler.Services
             }
         }
 
+        private List<ScheduledTaskModel>? _discoveredCache;
+
+        public List<ScheduledTaskModel> DiscoverTasksFromEventLog(bool forceRefresh = false)
+        {
+            if (_discoveredCache != null && !forceRefresh) return _discoveredCache;
+
+            var discoveredRaw = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            try
+            {
+                // Event IDs for task activity: 100 (started), 102 (completed), 107 (triggered), 110 (registered)
+                string query = "*[System[(EventID=100 or EventID=102 or EventID=107 or EventID=110)]]";
+                EventLogQuery eventsQuery = new EventLogQuery("Microsoft-Windows-TaskScheduler/Operational", PathType.LogName, query);
+                EventLogReader logReader = new EventLogReader(eventsQuery);
+
+                EventRecord record;
+                // Limit to last 2000 events to ensure older infrequent tasks are caught
+                int count = 0;
+                while (count < 2000 && (record = logReader.ReadEvent()) != null)
+                {
+                    using (record)
+                    {
+                        try
+                        {
+                            // In TaskScheduler Operational log, Data[0] (or similar) usually contains the TaskName
+                            // We look through all properties for anything starting with \ (task path)
+                            // This is language-independent.
+                            foreach (var prop in record.Properties)
+                            {
+                                if (prop.Value is string s && s.StartsWith("\\") && s.Length > 1)
+                                {
+                                    discoveredRaw.Add(s.Trim());
+                                    break;
+                                }
+                            }
+                        }
+                        catch { }
+                    }
+                    count++;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogService.Error($"Could not discover tasks via event log: {ex.Message}");
+            }
+
+            var discoveredTasks = new List<ScheduledTaskModel>();
+            foreach (var path in discoveredRaw)
+            {
+                bool added = false;
+                try
+                {
+                    using (var ts = new TaskService())
+                    {
+                        var task = ts.GetTask(path);
+                        if (task != null)
+                        {
+                            var model = MapTaskToModel(task);
+                            model.IsFromEventLog = true;
+                            discoveredTasks.Add(model);
+                            added = true;
+                        }
+                    }
+                }
+                catch (Exception ex) when (IsAccessDenied(ex))
+                {
+                    // Handled below if !added
+                }
+                catch { }
+
+                if (!added)
+                {
+                    // Definitive Fallback: If we saw it in the logs, it exists. 
+                    // Create a placeholder even if TaskService fails to find/load it.
+                    discoveredTasks.Add(new ScheduledTaskModel
+                    {
+                        Name = System.IO.Path.GetFileName(path),
+                        Path = path,
+                        IsFromEventLog = true,
+                        IsReadOnlyFallback = true,
+                        State = "Access Denied",
+                        Description = "This task was discovered via event logs but is highly protected. Access is restricted for non-administrator users."
+                    });
+                }
+            }
+            _discoveredCache = discoveredTasks;
+            return discoveredTasks;
+        }
+
         public List<TaskHistoryEntry> GetTaskHistory(string taskPath)
         {
             var history = new List<TaskHistoryEntry>();
@@ -911,7 +1014,39 @@ namespace FluentTaskScheduler.Services
             {
                 var root = new TaskFolderModel { Name = "Task Scheduler Library", Path = "\\" };
                 EnumFolders(ts.RootFolder, root);
+
+                // Synthesize folders from discovered tasks
+                // Pass true to force refresh if we're reloading folders
+                var discovered = DiscoverTasksFromEventLog(true); 
+                foreach (var task in discovered)
+                {
+                    SynthesizeFoldersInTree(root, task.Path);
+                }
+
                 return root;
+            }
+        }
+
+        private void SynthesizeFoldersInTree(TaskFolderModel root, string taskPath)
+        {
+            string? dirPath = System.IO.Path.GetDirectoryName(taskPath);
+            if (string.IsNullOrEmpty(dirPath) || dirPath == "\\") return;
+
+            // Split path into parts, skipping first empty (from root \)
+            var parts = dirPath.Split('\\', StringSplitOptions.RemoveEmptyEntries);
+            var current = root;
+            string currentPath = "";
+
+            foreach (var part in parts)
+            {
+                currentPath += "\\" + part;
+                var child = current.SubFolders.FirstOrDefault(f => f.Name.Equals(part, StringComparison.OrdinalIgnoreCase));
+                if (child == null)
+                {
+                    child = new TaskFolderModel { Name = part, Path = currentPath };
+                    current.SubFolders.Add(child);
+                }
+                current = child;
             }
         }
 

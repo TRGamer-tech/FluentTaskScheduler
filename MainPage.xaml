@@ -27,6 +27,7 @@
         <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
         <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
         <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
     </Page.Resources>
 
     <Grid>
@@ -252,6 +253,19 @@
                                                 Visibility="{x:Bind IsHidden, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
                                             <TextBlock Text="Hidden" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="10"/>
                                         </Border>
+                                        <Border Background="{ThemeResource SystemFillColorNeutralBrush}" 
+                                                CornerRadius="4" Padding="4,0" 
+                                                Visibility="{x:Bind IsFromEventLog, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <FontIcon Glyph="&#xE81C;" FontSize="10" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                                <TextBlock Text="From History" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="10"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}" 
+                                                CornerRadius="4" Padding="4,0" 
+                                                Visibility="{x:Bind IsReadOnlyFallback, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
+                                            <TextBlock Text="Read Only" Style="{StaticResource CaptionTextBlockStyle}" Foreground="White" FontSize="10"/>
+                                        </Border>
                                     </StackPanel>
                                     <TextBlock Text="{x:Bind Path}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
                                     <TextBlock Text="{x:Bind NextRunTime, Converter={StaticResource DateTimeConverter}}" 
@@ -259,6 +273,7 @@
                                 </StackPanel>
                                 <ToggleSwitch Grid.Column="2" 
                                               IsOn="{x:Bind IsEnabled, Mode=OneWay}" 
+                                              IsEnabled="{x:Bind IsReadOnlyFallback, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}"
                                               PointerPressed="ToggleSwitch_PointerPressed"
                                               Toggled="ToggleSwitch_Toggled"/>
                             </Grid>
@@ -321,6 +336,12 @@
             </ContentDialog.Resources>
             <ScrollViewer x:Name="DetailsScrollViewer" MaxHeight="600" VerticalScrollBarVisibility="Visible" IsScrollInertiaEnabled="False">
                 <StackPanel Spacing="12" Width="960">
+                    <InfoBar IsOpen="{x:Bind ViewModel.SelectedTask.IsReadOnlyFallback, Mode=OneWay}" 
+                             Severity="Warning" 
+                             Title="Limited Access" 
+                             Message="This task was discovered via event logs and cannot be fully managed without administrator privileges." 
+                             IsClosable="False" 
+                             Margin="0,0,0,8" />
                     <TextBlock x:Name="DialogTaskName" Style="{StaticResource TitleTextBlockStyle}"/>
                     <TextBlock x:Name="DialogTaskDescription" TextWrapping="WrapWholeWords"/>
                     <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}"/>
@@ -442,11 +463,11 @@
                     </ListView>
                     
                     <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,12,0,0">
-                        <Button x:Name="RunTaskButton" Content="Run Now" Click="RunTask_Click" Style="{StaticResource AccentButtonStyle}"/>
-                        <Button x:Name="StopTaskButton" Content="Stop" Click="StopTask_Click"/>
-                        <Button x:Name="EditTaskButton" Content="Edit" Click="EditTask_Click"/>
+                        <Button x:Name="RunTaskButton" Content="Run Now" Click="RunTask_Click" Style="{StaticResource AccentButtonStyle}" IsEnabled="{x:Bind ViewModel.SelectedTask.IsReadOnlyFallback, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}"/>
+                        <Button x:Name="StopTaskButton" Content="Stop" Click="StopTask_Click" IsEnabled="{x:Bind ViewModel.SelectedTask.IsReadOnlyFallback, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}"/>
+                        <Button x:Name="EditTaskButton" Content="Edit" Click="EditTask_Click" IsEnabled="{x:Bind ViewModel.SelectedTask.IsReadOnlyFallback, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}"/>
                         <Button x:Name="ExportTaskButton" Content="Export" Click="ExportTask_Click"/>
-                        <Button x:Name="DeleteTaskButton" Content="Delete" Click="DeleteTask_Click" />
+                        <Button x:Name="DeleteTaskButton" Content="Delete" Click="DeleteTask_Click" IsEnabled="{x:Bind ViewModel.SelectedTask.IsReadOnlyFallback, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}"/>
                     </StackPanel>
                 </StackPanel>
             </ScrollViewer>
