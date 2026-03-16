@@ -283,6 +283,9 @@ namespace FluentTaskScheduler
             Services.LogService.Info("Application started");
             Services.ReminderService.Start();
 
+            // Check for VeloPack auto-updates in the background
+            _ = CheckForVeloPackUpdateAsync();
+
             // Defer smooth scrolling until visual tree is built
             _windows[0].Win.DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
             {
@@ -498,6 +501,45 @@ namespace FluentTaskScheduler
         {
             foreach (var rec in _windows)
                 ApplyThemeToWindow(rec.Win);
+        }
+
+        private async System.Threading.Tasks.Task CheckForVeloPackUpdateAsync()
+        {
+            try
+            {
+                var (updateReady, info, newVersion) = await Services.VeloPackUpdateService.CheckAndDownloadAsync();
+                if (!updateReady || info == null || m_window == null) return;
+
+                m_window.DispatcherQueue.TryEnqueue(async () =>
+                {
+                    try
+                    {
+                        var dialog = new ContentDialog
+                        {
+                            Title = "Update Available",
+                            Content = $"Version {newVersion} has been downloaded and is ready to install.\nRestart now to apply the update?",
+                            PrimaryButtonText = "Restart Now",
+                            CloseButtonText = "Later",
+                            XamlRoot = m_window.Content?.XamlRoot,
+                            RequestedTheme = SS.Theme
+                        };
+
+                        var result = await dialog.ShowAsync();
+                        if (result == ContentDialogResult.Primary)
+                        {
+                            Services.VeloPackUpdateService.ApplyAndRestart(info);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Services.LogService.Info($"[AutoUpdate] Could not show update dialog: {ex.Message}");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Services.LogService.Info($"[AutoUpdate] Background update check failed: {ex.Message}");
+            }
         }
 
         void OnNavigationFailed(object sender, NavigationFailedEventArgs e)

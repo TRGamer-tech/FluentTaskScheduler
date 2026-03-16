@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.ApplicationModel.DynamicDependency;
+using Velopack;
 
 namespace FluentTaskScheduler
 {
@@ -15,6 +16,11 @@ namespace FluentTaskScheduler
         [STAThread]
         static void Main(string[] args)
         {
+            // VeloPack: Handle install/uninstall/update hooks before anything else.
+            // This must be the very first thing in Main so that Squirrel events
+            // (e.g. creating shortcuts on install) are processed immediately.
+            VelopackApp.Build().Run();
+
             // Initialize the Windows App SDK bootstrapper for unpackaged apps
             try
             {
@@ -36,7 +42,7 @@ namespace FluentTaskScheduler
             }
             catch (DllNotFoundException)
             {
-                // Fallback or log if needed, but continuing might still work 
+                // Fallback or log if needed, but continuing might still work
                 // if the bootstrapper did its job for other dependencies.
             }
 
