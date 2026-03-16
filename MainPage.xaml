@@ -457,6 +457,7 @@
             <ScrollViewer x:Name="EditScrollViewer" MaxHeight="600" VerticalScrollBarVisibility="Auto" IsTabStop="False" Background="Transparent" PointerPressed="DialogScrollViewer_PointerPressed" IsScrollInertiaEnabled="False">
                 <StackPanel Spacing="16" Width="750" Margin="0,8,12,8">
                 <TextBlock x:Uid="DialogTitle" Text="Add or edit task" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
+                <InfoBar x:Name="EditTaskErrorBar" IsOpen="False" Severity="Error" Margin="0,0,0,8" />
                 <TextBox x:Name="EditTaskName" x:Uid="TaskNameHeader" Header="Task Name" PlaceholderText="Enter task name"/>
                 <TextBox x:Name="EditTaskDescription" x:Uid="DescriptionHeader" Header="Description" AcceptsReturn="True" Height="80"/>
                 <TextBox x:Name="EditTaskAuthor" x:Uid="AuthorHeader" Header="Author"/>

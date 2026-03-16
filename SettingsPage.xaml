@@ -96,7 +96,7 @@
                 <!-- Content area -->
                 <ScrollViewer x:Name="PageScrollViewer" Padding="28,24,28,24"
                               IsScrollInertiaEnabled="False" VerticalScrollBarVisibility="Auto">
-                    <Grid MaxWidth="580" HorizontalAlignment="Left">
+                    <Grid MaxWidth="800" HorizontalAlignment="Left">
 
                     <!-- ── Appearance ── -->
                     <StackPanel x:Name="PanelAppearance" Spacing="4">
@@ -340,7 +340,7 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" CornerRadius="4" Padding="8,4" Margin="0,0,8,8" MaxWidth="280">
+                                            <Border Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" CornerRadius="4" Padding="8,4" Margin="0,0,8,8" MaxWidth="500">
                                                 <Grid ColumnSpacing="8">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*"/>
@@ -377,7 +377,7 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" CornerRadius="4" Padding="8,4" Margin="0,0,8,8" MaxWidth="280">
+                                            <Border Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" CornerRadius="4" Padding="8,4" Margin="0,0,8,8" MaxWidth="500">
                                                 <Grid ColumnSpacing="8">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*"/>

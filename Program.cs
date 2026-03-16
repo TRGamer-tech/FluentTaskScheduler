@@ -16,7 +16,16 @@ namespace FluentTaskScheduler
         static void Main(string[] args)
         {
             // Initialize the Windows App SDK bootstrapper for unpackaged apps
-            Bootstrap.Initialize(0x00010005, "1.5");
+            try
+            {
+                // Using 1.5 (0x00010005) without a version tag is more robust for stable releases.
+                Bootstrap.Initialize(0x00010005);
+            }
+            catch (Exception ex)
+            {
+                // In self-contained scenarios, this might fail but the app can still run if libraries are local.
+                System.Diagnostics.Debug.WriteLine($"Bootstrap initialization failed: {ex.Message}");
+            }
 
             try
             {

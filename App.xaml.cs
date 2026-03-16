@@ -109,14 +109,21 @@ namespace FluentTaskScheduler
                         // Fire and forget, we just want to see it
                         dispatcher.TryEnqueue(async () =>
                         {
-                            var dialog = new ContentDialog
+                            try
                             {
-                                Title = "Unhandled Exception",
-                                Content = errorMessage,
-                                CloseButtonText = "Close",
-                                XamlRoot = m_window.Content.XamlRoot
-                            };
-                            await dialog.ShowAsync();
+                                var dialog = new ContentDialog
+                                {
+                                    Title = "Unhandled Exception",
+                                    Content = errorMessage,
+                                    CloseButtonText = "Close",
+                                    XamlRoot = m_window.Content?.XamlRoot
+                                };
+                                await dialog.ShowAsync();
+                            }
+                            catch (Exception nestedEx)
+                            {
+                                System.Diagnostics.Debug.WriteLine($"Failed to show crash dialog: {nestedEx.Message}");
+                            }
                         });
                         // Keep process alive briefly?
                         System.Threading.Thread.Sleep(5000); 

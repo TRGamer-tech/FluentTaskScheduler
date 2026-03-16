@@ -775,6 +775,7 @@ namespace FluentTaskScheduler
             
             _isPopulatingDetails = false;
             TaskEditDialog.XamlRoot = this.Content.XamlRoot;
+            EditTaskErrorBar.IsOpen = false;
             await TaskEditDialog.ShowAsync();
         }
 
@@ -824,9 +825,13 @@ namespace FluentTaskScheduler
             {
                 ViewModel.TaskService.RegisterTask(folder ?? "\\", model);
                 TaskEditDialog.Hide();
-                _ = ViewModel.LoadTasksAsync();
+                await ViewModel.LoadTasksAsync();
             }
-            catch (Exception ex) { await ShowErrorDialog("Failed to save task: " + ex.Message); }
+            catch (Exception ex) 
+            { 
+                EditTaskErrorBar.Message = "Failed to save task: " + ex.Message;
+                EditTaskErrorBar.IsOpen = true;
+            }
         }
 
         // ========================================================================================================
@@ -1243,7 +1248,22 @@ namespace FluentTaskScheduler
         {
             if (_isDialogOpen) return;
             _isDialogOpen = true;
-            try { await new ContentDialog { Title = "Error", Content = message, CloseButtonText = "OK", XamlRoot = this.XamlRoot, RequestedTheme = Services.SettingsService.Theme }.ShowAsync(); }
+            try 
+            { 
+                var dialog = new ContentDialog 
+                { 
+                    Title = "Error", 
+                    Content = message, 
+                    CloseButtonText = "OK", 
+                    XamlRoot = this.XamlRoot, 
+                    RequestedTheme = Services.SettingsService.Theme 
+                };
+                await dialog.ShowAsync(); 
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to show error dialog: {ex.Message}");
+            }
             finally { _isDialogOpen = false; }
         }
 
