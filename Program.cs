@@ -18,8 +18,8 @@ namespace FluentTaskScheduler
             // Initialize the Windows App SDK bootstrapper for unpackaged apps
             try
             {
-                // Using 1.5 (0x00010005) without a version tag is more robust for stable releases.
-                Bootstrap.Initialize(0x00010005);
+                // Using 1.5 (0x00010005) with an empty version tag to match MddBootstrapInitialize2 requirements.
+                Bootstrap.Initialize(0x00010005, "");
             }
             catch (Exception ex)
             {

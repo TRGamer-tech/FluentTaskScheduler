@@ -2,8 +2,7 @@
 
 1. Add Setup so you don't have to make a Shortcut yourself
 2. Add update functionality to installed versions (not standalone)
-3. Add task hide/unhide functionality to the task editor
-4. **_More TBD_**
+3. **_More TBD_**
 
 # Done for next release:
 
@@ -14,4 +13,5 @@
 5. Fix [Issue #6](https://github.com/TRGamer-tech/FluentTaskScheduler/issues/6): Unhandled exception on 'Add or edit task' add tag, save
 6. Fix [Issue #4](https://github.com/TRGamer-tech/FluentTaskScheduler/issues/4): Hidden Tasks are not displayed
 7. Add Task Discovery via Event Log
-8. Let's see what we can do to make it even better.
+8. Add task hide/unhide functionality to the task editor
+9. Let's see what we can do to make it even better.
