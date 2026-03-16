@@ -329,6 +329,39 @@ namespace FluentTaskScheduler
             await dialog.ShowAsync();
         }
 
+        private async void CheckForUpdates_Click(object sender, RoutedEventArgs e)
+        {
+            CheckForUpdatesButton.IsEnabled = false;
+            UpdateCheckProgressRing.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+            UpdateCheckProgressRing.IsActive = true;
+
+            var (updateReady, info, newVersion) = await Services.VeloPackUpdateService.CheckAndDownloadAsync();
+
+            UpdateCheckProgressRing.IsActive = false;
+            UpdateCheckProgressRing.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+            CheckForUpdatesButton.IsEnabled = true;
+
+            if (!updateReady || info == null)
+            {
+                await ShowDialog("Up to Date", "You're already running the latest version.");
+                return;
+            }
+
+            var dialog = new ContentDialog
+            {
+                Title = "Update Available",
+                Content = $"Version {newVersion} has been downloaded and is ready to install.\nRestart now to apply the update?",
+                PrimaryButtonText = "Restart Now",
+                CloseButtonText = "Later",
+                XamlRoot = this.XamlRoot,
+                RequestedTheme = SettingsService.Theme
+            };
+
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+                Services.VeloPackUpdateService.ApplyAndRestart(info);
+        }
+
         private async void ReplayOnboardingButton_Click(object sender, RoutedEventArgs e)
         {
             Services.SettingsService.HasCompletedOnboarding = false;

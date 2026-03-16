@@ -435,6 +435,25 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock Text="Check for Updates" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="Check if a newer version is available." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <ProgressRing x:Name="UpdateCheckProgressRing" IsActive="False" Width="20" Height="20" Visibility="Collapsed"/>
+                                    <Button x:Name="CheckForUpdatesButton" Click="CheckForUpdates_Click">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <FontIcon Glyph="&#xE895;" FontSize="13"/>
+                                            <TextBlock Text="Check"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
                                     <TextBlock Text="Onboarding" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                                     <TextBlock Text="Replay the welcome walkthrough from first launch." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>

@@ -36,19 +36,22 @@ This project uses [VeloPack](https://velopack.io/) for auto-updates. If you are 
    dotnet tool install -g vpk
    ```
 
-2. Publish and package:
+2. Publish and package — **one MSI per architecture**, scope chosen by the end user at install time. 
+Requires vpk **0.0.1444** or later (`dotnet tool update -g vpk` or `dotnet tool update -g vpk --prerelease` to upgrade).
 
    ```bash
    # x64
    dotnet publish -c Release -r win-x64 --self-contained
-   vpk pack -u FluentTaskScheduler -v <VERSION> -p bin/x64/Release/net8.0-windows10.0.19041.0/win-x64/publish -e FluentTaskScheduler.exe
+   vpk pack -u FluentTaskScheduler -v 1.X.X -p bin/x64/Release/net8.0-windows10.0.19041.0/win-x64/publish -e FluentTaskScheduler.exe --msi
 
    # ARM64
    dotnet publish -c Release -r win-arm64 --self-contained
-   vpk pack -u FluentTaskScheduler -v <VERSION> -p bin/ARM64/Release/net8.0-windows10.0.19041.0/win-arm64/publish -e FluentTaskScheduler.exe
+   vpk pack -u FluentTaskScheduler -v 1.X.X -p bin/ARM64/Release/net8.0-windows10.0.19041.0/win-arm64/publish -e FluentTaskScheduler.exe --msi
    ```
 
-3. Upload the generated `Setup.exe`, full `.nupkg`, and delta `.nupkg` from the `Releases` folder to a GitHub Release. The app will pick these up automatically for in-app updates.
+   The resulting `Setup.msi` presents a standard MSI UI where the user selects *Per User* or *Machine-Wide* installation.
+
+3. Upload `Setup.msi`, the full `.nupkg`, and the delta `.nupkg` from the `Releases` folder to a GitHub Release. The app will pick these up automatically for in-app updates.
 
 ## Bug Reports and Feature Requests
 
