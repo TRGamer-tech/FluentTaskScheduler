@@ -41,17 +41,23 @@ Requires vpk **0.0.1444-gc245055** or later (`dotnet tool update -g vpk` or `dot
 
    ```bash
    # x64
-   dotnet publish -c Release -r win-x64 --self-contained
-   vpk pack -u FluentTaskScheduler -v 1.X.X -p bin/x64/Release/net8.0-windows10.0.19041.0/win-x64/publish -e FluentTaskScheduler.exe --msi
+   dotnet publish -c Release -r win-x64 --self-contained -p:Platform=x64
+   vpk pack -u FluentTaskScheduler -v 1.X.X -o Releases/x64 -p bin/x64/Release/net8.0-windows10.0.19041.0/win-x64/publish -e FluentTaskScheduler.exe --msi --instLocation Either --msiBanner Assets/MSI-Banner.bmp --msiLogo Assets/MSI-Logo.bmp
 
    # ARM64
-   dotnet publish -c Release -r win-arm64 --self-contained
-   vpk pack -u FluentTaskScheduler -v 1.X.X -p bin/ARM64/Release/net8.0-windows10.0.19041.0/win-arm64/publish -e FluentTaskScheduler.exe --msi
+   dotnet publish -c Release -r win-arm64 --self-contained -p:Platform=ARM64
+   vpk pack -u FluentTaskScheduler -v 1.X.X -o Releases/arm64 -p bin/arm64/Release/net8.0-windows10.0.19041.0/win-arm64/publish -e FluentTaskScheduler.exe --msi --instLocation Either --msiBanner Assets/MSI-Banner.bmp --msiLogo Assets/MSI-Logo.bmp
+
+   # Copy to dist folder -> Making it ready for release
+   Copy-Item -Path "Releases/x64/FluentTaskScheduler-win-Portable.zip" -Destination "Dist/Portable-x64/Portable-x64.zip" -Force;
+   Copy-Item -Path "Releases/x64/FluentTaskScheduler-win.msi" -Destination "Dist/Installer-x64/Setup-x64.msi" -Force;
+   Copy-Item -Path "Releases/arm64/FluentTaskScheduler-win-Portable.zip" -Destination "Dist/Portable-arm64/Portable-arm64.zip" -Force;
+   Copy-Item -Path "Releases/arm64/FluentTaskScheduler-win.msi" -Destination "Dist/Installer-arm64/Setup-arm64.msi" -Force;
    ```
 
-   The resulting `Setup.msi` presents a standard MSI UI where the user selects *Per User* or *Machine-Wide* installation.
+   The resulting `Setup-x64.msi` and `Setup-arm64.msi` presents a standard MSI UI where the user selects *Per User* or *Machine-Wide* installation.
 
-3. Upload `Setup.msi`, the full `.nupkg`, and the delta `.nupkg` from the `Releases` folder to a GitHub Release. The app will pick these up automatically for in-app updates.
+3. Upload `Setup-x64.msi`, `Setup-arm64.msi`, `Portable-x64.zip`, `Portable-arm64.zip` from the Dist folder to a GitHub Release. The app will pick these up automatically for in-app updates.
 
 ## Bug Reports and Feature Requests
 
