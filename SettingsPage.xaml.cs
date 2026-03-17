@@ -335,13 +335,19 @@ namespace FluentTaskScheduler
             UpdateCheckProgressRing.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
             UpdateCheckProgressRing.IsActive = true;
 
-            var (updateReady, info, newVersion) = await Services.VeloPackUpdateService.CheckAndDownloadAsync();
+            var result = await Services.VeloPackUpdateService.CheckAndDownloadAsync();
 
             UpdateCheckProgressRing.IsActive = false;
             UpdateCheckProgressRing.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
             CheckForUpdatesButton.IsEnabled = true;
 
-            if (!updateReady || info == null)
+            if (result.Status == Services.VeloPackUpdateService.UpdateResultStatus.Error)
+            {
+                await ShowDialog("Update Error", $"An error occurred while checking for updates:\n{result.ErrorMessage}");
+                return;
+            }
+
+            if (result.Status == Services.VeloPackUpdateService.UpdateResultStatus.NoUpdate || result.Info == null)
             {
                 await ShowDialog("Up to Date", "You're already running the latest version.");
                 return;
@@ -350,16 +356,16 @@ namespace FluentTaskScheduler
             var dialog = new ContentDialog
             {
                 Title = "Update Available",
-                Content = $"Version {newVersion} has been downloaded and is ready to install.\nRestart now to apply the update?",
+                Content = $"Version {result.NewVersion} has been downloaded and is ready to install.\nRestart now to apply the update?",
                 PrimaryButtonText = "Restart Now",
                 CloseButtonText = "Later",
                 XamlRoot = this.XamlRoot,
                 RequestedTheme = SettingsService.Theme
             };
 
-            var result = await dialog.ShowAsync();
-            if (result == ContentDialogResult.Primary)
-                Services.VeloPackUpdateService.ApplyAndRestart(info);
+            var dialogResult = await dialog.ShowAsync();
+            if (dialogResult == ContentDialogResult.Primary)
+                Services.VeloPackUpdateService.ApplyAndRestart(result.Info);
         }
 
         private async void ReplayOnboardingButton_Click(object sender, RoutedEventArgs e)

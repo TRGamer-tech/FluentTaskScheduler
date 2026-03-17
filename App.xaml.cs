@@ -507,8 +507,8 @@ namespace FluentTaskScheduler
         {
             try
             {
-                var (updateReady, info, newVersion) = await Services.VeloPackUpdateService.CheckAndDownloadAsync();
-                if (!updateReady || info == null || m_window == null) return;
+                var result = await Services.VeloPackUpdateService.CheckAndDownloadAsync();
+                if (result.Status != Services.VeloPackUpdateService.UpdateResultStatus.UpdateReady || result.Info == null || m_window == null) return;
 
                 m_window.DispatcherQueue.TryEnqueue(async () =>
                 {
@@ -517,17 +517,17 @@ namespace FluentTaskScheduler
                         var dialog = new ContentDialog
                         {
                             Title = "Update Available",
-                            Content = $"Version {newVersion} has been downloaded and is ready to install.\nRestart now to apply the update?",
+                            Content = $"Version {result.NewVersion} has been downloaded and is ready to install.\nRestart now to apply the update?",
                             PrimaryButtonText = "Restart Now",
                             CloseButtonText = "Later",
                             XamlRoot = m_window.Content?.XamlRoot,
                             RequestedTheme = SS.Theme
                         };
 
-                        var result = await dialog.ShowAsync();
-                        if (result == ContentDialogResult.Primary)
+                        var dialogResult = await dialog.ShowAsync();
+                        if (dialogResult == ContentDialogResult.Primary)
                         {
-                            Services.VeloPackUpdateService.ApplyAndRestart(info);
+                            Services.VeloPackUpdateService.ApplyAndRestart(result.Info);
                         }
                     }
                     catch (Exception ex)

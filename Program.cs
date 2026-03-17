@@ -17,9 +17,20 @@ namespace FluentTaskScheduler
         static void Main(string[] args)
         {
             // VeloPack: Handle install/uninstall/update hooks before anything else.
-            // This must be the very first thing in Main so that Squirrel events
-            // (e.g. creating shortcuts on install) are processed immediately.
-            VelopackApp.Build().Run();
+            // In a machine-wide install (C:\Program Files), non-admin users don't have write access,
+            // which causes Velopack to crash with UnauthorizedAccessException when it tries to 
+            // manage the 'packages' directory. We skip Velopack for non-admins in protected folders.
+            if (HasWriteAccessToAppDir())
+            {
+                try
+                {
+                    VelopackApp.Build().Run();
+                }
+                catch (Exception)
+                {
+                    // Catch-all for any other Velopack initialization issues
+                }
+            }
 
             // Initialize the Windows App SDK bootstrapper for unpackaged apps
             try
@@ -56,6 +67,22 @@ namespace FluentTaskScheduler
             });
 
             Bootstrap.Shutdown();
+        }
+
+        private static bool HasWriteAccessToAppDir()
+        {
+            try
+            {
+                string appDir = AppDomain.CurrentDomain.BaseDirectory;
+                string testPath = System.IO.Path.Combine(appDir, ".velopack_write_test");
+                System.IO.File.WriteAllText(testPath, "test");
+                System.IO.File.Delete(testPath);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
