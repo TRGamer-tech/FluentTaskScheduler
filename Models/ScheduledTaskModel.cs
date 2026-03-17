@@ -76,6 +76,8 @@ namespace FluentTaskScheduler.Models
 
         public ObservableCollection<string> Tags { get; set; } = new();
 
+        public string TagsDisplay => Tags.Count > 0 ? string.Join(", ", Tags) : "";
+
         public DateTime? LastRunTime { get; set; }
         public DateTime? NextRunTime { get; set; }
         public int LastTaskResult { get; set; }

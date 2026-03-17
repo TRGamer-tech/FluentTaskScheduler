@@ -49,10 +49,10 @@ Requires vpk **0.0.1444-gc245055** or later (`dotnet tool update -g vpk` or `dot
    vpk pack -u FluentTaskScheduler -v 1.X.X -o Releases/arm64 -p bin/arm64/Release/net8.0-windows10.0.19041.0/win-arm64/publish -e FluentTaskScheduler.exe --msi --instLocation Either --msiBanner Assets/MSI-Banner.bmp --msiLogo Assets/MSI-Logo.bmp
 
    # Copy to dist folder -> Making it ready for release
-   Copy-Item -Path "Releases/x64/FluentTaskScheduler-win-Portable.zip" -Destination "Dist/Portable-x64/Portable-x64.zip" -Force;
-   Copy-Item -Path "Releases/x64/FluentTaskScheduler-win.msi" -Destination "Dist/Installer-x64/Setup-x64.msi" -Force;
-   Copy-Item -Path "Releases/arm64/FluentTaskScheduler-win-Portable.zip" -Destination "Dist/Portable-arm64/Portable-arm64.zip" -Force;
-   Copy-Item -Path "Releases/arm64/FluentTaskScheduler-win.msi" -Destination "Dist/Installer-arm64/Setup-arm64.msi" -Force;
+   Copy-Item -Path "Releases/x64/FluentTaskScheduler-win-Portable.zip" -Destination "Dist/Portable-x64.zip" -Force;
+   Copy-Item -Path "Releases/x64/FluentTaskScheduler-win.msi" -Destination "Dist/Setup-x64.msi" -Force;
+   Copy-Item -Path "Releases/arm64/FluentTaskScheduler-win-Portable.zip" -Destination "Dist/Portable-arm64.zip" -Force;
+   Copy-Item -Path "Releases/arm64/FluentTaskScheduler-win.msi" -Destination "Dist/Setup-arm64.msi" -Force;
    ```
 
    The resulting `Setup-x64.msi` and `Setup-arm64.msi` presents a standard MSI UI where the user selects *Per User* or *Machine-Wide* installation.

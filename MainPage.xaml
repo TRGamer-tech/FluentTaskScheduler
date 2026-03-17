@@ -261,10 +261,18 @@
                                                 <TextBlock Text="From History" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="10"/>
                                             </StackPanel>
                                         </Border>
-                                        <Border Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}" 
-                                                CornerRadius="4" Padding="4,0" 
+                                        <Border Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}"
+                                                CornerRadius="4" Padding="4,0"
                                                 Visibility="{x:Bind IsReadOnlyFallback, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
                                             <TextBlock Text="Read Only" Style="{StaticResource CaptionTextBlockStyle}" Foreground="White" FontSize="10"/>
+                                        </Border>
+                                        <Border Background="{ThemeResource SystemFillColorNeutralBrush}"
+                                                CornerRadius="4" Padding="4,0"
+                                                Visibility="{x:Bind TagsDisplay, Converter={StaticResource StringToVisibilityConverter}, Mode=OneWay}">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <FontIcon Glyph="&#xE1CB;" FontSize="10" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                                <TextBlock Text="{x:Bind TagsDisplay, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="10" MaxWidth="200" TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
                                         </Border>
                                     </StackPanel>
                                     <TextBlock Text="{x:Bind Path}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
