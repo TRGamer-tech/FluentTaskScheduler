@@ -651,7 +651,7 @@ namespace FluentTaskScheduler.Services
                 if (task != null)
                 {
                     task.Definition.XmlText = task.Definition.XmlText; // Ensure XML is generated
-                    System.IO.File.WriteAllText(outputPath, task.Definition.XmlText);
+                    System.IO.File.WriteAllText(outputPath, task.Definition.XmlText, new System.Text.UnicodeEncoding(bigEndian: false, byteOrderMark: true));
                 }
                 else
                 {
