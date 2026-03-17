@@ -37,7 +37,7 @@ This project uses [VeloPack](https://velopack.io/) for auto-updates. If you are 
    ```
 
 2. Publish and package — **one MSI per architecture**, scope chosen by the end user at install time. 
-Requires vpk **0.0.1444** or later (`dotnet tool update -g vpk` or `dotnet tool update -g vpk --prerelease` to upgrade).
+Requires vpk **0.0.1444-gc245055** or later (`dotnet tool update -g vpk` or `dotnet tool update -g vpk --prerelease` to upgrade).
 
    ```bash
    # x64

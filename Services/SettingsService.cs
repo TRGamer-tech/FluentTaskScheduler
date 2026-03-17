@@ -17,9 +17,9 @@ namespace FluentTaskScheduler.Services
         public bool EnableTrayIcon { get; set; } = true;
         public bool MinimizeToTray { get; set; } = false;
         public bool EnableLogging { get; set; } = true;
-        public bool SeparateLogFiles { get; set; } = false;
+        public bool SeparateLogFiles { get; set; } = true;
         public bool RunOnStartup { get; set; } = false;
-        public bool SmoothScrolling { get; set; } = false;
+        public bool SmoothScrolling { get; set; } = true;
         public int WindowWidth { get; set; } = 1200;
         public int WindowHeight { get; set; } = 800;
         public string LastFolderPath { get; set; } = "\\";

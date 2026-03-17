@@ -72,7 +72,7 @@
             <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
                 <FontIcon Glyph="&#xE7BA;" FontSize="14" VerticalAlignment="Center"
                           Foreground="{ThemeResource SystemFillColorCautionBrush}"/>
-                <TextBlock Text="Some tasks are discovered via the Event Log and can thus not be edited. Run as admin if you want to edit them."
+                <TextBlock Text="Some tasks are discovered via the Event Log and can thus not be edited.&#x0a;Run as admin if you want to edit them."
                            FontSize="12"
                            Opacity="0.85"
                            TextWrapping="Wrap"

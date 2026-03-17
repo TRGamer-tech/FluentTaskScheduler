@@ -168,10 +168,10 @@ FluentTaskScheduler.exe --export-history "MyTaskName" --output "C:\logs\history.
 
    The project uses [VeloPack](https://velopack.io/) for packaging and auto-updates. 
    A single MSI installer is built per architecture — end users can choose *Per User* or *Machine-Wide* installation from the standard MSI UI. 
-   Requires vpk **0.0.1444** or later.
+   Requires vpk **0.0.1444-gc245055** or later.
 
    ```bash
-   # Install / update the VeloPack CLI (0.0.1444+)
+   # Install / update the VeloPack CLI (0.0.1444-gc245055+)
    dotnet tool install -g vpk
    # or, if already installed:
    dotnet tool update -g vpk
