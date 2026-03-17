@@ -36,8 +36,8 @@ This project uses [VeloPack](https://velopack.io/) for auto-updates. If you are 
    dotnet tool install -g vpk
    ```
 
-2. Publish and package — **one MSI per architecture**, scope chosen by the end user at install time. 
-Requires vpk **0.0.1444-gc245055** or later (`dotnet tool update -g vpk` or `dotnet tool update -g vpk --prerelease` to upgrade).
+2. Publish and package — **one MSI per architecture**, scope chosen by the end user at install time.
+   Requires vpk **0.0.1444-gc245055** or later (`dotnet tool update -g vpk` or `dotnet tool update -g vpk --prerelease` to upgrade).
 
    ```bash
    # x64
@@ -55,7 +55,7 @@ Requires vpk **0.0.1444-gc245055** or later (`dotnet tool update -g vpk` or `dot
    Copy-Item -Path "Releases/arm64/FluentTaskScheduler-win.msi" -Destination "Dist/Setup-arm64.msi" -Force;
    ```
 
-   The resulting `Setup-x64.msi` and `Setup-arm64.msi` presents a standard MSI UI where the user selects *Per User* or *Machine-Wide* installation.
+   The resulting `Setup-x64.msi` and `Setup-arm64.msi` presents a standard MSI UI where the user selects _Per User_ or _Machine-Wide_ installation.
 
 3. Upload `Setup-x64.msi`, `Setup-arm64.msi`, `Portable-x64.zip`, `Portable-arm64.zip` from the Dist folder to a GitHub Release. The app will pick these up automatically for in-app updates.
 
