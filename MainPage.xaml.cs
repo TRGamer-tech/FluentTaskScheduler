@@ -569,13 +569,39 @@ namespace FluentTaskScheduler
         }
 
         private void HistoryFilter_Changed(object sender, SelectionChangedEventArgs e) => UpdateHistoryList(); // Placeholder for actual date logic
-        private void ExportHistoryCsv_Click(object sender, RoutedEventArgs e) { /* Implement CSV export */ }
+        private async void ExportHistoryCsv_Click(object sender, RoutedEventArgs e)
+        {
+            if (_fullHistory == null || _fullHistory.Count == 0) return;
+            var picker = new Windows.Storage.Pickers.FileSavePicker();
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.m_window);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+            picker.FileTypeChoices.Add("CSV File", new List<string>() { ".csv" });
+            picker.SuggestedFileName = (ViewModel.SelectedTask?.Name ?? "history") + "_history";
+            var file = await picker.PickSaveFileAsync();
+            if (file != null)
+            {
+                try
+                {
+                    var sb = new System.Text.StringBuilder();
+                    sb.AppendLine("Time,EventId,Result,User,ExitCode,Message");
+                    foreach (var h in _fullHistory)
+                    {
+                        sb.AppendLine($"\"{h.Time}\",{h.EventId},\"{h.Result}\",\"{h.User}\",{h.ExitCode},\"{h.Message?.Replace("\"", "\"\"") ?? ""}\"");
+                    }
+                    System.IO.File.WriteAllText(file.Path, sb.ToString());
+                }
+                catch (Exception ex) { await ShowErrorDialog(ex.Message); }
+            }
+        }
         
-        private void CopyHistory_Click(object sender, RoutedEventArgs e) 
+        private async void CopyHistory_Click(object sender, RoutedEventArgs e)
         {
              var dp = new DataPackage();
              dp.SetText(string.Join("\n", _fullHistory.Select(h => $"{h.Time}\t{h.Result}\t{h.Message}")));
              Clipboard.SetContent(dp);
+             CopyHistoryBtn.Content = "✅ Copied!";
+             await Task.Delay(2000);
+             CopyHistoryBtn.Content = "📋 Copy";
         }
         
         private void StatTotal_Tapped(object sender, TappedRoutedEventArgs e) { _historyStatusFilter = "Total"; UpdateHistoryList(); }

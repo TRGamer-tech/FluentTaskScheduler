@@ -12,12 +12,12 @@
     > A clearer distinction between tasks that are simply scheduled and tasks that appear to be working as expected
     > Describe alternatives you've considered
     > So far I have mainly tried organizing tasks with tags and relying on the existing enabled list. Those help with finding tasks, but they do not really solve the problem of quickly seeing all relevant tasks and understanding task health or activity.
-2. The CSV Export feature does not work. It doesn't show any file save dialog, and no file is created.
-3. **_More TBD_**
+2. **_More TBD_**
 
 # Done for next release:
 
 1. Fix Issue #9 by Relocating WinRT ComWrapper initialization
 2. Fix Issue #10 by adding a Reload button to the Recent History panel
 3. Fix Issue #12 by adding "TaskRunFlags.IgnoreConstraints, 0, null" to the Run Task action.
-4. Let's see what we can do to make it even better.
+4. Fix CSV Export feature.
+5. Let's see what we can do to make it even better.
