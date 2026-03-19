@@ -410,6 +410,12 @@
                                 <ComboBoxItem Content="This Week" Tag="Week"/>
                                 <ComboBoxItem Content="All Time" Tag="All"/>
                             </ComboBox>
+                            <Button x:Name="RefreshHistoryBtn" Click="RefreshHistory_Click" ToolTipService.ToolTip="Reload History">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <SymbolIcon Symbol="Refresh" />
+                                    <TextBlock Text="Reload" />
+                                </StackPanel>
+                            </Button>
                             <Button x:Name="ExportHistoryCsvBtn" Content="Export CSV" Click="ExportHistoryCsv_Click" />
                             <Button x:Name="CopyHistoryBtn" Content="📋 Copy" Click="CopyHistory_Click"/>
                         </StackPanel>

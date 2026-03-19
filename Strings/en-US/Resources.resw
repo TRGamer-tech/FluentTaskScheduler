@@ -63,7 +63,7 @@
   <data name="NavAllTasks.Content" xml:space="preserve"><value>All Tasks</value></data>
   <data name="NavRunning.Content" xml:space="preserve"><value>Running</value></data>
   <data name="NavEnabled.Content" xml:space="preserve"><value>Enabled</value></data>
-  <data name="RefreshButton.Content" xml:space="preserve"><value>Refresh</value></data>
+  <data name="RefreshButton.Content" xml:space="preserve"><value>Reload</value></data>
   <data name="SearchBox.PlaceholderText" xml:space="preserve"><value>Search tasks...</value></data>
   <data name="TaskNameHeader.Header" xml:space="preserve"><value>Task Name</value></data>
   <data name="DescriptionHeader.Header" xml:space="preserve"><value>Description</value></data>

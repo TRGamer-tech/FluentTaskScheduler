@@ -14,14 +14,24 @@ namespace FluentTaskScheduler
             this.NavigationCacheMode = Microsoft.UI.Xaml.Navigation.NavigationCacheMode.Required;
         }
 
-        private async void Page_Loaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+        protected override async void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
         {
-            PageScrollViewer.IsScrollInertiaEnabled = FluentTaskScheduler.Services.SettingsService.SmoothScrolling;
-            if (ViewModel.TotalTasks == 0 && !ViewModel.IsLoading)
+            base.OnNavigatedTo(e);
+            if (!ViewModel.IsLoading)
             {
                 await ViewModel.LoadDashboardData();
             }
         }
+
+        private void Page_Loaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+        {
+            PageScrollViewer.IsScrollInertiaEnabled = FluentTaskScheduler.Services.SettingsService.SmoothScrolling;
+        }
+        private async void DashboardReload_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+        {
+            await ViewModel.LoadDashboardData();
+        }
+
         private void ActivityList_ItemClick(object sender, ItemClickEventArgs e)
         {
             if (e.ClickedItem is FluentTaskScheduler.Models.TaskHistoryEntry entry && !string.IsNullOrEmpty(entry.TaskPath))

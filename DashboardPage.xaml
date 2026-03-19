@@ -11,9 +11,13 @@
 
     <Grid>
         <ScrollViewer x:Name="PageScrollViewer" Padding="24" IsScrollInertiaEnabled="False">
-            <StackPanel Spacing="24" MaxWidth="1000" HorizontalAlignment="Left">
-                
-                <!-- Top Stats Cards -->
+            <StackPanel Spacing="24" MaxWidth="1000" HorizontalAlignment="Stretch">
+                <Button x:Name="DashboardReloadBtn" Click="DashboardReload_Click" HorizontalAlignment="Right" Margin="0,0,0,-12">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <SymbolIcon Symbol="Refresh" />
+                        <TextBlock Text="Reload Dashboard" />
+                    </StackPanel>
+                </Button>
                 <Grid ColumnSpacing="16">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>

@@ -581,6 +581,32 @@ namespace FluentTaskScheduler
         private void StatTotal_Tapped(object sender, TappedRoutedEventArgs e) { _historyStatusFilter = "Total"; UpdateHistoryList(); }
         private void StatSuccess_Tapped(object sender, TappedRoutedEventArgs e) { _historyStatusFilter = "Success"; UpdateHistoryList(); }
         private void StatFailed_Tapped(object sender, TappedRoutedEventArgs e) { _historyStatusFilter = "Failed"; UpdateHistoryList(); }
+        
+        private async void RefreshHistory_Click(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel.SelectedTask == null) return;
+            RefreshHistoryBtn.IsEnabled = false;
+            try { await RefreshTaskHistoryAsync(ViewModel.SelectedTask); }
+            finally { RefreshHistoryBtn.IsEnabled = true; }
+        }
+
+        private async System.Threading.Tasks.Task RefreshTaskHistoryAsync(ScheduledTaskModel task)
+        {
+            if (task == null) return;
+            var history = await System.Threading.Tasks.Task.Run(() => ViewModel.TaskService.GetTaskHistory(task.Path));
+            
+            // Only update if the user is still looking at the same task
+            if (ViewModel.SelectedTask != null && ViewModel.SelectedTask.Path == task.Path)
+            {
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    _fullHistory = history;
+                    UpdateHistoryList();
+                    UpdateHistoryStats();
+                });
+            }
+        }
+
         private void HistoryList_KeyDown(object sender, KeyRoutedEventArgs e) { /* Copy logic */ }
 
         // ========================================================================================================
@@ -595,6 +621,7 @@ namespace FluentTaskScheduler
                 ViewModel.TaskService.RunTask(ViewModel.SelectedTask.Path);
                 ViewModel.SelectedTask.IsRunning = true;
                 _ = WatchTaskUntilFinished(ViewModel.SelectedTask);
+                _ = RefreshTaskHistoryAsync(ViewModel.SelectedTask); // Refresh to show "Task Started"
             }
             catch (Exception ex) { _ = ShowErrorDialog(ex.Message); }
         }
@@ -607,6 +634,7 @@ namespace FluentTaskScheduler
                 ViewModel.TaskService.StopTask(ViewModel.SelectedTask.Path);
                 ViewModel.SelectedTask.State = "Ready";
                 ViewModel.SelectedTask.IsRunning = false;
+                _ = RefreshTaskHistoryAsync(ViewModel.SelectedTask);
             }
             catch (Exception ex) { _ = ShowErrorDialog(ex.Message); }
         }
@@ -641,7 +669,11 @@ namespace FluentTaskScheduler
                 catch { break; }
             }
             // Safety net: ensure the ring is cleared even if we exit via maxPolls or exception
-            DispatcherQueue.TryEnqueue(() => task.IsRunning = false);
+            DispatcherQueue.TryEnqueue(() => 
+            {
+                task.IsRunning = false;
+                _ = RefreshTaskHistoryAsync(task); // Final refresh when finished
+            });
         }
 
         private async void DeleteTask_Click(object sender, RoutedEventArgs e)
