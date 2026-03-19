@@ -10,7 +10,7 @@ FluentTaskScheduler is a professional-grade wrapper for the Windows Task Schedul
 
 ### Donate on Buy me a coffee
 If you like what this project is for, I would really appreciate a (optional!) donation:
-<a href="https://buymeacoffee.com/t.r.g"><img src="/assets/yellow.png" alt="Buy Me a Coffee Donation Link" width="auto" height="75"></a>
+<br><a href="https://buymeacoffee.com/t.r.g"><img src="/Assets/yellow.png" alt="Buy Me a Coffee Donation Link" width="auto" height="75"></a>
 
 
 ## Key Features
