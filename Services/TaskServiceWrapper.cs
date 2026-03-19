@@ -266,7 +266,7 @@ namespace FluentTaskScheduler.Services
                     var task = ts.GetTask(path);
                     if (task != null)
                     {
-                        task.Run();
+                        task.RunEx(TaskRunFlags.IgnoreConstraints, 0, null);
                         NotificationService.ShowTaskStarted(task.Name);
                     }
                 }
