@@ -85,19 +85,20 @@ namespace FluentTaskScheduler.Models
 
         public ObservableCollection<TaskTriggerModel> TriggersList { get; set; } = new();
 
-        public bool IsEnabled 
-        { 
-            get => _isEnabled; 
-            set 
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set
             {
                 if (_isEnabled != value)
                 {
                     _isEnabled = value;
-                    State = value ? "Ready" : "Disabled";
+                    if (_state != "Running")
+                        State = value ? "Ready" : "Disabled";
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(State));
                 }
-            } 
+            }
         }
         public System.Collections.ObjectModel.ObservableCollection<TaskActionModel> Actions { get; set; } = new();
 

@@ -645,6 +645,7 @@ namespace FluentTaskScheduler
             try
             {
                 ViewModel.TaskService.RunTask(ViewModel.SelectedTask.Path);
+                ViewModel.SelectedTask.State = "Running";
                 ViewModel.SelectedTask.IsRunning = true;
                 _ = WatchTaskUntilFinished(ViewModel.SelectedTask);
                 _ = RefreshTaskHistoryAsync(ViewModel.SelectedTask); // Refresh to show "Task Started"
@@ -1088,6 +1089,7 @@ namespace FluentTaskScheduler
             var tasks = TaskListView.SelectedItems.Cast<ScheduledTaskModel>().ToList();
             foreach (var t in tasks)
             {
+                t.State = "Running";
                 t.IsRunning = true;           // show the ring immediately
                 try
                 {

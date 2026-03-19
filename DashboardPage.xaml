@@ -18,9 +18,9 @@
                         <TextBlock Text="Reload Dashboard" />
                     </StackPanel>
                 </Button>
+                <!-- Row 1: Task counts -->
                 <Grid ColumnSpacing="16">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
@@ -44,8 +44,20 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- Health Score -->
+                    <!-- Running Now -->
                     <Grid Grid.Column="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE768;" FontSize="16" Opacity="0.7" Foreground="MediumSeaGreen"/>
+                                <TextBlock Text="Running Now" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            </StackPanel>
+                            <TextBlock Text="{x:Bind ViewModel.RunningTasks, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0" Foreground="MediumSeaGreen"/>
+                            <TextBlock Text="Active processes" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Health Score -->
+                    <Grid Grid.Column="2" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE9D9;" FontSize="16" Opacity="0.7"/>
@@ -55,21 +67,30 @@
                             <ProgressBar Value="{x:Bind ViewModel.HealthScore, Mode=OneWay}" Maximum="100" Margin="0,12,0,0" Height="4"/>
                         </StackPanel>
                     </Grid>
-                    
+                </Grid>
+
+                <!-- Row 2: Run results -->
+                <Grid ColumnSpacing="16" Margin="0,-8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
                     <!-- Recent Success -->
-                    <Grid Grid.Column="2" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                    <Grid Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE73E;" FontSize="16" Opacity="0.7" Foreground="{ThemeResource SystemFillColorSuccessBrush}"/>
                                 <TextBlock Text="Recent Success" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                             </StackPanel>
                             <TextBlock Text="{x:Bind ViewModel.LastRunSuccess, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
-                            <TextBlock Text="Last checked 10 tasks" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Margin="0,4,0,0"/>
+                            <TextBlock Text="Last checked tasks" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Grid>
 
                     <!-- Recent Failures -->
-                    <Grid Grid.Column="3" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                    <Grid Grid.Column="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE711;" FontSize="16" Opacity="0.7" Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
@@ -79,7 +100,96 @@
                             <TextBlock Text="Attention needed" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Grid>
+
+                    <!-- Placeholder for symmetry - empty third column -->
+                    <Grid Grid.Column="2"/>
                 </Grid>
+
+                <!-- Currently Running Tasks -->
+                <StackPanel Spacing="6">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="Currently Running" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                        <ProgressRing IsActive="{x:Bind ViewModel.HasRunningTasks, Mode=OneWay}" Width="16" Height="16" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <ListView x:Name="RunningTasksListView" ItemsSource="{x:Bind ViewModel.RunningTasksList, Mode=OneWay}" SelectionMode="None" IsItemClickEnabled="True" ItemClick="RunningTask_ItemClick" Padding="0">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Margin" Value="0"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="MinHeight" Value="0"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="viewmodels:RunningTaskInfo">
+                                <Grid Padding="12" CornerRadius="4" Background="{ThemeResource LayerFillColorDefaultBrush}" Margin="0,0,0,8" BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ProgressRing IsActive="True" Width="20" Height="20" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold"/>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Text="{x:Bind ActionCommand}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
+                                            <TextBlock Text="{x:Bind Path}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.4"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="12,0">
+                                        <TextBlock Text="{x:Bind RunningDuration}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" HorizontalAlignment="Right"/>
+                                    </StackPanel>
+                                    <Border Grid.Column="3" CornerRadius="4" Padding="8,4" VerticalAlignment="Center"
+                                            Background="{ThemeResource SystemFillColorSuccessBackgroundBrush}">
+                                        <TextBlock Text="{x:Bind ProcessStatus}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource SystemFillColorSuccessBrush}"/>
+                                    </Border>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <TextBlock Text="No tasks currently running" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5"
+                               Visibility="{x:Bind ViewModel.NoRunningTasksVisible, Mode=OneWay}"/>
+                </StackPanel>
+
+                <!-- Recently Failed Tasks -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Recently Failed" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                    <ListView x:Name="FailedTasksListView" ItemsSource="{x:Bind ViewModel.FailedTasksList, Mode=OneWay}" SelectionMode="None" IsItemClickEnabled="True" ItemClick="FailedTask_ItemClick" Padding="0">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Margin" Value="0"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="MinHeight" Value="0"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="viewmodels:FailedTaskInfo">
+                                <Grid Padding="12" CornerRadius="4" Background="{ThemeResource LayerFillColorDefaultBrush}" Margin="0,0,0,8" BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <FontIcon Glyph="&#xE711;" FontSize="16" Foreground="{ThemeResource SystemFillColorCriticalBrush}" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold"/>
+                                        <TextBlock Text="{x:Bind ErrorMessage}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" TextTrimming="CharacterEllipsis" MaxLines="1"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="12,0,0,0">
+                                        <TextBlock Text="{x:Bind LastRunTime}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" HorizontalAlignment="Right"/>
+                                        <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" HorizontalAlignment="Right">
+                                            <Run Text="Exit code: "/><Run Text="{x:Bind ExitCode}"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <TextBlock Text="No recent failures — all tasks healthy" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Foreground="{ThemeResource SystemFillColorSuccessBrush}"
+                               Visibility="{x:Bind ViewModel.NoFailedTasksVisible, Mode=OneWay}"/>
+                </StackPanel>
 
                 <Grid ColumnSpacing="24">
                     <Grid.ColumnDefinitions>

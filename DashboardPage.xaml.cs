@@ -21,6 +21,13 @@ namespace FluentTaskScheduler
             {
                 await ViewModel.LoadDashboardData();
             }
+            ViewModel.StartAutoRefresh();
+        }
+
+        protected override void OnNavigatedFrom(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
+        {
+            base.OnNavigatedFrom(e);
+            ViewModel.StopAutoRefresh();
         }
 
         private void Page_Loaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
@@ -37,6 +44,22 @@ namespace FluentTaskScheduler
             if (e.ClickedItem is FluentTaskScheduler.Models.TaskHistoryEntry entry && !string.IsNullOrEmpty(entry.TaskPath))
             {
                 ViewModel.NavigateToTask(entry.TaskPath);
+            }
+        }
+
+        private void RunningTask_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            if (e.ClickedItem is FluentTaskScheduler.ViewModels.RunningTaskInfo info && !string.IsNullOrEmpty(info.Path))
+            {
+                ViewModel.NavigateToTask(info.Path);
+            }
+        }
+
+        private void FailedTask_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            if (e.ClickedItem is FluentTaskScheduler.ViewModels.FailedTaskInfo info && !string.IsNullOrEmpty(info.Path))
+            {
+                ViewModel.NavigateToTask(info.Path);
             }
         }
     }

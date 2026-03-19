@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -21,6 +22,25 @@ namespace FluentTaskScheduler.ViewModels
         public double FailureHeight { get; set; }
         public double LabelOpacity { get; set; } = 0.6;
     }
+
+    public class RunningTaskInfo
+    {
+        public string Name { get; set; } = "";
+        public string Path { get; set; } = "";
+        public string ActionCommand { get; set; } = "";
+        public string RunningDuration { get; set; } = "";
+        public bool ProcessAlive { get; set; }
+        public string ProcessStatus { get; set; } = "";
+    }
+
+    public class FailedTaskInfo
+    {
+        public string Name { get; set; } = "";
+        public string Path { get; set; } = "";
+        public string LastRunTime { get; set; } = "";
+        public string ErrorMessage { get; set; } = "";
+        public string ExitCode { get; set; } = "";
+    }
     public class DashboardViewModel : INotifyPropertyChanged
     {
         private readonly TaskServiceWrapper _taskService;
@@ -31,6 +51,8 @@ namespace FluentTaskScheduler.ViewModels
         private int _lastRunFailed;
         private int _healthScore;
         private bool _isLoading;
+        private int _runningTasks;
+        private DispatcherQueueTimer? _autoRefreshTimer;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -40,7 +62,19 @@ namespace FluentTaskScheduler.ViewModels
             RecentHistory = new ObservableCollection<TaskHistoryEntry>();
             UpcomingTasks = new ObservableCollection<ScheduledTaskModel>();
             DailyHistory = new ObservableCollection<DailyChartPoint>();
+            RunningTasksList = new ObservableCollection<RunningTaskInfo>();
+            FailedTasksList = new ObservableCollection<FailedTaskInfo>();
         }
+
+        public int RunningTasks
+        {
+            get => _runningTasks;
+            set { _runningTasks = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasRunningTasks)); OnPropertyChanged(nameof(NoRunningTasksVisible)); }
+        }
+
+        public bool HasRunningTasks => _runningTasks > 0;
+        public Visibility NoRunningTasksVisible => _runningTasks == 0 ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility NoFailedTasksVisible => FailedTasksList.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
 
         public int TotalTasks
         {
@@ -87,6 +121,8 @@ namespace FluentTaskScheduler.ViewModels
         public ObservableCollection<TaskHistoryEntry> RecentHistory { get; }
         public ObservableCollection<ScheduledTaskModel> UpcomingTasks { get; }
         public ObservableCollection<DailyChartPoint> DailyHistory { get; }
+        public ObservableCollection<RunningTaskInfo> RunningTasksList { get; }
+        public ObservableCollection<FailedTaskInfo> FailedTasksList { get; }
 
         public async Task LoadDashboardData()
         {
@@ -104,11 +140,55 @@ namespace FluentTaskScheduler.ViewModels
                     int enabled = allTasks.Count(t => t.IsEnabled);
                     int disabled = allTasks.Count(t => !t.IsEnabled);
 
-                    // 3. Get Recent History + chart data
+                    // 3. Currently Running Tasks with process detection
+                    var runningTasks = allTasks.Where(t => t.State == "Running").ToList();
+                    var runningInfos = new List<RunningTaskInfo>();
+                    foreach (var task in runningTasks)
+                    {
+                        var actionCmd = task.ActionCommand;
+                        var processName = "";
+                        var processAlive = false;
+                        var processStatus = "Unknown";
+
+                        if (!string.IsNullOrEmpty(actionCmd))
+                        {
+                            // Extract process name from command (e.g. "C:\Python\python.exe" -> "python")
+                            processName = System.IO.Path.GetFileNameWithoutExtension(actionCmd.Trim('"'));
+                            try
+                            {
+                                var procs = Process.GetProcessesByName(processName);
+                                processAlive = procs.Length > 0;
+                                processStatus = processAlive ? $"Process active ({procs.Length} instance{(procs.Length > 1 ? "s" : "")})" : "Process not found";
+                            }
+                            catch { processStatus = "Unable to check"; }
+                        }
+
+                        var duration = "";
+                        if (task.LastRunTime.HasValue)
+                        {
+                            var elapsed = DateTime.Now - task.LastRunTime.Value;
+                            if (elapsed.TotalDays >= 1) duration = $"{(int)elapsed.TotalDays}d {elapsed.Hours}h";
+                            else if (elapsed.TotalHours >= 1) duration = $"{(int)elapsed.TotalHours}h {elapsed.Minutes}m";
+                            else duration = $"{(int)elapsed.TotalMinutes}m";
+                        }
+
+                        runningInfos.Add(new RunningTaskInfo
+                        {
+                            Name = task.Name,
+                            Path = task.Path,
+                            ActionCommand = string.IsNullOrEmpty(processName) ? actionCmd : processName,
+                            RunningDuration = duration,
+                            ProcessAlive = processAlive,
+                            ProcessStatus = processStatus
+                        });
+                    }
+
+                    // 4. Get Recent History + chart data + failed tasks
                     int success = 0;
                     int failed = 0;
                     var historyEntries = new List<TaskHistoryEntry>();
                     var allHistoryForChart = new List<TaskHistoryEntry>();
+                    var failedInfos = new List<FailedTaskInfo>();
 
                     foreach (var task in allTasks.Where(t => t.LastRunTime.HasValue)
                                                   .OrderByDescending(t => t.LastRunTime).Take(20))
@@ -118,13 +198,24 @@ namespace FluentTaskScheduler.ViewModels
                         {
                             var last = taskHistory.First();
                             if (last.Result == "Task Completed") success++;
-                            else if (last.Result == "Task Failed") failed++;
+                            else if (last.Result == "Task Failed")
+                            {
+                                failed++;
+                                failedInfos.Add(new FailedTaskInfo
+                                {
+                                    Name = task.Name,
+                                    Path = task.Path,
+                                    LastRunTime = task.LastRunTime?.ToString("g") ?? "",
+                                    ErrorMessage = last.Message,
+                                    ExitCode = last.ExitCode
+                                });
+                            }
                             historyEntries.AddRange(taskHistory.Take(5));
                         }
                         allHistoryForChart.AddRange(taskHistory);
                     }
 
-                    // 4. Build 7-day chart (last 7 days, oldest first)
+                    // 5. Build 7-day chart (last 7 days, oldest first)
                     var today = DateTime.Today;
                     var chartPoints = Enumerable.Range(0, 7)
                         .Select(i => today.AddDays(-6 + i))
@@ -150,12 +241,12 @@ namespace FluentTaskScheduler.ViewModels
                         p.FailureHeight = (p.Failures  / (double)maxVal) * MaxBarHeight;
                     }
 
-                    // 4. Calculate Health Score
+                    // 6. Calculate Health Score
                     int score = 100;
                     if (failed > 0) score -= (failed * 10);
                     if (score < 0) score = 0;
 
-                    // 5. Get Upcoming
+                    // 7. Get Upcoming
                     var upcoming = allTasks.Where(t => t.NextRunTime.HasValue && t.IsEnabled)
                                            .OrderBy(t => t.NextRunTime)
                                            .Take(5)
@@ -167,9 +258,19 @@ namespace FluentTaskScheduler.ViewModels
                         TotalTasks = total;
                         EnabledTasks = enabled;
                         DisabledTasks = disabled;
+                        RunningTasks = runningTasks.Count;
                         LastRunSuccess = success;
                         LastRunFailed = failed;
                         HealthScore = score;
+
+                        RunningTasksList.Clear();
+                        foreach (var r in runningInfos)
+                            RunningTasksList.Add(r);
+
+                        FailedTasksList.Clear();
+                        foreach (var f in failedInfos)
+                            FailedTasksList.Add(f);
+                        OnPropertyChanged(nameof(NoFailedTasksVisible));
 
                         RecentHistory.Clear();
                         foreach (var h in historyEntries.OrderByDescending(x => x.Time).Take(10))
@@ -201,6 +302,23 @@ namespace FluentTaskScheduler.ViewModels
             {
                 MainPage.Current.NavigateToTask(taskPath);
             }
+        }
+
+        public void StartAutoRefresh()
+        {
+            if (_autoRefreshTimer != null) return;
+            var dq = DispatcherQueue.GetForCurrentThread();
+            if (dq == null) return;
+            _autoRefreshTimer = dq.CreateTimer();
+            _autoRefreshTimer.Interval = TimeSpan.FromSeconds(30);
+            _autoRefreshTimer.Tick += async (s, e) => { await LoadDashboardData(); };
+            _autoRefreshTimer.Start();
+        }
+
+        public void StopAutoRefresh()
+        {
+            _autoRefreshTimer?.Stop();
+            _autoRefreshTimer = null;
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
