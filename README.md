@@ -9,7 +9,9 @@ A modern, powerful, and intuitive Windows task scheduling application built with
 FluentTaskScheduler is a professional-grade wrapper for the Windows Task Scheduler API, designed with Microsoft's modern Fluent Design System. It simplifies the creation and management of automation tasks, offering a sleek alternative to the legacy Windows Task Scheduler.
 
 ### Donate on Buy me a coffee
-If you like what this project is for, I would really appreciate a (optional!) donation: [https://buymeacoffee.com/t.r.g](https://buymeacoffee.com/t.r.g)
+If you like what this project is for, I would really appreciate a (optional!) donation:
+<a href="https://buymeacoffee.com/t.r.g"><img src="assets/yellow.png" alt="A mushroom-head robot drinking bubble tea" width="auto" height="75"></a>
+
 
 ## Key Features
 
