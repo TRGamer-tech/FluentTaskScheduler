@@ -16,6 +16,10 @@ namespace FluentTaskScheduler
         [STAThread]
         static void Main(string[] args)
         {
+            // Initialize ComWrappers as early as possible for WinRT support.
+            // This MUST be done before any WinRT types are accessed or the bootstrapper runs.
+            WinRT.ComWrappersSupport.InitializeComWrappers();
+
             // VeloPack: Handle install/uninstall/update hooks before anything else.
             // In a machine-wide install (C:\Program Files), non-admin users don't have write access,
             // which causes Velopack to crash with UnauthorizedAccessException when it tries to 
@@ -36,11 +40,14 @@ namespace FluentTaskScheduler
             try
             {
                 // Using 1.5 (0x00010005) with an empty version tag to match MddBootstrapInitialize2 requirements.
+                // We use Windows App SDK 1.5 and an empty tag for the stable release.
                 Bootstrap.Initialize(0x00010005, "");
             }
             catch (Exception ex)
             {
-                // In self-contained scenarios, this might fail but the app can still run if libraries are local.
+                // If this fails on ARM64, it's usually because the local runtime DLLs are missing or 
+                // the architecture is mismatched. In self-contained scenarios, we might continue 
+                // if the DLLs are already in the search path, but usually this is a fatal error.
                 System.Diagnostics.Debug.WriteLine($"Bootstrap initialization failed: {ex.Message}");
             }
 
@@ -56,8 +63,6 @@ namespace FluentTaskScheduler
                 // Fallback or log if needed, but continuing might still work
                 // if the bootstrapper did its job for other dependencies.
             }
-
-            WinRT.ComWrappersSupport.InitializeComWrappers();
 
             Application.Start((p) =>
             {
