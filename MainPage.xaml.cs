@@ -1061,12 +1061,27 @@ namespace FluentTaskScheduler
 
         private void PopulateNetworkList()
         {
+            bool isAdmin = new System.Security.Principal.WindowsPrincipal(
+                System.Security.Principal.WindowsIdentity.GetCurrent())
+                .IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
+
+            if (!isAdmin)
+            {
+                // Non-admin: disable dropdown and show explanation notice
+                EditTaskNetworkSelection.IsEnabled = false;
+                EditTaskNetworkSelection.Items.Clear();
+                EditTaskNetworkSelection.Items.Add(new ComboBoxItem { Content = "Any network", Tag = "" });
+                EditTaskNetworkSelection.SelectedIndex = 0;
+                NetworkAdminNotice.IsOpen = true;
+                return;
+            }
+
+            // Admin: populate from registry (exact NLM profile GUIDs)
+            NetworkAdminNotice.IsOpen = false;
+            EditTaskNetworkSelection.IsEnabled = true;
             EditTaskNetworkSelection.Items.Clear();
-            EditTaskNetworkSelection.Items.Add(new Microsoft.UI.Xaml.Controls.ComboBoxItem { Content = "Any network", Tag = "" });
-            
-            var profiles = new List<(string Name, string Id)>();
-            
-            // Strategy 1: Registry (requires admin, gives exact profile GUIDs matching Task Scheduler)
+            EditTaskNetworkSelection.Items.Add(new ComboBoxItem { Content = "Any network", Tag = "" });
+
             try
             {
                 using var profilesKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
@@ -1078,37 +1093,11 @@ namespace FluentTaskScheduler
                         using var profileKey = profilesKey.OpenSubKey(subKeyName);
                         var name = profileKey?.GetValue("ProfileName") as string;
                         if (!string.IsNullOrWhiteSpace(name))
-                            profiles.Add((name, subKeyName));
+                            EditTaskNetworkSelection.Items.Add(new ComboBoxItem { Content = name, Tag = subKeyName });
                     }
                 }
             }
-            catch { }
-            
-            // Strategy 2: NLM COM via typed vtable interop — same source as legacy Task Scheduler, works without admin
-            if (profiles.Count == 0)
-            {
-                try
-                {
-                    var nlm = (Helpers.INlmNetworkListManager)new Helpers.NetworkListManagerClass();
-                    var enumNetworks = nlm.GetNetworks(3); // NLM_ENUM_NETWORK_ALL = 3
-                    int count = enumNetworks.Count;
-                    for (int i = 0; i < count; i++)
-                    {
-                        try
-                        {
-                            var net = enumNetworks.Item(i);
-                            string netName = net.GetName();
-                            Guid netId = net.GetNetworkId();
-                            profiles.Add((netName, netId.ToString("B").ToUpperInvariant()));
-                        }
-                        catch { }
-                    }
-                }
-                catch (Exception ex) { LogService.Warn($"NLM COM fallback failed: {ex.Message}"); }
-            }
-            
-            foreach (var (name, id) in profiles)
-                EditTaskNetworkSelection.Items.Add(new Microsoft.UI.Xaml.Controls.ComboBoxItem { Content = name, Tag = id });
+            catch (Exception ex) { LogService.Warn($"Could not populate network list: {ex.Message}"); }
         }
 
         // List Buttons

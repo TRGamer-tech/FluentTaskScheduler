@@ -818,11 +818,16 @@
                     <CheckBox x:Name="EditTaskOnBattery" Content="Computer is on battery power"/>
                     
                     <CheckBox x:Name="EditTaskOnlyIfNetwork" x:Uid="ConditionNetwork" Content="Network is available"/>
-                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
-                        <TextBlock Text="Specific network:" VerticalAlignment="Center"/>
-                        <ComboBox x:Name="EditTaskNetworkSelection" Width="250" MaxDropDownHeight="280">
-                            <ComboBoxItem Content="Any network" Tag="" IsSelected="True"/>
-                        </ComboBox>
+                    <StackPanel Spacing="4" Margin="24,0,0,0">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Specific network:" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="EditTaskNetworkSelection" Width="250" MaxDropDownHeight="280">
+                                <ComboBoxItem Content="Any network" Tag="" IsSelected="True"/>
+                            </ComboBox>
+                        </StackPanel>
+                        <InfoBar x:Name="NetworkAdminNotice" Severity="Informational" IsOpen="False" IsClosable="False"
+                                 Title="Administrator required"
+                                 Message="Specific network selection requires the app to run as administrator."/>
                     </StackPanel>
                     
                     <CheckBox x:Name="EditTaskWakeToRun" x:Uid="ConditionWake" Content="Wake the computer to run this task"/>
