@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>fluenttaskscheduler</id>
+    <version>1.7.1</version>
+    <title>Fluent Task Scheduler</title>
+    <authors>TRGamer-tech</authors>
+    <owners>TRGamer-tech</owners>
+    <projectUrl>https://github.com/TRGamer-tech/FluentTaskScheduler</projectUrl>
+    <packageSourceUrl>https://github.com/TRGamer-tech/FluentTaskScheduler/tree/main/packaging/chocolatey</packageSourceUrl>
+    <licenseUrl>https://github.com/TRGamer-tech/FluentTaskScheduler/blob/main/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <iconUrl>https://raw.githubusercontent.com/TRGamer-tech/FluentTaskScheduler/main/Assets/StoreLogo.png</iconUrl>
+    <summary>A modern WinUI 3 wrapper for the Windows Task Scheduler.</summary>
+    <description><![CDATA[
+FluentTaskScheduler is a professional-grade, modern alternative to the legacy Windows Task Scheduler.
+Built with WinUI 3 and .NET 8, it offers a clean Fluent Design interface to create, edit, and monitor
+scheduled tasks without the dated MMC snap-in.
+
+**Key features:**
+- Live dashboard with activity stream and history charts
+- Full trigger support: Daily, Weekly, Monthly, At Logon, At Startup, On Event, Session State Change
+- Conditions: idle, AC power, battery, network availability, wake-to-run
+- Batch operations, smart search, folder management, import/export
+- ARM64 native support
+- System tray with running-task badge
+- Auto-updates via VeloPack
+- Full CLI interface (`--list`, `--run`, `--enable`, `--disable`, `--export-history`)
+
+**Requirements:** Windows 10 1809 (build 17763) or later.
+    ]]></description>
+    <tags>task-scheduler automation windows winui3 fluent productivity admin</tags>
+    <releaseNotes>https://github.com/TRGamer-tech/FluentTaskScheduler/releases/tag/v1.7.1</releaseNotes>
+    <dependencies>
+      <!-- .NET 8 Desktop Runtime is bundled (self-contained build) — no extra dependency needed -->
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

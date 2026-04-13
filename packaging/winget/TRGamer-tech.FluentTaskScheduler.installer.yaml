@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
+# ---------------------------------------------------------------------------
+# NOTE TO MAINTAINER: Before submitting a PR to winget-pkgs, replace every
+# <SHA256_OF_...> placeholder with the real SHA-256 hash of the corresponding
+# file from the GitHub Release. You can compute hashes with:
+#   (Get-FileHash "Setup-x64.msi" -Algorithm SHA256).Hash
+# ---------------------------------------------------------------------------
+
+PackageIdentifier: TRGamer-tech.FluentTaskScheduler
+PackageVersion: 1.7.1
+MinimumOSVersion: "10.0.17763.0"
+InstallerType: msi
+InstallModes:
+  - interactive
+  - silent
+InstallerSwitches:
+  Silent: /qn
+  SilentWithProgress: /qb
+  Log: /log "$TEMP\FluentTaskScheduler-Install.log"
+UpgradeBehavior: install
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/v1.7.1/Setup-x64.msi
+    InstallerSha256: <SHA256_OF_Setup-x64.msi>
+  - Architecture: arm64
+    InstallerUrl: https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/v1.7.1/Setup-arm64.msi
+    InstallerSha256: <SHA256_OF_Setup-arm64.msi>
+ManifestType: installer
+ManifestVersion: 1.6.0
