@@ -449,7 +449,13 @@ namespace FluentTaskScheduler.Services
             td.Settings.RunOnlyIfNetworkAvailable = model.OnlyIfNetwork || hasNetworkId;
             if (hasNetworkId)
             {
-                try { td.Settings.NetworkSettings.Id = Guid.Parse(model.NetworkId); } catch { }
+                try 
+                { 
+                    td.Settings.NetworkSettings.Id = Guid.Parse(model.NetworkId);
+                    if (!string.IsNullOrWhiteSpace(model.NetworkName) && model.NetworkName != "Any network")
+                        td.Settings.NetworkSettings.Name = model.NetworkName;
+                } 
+                catch (Exception ex) { LogService.Warn($"Could not set NetworkSettings: {ex.Message}"); }
             }
 
             td.Settings.WakeToRun = model.WakeToRun;
@@ -921,7 +927,7 @@ namespace FluentTaskScheduler.Services
             }
         }
 
-        private const string MetadataPrefix = "<!-- FTS_METADATA:";
+        private const string MetadataPrefix = "<!-- FTS_META:";
         private const string MetadataSuffix = " -->";
 
         private void ParseMetadata(ScheduledTaskModel model)

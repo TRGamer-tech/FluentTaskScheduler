@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Media;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using FluentTaskScheduler.Models;
+using FluentTaskScheduler.Services;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.UI.Dispatching;
@@ -856,7 +857,21 @@ namespace FluentTaskScheduler
             if (EditTaskRestartCount != null) EditTaskRestartCount.Value = ViewModel.SelectedTask.RestartCount;
             // All settings mapped
             
-            PopulateNetworkList(); // TODO: Select correct network
+            PopulateNetworkList();
+            if (!string.IsNullOrEmpty(ViewModel.SelectedTask.NetworkId) &&
+                Guid.TryParse(ViewModel.SelectedTask.NetworkId, out var taskNetworkGuid))
+            {
+                foreach (Microsoft.UI.Xaml.Controls.ComboBoxItem item in EditTaskNetworkSelection.Items)
+                {
+                    if (Guid.TryParse(item.Tag?.ToString(), out var itemGuid) && itemGuid == taskNetworkGuid)
+                    {
+                        EditTaskNetworkSelection.SelectedItem = item;
+                        break;
+                    }
+                }
+            }
+            else
+                EditTaskNetworkSelection.SelectedIndex = 0;
             
             _isPopulatingDetails = false;
             TaskEditDialog.XamlRoot = this.Content.XamlRoot;
@@ -886,6 +901,8 @@ namespace FluentTaskScheduler
                 OnlyIfIdle = EditTaskOnlyIfIdle.IsChecked == true,
                 OnlyIfAC = EditTaskOnlyIfAC.IsChecked == true,
                 OnlyIfNetwork = EditTaskOnlyIfNetwork.IsChecked == true,
+                NetworkId = (EditTaskNetworkSelection.SelectedItem as Microsoft.UI.Xaml.Controls.ComboBoxItem)?.Tag?.ToString() ?? "",
+                NetworkName = (EditTaskNetworkSelection.SelectedItem as Microsoft.UI.Xaml.Controls.ComboBoxItem)?.Content?.ToString() ?? "",
                 WakeToRun = EditTaskWakeToRun.IsChecked == true,
                 IsHidden = EditTaskIsHidden.IsChecked == true,
                 RunWithHighestPrivileges = EditTaskRunWithHighestPrivileges.IsChecked == true,
@@ -1044,15 +1061,79 @@ namespace FluentTaskScheduler
 
         private void PopulateNetworkList()
         {
-            // Simplified for now - avoiding direct networking calls which might crash if permission missing
-            // EditTaskNetworkSelection is in XAML
+            EditTaskNetworkSelection.Items.Clear();
+            EditTaskNetworkSelection.Items.Add(new Microsoft.UI.Xaml.Controls.ComboBoxItem { Content = "Any network", Tag = "" });
+            
+            var profiles = new List<(string Name, string Id)>();
+            
+            // Strategy 1: Registry (requires admin, gives exact profile GUIDs matching Task Scheduler)
+            try
+            {
+                using var profilesKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
+                    @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkList\Profiles");
+                if (profilesKey != null)
+                {
+                    foreach (var subKeyName in profilesKey.GetSubKeyNames())
+                    {
+                        using var profileKey = profilesKey.OpenSubKey(subKeyName);
+                        var name = profileKey?.GetValue("ProfileName") as string;
+                        if (!string.IsNullOrWhiteSpace(name))
+                            profiles.Add((name, subKeyName));
+                    }
+                }
+            }
+            catch { }
+            
+            // Strategy 2: NLM COM via typed vtable interop — same source as legacy Task Scheduler, works without admin
+            if (profiles.Count == 0)
+            {
+                try
+                {
+                    var nlm = (Helpers.INlmNetworkListManager)new Helpers.NetworkListManagerClass();
+                    var enumNetworks = nlm.GetNetworks(3); // NLM_ENUM_NETWORK_ALL = 3
+                    int count = enumNetworks.Count;
+                    for (int i = 0; i < count; i++)
+                    {
+                        try
+                        {
+                            var net = enumNetworks.Item(i);
+                            string netName = net.GetName();
+                            Guid netId = net.GetNetworkId();
+                            profiles.Add((netName, netId.ToString("B").ToUpperInvariant()));
+                        }
+                        catch { }
+                    }
+                }
+                catch (Exception ex) { LogService.Warn($"NLM COM fallback failed: {ex.Message}"); }
+            }
+            
+            foreach (var (name, id) in profiles)
+                EditTaskNetworkSelection.Items.Add(new Microsoft.UI.Xaml.Controls.ComboBoxItem { Content = name, Tag = id });
         }
 
         // List Buttons
         private void BtnAddTrigger_Click(object sender, RoutedEventArgs e) { _tempTriggers.Add(new TaskTriggerModel { TriggerType="Daily", ScheduleInfo=DateTime.Now.ToString("g") }); TriggerList.SelectedIndex = _tempTriggers.Count - 1; }
         private void BtnRemoveTrigger_Click(object sender, RoutedEventArgs e) { if (TriggerList.SelectedItem is TaskTriggerModel t) _tempTriggers.Remove(t); }
-        private void BtnMoveTriggerUp_Click(object sender, RoutedEventArgs e) { /* ... */ }
-        private void BtnMoveTriggerDown_Click(object sender, RoutedEventArgs e) { /* ... */ }
+        private void BtnMoveTriggerUp_Click(object sender, RoutedEventArgs e) 
+        { 
+            int idx = TriggerList.SelectedIndex;
+            if (idx > 0) {
+                var item = _tempTriggers[idx];
+                _tempTriggers.RemoveAt(idx);
+                _tempTriggers.Insert(idx - 1, item);
+                TriggerList.SelectedIndex = idx - 1;
+            }
+        }
+        private void BtnMoveTriggerDown_Click(object sender, RoutedEventArgs e) 
+        { 
+            int idx = TriggerList.SelectedIndex;
+            if (idx >= 0 && idx < _tempTriggers.Count - 1) {
+                var item = _tempTriggers[idx];
+                _tempTriggers.RemoveAt(idx);
+                _tempTriggers.Insert(idx + 1, item);
+                TriggerList.SelectedIndex = idx + 1;
+            }
+        }
 
         private void BtnAddAction_Click(object sender, RoutedEventArgs e) { _tempActions.Add(new TaskActionModel { Command="notepad.exe" }); ActionList.SelectedIndex = _tempActions.Count - 1; }
         
@@ -1073,8 +1154,26 @@ namespace FluentTaskScheduler
         }
 
         private void BtnRemoveAction_Click(object sender, RoutedEventArgs e) { if (ActionList.SelectedItem is TaskActionModel t) _tempActions.Remove(t); }
-        private void BtnMoveActionUp_Click(object sender, RoutedEventArgs e) { /* ... */ }
-        private void BtnMoveActionDown_Click(object sender, RoutedEventArgs e) { /* ... */ }
+        private void BtnMoveActionUp_Click(object sender, RoutedEventArgs e) 
+        { 
+            int idx = ActionList.SelectedIndex;
+            if (idx > 0) {
+                var item = _tempActions[idx];
+                _tempActions.RemoveAt(idx);
+                _tempActions.Insert(idx - 1, item);
+                ActionList.SelectedIndex = idx - 1;
+            }
+        }
+        private void BtnMoveActionDown_Click(object sender, RoutedEventArgs e) 
+        { 
+            int idx = ActionList.SelectedIndex;
+            if (idx >= 0 && idx < _tempActions.Count - 1) {
+                var item = _tempActions[idx];
+                _tempActions.RemoveAt(idx);
+                _tempActions.Insert(idx + 1, item);
+                ActionList.SelectedIndex = idx + 1;
+            }
+        }
 
         // Handlers to satisfy XAML connection
         private void EditTaskExpires_Click(object sender, RoutedEventArgs e) 

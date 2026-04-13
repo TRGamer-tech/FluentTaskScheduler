@@ -12,3 +12,5 @@
 6. Let's see what we can do to make it even better.
 7. Fix Issue #13 by adding a filter by category and tag to the dashboard.
 8. Fix Issue #14 by removing the warning when the apps runs as admin.
+9. Fix Reordering triggers and actions.
+10. Fix Network selection.
