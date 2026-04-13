@@ -1201,7 +1201,52 @@ namespace FluentTaskScheduler
              }
         }
         private void RunAsSystem_Click(object sender, RoutedEventArgs e) => RunAsSystem.IsChecked = true;
-        private void DialogScrollViewer_PointerPressed(object sender, PointerRoutedEventArgs e) {} // no-op
+        private void DialogScrollViewer_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            // When the user clicks on empty space (no interactive element), WinUI shifts focus to
+            // the ScrollViewer and calls BringIntoView on it, which resets the scroll position to
+            // the top. We prevent this by capturing the current vertical offset and restoring it
+            // on the next dispatcher frame (after BringIntoView has already fired).
+            if (sender is not ScrollViewer sv) return;
+            double savedOffset = sv.VerticalOffset;
+            DispatcherQueue.TryEnqueue(() => sv.ChangeView(null, savedOffset, null, true));
+        }
+
+        private void InfoIcon_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            e.Handled = true; // Don't bubble to ScrollViewer
+            if (sender is not FrameworkElement icon) return;
+
+            var text = ToolTipService.GetToolTip(icon) as string;
+            if (string.IsNullOrEmpty(text)) return;
+
+            // Un-escape XML character references that appear literally in the string
+            text = text.Replace("&#x0a;", "\n").Replace("&#x2022;", "\u2022");
+
+            var content = new TextBlock
+            {
+                Text = text,
+                MaxWidth = 300,
+                TextWrapping = TextWrapping.Wrap,
+                Style = (Style)Application.Current.Resources["CaptionTextBlockStyle"]
+            };
+
+            var flyout = new Flyout
+            {
+                Content = content,
+                Placement = Microsoft.UI.Xaml.Controls.Primitives.FlyoutPlacementMode.Bottom
+            };
+
+            // Save the current scroll offset now. When the flyout light-dismisses, WinUI
+            // processes the outside tap as a focus change on the ScrollViewer and calls
+            // BringIntoView, jumping the scroll to the top. Restoring the saved offset on
+            // the next dispatcher frame (after BringIntoView has already fired) undoes that.
+            double savedOffset = EditScrollViewer.VerticalOffset;
+            flyout.Closed += (_, _) =>
+                DispatcherQueue.TryEnqueue(() => EditScrollViewer.ChangeView(null, savedOffset, null, true));
+
+            flyout.ShowAt(icon);
+        }
 
         // Batch
         private void UpdateBatchActionsState()

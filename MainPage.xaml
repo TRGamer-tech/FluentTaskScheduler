@@ -499,31 +499,79 @@
                 <StackPanel Spacing="16" Width="750" Margin="0,8,12,8">
                 <TextBlock x:Uid="DialogTitle" Text="Add or edit task" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
                 <InfoBar x:Name="EditTaskErrorBar" IsOpen="False" Severity="Error" Margin="0,0,0,8" />
-                <TextBox x:Name="EditTaskName" x:Uid="TaskNameHeader" Header="Task Name" PlaceholderText="Enter task name"/>
-                <TextBox x:Name="EditTaskDescription" x:Uid="DescriptionHeader" Header="Description" AcceptsReturn="True" Height="80"/>
-                <TextBox x:Name="EditTaskAuthor" x:Uid="AuthorHeader" Header="Author"/>
+                <TextBox x:Name="EditTaskName" x:Uid="TaskNameHeader" PlaceholderText="Enter task name">
+                    <TextBox.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBlock Text="Task Name" VerticalAlignment="Center"/>
+                            <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                      ToolTipService.ToolTip="The unique identifier for this task. It must be distinct within its folder in Windows Task Scheduler."/>
+                        </StackPanel>
+                    </TextBox.Header>
+                </TextBox>
+                <TextBox x:Name="EditTaskDescription" x:Uid="DescriptionHeader" AcceptsReturn="True" Height="80">
+                    <TextBox.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBlock Text="Description" VerticalAlignment="Center"/>
+                            <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                      ToolTipService.ToolTip="A human-readable note that explains what this task does. Visible in Task Scheduler and the details panel."/>
+                        </StackPanel>
+                    </TextBox.Header>
+                </TextBox>
+                <TextBox x:Name="EditTaskAuthor" x:Uid="AuthorHeader">
+                    <TextBox.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBlock Text="Author" VerticalAlignment="Center"/>
+                            <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                      ToolTipService.ToolTip="The person or system that owns this task. Stored in the task XML; not enforced by Windows."/>
+                        </StackPanel>
+                    </TextBox.Header>
+                </TextBox>
                 
                 <Grid ColumnSpacing="12">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <AutoSuggestBox x:Name="EditTaskCategory" Header="Category" PlaceholderText="e.g. Work" 
+                    <AutoSuggestBox x:Name="EditTaskCategory" PlaceholderText="e.g. Work" 
                                    ItemsSource="{x:Bind ViewModel.SavedCategories}"
                                    QueryIcon="Find" 
                                    GotFocus="EditTaskCategory_GotFocus"
                                    Tapped="EditTaskCategory_GotFocus"
                                    TextChanged="EditTaskCategory_TextChanged"
-                                   SuggestionChosen="EditTaskCategory_SuggestionChosen" />
-                    <AutoSuggestBox x:Name="EditTaskTags" Grid.Column="1" Header="Tags" PlaceholderText="e.g. urgent, sync (comma separated)"
+                                   SuggestionChosen="EditTaskCategory_SuggestionChosen">
+                        <AutoSuggestBox.Header>
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Text="Category" VerticalAlignment="Center"/>
+                                <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                          ToolTipService.ToolTip="Groups tasks together for filtering in the main list. Stored inside the task XML as the task's category label."/>
+                            </StackPanel>
+                        </AutoSuggestBox.Header>
+                    </AutoSuggestBox>
+                    <AutoSuggestBox x:Name="EditTaskTags" Grid.Column="1" PlaceholderText="e.g. urgent, sync (comma separated)"
                                    QueryIcon="Find"
                                    GotFocus="EditTaskTags_GotFocus"
                                    Tapped="EditTaskTags_GotFocus"
                                    TextChanged="EditTaskTags_TextChanged"
-                                   SuggestionChosen="EditTaskTags_SuggestionChosen" />
+                                   SuggestionChosen="EditTaskTags_SuggestionChosen">
+                        <AutoSuggestBox.Header>
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Text="Tags" VerticalAlignment="Center"/>
+                                <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                          ToolTipService.ToolTip="Custom comma-separated labels used for filtering inside this app. Tags are stored in the task Description field and are NOT a native Windows Task Scheduler feature."/>
+                            </StackPanel>
+                        </AutoSuggestBox.Header>
+                    </AutoSuggestBox>
                 </Grid>
 
-                <ToggleSwitch x:Name="EditTaskEnabled" x:Uid="EnabledSwitch" Header="Enabled" IsOn="True"/>
+                <ToggleSwitch x:Name="EditTaskEnabled" x:Uid="EnabledSwitch" IsOn="True">
+                    <ToggleSwitch.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBlock Text="Enabled" VerticalAlignment="Center"/>
+                            <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                      ToolTipService.ToolTip="When off, the task is disabled and will not run on any of its triggers, even if they fire."/>
+                        </StackPanel>
+                    </ToggleSwitch.Header>
+                </ToggleSwitch>
                 
                 <!-- Trigger Section -->
                 <Rectangle Height="2" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,12,0,4"/>
@@ -556,7 +604,14 @@
                 </Grid>
 
                 <StackPanel x:Name="TriggerDetailsPanel" Spacing="0" Visibility="Collapsed">
-                <ComboBox x:Name="EditTaskTriggerType" x:Uid="TriggerTypeHeader" Header="Trigger Type" SelectedIndex="0" SelectionChanged="EditTaskTriggerType_SelectionChanged" HorizontalAlignment="Stretch">
+                <ComboBox x:Name="EditTaskTriggerType" x:Uid="TriggerTypeHeader" SelectedIndex="0" SelectionChanged="EditTaskTriggerType_SelectionChanged" HorizontalAlignment="Stretch">
+                    <ComboBox.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBlock Text="Trigger Type" VerticalAlignment="Center"/>
+                            <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                      ToolTipService.ToolTip="Determines what event or schedule starts the task. &#x0a;&#x2022; Daily / Weekly / Monthly: time-based schedules.&#x0a;&#x2022; At Logon: runs when a user signs in.&#x0a;&#x2022; At Startup: runs when Windows boots.&#x0a;&#x2022; On an event: triggers from the Windows Event Log."/>
+                        </StackPanel>
+                    </ComboBox.Header>
                     <ComboBoxItem Content="Daily" Tag="Daily"/>
                     <ComboBoxItem Content="Weekly" Tag="Weekly"/>
                     <ComboBoxItem Content="Monthly" Tag="Monthly"/>
@@ -574,12 +629,16 @@
                     
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <CheckBox x:Name="EditTaskRandomDelay" Content="Delay task for up to (random delay):" Click="EditTaskRandomDelay_Click"/>
+                        <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                  ToolTipService.ToolTip="Adds a random wait (between 0 and the specified value) before the task actually starts. Useful to stagger tasks that trigger at the same time across many machines."/>
                         <TextBox x:Name="EditTaskRandomDelayVal" PlaceholderText="e.g. 1 hour" Width="120"/>
                         <TextBlock Text="(e.g. 30s, 1m, 1h)" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Spacing="8">
                          <CheckBox x:Name="EditTaskStopAfter" Content="Stop task if runs longer than:" Click="EditTaskStopAfter_Click"/>
+                         <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                   ToolTipService.ToolTip="Automatically terminates the task process if it has been running longer than the chosen duration. Helps prevent runaway processes."/>
                          <ComboBox x:Name="EditTaskStopAfterVal" IsEditable="True" Width="120">
                              <ComboBoxItem Content="15 minutes" Tag="PT15M"/>
                              <ComboBoxItem Content="30 minutes" Tag="PT30M"/>
@@ -711,7 +770,11 @@
                 </StackPanel>
 
                 <StackPanel Spacing="8" Margin="0,12,0,0">
-                     <CheckBox x:Name="EditTaskExpires" Content="Expire task on:" Click="EditTaskExpires_Click"/>
+                     <StackPanel Orientation="Horizontal" Spacing="4">
+                         <CheckBox x:Name="EditTaskExpires" Content="Expire task on:" Click="EditTaskExpires_Click"/>
+                         <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                   ToolTipService.ToolTip="After this date and time the trigger will stop firing. The task itself remains; only the trigger is deactivated."/>
+                     </StackPanel>
                      <StackPanel Spacing="8" Margin="28,0,0,0">
                          <DatePicker x:Name="EditTaskExpirationDate" HorizontalAlignment="Left"/>
                          <TimePicker x:Name="EditTaskExpirationTime" HorizontalAlignment="Left" ClockIdentifier="24HourClock"/>
@@ -762,11 +825,35 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox x:Name="EditTaskActionCommand" x:Uid="ProgramScriptHeader" Header="Program/Script" PlaceholderText="e.g., notepad.exe or C:\Scripts\myscript.ps1" Grid.Column="0" TextChanged="EditTaskActionCommand_TextChanged"/>
+                        <TextBox x:Name="EditTaskActionCommand" x:Uid="ProgramScriptHeader" PlaceholderText="e.g., notepad.exe or C:\Scripts\myscript.ps1" Grid.Column="0" TextChanged="EditTaskActionCommand_TextChanged">
+                            <TextBox.Header>
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <TextBlock Text="Program / Script" VerticalAlignment="Center"/>
+                                    <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                              ToolTipService.ToolTip="The full path or name of the executable, script, or document to launch. Use 'powershell.exe' with arguments for PowerShell scripts."/>
+                                </StackPanel>
+                            </TextBox.Header>
+                        </TextBox>
                         <Button x:Name="BrowseActionButton" x:Uid="BrowseButton" Content="Browse..." Click="BrowseAction_Click" VerticalAlignment="Bottom" Margin="0,0,0,6" Grid.Column="1"/>
                     </Grid>
-                    <TextBox x:Name="EditTaskArguments" x:Uid="ArgumentsHeader" Header="Arguments (optional)" PlaceholderText="e.g., /c echo hello or -File script.ps1" TextChanged="EditTaskArguments_TextChanged" Margin="0,8,0,0"/>
-                    <TextBox x:Name="EditTaskWorkingDirectory" x:Uid="WorkingDirectoryHeader" Header="Run in (optional)" PlaceholderText="e.g., C:\Scripts" TextChanged="EditTaskWorkingDirectory_TextChanged" Margin="0,8,0,0"/>
+                    <TextBox x:Name="EditTaskArguments" x:Uid="ArgumentsHeader" PlaceholderText="e.g., /c echo hello or -File script.ps1" TextChanged="EditTaskArguments_TextChanged" Margin="0,8,0,0">
+                        <TextBox.Header>
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Text="Arguments (optional)" VerticalAlignment="Center"/>
+                                <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                          ToolTipService.ToolTip="Command-line parameters passed directly to the program. For PowerShell: -ExecutionPolicy Bypass -File &quot;C:\path\to\script.ps1&quot;"/>
+                            </StackPanel>
+                        </TextBox.Header>
+                    </TextBox>
+                    <TextBox x:Name="EditTaskWorkingDirectory" x:Uid="WorkingDirectoryHeader" PlaceholderText="e.g., C:\Scripts" TextChanged="EditTaskWorkingDirectory_TextChanged" Margin="0,8,0,0">
+                        <TextBox.Header>
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Text="Run in (optional)" VerticalAlignment="Center"/>
+                                <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                          ToolTipService.ToolTip="Sets the working directory (current folder) for the process. Relative paths in the program or script will resolve relative to this folder."/>
+                            </StackPanel>
+                        </TextBox.Header>
+                    </TextBox>
                     <TextBlock Text="Tip: For PowerShell scripts, use 'powershell.exe' as Program and '-ExecutionPolicy Bypass -File &quot;C:\path\to\script.ps1&quot;' as Arguments" 
                                Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" TextWrapping="Wrap" Margin="0,4,0,0"/>
                 </StackPanel>
@@ -775,7 +862,14 @@
                 <Rectangle Height="2" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,12,0,4"/>
                 <TextBlock Text="Repetition" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,4"/>
                 <StackPanel Spacing="12">
-                    <ComboBox x:Name="EditTaskRepetitionInterval" Header="Repeat task every" SelectedIndex="0" SelectionChanged="EditTaskRepetitionInterval_SelectionChanged">
+                    <ComboBox x:Name="EditTaskRepetitionInterval" SelectedIndex="0" SelectionChanged="EditTaskRepetitionInterval_SelectionChanged">
+                        <ComboBox.Header>
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Text="Repeat task every" VerticalAlignment="Center"/>
+                                <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                          ToolTipService.ToolTip="After the task starts, re-trigger it at this interval until the 'For a duration of' limit is reached. Useful for tasks that must run repeatedly within a window."/>
+                            </StackPanel>
+                        </ComboBox.Header>
                         <ComboBoxItem Content="(No repetition)" Tag=""/>
                         <ComboBoxItem Content="5 minutes" Tag="PT5M"/>
                         <ComboBoxItem Content="10 minutes" Tag="PT10M"/>
@@ -787,7 +881,14 @@
                         <ComboBoxItem Content="6 hours" Tag="PT6H"/>
                         <ComboBoxItem Content="12 hours" Tag="PT12H"/>
                     </ComboBox>
-                    <ComboBox x:Name="EditTaskRepetitionDuration" x:Uid="RepetitionDurationHeader" Header="For a duration of" SelectedIndex="0" SelectionChanged="EditTaskRepetitionDuration_SelectionChanged">
+                    <ComboBox x:Name="EditTaskRepetitionDuration" x:Uid="RepetitionDurationHeader" SelectedIndex="0" SelectionChanged="EditTaskRepetitionDuration_SelectionChanged">
+                        <ComboBox.Header>
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Text="For a duration of" VerticalAlignment="Center"/>
+                                <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                          ToolTipService.ToolTip="How long the repetition continues. 'Indefinitely' means the task keeps repeating until the trigger itself expires. A finite duration caps the total repetition window."/>
+                            </StackPanel>
+                        </ComboBox.Header>
                         <ComboBoxItem Content="Indefinitely" Tag=""/>
                         <ComboBoxItem Content="1 hour" Tag="PT1H"/>
                         <ComboBoxItem Content="2 hours" Tag="PT2H"/>
@@ -805,19 +906,39 @@
                 <StackPanel Spacing="8">
                     <TextBlock Text="Start the task only if:" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
                     
-                    <CheckBox x:Name="EditTaskOnlyIfIdle" x:Uid="ConditionIdle" Content="Computer is idle"/>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <CheckBox x:Name="EditTaskOnlyIfIdle" x:Uid="ConditionIdle" Content="Computer is idle"/>
+                        <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                  ToolTipService.ToolTip="Only starts the task if the computer has had no user input for the specified idle period. Prevents the task from interrupting active work."/>
+                    </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
                         <TextBlock Text="Idle for:" VerticalAlignment="Center"/>
                         <TextBox x:Name="EditTaskIdleDurationSetting" PlaceholderText="e.g., 10m" Width="100" Text="PT10M"/>
                         <CheckBox x:Name="EditTaskStopOnIdleEnd" Content="Stop when idle ends" VerticalAlignment="Center"/>
                     </StackPanel>
                     
-                    <CheckBox x:Name="EditTaskOnlyIfAC" x:Uid="ConditionAC" Content="Computer is on AC power"/>
-                    <CheckBox x:Name="EditTaskStopBatterySwitch" Content="Stop if switching to battery power" Margin="24,0,0,0"/>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <CheckBox x:Name="EditTaskOnlyIfAC" x:Uid="ConditionAC" Content="Computer is on AC power"/>
+                        <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                  ToolTipService.ToolTip="Prevents the task from starting when the device is running on battery. Ideal for power-intensive operations."/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="4" Margin="24,0,0,0">
+                        <CheckBox x:Name="EditTaskStopBatterySwitch" Content="Stop if switching to battery power"/>
+                        <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                  ToolTipService.ToolTip="If the task is running and the power source switches from AC to battery, the task will be automatically stopped."/>
+                    </StackPanel>
                     
-                    <CheckBox x:Name="EditTaskOnBattery" Content="Computer is on battery power"/>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <CheckBox x:Name="EditTaskOnBattery" Content="Computer is on battery power"/>
+                        <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                  ToolTipService.ToolTip="Only starts the task when the device is running on battery (i.e., not plugged in to AC power)."/>
+                    </StackPanel>
                     
-                    <CheckBox x:Name="EditTaskOnlyIfNetwork" x:Uid="ConditionNetwork" Content="Network is available"/>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <CheckBox x:Name="EditTaskOnlyIfNetwork" x:Uid="ConditionNetwork" Content="Network is available"/>
+                        <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                  ToolTipService.ToolTip="Only starts the task if a network connection is detected. Use the specific network dropdown below to restrict to a named connection."/>
+                    </StackPanel>
                     <StackPanel Spacing="4" Margin="24,0,0,0">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <TextBlock Text="Specific network:" VerticalAlignment="Center"/>
@@ -830,25 +951,55 @@
                                  Message="Specific network selection requires the app to run as administrator."/>
                     </StackPanel>
                     
-                    <CheckBox x:Name="EditTaskWakeToRun" x:Uid="ConditionWake" Content="Wake the computer to run this task"/>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <CheckBox x:Name="EditTaskWakeToRun" x:Uid="ConditionWake" Content="Wake the computer to run this task"/>
+                        <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                  ToolTipService.ToolTip="Instructs Windows to wake the computer from sleep or hibernation when it is time to run this task. Requires Wake Timers to be enabled in Power Options."/>
+                    </StackPanel>
                 </StackPanel>
                 
                 <!-- Settings Section -->
                 <Rectangle Height="2" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,12,0,4"/>
                 <TextBlock x:Uid="SettingsTitle" Text="Settings" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,12,0,4"/>
                 <StackPanel Spacing="12">
-                    <CheckBox x:Name="EditTaskRunWithHighestPrivileges" Content="Run with highest privileges"/>
-                    <CheckBox x:Name="EditTaskIsHidden" Content="Hidden task"/>
-                    <CheckBox x:Name="EditTaskRunIfMissed" x:Uid="RunIfMissed" Content="Run task as soon as possible after a scheduled start is missed"/>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <CheckBox x:Name="EditTaskRunWithHighestPrivileges" Content="Run with highest privileges"/>
+                        <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                  ToolTipService.ToolTip="Requests UAC elevation so the task runs as a full administrator. Required for tasks that modify system files, the registry, or other protected resources."/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <CheckBox x:Name="EditTaskIsHidden" Content="Hidden task"/>
+                        <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                  ToolTipService.ToolTip="Hides this task from the default view in Windows Task Scheduler. The task still runs normally; it is just not shown to standard users browsing the scheduler."/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <CheckBox x:Name="EditTaskRunIfMissed" x:Uid="RunIfMissed" Content="Run task as soon as possible after a scheduled start is missed"/>
+                        <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                  ToolTipService.ToolTip="If the computer was off or the task could not run at its scheduled time, Windows will run it immediately once the machine is available again."/>
+                    </StackPanel>
                     
-                    <ComboBox x:Name="EditTaskMultipleInstances" Header="If the task is already running:">
+                    <ComboBox x:Name="EditTaskMultipleInstances">
+                        <ComboBox.Header>
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Text="If the task is already running:" VerticalAlignment="Center"/>
+                                <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                          ToolTipService.ToolTip="Controls behaviour when a new trigger fires while a previous instance is still running.&#x0a;&#x2022; Do not start: ignore the new trigger.&#x0a;&#x2022; Parallel: start another instance alongside.&#x0a;&#x2022; Queue: wait until the current one finishes.&#x0a;&#x2022; Stop existing: kill the current run and start fresh."/>
+                            </StackPanel>
+                        </ComboBox.Header>
                         <ComboBoxItem Content="Do not start a new instance" Tag="IgnoreNew" IsSelected="True"/>
                         <ComboBoxItem Content="Run a new instance in parallel" Tag="Parallel"/>
                         <ComboBoxItem Content="Queue a new instance" Tag="Queue"/>
                         <ComboBoxItem Content="Stop the existing instance" Tag="StopExisting"/>
                     </ComboBox>
                     
-                    <ComboBox x:Name="EditTaskPriority" Header="Task Priority:" SelectedIndex="4">
+                    <ComboBox x:Name="EditTaskPriority" SelectedIndex="4">
+                        <ComboBox.Header>
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Text="Task Priority:" VerticalAlignment="Center"/>
+                                <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                          ToolTipService.ToolTip="Sets the Windows thread scheduling priority for the task process. Higher priority tasks get more CPU time. 'Normal (7)' is recommended for most tasks; avoid Realtime unless absolutely necessary as it can starve other system processes."/>
+                            </StackPanel>
+                        </ComboBox.Header>
                         <ComboBoxItem Content="Realtime (0)" Tag="0"/>
                         <ComboBoxItem Content="High (1)" Tag="1"/>
                         <ComboBoxItem Content="Above Normal (3)" Tag="3"/>
@@ -857,10 +1008,22 @@
                         <ComboBoxItem Content="Idle (10)" Tag="10"/>
                     </ComboBox>
                     
-                    <CheckBox x:Name="EditTaskDeleteExpired" Content="Delete the task if it is not scheduled to run again"/>
-                    <CheckBox x:Name="EditTaskAllowHardTerminate" Content="Allow task to be forcefully terminated" IsChecked="True"/>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <CheckBox x:Name="EditTaskDeleteExpired" Content="Delete the task if it is not scheduled to run again"/>
+                        <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                  ToolTipService.ToolTip="Automatically removes the task from Task Scheduler once it has no future scheduled occurrences (e.g., a one-time task that has already run)."/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <CheckBox x:Name="EditTaskAllowHardTerminate" Content="Allow task to be forcefully terminated" IsChecked="True"/>
+                        <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                  ToolTipService.ToolTip="Allows Task Scheduler (or a user) to forcefully kill the task process when it is stopped. Disable this only for tasks that must always be allowed to finish gracefully."/>
+                    </StackPanel>
                     
-                    <CheckBox x:Name="EditTaskRestartOnFailure" x:Uid="RestartOnFailure" Content="If the task fails, restart every:"/>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <CheckBox x:Name="EditTaskRestartOnFailure" x:Uid="RestartOnFailure" Content="If the task fails, restart every:"/>
+                        <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                  ToolTipService.ToolTip="Automatically re-runs the task if it exits with a non-zero exit code (failure). Configure the interval and maximum number of attempts below."/>
+                    </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
                         <TextBox x:Name="EditTaskRestartInterval" PlaceholderText="e.g. 1 minute" Width="120"/>
                         <TextBlock Text="(e.g. 30s, 1m, 5m)" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
@@ -874,10 +1037,22 @@
                 <Rectangle Height="2" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,12,0,4"/>
                 <TextBlock Text="User Context" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,12,0,4"/>
                 <StackPanel Spacing="8">
-                    <RadioButton x:Name="RunAsCurrentUser" Content="Run as current user" GroupName="UserContext" IsChecked="True" Checked="UserContextRadio_Checked"/>
-                    <RadioButton x:Name="RunAsSpecificUser" Content="Run as specific user" GroupName="UserContext" Checked="UserContextRadio_Checked"/>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <RadioButton x:Name="RunAsCurrentUser" Content="Run as current user" GroupName="UserContext" IsChecked="True" Checked="UserContextRadio_Checked"/>
+                        <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                  ToolTipService.ToolTip="Runs the task under the account of the currently logged-in user. The task can show windows and UI. The user must be logged in for the task to run."/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <RadioButton x:Name="RunAsSpecificUser" Content="Run as specific user" GroupName="UserContext" Checked="UserContextRadio_Checked"/>
+                        <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                  ToolTipService.ToolTip="Runs under a specific user account. Enter the username below. The task runs only when that user is logged in (unless 'Run with highest privileges' is also set)."/>
+                    </StackPanel>
                     <TextBox x:Name="EditTaskRunAsUser" Header="Username" PlaceholderText="DOMAIN\Username or username@domain.com" Margin="24,0,0,0" IsEnabled="False"/>
-                    <RadioButton x:Name="RunAsSystem" Content="Run as SYSTEM (requires admin)" GroupName="UserContext" Click="RunAsSystem_Click" Checked="UserContextRadio_Checked"/>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <RadioButton x:Name="RunAsSystem" Content="Run as SYSTEM (requires admin)" GroupName="UserContext" Click="RunAsSystem_Click" Checked="UserContextRadio_Checked"/>
+                        <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
+                                  ToolTipService.ToolTip="Runs under the LocalSystem account with the highest possible privileges. The task runs whether or not any user is logged in and has no access to the interactive desktop. Requires this app to be running as administrator."/>
+                    </StackPanel>
                     
                     <InfoBar x:Name="SystemUserWarning" Severity="Warning" IsOpen="False" IsClosable="False" Margin="0,4,0,0">
                         <InfoBar.Title>Administrator Privileges Required</InfoBar.Title>
