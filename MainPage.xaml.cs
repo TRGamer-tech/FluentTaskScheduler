@@ -829,7 +829,32 @@ namespace FluentTaskScheduler
             // For now, retaining basic load logic manually.
             EditTaskOnlyIfIdle.IsChecked = ViewModel.SelectedTask.OnlyIfIdle;
             EditTaskIsHidden.IsChecked = ViewModel.SelectedTask.IsHidden;
-            // ... (Other settings would act similarly)
+            EditTaskRunWithHighestPrivileges.IsChecked = ViewModel.SelectedTask.RunWithHighestPrivileges;
+            
+            if (ViewModel.SelectedTask.RunAsSystem)
+            {
+                RunAsSystem.IsChecked = true;
+            }
+            else if (!string.IsNullOrEmpty(ViewModel.SelectedTask.RunAsUser))
+            {
+                RunAsSpecificUser.IsChecked = true;
+                EditTaskRunAsUser.Text = ViewModel.SelectedTask.RunAsUser;
+            }
+            else
+            {
+                RunAsCurrentUser.IsChecked = true;
+            }
+            EditTaskRunIfMissed.IsChecked = ViewModel.SelectedTask.RunIfMissed;
+            foreach (var item in EditTaskMultipleInstances.Items.Cast<Microsoft.UI.Xaml.Controls.ComboBoxItem>())
+                if (item.Tag?.ToString() == ViewModel.SelectedTask.MultipleInstancesPolicy) { EditTaskMultipleInstances.SelectedItem = item; break; }
+            foreach (var item in EditTaskPriority.Items.Cast<Microsoft.UI.Xaml.Controls.ComboBoxItem>())
+                if (item.Tag?.ToString() == ViewModel.SelectedTask.TaskPriority.ToString()) { EditTaskPriority.SelectedItem = item; break; }
+            EditTaskDeleteExpired.IsChecked = ViewModel.SelectedTask.DeleteExpiredTaskAfter;
+            EditTaskAllowHardTerminate.IsChecked = ViewModel.SelectedTask.AllowHardTerminate;
+            EditTaskRestartOnFailure.IsChecked = ViewModel.SelectedTask.RestartOnFailure;
+            EditTaskRestartInterval.Text = ViewModel.SelectedTask.RestartInterval;
+            if (EditTaskRestartCount != null) EditTaskRestartCount.Value = ViewModel.SelectedTask.RestartCount;
+            // All settings mapped
             
             PopulateNetworkList(); // TODO: Select correct network
             
@@ -863,7 +888,17 @@ namespace FluentTaskScheduler
                 OnlyIfNetwork = EditTaskOnlyIfNetwork.IsChecked == true,
                 WakeToRun = EditTaskWakeToRun.IsChecked == true,
                 IsHidden = EditTaskIsHidden.IsChecked == true,
-                // ...
+                RunWithHighestPrivileges = EditTaskRunWithHighestPrivileges.IsChecked == true,
+                RunAsSystem = RunAsSystem.IsChecked == true,
+                RunAsUser = RunAsSpecificUser.IsChecked == true ? EditTaskRunAsUser.Text : "",
+                RunIfMissed = EditTaskRunIfMissed.IsChecked == true,
+                MultipleInstancesPolicy = (EditTaskMultipleInstances.SelectedItem as Microsoft.UI.Xaml.Controls.ComboBoxItem)?.Tag?.ToString() ?? "IgnoreNew",
+                TaskPriority = int.TryParse((EditTaskPriority.SelectedItem as Microsoft.UI.Xaml.Controls.ComboBoxItem)?.Tag?.ToString(), out int p) ? p : 7,
+                DeleteExpiredTaskAfter = EditTaskDeleteExpired.IsChecked == true,
+                AllowHardTerminate = EditTaskAllowHardTerminate.IsChecked == true,
+                RestartOnFailure = EditTaskRestartOnFailure.IsChecked == true,
+                RestartInterval = EditTaskRestartInterval.Text ?? "",
+                RestartCount = EditTaskRestartCount != null ? (int)double.Round(EditTaskRestartCount.Value) : 3
             };
             
             // Handle folder
@@ -1066,7 +1101,16 @@ namespace FluentTaskScheduler
         private void UserContextRadio_Checked(object sender, RoutedEventArgs e) 
         { 
              if (EditTaskRunAsUser != null) EditTaskRunAsUser.IsEnabled = RunAsSpecificUser.IsChecked == true; 
-             if (SystemUserWarning != null) SystemUserWarning.IsOpen = RunAsSystem.IsChecked == true;
+             if (SystemUserWarning != null) 
+             {
+                 bool isElevated = false;
+                 using (var identity = System.Security.Principal.WindowsIdentity.GetCurrent())
+                 {
+                     var principal = new System.Security.Principal.WindowsPrincipal(identity);
+                     isElevated = principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
+                 }
+                 SystemUserWarning.IsOpen = (!isElevated) && (RunAsSystem.IsChecked == true);
+             }
         }
         private void RunAsSystem_Click(object sender, RoutedEventArgs e) => RunAsSystem.IsChecked = true;
         private void DialogScrollViewer_PointerPressed(object sender, PointerRoutedEventArgs e) {} // no-op

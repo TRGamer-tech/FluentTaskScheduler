@@ -11,4 +11,4 @@
 5. Add Feature #11 by adding a dashboard for monitoring tasks.
 6. Let's see what we can do to make it even better.
 7. Fix Issue #13 by adding a filter by category and tag to the dashboard.
-8. Fix Issue #14
+8. Fix Issue #14 by removing the warning when the apps runs as admin.
