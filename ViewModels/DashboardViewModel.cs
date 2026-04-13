@@ -23,6 +23,29 @@ namespace FluentTaskScheduler.ViewModels
         public double LabelOpacity { get; set; } = 0.6;
     }
 
+    public class FilterItem : INotifyPropertyChanged
+    {
+        private string _name = "";
+        public string Name
+        {
+            get => _name;
+            set { if (_name != value) { _name = value; OnPropertyChanged(); } }
+        }
+
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set { if (_isSelected != value) { _isSelected = value; OnPropertyChanged(); } }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
     public class RunningTaskInfo
     {
         public string Name { get; set; } = "";
@@ -64,6 +87,10 @@ namespace FluentTaskScheduler.ViewModels
             DailyHistory = new ObservableCollection<DailyChartPoint>();
             RunningTasksList = new ObservableCollection<RunningTaskInfo>();
             FailedTasksList = new ObservableCollection<FailedTaskInfo>();
+            AvailableTags = new ObservableCollection<FilterItem> { new FilterItem { Name = "All Tags", IsSelected = true } };
+            _selectedTag = "All Tags";
+            AvailableCategories = new ObservableCollection<FilterItem> { new FilterItem { Name = "All Categories", IsSelected = true } };
+            _selectedCategory = "All Categories";
         }
 
         public int RunningTasks
@@ -123,6 +150,42 @@ namespace FluentTaskScheduler.ViewModels
         public ObservableCollection<DailyChartPoint> DailyHistory { get; }
         public ObservableCollection<RunningTaskInfo> RunningTasksList { get; }
         public ObservableCollection<FailedTaskInfo> FailedTasksList { get; }
+        public ObservableCollection<FilterItem> AvailableTags { get; }
+        public ObservableCollection<FilterItem> AvailableCategories { get; }
+
+        private string _selectedTag = "All Tags";
+        public string SelectedTag
+        {
+            get => _selectedTag;
+            set
+            {
+                if (_selectedTag != value)
+                {
+                    _selectedTag = value ?? "All Tags";
+                    OnPropertyChanged();
+
+                    foreach (var tag in AvailableTags) tag.IsSelected = (tag.Name == _selectedTag);
+                    _ = LoadDashboardData();
+                }
+            }
+        }
+
+        private string _selectedCategory = "All Categories";
+        public string SelectedCategory
+        {
+            get => _selectedCategory;
+            set
+            {
+                if (_selectedCategory != value)
+                {
+                    _selectedCategory = value ?? "All Categories";
+                    OnPropertyChanged();
+
+                    foreach (var cat in AvailableCategories) cat.IsSelected = (cat.Name == _selectedCategory);
+                    _ = LoadDashboardData();
+                }
+            }
+        }
 
         public async Task LoadDashboardData()
         {
@@ -133,9 +196,36 @@ namespace FluentTaskScheduler.ViewModels
                 await Task.Run(() =>
                 {
                     // 1. Get All Tasks
-                    var allTasks = _taskService.GetAllTasks(recursive: true);
+                    var allTasksRaw = _taskService.GetAllTasks(recursive: true);
 
-                    // 2. Calculate Counts
+                    // 2. Extract unique tags and categories
+                    var uniqueTags = allTasksRaw
+                        .Where(t => t.Tags != null)
+                        .SelectMany(t => t.Tags)
+                        .Where(t => !string.IsNullOrWhiteSpace(t))
+                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                        .OrderBy(t => t)
+                        .ToList();
+
+                    var uniqueCategories = allTasksRaw
+                        .Where(t => !string.IsNullOrWhiteSpace(t.Category))
+                        .Select(t => t.Category)
+                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                        .OrderBy(t => t)
+                        .ToList();
+
+                    // 3. Filter tasks if needed
+                    var allTasks = allTasksRaw;
+                    if (!string.IsNullOrEmpty(SelectedTag) && SelectedTag != "All Tags")
+                    {
+                        allTasks = allTasks.Where(t => t.Tags != null && t.Tags.Contains(SelectedTag, StringComparer.OrdinalIgnoreCase)).ToList();
+                    }
+                    if (!string.IsNullOrEmpty(SelectedCategory) && SelectedCategory != "All Categories")
+                    {
+                        allTasks = allTasks.Where(t => string.Equals(t.Category, SelectedCategory, StringComparison.OrdinalIgnoreCase)).ToList();
+                    }
+
+                    // 4. Calculate Counts
                     int total = allTasks.Count;
                     int enabled = allTasks.Count(t => t.IsEnabled);
                     int disabled = allTasks.Count(t => !t.IsEnabled);
@@ -283,6 +373,30 @@ namespace FluentTaskScheduler.ViewModels
                         DailyHistory.Clear();
                         foreach (var p in chartPoints)
                             DailyHistory.Add(p);
+
+                        // Update available tags
+                        var currentTags = AvailableTags.Select(t => t.Name).ToList();
+                        var newTags = new List<string> { "All Tags" };
+                        newTags.AddRange(uniqueTags);
+
+                        if (!currentTags.SequenceEqual(newTags))
+                        {
+                            AvailableTags.Clear();
+                            foreach (var tag in newTags)
+                                AvailableTags.Add(new FilterItem { Name = tag, IsSelected = (tag == SelectedTag) });
+                        }
+
+                        // Update available categories
+                        var currentCats = AvailableCategories.Select(t => t.Name).ToList();
+                        var newCats = new List<string> { "All Categories" };
+                        newCats.AddRange(uniqueCategories);
+
+                        if (!currentCats.SequenceEqual(newCats))
+                        {
+                            AvailableCategories.Clear();
+                            foreach (var cat in newCats)
+                                AvailableCategories.Add(new FilterItem { Name = cat, IsSelected = (cat == SelectedCategory) });
+                        }
                     });
                 });
             }

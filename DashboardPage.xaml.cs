@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using FluentTaskScheduler.ViewModels;
 
@@ -60,6 +61,22 @@ namespace FluentTaskScheduler
             if (e.ClickedItem is FluentTaskScheduler.ViewModels.FailedTaskInfo info && !string.IsNullOrEmpty(info.Path))
             {
                 ViewModel.NavigateToTask(info.Path);
+            }
+        }
+
+        private void CategoryToggle_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement fe && fe.DataContext is FluentTaskScheduler.ViewModels.FilterItem filterItem)
+            {
+                ViewModel.SelectedCategory = filterItem.Name;
+            }
+        }
+
+        private void TagToggle_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement fe && fe.DataContext is FluentTaskScheduler.ViewModels.FilterItem filterItem)
+            {
+                ViewModel.SelectedTag = filterItem.Name;
             }
         }
     }

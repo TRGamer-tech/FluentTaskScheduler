@@ -18,6 +18,54 @@
                         <TextBlock Text="Reload Dashboard" />
                     </StackPanel>
                 </Button>
+
+                <!-- Filters -->
+                <Grid ColumnSpacing="24" Margin="0,0,0,-8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Category Filter -->
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Filter by category" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="4,0,0,0"/>
+                        <ItemsControl ItemsSource="{x:Bind ViewModel.AvailableCategories, Mode=OneWay}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="8"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="viewmodels:FilterItem">
+                                    <ToggleButton Content="{x:Bind Name}" 
+                                                  IsChecked="{x:Bind IsSelected, Mode=OneWay}"
+                                                  Click="CategoryToggle_Click"
+                                                  CornerRadius="4" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+
+                    <!-- Tag Filter -->
+                    <StackPanel Grid.Column="1" Spacing="8">
+                        <TextBlock Text="Filter by tag" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="4,0,0,0"/>
+                        <ItemsControl ItemsSource="{x:Bind ViewModel.AvailableTags, Mode=OneWay}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="8"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="viewmodels:FilterItem">
+                                    <ToggleButton Content="{x:Bind Name}" 
+                                                  IsChecked="{x:Bind IsSelected, Mode=OneWay}"
+                                                  Click="TagToggle_Click"
+                                                  CornerRadius="4" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Grid>
                 <!-- Row 1: Task counts -->
                 <Grid ColumnSpacing="16">
                     <Grid.ColumnDefinitions>
