@@ -1066,6 +1066,85 @@ namespace FluentTaskScheduler.Services
             }
         }
 
+        public void MoveTask(string sourcePath, string targetFolderPath)
+        {
+            using (var ts = new TaskService())
+            {
+                var task = ts.GetTask(sourcePath);
+                if (task == null) throw new Exception($"Task '{sourcePath}' not found.");
+
+                var targetFolder = GetOrCreateFolder(ts, targetFolderPath);
+
+                // Guard: already in the target folder
+                string currentFolder = System.IO.Path.GetDirectoryName(sourcePath) ?? "\\";
+                if (currentFolder.Equals(targetFolderPath, StringComparison.OrdinalIgnoreCase)) return;
+
+                // Guard: name collision in target
+                string taskName = task.Name;
+                if (targetFolder.Tasks.Any(t => t.Name.Equals(taskName, StringComparison.OrdinalIgnoreCase)))
+                    throw new Exception($"A task named '{taskName}' already exists in the target folder.");
+
+                try
+                {
+                    targetFolder.RegisterTaskDefinition(taskName, task.Definition, TaskCreation.CreateOrUpdate, null, null, TaskLogonType.InteractiveToken);
+                }
+                catch (Exception ex) when (IsAccessDenied(ex))
+                {
+                    // Fall back to a safe (non-elevated) copy
+                    var safeTd = ts.NewTask();
+                    safeTd.XmlText = task.Xml;
+                    safeTd.Principal.RunLevel = TaskRunLevel.LUA;
+                    safeTd.Principal.LogonType = TaskLogonType.InteractiveToken;
+                    safeTd.Principal.UserId = null;
+                    targetFolder.RegisterTaskDefinition(taskName, safeTd, TaskCreation.CreateOrUpdate, null, null, TaskLogonType.InteractiveToken);
+                }
+
+                task.Folder.DeleteTask(taskName);
+                LogService.Info($"Moved task '{taskName}' to '{targetFolderPath}'.");
+            }
+        }
+
+        public void MoveFolder(string sourceFolderPath, string targetParentFolderPath)
+        {
+            if (string.IsNullOrWhiteSpace(sourceFolderPath) || sourceFolderPath == "\\")
+                throw new Exception("Cannot move the root folder.");
+
+            // Guard: already in the target folder (no-op move)
+            string currentParent = System.IO.Path.GetDirectoryName(sourceFolderPath) ?? "\\";
+            if (targetParentFolderPath.TrimEnd('\\').Equals(currentParent.TrimEnd('\\'), StringComparison.OrdinalIgnoreCase))
+                return;
+
+            // Guard: moving into own descendant
+            if (targetParentFolderPath.Equals(sourceFolderPath, StringComparison.OrdinalIgnoreCase) || 
+                targetParentFolderPath.StartsWith(sourceFolderPath.TrimEnd('\\') + "\\", StringComparison.OrdinalIgnoreCase))
+                throw new Exception("Cannot move a folder into one of its own sub-folders.");
+
+            using (var ts = new TaskService())
+            {
+                var sourceFolder = ts.GetFolder(sourceFolderPath);
+                if (sourceFolder == null) throw new Exception($"Source folder '{sourceFolderPath}' not found.");
+
+                string folderName = sourceFolder.Name;
+                string newPath = targetParentFolderPath == "\\"
+                    ? "\\" + folderName
+                    : targetParentFolderPath.TrimEnd('\\') + "\\" + folderName;
+
+                // Guard: name collision
+                try
+                {
+                    if (ts.GetFolder(newPath) != null)
+                        throw new Exception($"A folder named '{folderName}' already exists in the target.");
+                }
+                catch (System.IO.FileNotFoundException) { }
+
+                var targetFolder = GetOrCreateFolder(ts, newPath);
+                CopyFolderContents(ts, sourceFolder, targetFolder);
+                DeleteFolderRecursive(sourceFolder);
+                sourceFolder.Parent?.DeleteFolder(folderName);
+                LogService.Info($"Moved folder '{sourceFolderPath}' to '{newPath}'.");
+            }
+        }
+
         public void CreateFolder(string path)
         {
              using (var ts = new TaskService())

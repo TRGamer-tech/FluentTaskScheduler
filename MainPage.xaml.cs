@@ -249,6 +249,7 @@ namespace FluentTaskScheduler
             try
             {
                 var rootFolder = ViewModel.TaskService.GetFolderStructure();
+                _treeNodeFolderMap.Clear();
                 FolderTreeView.RootNodes.Clear();
                 AddFolderToTree(rootFolder, null);
             }
@@ -1482,7 +1483,161 @@ namespace FluentTaskScheduler
             }
         }
 
+
         private bool _isDialogOpen = false;
+
+        // ========================================================================================================
+        // Drag and Drop
+        // ========================================================================================================
+
+        private const string DragTaskPrefix  = "FTS_TASKS:";
+        private const string DragFolderPrefix = "FTS_FOLDER:";
+        private Grid? _dragHighlightedGrid;
+
+        // --- Task dragging from TaskListView ---
+
+        private void TaskListView_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
+        {
+            var paths = e.Items
+                .OfType<ScheduledTaskModel>()
+                .Where(t => !t.IsReadOnlyFallback)
+                .Select(t => t.Path)
+                .ToList();
+
+            if (paths.Count == 0) { e.Cancel = true; return; }
+
+            e.Data.RequestedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Move;
+            e.Data.SetText(DragTaskPrefix + string.Join("\n", paths));
+        }
+
+        // --- Per-folder-item DataTemplate Grid events ---
+
+        private TaskFolderModel? FindFolderFromItemGrid(DependencyObject element)
+        {
+            var tvi = FindParent<TreeViewItem>(element);
+            if (tvi == null) return null;
+            var node = FolderTreeView.NodeFromContainer(tvi);
+            if (node == null) return null;
+            return _treeNodeFolderMap.TryGetValue(node, out var f) ? f : null;
+        }
+
+        private void SetDragHighlight(Grid? grid, bool on)
+        {
+            if (grid == null) return;
+            grid.Background = on
+                ? new Microsoft.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(50, 0, 103, 192))
+                : new Microsoft.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(0, 0, 0, 0));
+        }
+
+        private void FolderItem_DragStarting(UIElement sender, DragStartingEventArgs e)
+        {
+            if (sender is not FrameworkElement fe) return;
+            var folder = FindFolderFromItemGrid(fe);
+            if (folder == null || folder.Path == "\\") { e.Cancel = true; return; }
+            e.Data.RequestedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Move;
+            e.Data.SetText(DragFolderPrefix + folder.Path);
+        }
+
+        private void FolderItem_DragOver(object sender, DragEventArgs e)
+        {
+            if (sender is not Grid grid) return;
+            var folder = FindFolderFromItemGrid(grid);
+            if (folder == null) { e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.None; return; }
+
+            e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Move;
+            e.DragUIOverride.Caption = $"Move to \"{folder.Name}\"";
+            e.DragUIOverride.IsGlyphVisible = true;
+
+            if (_dragHighlightedGrid != grid)
+            {
+                SetDragHighlight(_dragHighlightedGrid, false);
+                _dragHighlightedGrid = grid;
+                SetDragHighlight(grid, true);
+            }
+        }
+
+        private void FolderItem_DragLeave(object sender, DragEventArgs e)
+        {
+            if (sender is Grid grid && grid == _dragHighlightedGrid)
+            {
+                SetDragHighlight(grid, false);
+                _dragHighlightedGrid = null;
+            }
+        }
+
+        private async void FolderItem_Drop(object sender, DragEventArgs e)
+        {
+            if (sender is not Grid grid) return;
+            var folder = FindFolderFromItemGrid(grid);
+            SetDragHighlight(grid, false);
+            _dragHighlightedGrid = null;
+            if (folder == null) return;
+            if (!e.DataView.Contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.Text)) return;
+
+            string payload;
+            try { payload = await e.DataView.GetTextAsync(); }
+            catch { return; }
+
+            if (payload.StartsWith(DragTaskPrefix))
+                await MoveDraggedTasksAsync(payload.Substring(DragTaskPrefix.Length), folder.Path);
+            else if (payload.StartsWith(DragFolderPrefix))
+                await MoveDraggedFolderAsync(payload.Substring(DragFolderPrefix.Length), folder.Path);
+        }
+
+        // --- TreeView-level fallback handlers ---
+
+        private void FolderTreeView_DragOver(object sender, DragEventArgs e)
+        {
+            e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Move;
+        }
+
+        private void FolderTreeView_DragLeave(object sender, DragEventArgs e)
+        {
+            SetDragHighlight(_dragHighlightedGrid, false);
+            _dragHighlightedGrid = null;
+        }
+
+        private void FolderTreeView_Drop(object sender, DragEventArgs e)
+        {
+            SetDragHighlight(_dragHighlightedGrid, false);
+            _dragHighlightedGrid = null;
+        }
+
+        // --- Move helpers ---
+
+        private async System.Threading.Tasks.Task MoveDraggedTasksAsync(string rawPaths, string targetFolderPath)
+        {
+            var paths = rawPaths.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            var errors = new List<string>();
+
+            foreach (var path in paths)
+            {
+                try { await System.Threading.Tasks.Task.Run(() => ViewModel.TaskService.MoveTask(path, targetFolderPath)); }
+                catch (Exception ex) { errors.Add($"{System.IO.Path.GetFileName(path)}: {ex.Message}"); }
+            }
+
+            await ViewModel.LoadTasksAsync();
+            LoadFolderStructure();
+
+            if (errors.Count > 0)
+                await ShowErrorDialog("Some tasks could not be moved:\n\n" + string.Join("\n", errors));
+        }
+
+        private async System.Threading.Tasks.Task MoveDraggedFolderAsync(string sourceFolderPath, string targetFolderPath)
+        {
+            try
+            {
+                // Ensure target folder is expanded so user sees the change
+                _folderExpandedState[targetFolderPath] = true;
+
+                await System.Threading.Tasks.Task.Run(() => ViewModel.TaskService.MoveFolder(sourceFolderPath, targetFolderPath));
+                LoadFolderStructure();
+                await ViewModel.LoadTasksAsync();
+            }
+            catch (Exception ex) { await ShowErrorDialog($"Could not move folder: {ex.Message}"); }
+        }
+
+
         private async Task ShowErrorDialog(string message) 
         {
             if (_isDialogOpen) return;

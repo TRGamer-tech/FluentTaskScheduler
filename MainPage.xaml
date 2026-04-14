@@ -78,31 +78,56 @@
                                   SelectionMode="Single"
                                   ItemInvoked="FolderTreeView_ItemInvoked"
                                   RightTapped="FolderTreeViewItem_RightTapped"
+                                  AllowDrop="True"
+                                  CanDragItems="False"
+                                  CanReorderItems="False"
+                                  DragOver="FolderTreeView_DragOver"
+                                  DragLeave="FolderTreeView_DragLeave"
+                                  Drop="FolderTreeView_Drop"
                                   Margin="4,0,0,8">
                             <TreeView.ItemContainerTransitions>
                                 <TransitionCollection>
                                     <ContentThemeTransition/>
-                                    <ReorderThemeTransition/>
                                     <EntranceThemeTransition IsStaggeringEnabled="True"/>
                                 </TransitionCollection>
                             </TreeView.ItemContainerTransitions>
                             <TreeView.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Height="27" Padding="0" Background="Transparent">
+                                    <Grid Height="27" Padding="0" Background="Transparent"
+                                          AllowDrop="True"
+                                          CanDrag="False"
+                                          DragOver="FolderItem_DragOver"
+                                          DragLeave="FolderItem_DragLeave"
+                                          Drop="FolderItem_Drop">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <FontIcon Grid.Column="0" 
+                                        <FontIcon Grid.Column="0"
                                                  Glyph="&#xE8B7;" 
                                                  FontSize="16"
                                                  Margin="0,0,12,0"
-                                                 VerticalAlignment="Center"/>
+                                                 VerticalAlignment="Center"
+                                                 CanDrag="False"/>
                                         <TextBlock Grid.Column="1" 
                                                   Text="{Binding}"
                                                   VerticalAlignment="Center"
                                                   TextTrimming="CharacterEllipsis"
-                                                  FontSize="14"/>
+                                                  FontSize="14"
+                                                  CanDrag="False"/>
+                                        <!-- Drag handle: Moved to the right -->
+                                        <FontIcon Grid.Column="2"
+                                                  Glyph="&#xE784;"
+                                                  FontFamily="Segoe MDL2 Assets"
+                                                  FontSize="12"
+                                                  Opacity="0.6"
+                                                  Margin="12,0,8,0"
+                                                  HorizontalAlignment="Right"
+                                                  VerticalAlignment="Center"
+                                                  CanDrag="True"
+                                                  DragStarting="FolderItem_DragStarting"
+                                                  ToolTipService.ToolTip="Drag to move folder"/>
                                     </Grid>
                                 </DataTemplate>
                             </TreeView.ItemTemplate>
@@ -210,6 +235,8 @@
                           ItemClick="TaskListView_ItemClick"
                           SelectionChanged="TaskListView_SelectionChanged"
                           ItemsSource="{x:Bind FilteredTasks}"
+                          CanDragItems="True"
+                          DragItemsStarting="TaskListView_DragItemsStarting"
                           Padding="0">
                     <!-- Disable default animations for snappy filtering -->
                     <ListView.ItemContainerTransitions>

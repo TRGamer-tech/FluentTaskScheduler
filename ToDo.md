@@ -1,7 +1,10 @@
 # To Do:
 
 1. Add ability to install from winget, scoop and chocolatey.
-2. **_More TBD_**
+2. Enable drag and drop for task folder organization.
+3. Shared task templates library.
+4. Fix bug when renaming a task it creates a new one instead of renaming the existing one.
+5. **_More TBD_**
 
 # Done for next release:
 
