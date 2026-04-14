@@ -67,6 +67,7 @@ If you like what this project is for, I would really appreciate a (optional!) do
 
 - **Themes**: Choose between **Light Mode** and **Dark Mode** for a standard look, or go full stealth with **OLED Mode** (Pure Black) if you actually care about your display longevity.
 - **Mica Effect**: Enable or disable the Mica effect for a more premium look.
+- **Animated Icons**: UI elements that come to life, like the Settings icon that reacts to your touch.
 - **Title Bar Integration**: Modern, customized title bar with proper drag regions that actually work (unlike some other apps we won't mention).
 - **Languages**: Native English (en-US) support.
 - **Smooth Scrolling**: Optional smooth/inertia scrolling throughout the app, disabled by default for a snappier feel.
@@ -99,9 +100,10 @@ If you like what this project is for, I would really appreciate a (optional!) do
 ### 📊 Management & History
 
 - **Task History**: View recent task execution history within the app (Today, Yesterday, This Week, All Time).
+- **Detailed Analysis**: Click any history entry to open a deep-dive view with granular Event Log data (Event IDs, OpCodes, User context, etc.).
 - **Categorization & Tags**: Organize tasks with custom tags and categories.
 - **Smart Search**: Instantly find tasks by name, status, path, or those tags you just added.
-- **Folder Management**: Organize your tasks logically by creating, renaming, and deleting custom folders.
+- **Folder Management**: Organize your tasks logically by creating, renaming, and deleting custom folders. Features dedicated grip handles for reliable drag-and-drop reordering.
 - **Smart Navigation**: The application remembers your last-used folder on restart.
 - **Sortable Lists**: Sort tasks easily by clicking column headers directly in the task list (by name, status, next run, etc.).
 - **Import/Export**: Easily backup or migrate task definitions. Supports importing to any selected folder.
