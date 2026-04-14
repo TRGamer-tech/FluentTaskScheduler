@@ -10,7 +10,7 @@
     <packageSourceUrl>https://github.com/TRGamer-tech/FluentTaskScheduler/tree/main/packaging/chocolatey</packageSourceUrl>
     <licenseUrl>https://github.com/TRGamer-tech/FluentTaskScheduler/blob/main/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <iconUrl>https://raw.githubusercontent.com/TRGamer-tech/FluentTaskScheduler/main/Assets/StoreLogo.png</iconUrl>
+    <iconUrl>https://raw.githubusercontent.com/TRGamer-tech/FluentTaskScheduler/main/Assets/AppIcon.png</iconUrl>
     <summary>A modern WinUI 3 wrapper for the Windows Task Scheduler.</summary>
     <description><![CDATA[
 FluentTaskScheduler is a professional-grade, modern alternative to the legacy Windows Task Scheduler.
