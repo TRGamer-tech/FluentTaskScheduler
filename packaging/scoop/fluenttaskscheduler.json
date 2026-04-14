@@ -18,7 +18,9 @@
     }
   },
   "bin": "FluentTaskScheduler.exe",
-  "shortcuts": [["FluentTaskScheduler.exe", "Fluent Task Scheduler"]],
+  "shortcuts": [
+    ["FluentTaskScheduler.exe", "Fluent Task Scheduler"]
+  ],
   "checkver": {
     "github": "https://github.com/TRGamer-tech/FluentTaskScheduler"
   },
