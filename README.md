@@ -4,6 +4,28 @@ A modern, powerful, and intuitive Windows task scheduling application built with
 
 ![App Icon](Assets/Logo.png)
 
+## Installation instructions
+### Manually
+Go to the [Releases Page](https://github.com/TRGamer-tech/FluentTaskScheduler/releases) and download the newest Version from there :)
+
+### Winget
+**Coming Soon, I'm working on it!**
+```
+```
+
+### Scoop
+```
+scoop bucket add extras
+scoop install extras/fluenttaskscheduler
+```
+
+### Chocolatey
+The app is still under review as of now but I am also working on this one.
+<br>https://community.chocolatey.org/packages/fluenttaskscheduler/1.8.0#files
+```
+choco install fluenttaskscheduler
+```
+
 ## Overview
 
 FluentTaskScheduler is a professional-grade wrapper for the Windows Task Scheduler API, designed with Microsoft's modern Fluent Design System. It simplifies the creation and management of automation tasks, offering a sleek alternative to the legacy Windows Task Scheduler.
@@ -11,7 +33,6 @@ FluentTaskScheduler is a professional-grade wrapper for the Windows Task Schedul
 ### Donate on Buy me a coffee
 If you like what this project is for, I would really appreciate a (optional!) donation:
 <br><a href="https://buymeacoffee.com/t.r.g"><img src="/Assets/yellow.png" alt="Buy Me a Coffee Donation Link" width="auto" height="75"></a>
-
 
 ## Key Features
 
