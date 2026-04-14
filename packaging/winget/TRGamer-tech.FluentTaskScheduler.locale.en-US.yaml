@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.12.0.schema.json
 
 PackageIdentifier: TRGamer-tech.FluentTaskScheduler
 PackageVersion: 1.8.0
@@ -26,6 +26,13 @@ Tags:
   - winui3
   - fluent-design
   - productivity
-ReleaseNotesUrl: https://github.com/TRGamer-tech/FluentTaskScheduler/releases
+Documentations:
+  - DocumentLabel: README
+    DocumentUrl: https://github.com/TRGamer-tech/FluentTaskScheduler/blob/main/README.md
+Icons:
+  - IconUrl: https://raw.githubusercontent.com/TRGamer-tech/FluentTaskScheduler/main/Assets/AppIcon.png
+    IconFileType: png
+    IconTheme: default
+ReleaseNotesUrl: https://github.com/TRGamer-tech/FluentTaskScheduler/releases/tag/V1.8.0
 ManifestType: defaultLocale
-ManifestVersion: 1.6.0
+ManifestVersion: 1.12.0
