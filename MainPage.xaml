@@ -5,6 +5,7 @@
     xmlns:local="using:FluentTaskScheduler"
     xmlns:models="using:FluentTaskScheduler.Models"
     xmlns:converters="using:FluentTaskScheduler.Converters"
+    xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     Loaded="MainPage_Loaded"
     SizeChanged="Page_SizeChanged"
     Background="Transparent">
@@ -45,7 +46,7 @@
         <NavigationView x:Name="NavView" x:Uid="AppHeader"
                         PaneDisplayMode="Left"
                         IsBackButtonVisible="Collapsed"
-                        IsSettingsVisible="True"
+                        IsSettingsVisible="False"
                         SelectionChanged="NavView_SelectionChanged"
                         ItemInvoked="NavView_ItemInvoked"
                         Background="Transparent">
@@ -155,6 +156,20 @@
                 <NavigationViewItem x:Name="NavRunning" x:Uid="NavRunning" Tag="running" Icon="Play" Content="Running"/>
                 <NavigationViewItem x:Uid="NavEnabled" Content="Enabled" Icon="Accept" Tag="enabled" />
                 <NavigationViewItem x:Name="NavDisabled" Content="Disabled" Icon="Cancel" Tag="disabled" />
+                <NavigationViewItem x:Name="NavSettings" Tag="settings" Content="Settings"
+                                   PointerEntered="Settings_PointerEntered"
+                                   PointerExited="Settings_PointerExited">
+                    <NavigationViewItem.Icon>
+                        <AnimatedIcon x:Name="SettingsAnimatedIcon">
+                            <AnimatedIcon.Source>
+                                <animatedvisuals:AnimatedSettingsVisualSource/>
+                            </AnimatedIcon.Source>
+                            <AnimatedIcon.FallbackIconSource>
+                                <SymbolIconSource Symbol="Setting"/>
+                            </AnimatedIcon.FallbackIconSource>
+                        </AnimatedIcon>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
             </NavigationView.FooterMenuItems>
 
             <Grid>

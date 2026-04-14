@@ -1,8 +1,7 @@
 # To Do:
 
 1. Add ability to install from winget, scoop and chocolatey.
-2. Add animated Icons for Settings, Search and Menu open / close.
-3. **_More TBD_**
+2. **_More TBD_**
 
 # Done for next release:
 
@@ -20,3 +19,4 @@
 12. Fix the annoying bug that the Scrolling gets reset to the top everytime you miss a UI element in the add / edit dialog.
 13. Enable drag and drop for task folder organization.
 14. Fix bug when renaming a task it creates a new one instead of renaming the existing one.
+15. Add animated Icons for Settings, Search and Menu open / close.

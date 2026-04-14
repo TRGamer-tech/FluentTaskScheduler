@@ -69,8 +69,6 @@ namespace FluentTaskScheduler
             _isLoaded = true;
             PageScrollViewer.IsScrollInertiaEnabled = SettingsService.SmoothScrolling;
 
-            // Set custom title bar drag region
-            App.m_window?.SetTitleBar(AppTitleBarDragArea);
         }
 
         // ── Sidebar ────────────────────────────────────────────────────────────
@@ -102,11 +100,7 @@ namespace FluentTaskScheduler
 
         // ── Navigation ─────────────────────────────────────────────────────────
 
-        private void BackButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (Frame.CanGoBack)
-                Frame.GoBack();
-        }
+        // ── Navigation ─────────────────────────────────────────────────────────
 
         // ── Appearance ─────────────────────────────────────────────────────────
 

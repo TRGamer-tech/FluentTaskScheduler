@@ -308,10 +308,12 @@ namespace FluentTaskScheduler
 
         private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            if (args.IsSettingsSelected) 
+            if (args.IsSettingsSelected || (args.SelectedItem is NavigationViewItem settingsItem && settingsItem.Tag?.ToString() == "settings")) 
             {
                  NavView.Header = "Settings";
-                 Frame.Navigate(typeof(SettingsPage));
+                 ContentFrame.Visibility = Visibility.Visible;
+                 TasksViewGrid.Visibility = Visibility.Collapsed;
+                 ContentFrame.Navigate(typeof(SettingsPage));
             }
             else if (args.SelectedItem is NavigationViewItem item && item.Tag != null)
             {
@@ -1816,6 +1818,15 @@ namespace FluentTaskScheduler
             }
 
             sender.Text = string.Join(", ", parts.Where(p => !string.IsNullOrEmpty(p))) + ", ";
+        }
+        private void Settings_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            AnimatedIcon.SetState(this.SettingsAnimatedIcon, "PointerOver");
+        }
+
+        private void Settings_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            AnimatedIcon.SetState(this.SettingsAnimatedIcon, "Normal");
         }
     }
 }

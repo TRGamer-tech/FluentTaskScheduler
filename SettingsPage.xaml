@@ -20,34 +20,8 @@
     </Page.Resources>
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <!-- Custom Title Bar Drag Region -->
-        <Grid x:Name="AppTitleBar" Height="32" VerticalAlignment="Top" Grid.RowSpan="2" Canvas.ZIndex="100">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="48"/> <!-- Back button area -->
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="140"/> <!-- Caption buttons area -->
-            </Grid.ColumnDefinitions>
-            <Border Grid.Column="1" Background="Transparent" x:Name="AppTitleBarDragArea"/>
-        </Grid>
-
-        <!-- Header -->
-        <StackPanel Grid.Row="0" Margin="16,12,16,12">
-            <StackPanel Orientation="Horizontal" Spacing="16">
-                <Button x:Name="BackButton" Click="BackButton_Click" Background="Transparent" BorderThickness="0" Width="40" Height="40" CornerRadius="5" ToolTipService.ToolTip="Go Back">
-                    <FontIcon Glyph="&#xE72B;"/>
-                </Button>
-                <TextBlock Text="Settings" Style="{StaticResource TitleTextBlockStyle}" VerticalAlignment="Center"/>
-            </StackPanel>
-        </StackPanel>
-
         <!-- Body: NavigationView for Sidebar + Content -->
         <NavigationView x:Name="SettingsNav"
-                        Grid.Row="1"
                         PaneDisplayMode="Left"
                         IsBackButtonVisible="Collapsed"
                         IsSettingsVisible="False"
