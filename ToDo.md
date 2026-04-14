@@ -1,7 +1,6 @@
 # To Do:
 
-1. Add ability to install from winget, scoop and chocolatey.
-2. **_More TBD_**
+1. **_More TBD_**
 
 # Done for next release:
 
@@ -21,3 +20,4 @@
 14. Add animated Icons for Settings, Search and Menu open / close.
 15. Add a button to the history entries to show more details.
 16. Let's see what we can do to make it even better.
+17. BIG: Add ability to install from winget, scoop and chocolatey.
