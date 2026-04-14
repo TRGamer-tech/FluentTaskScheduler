@@ -30,7 +30,7 @@ scheduled tasks without the dated MMC snap-in.
 **Requirements:** Windows 10 1809 (build 17763) or later.
     ]]></description>
     <tags>task-scheduler automation windows winui3 fluent productivity admin</tags>
-    <releaseNotes>https://github.com/TRGamer-tech/FluentTaskScheduler/releases/tag/v1.8.0</releaseNotes>
+    <releaseNotes>https://github.com/TRGamer-tech/FluentTaskScheduler/releases/tag/V1.8.0</releaseNotes>
     <dependencies>
       <!-- .NET 8 Desktop Runtime is bundled (self-contained build) — no extra dependency needed -->
     </dependencies>

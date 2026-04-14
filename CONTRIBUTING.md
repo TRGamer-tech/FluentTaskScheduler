@@ -125,8 +125,8 @@ The three required files follow the [winget multi-file manifest schema v1.6](htt
 > ```powershell
 > winget install wingetcreate
 > wingetcreate update TRGamer-tech.FluentTaskScheduler --version 1.8.0 `
->   --urls "https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/v1.8.0/Setup-x64.msi|x64|msi" `
->          "https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/v1.8.0/Setup-arm64.msi|arm64|msi" `
+>   --urls "https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/V1.8.0/Setup-x64.msi|x64|msi" `
+>          "https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/V1.8.0/Setup-arm64.msi|arm64|msi" `
 >   --submit
 > ```
 
