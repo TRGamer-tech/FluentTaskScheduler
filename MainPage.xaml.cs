@@ -938,6 +938,16 @@ namespace FluentTaskScheduler
             try
             {
                 ViewModel.TaskService.RegisterTask(folder ?? "\\", model);
+
+                // Handle renaming: if name changed (case-sensitive check for the file system/TS behavior)
+                // but Task Scheduler is case-insensitive, so we only delete if it's truly a different task
+                if (_isEditMode && ViewModel.SelectedTask != null && 
+                    !model.Name.Equals(ViewModel.SelectedTask.Name, StringComparison.OrdinalIgnoreCase))
+                {
+                    ViewModel.TaskService.DeleteTask(ViewModel.SelectedTask.Path);
+                    LogService.Info($"Renamed task - deleted old task at '{ViewModel.SelectedTask.Path}'");
+                }
+
                 TaskEditDialog.Hide();
                 await ViewModel.LoadTasksAsync();
             }
