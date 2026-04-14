@@ -19,4 +19,5 @@
 12. Enable drag and drop for task folder organization.
 13. Fix bug when renaming a task it creates a new one instead of renaming the existing one.
 14. Add animated Icons for Settings, Search and Menu open / close.
-15. Let's see what we can do to make it even better.
+15. Add a button to the history entries to show more details.
+16. Let's see what we can do to make it even better.

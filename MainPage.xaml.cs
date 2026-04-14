@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
@@ -1827,6 +1828,29 @@ namespace FluentTaskScheduler
         private void Settings_PointerExited(object sender, PointerRoutedEventArgs e)
         {
             AnimatedIcon.SetState(this.SettingsAnimatedIcon, "Normal");
+        }
+
+        private void HistoryList_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            if (e.ClickedItem is Models.TaskHistoryEntry entry)
+            {
+                var detailView = new Dialogs.HistoryEntryDetailDialog(entry);
+                var flyout = new Flyout
+                {
+                    Content = detailView,
+                    Placement = FlyoutPlacementMode.BottomEdgeAlignedLeft,
+                    FlyoutPresenterStyle = new Style(typeof(FlyoutPresenter))
+                    {
+                        Setters = { new Setter(FlyoutPresenter.MaxWidthProperty, 1000) }
+                    }
+                };
+                
+                if (sender is ListView lv)
+                {
+                    var container = lv.ContainerFromItem(e.ClickedItem) as FrameworkElement;
+                    flyout.ShowAt(container ?? lv);
+                }
+            }
         }
     }
 }

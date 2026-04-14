@@ -778,7 +778,12 @@ namespace FluentTaskScheduler.Services
                             ActivityId = record.ActivityId,
                             User = GetUserFromRecord(record),
                             TaskPath = taskPath,
-                            TaskName = System.IO.Path.GetFileName(taskPath)
+                            TaskName = System.IO.Path.GetFileName(taskPath),
+                            Level = record.LevelDisplayName ?? "Information",
+                            Keywords = record.KeywordsDisplayNames != null ? string.Join(", ", record.KeywordsDisplayNames) : "None",
+                            Computer = record.MachineName ?? "Local",
+                            TaskCategory = record.TaskDisplayName ?? "None",
+                            OpCode = record.OpcodeDisplayName ?? "Info"
                         });
                     }
                 }

@@ -501,7 +501,9 @@
                         </Grid>
                     </Grid>
                     
-                    <ListView x:Name="InlineHistoryListView" MaxHeight="170" SelectionMode="Extended" PreviewKeyDown="HistoryList_KeyDown" Margin="0,0,16,0">
+                    <ListView x:Name="InlineHistoryListView" MaxHeight="170" SelectionMode="Single" 
+                              IsItemClickEnabled="True" ItemClick="HistoryList_ItemClick"
+                              PreviewKeyDown="HistoryList_KeyDown" Margin="0,0,16,0">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Padding="8">
