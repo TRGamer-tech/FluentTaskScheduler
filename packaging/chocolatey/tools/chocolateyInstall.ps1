@@ -6,7 +6,7 @@ $ErrorActionPreference = 'Stop'
 
 $packageName   = 'fluenttaskscheduler'
 $toolsDir      = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$version       = '1.7.1'
+$version       = '1.8.0'
 $url64         = "https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/v$version/Setup-x64.msi"
 $checksum64    = '<SHA256_OF_Setup-x64.msi>'
 
