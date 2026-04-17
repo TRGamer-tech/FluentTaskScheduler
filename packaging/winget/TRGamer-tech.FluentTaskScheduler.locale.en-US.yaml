@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.12.0.schema.json
 
 PackageIdentifier: TRGamer-tech.FluentTaskScheduler
-PackageVersion: 1.8.0
+PackageVersion: 1.8.1
 PackageLocale: en-US
 Publisher: TRGamer-tech
 PublisherUrl: https://github.com/TRGamer-tech
@@ -29,6 +29,6 @@ Tags:
 Documentations:
   - DocumentLabel: README
     DocumentUrl: https://github.com/TRGamer-tech/FluentTaskScheduler/blob/main/README.md
-ReleaseNotesUrl: https://github.com/TRGamer-tech/FluentTaskScheduler/releases/tag/V1.8.0
+ReleaseNotesUrl: https://github.com/TRGamer-tech/FluentTaskScheduler/releases/tag/V1.8.1
 ManifestType: defaultLocale
 ManifestVersion: 1.12.0

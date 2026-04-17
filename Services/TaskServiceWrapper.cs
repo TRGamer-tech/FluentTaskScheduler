@@ -1124,13 +1124,14 @@ namespace FluentTaskScheduler.Services
                 targetParentFolderPath.StartsWith(sourceFolderPath.TrimEnd('\\') + "\\", StringComparison.OrdinalIgnoreCase))
                 throw new Exception("Cannot move a folder into one of its own sub-folders.");
 
+            string newPath;
             using (var ts = new TaskService())
             {
                 var sourceFolder = ts.GetFolder(sourceFolderPath);
                 if (sourceFolder == null) throw new Exception($"Source folder '{sourceFolderPath}' not found.");
 
                 string folderName = sourceFolder.Name;
-                string newPath = targetParentFolderPath == "\\"
+                newPath = targetParentFolderPath == "\\"
                     ? "\\" + folderName
                     : targetParentFolderPath.TrimEnd('\\') + "\\" + folderName;
 
@@ -1144,10 +1145,11 @@ namespace FluentTaskScheduler.Services
 
                 var targetFolder = GetOrCreateFolder(ts, newPath);
                 CopyFolderContents(ts, sourceFolder, targetFolder);
-                DeleteFolderRecursive(sourceFolder);
-                sourceFolder.Parent?.DeleteFolder(folderName);
-                LogService.Info($"Moved folder '{sourceFolderPath}' to '{newPath}'.");
             }
+
+            // Perform deletion in a fresh context to ensure no handles are held
+            DeleteFolder(sourceFolderPath);
+            LogService.Info($"Moved folder '{sourceFolderPath}' to '{newPath}'.");
         }
 
         public void CreateFolder(string path)
@@ -1173,11 +1175,15 @@ namespace FluentTaskScheduler.Services
 
         private void DeleteFolderRecursive(TaskFolder folder)
         {
-            foreach (var task in folder.Tasks)
+            // Copy to list to avoid collection modification exceptions
+            var tasks = folder.Tasks.ToList();
+            foreach (var task in tasks)
             {
                 folder.DeleteTask(task.Name);
             }
-            foreach (var sub in folder.SubFolders)
+
+            var subFolders = folder.SubFolders.ToList();
+            foreach (var sub in subFolders)
             {
                 DeleteFolderRecursive(sub);
                 folder.DeleteFolder(sub.Name);

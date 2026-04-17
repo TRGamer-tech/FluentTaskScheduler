@@ -29,7 +29,7 @@ scoop install extras/fluenttaskscheduler
 
 ### Chocolatey
 The app is still under review as of now but I am also working on this one.
-<br>https://community.chocolatey.org/packages/fluenttaskscheduler/1.8.0#files
+<br>https://community.chocolatey.org/packages/fluenttaskscheduler/1.8.1
 ```
 choco install fluenttaskscheduler
 ```

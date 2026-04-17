@@ -104,7 +104,7 @@ The three required files follow the [winget multi-file manifest schema v1.6](htt
 
 **Submission steps:**
 
-1. Update `PackageVersion` in all three files to the new version (e.g. `1.8.0`).
+1. Update `PackageVersion` in all three files to the new version (e.g. `1.8.1`).
 2. In the **installer manifest**, replace both `InstallerSha256` placeholders with the real hashes.
 3. Update both `InstallerUrl` paths to point to the new GitHub Release tag.
 4. Validate locally (**requires winget CLI 1.6+**):
@@ -124,9 +124,9 @@ The three required files follow the [winget multi-file manifest schema v1.6](htt
 > **Tip:** `wingetcreate update` can automate steps 1–3:
 > ```powershell
 > winget install wingetcreate
-> wingetcreate update TRGamer-tech.FluentTaskScheduler --version 1.8.0 `
->   --urls "https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/V1.8.0/Setup-x64.msi|x64|msi" `
->          "https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/V1.8.0/Setup-arm64.msi|arm64|msi" `
+> wingetcreate update TRGamer-tech.FluentTaskScheduler --version 1.8.1 `
+>   --urls "https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/V1.8.1/Setup-x64.msi|x64|msi" `
+>          "https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/V1.8.1/Setup-arm64.msi|arm64|msi" `
 >   --submit
 > ```
 

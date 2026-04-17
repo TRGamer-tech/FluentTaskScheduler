@@ -119,7 +119,7 @@
                                                   CanDrag="False"/>
                                         <!-- Drag handle: Moved to the right -->
                                         <FontIcon Grid.Column="2"
-                                                  Glyph="&#xE784;"
+                                                  Glyph="&#xE76F;"
                                                   FontFamily="Segoe MDL2 Assets"
                                                   FontSize="12"
                                                   Opacity="0.6"
@@ -178,6 +178,17 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
+                
+                <!-- Admin Drag & Drop Warning -->
+                <InfoBar x:Name="AdminDragWarning"
+                         Severity="Informational"
+                         Title="Drag &amp; Drop Restricted"
+                         Message="Windows does not support drag-and-drop operations when the app is running as Administrator."
+                         IsClosable="True"
+                         Margin="16,8,16,0"
+                         Visibility="Collapsed"
+                         Grid.Row="0"
+                         Canvas.ZIndex="100"/>
                 
                 <!-- Loading Ring -->
                 <ProgressRing x:Name="LoadingRing" IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}" Width="50" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" Canvas.ZIndex="100" Grid.RowSpan="2"/>
@@ -1153,5 +1164,21 @@
                 </StackPanel>
             </ScrollViewer>
         </ContentDialog>
+
+        <!-- Custom Drag Visual for Elevated Mode -->
+        <Canvas x:Name="CustomDragCanvas" IsHitTestVisible="False" Canvas.ZIndex="9999" Visibility="Collapsed">
+            <Border x:Name="CustomDragVisual" 
+                    Background="{ThemeResource LayerFillColorDefaultBrush}" 
+                    BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" 
+                    BorderThickness="1" 
+                    CornerRadius="8" 
+                    Padding="12,8"
+                    Opacity="0.8">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon x:Name="CustomDragIcon" Glyph="&#xE8B7;" FontSize="16" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="CustomDragText" Text="Dragging item..." Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Canvas>
     </Grid>
 </Page>

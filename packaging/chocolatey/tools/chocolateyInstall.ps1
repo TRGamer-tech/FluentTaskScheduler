@@ -6,7 +6,7 @@ $ErrorActionPreference = 'Stop'
 
 $packageName   = 'fluenttaskscheduler'
 $toolsDir      = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$version       = '1.8.0'
+$version       = '1.8.1'
 
 # Detect architecture
 $isArm64 = ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') -or ($env:PROCESSOR_ARCHITEW6432 -eq 'ARM64')

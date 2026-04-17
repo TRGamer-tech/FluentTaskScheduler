@@ -96,7 +96,7 @@
                     <Grid Grid.Column="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="&#xE768;" FontSize="16" Opacity="0.7" Foreground="MediumSeaGreen"/>
+                                <FontIcon Glyph="&#xE76F;" FontSize="16" Opacity="0.7" Foreground="MediumSeaGreen"/>
                                 <TextBlock Text="Running Now" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                             </StackPanel>
                             <TextBlock Text="{x:Bind ViewModel.RunningTasks, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0" Foreground="MediumSeaGreen"/>
