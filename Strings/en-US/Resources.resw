@@ -118,4 +118,94 @@
   <data name="AboutHeader.Text" xml:space="preserve"><value>About</value></data>
   <data name="AboutTitle.Text" xml:space="preserve"><value>Fluent Task Scheduler</value></data>
   <data name="AboutBuilt.Text" xml:space="preserve"><value>Built with WinUI 3</value></data>
+  <data name="Dialog.Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Dialog.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Dialog.OK" xml:space="preserve"><value>OK</value></data>
+  <data name="Dialog.Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Dialog.Import" xml:space="preserve"><value>Import</value></data>
+  <data name="Dialog.Create" xml:space="preserve"><value>Create</value></data>
+  <data name="Dialog.Rename" xml:space="preserve"><value>Rename</value></data>
+  <data name="Dialog.RestartNow" xml:space="preserve"><value>Restart Now</value></data>
+  <data name="Dialog.Later" xml:space="preserve"><value>Later</value></data>
+  <data name="Dialog.Next" xml:space="preserve"><value>Next</value></data>
+  <data name="Dialog.GetStarted" xml:space="preserve"><value>Get Started</value></data>
+  <data name="App.UnhandledException.Title" xml:space="preserve"><value>Unhandled Exception</value></data>
+  <data name="App.UpdateAvailable.Title" xml:space="preserve"><value>Update Available</value></data>
+  <data name="App.UpdateAvailable.Content" xml:space="preserve"><value>Version {0} has been downloaded and is ready to install.
+Restart now to apply the update?</value></data>
+  <data name="Main.HistoryCopied" xml:space="preserve"><value>✅ Copied!</value></data>
+  <data name="Main.HistoryCopy" xml:space="preserve"><value>📋 Copy</value></data>
+  <data name="Main.ConfirmDelete.Title" xml:space="preserve"><value>Confirm Delete</value></data>
+  <data name="Main.ConfirmDelete.Content" xml:space="preserve"><value>Are you sure you want to delete '{0}'?</value></data>
+  <data name="Main.ImportTask.Title" xml:space="preserve"><value>Import Task</value></data>
+  <data name="Main.ImportTask.SelectFolder" xml:space="preserve"><value>Select the folder to import this task into:</value></data>
+  <data name="Main.AnyNetwork" xml:space="preserve"><value>Any network</value></data>
+  <data name="Main.PermissionEnableDenied" xml:space="preserve"><value>The user account under which you are performing this action does not have permission to enable the following task(s):
+
+{0}
+
+These tasks are protected and cannot be modified, even with administrator privileges.</value></data>
+  <data name="Main.PermissionDisableDenied" xml:space="preserve"><value>The user account under which you are performing this action does not have permission to disable the following task(s):
+
+{0}
+
+These tasks are protected and cannot be modified, even with administrator privileges.</value></data>
+  <data name="Main.BatchDelete.Content" xml:space="preserve"><value>Delete {0} tasks?</value></data>
+  <data name="Main.NewFolder.Title" xml:space="preserve"><value>New Folder</value></data>
+  <data name="Main.NewFolder.NamePlaceholder" xml:space="preserve"><value>Name</value></data>
+  <data name="Main.RenameFolder.Title" xml:space="preserve"><value>Rename Folder</value></data>
+  <data name="Main.RenameFolder.NamePlaceholder" xml:space="preserve"><value>New Name</value></data>
+  <data name="Main.DeleteFolder.Title" xml:space="preserve"><value>Delete Folder</value></data>
+  <data name="Main.DeleteFolder.Content" xml:space="preserve"><value>Delete '{0}' and ALL tasks in it?</value></data>
+  <data name="Main.MoveTasksPartialError" xml:space="preserve"><value>Some tasks could not be moved:
+
+</value></data>
+  <data name="Main.MoveFolderError" xml:space="preserve"><value>Could not move folder: {0}</value></data>
+  <data name="Main.Error.Title" xml:space="preserve"><value>Error</value></data>
+  <data name="ScriptLibrary.DeleteTemplate.Title" xml:space="preserve"><value>Delete Template</value></data>
+  <data name="ScriptLibrary.DeleteTemplate.Content" xml:space="preserve"><value>Delete '{0}'?</value></data>
+  <data name="SettingsLanguageTitle.Text" xml:space="preserve"><value>Language</value></data>
+  <data name="SettingsLanguageHint.Text" xml:space="preserve"><value>Select UI language. Restart the app to apply all text changes.</value></data>
+  <data name="SettingsLanguageEnglish.Content" xml:space="preserve"><value>English</value></data>
+  <data name="SettingsLanguageChinese.Content" xml:space="preserve"><value>Simplified Chinese</value></data>
+  <data name="Settings.Language.Changed.Title" xml:space="preserve"><value>Language Updated</value></data>
+  <data name="Settings.Language.Changed.Content" xml:space="preserve"><value>Language preference has been saved. Restart the app to apply all text changes.</value></data>
+  <data name="Settings.Export.Success.Title" xml:space="preserve"><value>Export Successful</value></data>
+  <data name="Settings.Export.Success.Content" xml:space="preserve"><value>Settings exported to:
+{0}</value></data>
+  <data name="Settings.Export.Failed.Title" xml:space="preserve"><value>Export Failed</value></data>
+  <data name="Settings.Import.Success.Title" xml:space="preserve"><value>Import Successful</value></data>
+  <data name="Settings.Import.Success.Content" xml:space="preserve"><value>Settings have been restored. Some changes may require an app restart.</value></data>
+  <data name="Settings.Import.Failed.Title" xml:space="preserve"><value>Import Failed</value></data>
+  <data name="Settings.WhatsNew.Title" xml:space="preserve"><value>What's New</value></data>
+  <data name="Settings.WhatsNew.FetchFailed" xml:space="preserve"><value>Could not fetch release notes. Check your internet connection and try again.</value></data>
+  <data name="Settings.Update.ErrorTitle" xml:space="preserve"><value>Update Error</value></data>
+  <data name="Settings.Update.ErrorContent" xml:space="preserve"><value>An error occurred while checking for updates:
+{0}</value></data>
+  <data name="Settings.Update.UpToDate.Title" xml:space="preserve"><value>Up to Date</value></data>
+  <data name="Settings.Update.UpToDate.Content" xml:space="preserve"><value>You're already running the latest version.</value></data>
+  <data name="Settings.Update.Available.Title" xml:space="preserve"><value>Update Available</value></data>
+  <data name="Settings.Update.Available.Content" xml:space="preserve"><value>Version {0} has been downloaded and is ready to install.
+Restart now to apply the update?</value></data>
+  <data name="OnboardingHint.Text" xml:space="preserve"><value>You can replay this walkthrough anytime from Settings.</value></data>
+  <data name="OnboardingWarn.Text" xml:space="preserve"><value>Some tasks are discovered via the Event Log and can thus not be edited.
+Run as admin if you want to edit them.</value></data>
+  <data name="OnboardingBackButton.Content" xml:space="preserve"><value>Back</value></data>
+  <data name="OnboardingNextButton.Content" xml:space="preserve"><value>Next</value></data>
+  <data name="Onboarding.Step1.Title" xml:space="preserve"><value>Welcome to FluentTaskScheduler</value></data>
+  <data name="Onboarding.Step1.Body" xml:space="preserve"><value>Manage Windows Task Scheduler with a modern, fluent interface — no XML, no fuss.</value></data>
+  <data name="Onboarding.Step2.Title" xml:space="preserve"><value>Create your first task</value></data>
+  <data name="Onboarding.Step2.Body" xml:space="preserve"><value>Hit + New Task to schedule any program, script, or command to run automatically — daily, on login, on an event, and more.</value></data>
+  <data name="Onboarding.Step3.Title" xml:space="preserve"><value>Organise with folders</value></data>
+  <data name="Onboarding.Step3.Body" xml:space="preserve"><value>Group related tasks into folders using the sidebar, just like Windows Explorer. Your last folder is remembered across restarts.</value></data>
+  <data name="Onboarding.Step4.Title" xml:space="preserve"><value>Track history &amp; status</value></data>
+  <data name="Onboarding.Step4.Body" xml:space="preserve"><value>Click any task to see its run history, success and failure counts, and live running status — all in one place.</value></data>
+  <data name="Onboarding.Step5.Title" xml:space="preserve"><value>Always up to date</value></data>
+  <data name="Onboarding.Step5.Body" xml:space="preserve"><value>FluentTaskScheduler checks for updates automatically every time it starts. You can also trigger a manual check at any time from Settings → About → Check for Updates.</value></data>
+  <data name="Onboarding.Step6.Title" xml:space="preserve"><value>Discover existing tasks</value></data>
+  <data name="Onboarding.Step6.Body" xml:space="preserve"><value>Use Task Discovery to scan the Windows Event Log and automatically import tasks created by other applications — no manual recreation needed.</value></data>
+  <data name="Onboarding.Step7.Title" xml:space="preserve"><value>Tune it to your liking</value></data>
+  <data name="Onboarding.Step7.Body" xml:space="preserve"><value>Head to Settings to enable Mica backdrop, minimise to tray, configure logging, run on startup, and more.</value></data>
+  <data name="WhatsNewDialog.CloseButtonText" xml:space="preserve"><value>Got it</value></data>
+  <data name="WhatsNewViewOnGitHub.Text" xml:space="preserve"><value>View full release on GitHub</value></data>
 </root>

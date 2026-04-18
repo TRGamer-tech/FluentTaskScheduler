@@ -55,12 +55,12 @@
                 <StackPanel>
                     <StackPanel x:Name="FolderSection" Visibility="{x:Bind NavView.IsPaneOpen, Mode=OneWay}">
                         <Grid Margin="10,5,10,4">
-                            <TextBlock Text="Folders" 
+                            <TextBlock Text="文件夹" 
                                       FontWeight="SemiBold" 
                                       VerticalAlignment="Center"
                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
-                                <Button x:Name="FolderRefreshBtn" Padding="4" Background="Transparent" BorderThickness="0" Click="ReloadFolders_Click" ToolTipService.ToolTip="Reload Folders">
+                                <Button x:Name="FolderRefreshBtn" Padding="4" Background="Transparent" BorderThickness="0" Click="ReloadFolders_Click" ToolTipService.ToolTip="刷新文件夹">
                                     <Grid Width="14" Height="14">
                                         <Viewbox>
                                             <SymbolIcon x:Name="FolderRefreshIcon" Symbol="Refresh" />
@@ -68,7 +68,7 @@
                                         <ProgressRing x:Name="FolderRefreshRing" IsActive="False" Visibility="Collapsed" />
                                     </Grid>
                                 </Button>
-                                <Button x:Name="FolderCreateBtn" Padding="4" Background="Transparent" BorderThickness="0" Click="CreateRootFolder_Click" ToolTipService.ToolTip="New Folder">
+                                <Button x:Name="FolderCreateBtn" Padding="4" Background="Transparent" BorderThickness="0" Click="CreateRootFolder_Click" ToolTipService.ToolTip="新建文件夹">
                                     <Viewbox Width="14" Height="14">
                                         <SymbolIcon Symbol="Add" />
                                     </Viewbox>
@@ -128,7 +128,7 @@
                                                   VerticalAlignment="Center"
                                                   CanDrag="True"
                                                   DragStarting="FolderItem_DragStarting"
-                                                  ToolTipService.ToolTip="Drag to move folder"/>
+                                                   ToolTipService.ToolTip="拖动以移动文件夹"/>
                                     </Grid>
                                 </DataTemplate>
                             </TreeView.ItemTemplate>
@@ -139,9 +139,9 @@
 
             <NavigationView.MenuItems>
                 <NavigationViewItemSeparator />
-                <NavigationViewItem x:Name="NavDashboard" Tag="Dashboard" Icon="ViewAll" Content="Dashboard" />
-                <NavigationViewItem x:Name="NavScriptLibrary" Tag="ScriptLibrary" Icon="Library" Content="Script Library" />
-                <NavigationViewItem x:Name="NavAdd" Tag="Add" Icon="Add" Content="New Task" SelectsOnInvoked="False" />
+                <NavigationViewItem x:Name="NavDashboard" Tag="Dashboard" Icon="ViewAll" Content="仪表盘" />
+                <NavigationViewItem x:Name="NavScriptLibrary" Tag="ScriptLibrary" Icon="Library" Content="脚本库" />
+                <NavigationViewItem x:Name="NavAdd" Tag="Add" Icon="Add" Content="新建任务" SelectsOnInvoked="False" />
                 <NavigationViewItemSeparator />
             </NavigationView.MenuItems>
 
@@ -155,8 +155,8 @@
                 <NavigationViewItem x:Name="NavAllTasks" x:Uid="NavAllTasks" Tag="all" Icon="List" Content="All Tasks" IsSelected="True"/>
                 <NavigationViewItem x:Name="NavRunning" x:Uid="NavRunning" Tag="running" Icon="Play" Content="Running"/>
                 <NavigationViewItem x:Uid="NavEnabled" Content="Enabled" Icon="Accept" Tag="enabled" />
-                <NavigationViewItem x:Name="NavDisabled" Content="Disabled" Icon="Cancel" Tag="disabled" />
-                <NavigationViewItem x:Name="NavSettings" Tag="settings" Content="Settings"
+                <NavigationViewItem x:Name="NavDisabled" Content="已禁用" Icon="Cancel" Tag="disabled" />
+                <NavigationViewItem x:Name="NavSettings" Tag="settings" Content="设置"
                                    PointerEntered="Settings_PointerEntered"
                                    PointerExited="Settings_PointerExited">
                     <NavigationViewItem.Icon>
@@ -182,8 +182,8 @@
                 <!-- Admin Drag & Drop Warning -->
                 <InfoBar x:Name="AdminDragWarning"
                          Severity="Informational"
-                         Title="Drag &amp; Drop Restricted"
-                         Message="Windows does not support drag-and-drop operations when the app is running as Administrator."
+                         Title="拖拽受限"
+                         Message="当应用以管理员身份运行时，Windows 不支持拖放操作。"
                          IsClosable="True"
                          Margin="16,8,16,0"
                          Visibility="Collapsed"
@@ -203,43 +203,43 @@
                     </Grid.ColumnDefinitions>
                     
                     <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center" Margin="16,0,0,0">
-                        <TextBlock x:Name="BatchCountText" Text="0 selected" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="BatchCountText" Text="已选择 0 项" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         <Rectangle Width="1" Height="24" Fill="{ThemeResource DividerStrokeColorDefaultBrush}"/>
-                        <Button x:Name="BatchRunBtn" Click="BatchRun_Click" ToolTipService.ToolTip="Run Selected">
+                        <Button x:Name="BatchRunBtn" Click="BatchRun_Click" ToolTipService.ToolTip="运行所选">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <SymbolIcon Symbol="Play"/>
-                                <TextBlock Text="Run"/>
+                                <TextBlock Text="运行"/>
                             </StackPanel>
                         </Button>
-                        <Button x:Name="BatchStopBtn" Click="BatchStop_Click" ToolTipService.ToolTip="Stop Selected">
+                        <Button x:Name="BatchStopBtn" Click="BatchStop_Click" ToolTipService.ToolTip="停止所选">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <SymbolIcon Symbol="Stop"/>
-                                <TextBlock Text="Stop"/>
+                                <TextBlock Text="停止"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
                     
                     <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="0,0,16,0">
-                       <Button x:Name="BatchEnableBtn" Click="BatchEnable_Click" ToolTipService.ToolTip="Enable Selected">
+                       <Button x:Name="BatchEnableBtn" Click="BatchEnable_Click" ToolTipService.ToolTip="启用所选">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <SymbolIcon Symbol="Accept"/>
-                                <TextBlock Text="Enable"/>
+                                <TextBlock Text="启用"/>
                             </StackPanel>
                         </Button>
-                        <Button x:Name="BatchDisableBtn" Click="BatchDisable_Click" ToolTipService.ToolTip="Disable Selected">
+                        <Button x:Name="BatchDisableBtn" Click="BatchDisable_Click" ToolTipService.ToolTip="禁用所选">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <SymbolIcon Symbol="Cancel"/>
-                                <TextBlock Text="Disable"/>
+                                <TextBlock Text="禁用"/>
                             </StackPanel>
                         </Button>
                         <Rectangle Width="1" Height="24" Fill="{ThemeResource DividerStrokeColorDefaultBrush}"/>
-                        <Button x:Name="BatchDeleteBtn" Click="BatchDelete_Click" Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}" Foreground="White" ToolTipService.ToolTip="Delete Selected">
+                        <Button x:Name="BatchDeleteBtn" Click="BatchDelete_Click" Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}" Foreground="White" ToolTipService.ToolTip="删除所选">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <SymbolIcon Symbol="Delete"/>
-                                <TextBlock Text="Delete"/>
+                                <TextBlock Text="删除"/>
                             </StackPanel>
                         </Button>
-                        <Button x:Name="BatchCancelBtn" Click="BatchCancel_Click" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Clear Selection">
+                        <Button x:Name="BatchCancelBtn" Click="BatchCancel_Click" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="清除选择">
                             <SymbolIcon Symbol="Cancel"/>
                         </Button>
                     </StackPanel>
@@ -249,9 +249,9 @@
 
                     <AutoSuggestBox x:Name="SearchBox" x:Uid="SearchBox" QueryIcon="Find" PlaceholderText="Search tasks..." Width="300" TextChanged="SearchBox_TextChanged"/>
                     <Button x:Uid="RefreshButton" Content="Refresh" Click="RefreshButton_Click" />
-                    <Button x:Name="ImportTaskButton" Content="Import Task" Click="ImportTask_Click" />
-                    <Button x:Name="SortButton" Content="Sort ↕" Click="SortButton_Click" />
-                    <Button x:Name="ShortcutsButton" Content="?" Width="38" ToolTipService.ToolTip="Keyboard Shortcuts (F1)" Click="ShortcutsButton_Click" />
+                    <Button x:Name="ImportTaskButton" Content="导入任务" Click="ImportTask_Click" />
+                    <Button x:Name="SortButton" Content="排序 ↕" Click="SortButton_Click" />
+                    <Button x:Name="ShortcutsButton" Content="?" Width="38" ToolTipService.ToolTip="快捷键 (F1)" Click="ShortcutsButton_Click" />
                 </StackPanel>
 
                 <ListView x:Name="TaskListView" 
@@ -350,8 +350,8 @@
 
         <!-- Keyboard Shortcuts Dialog -->
         <ContentDialog x:Name="ShortcutsDialog"
-                       Title="Keyboard Shortcuts"
-                       CloseButtonText="Close"
+                       Title="快捷键"
+                       CloseButtonText="关闭"
                        DefaultButton="Close">
             <StackPanel Spacing="8" MinWidth="340">
                 <Grid>
@@ -365,24 +365,24 @@
                     </Grid.RowDefinitions>
 
                     <!-- Headers -->
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Shortcut" Style="{StaticResource CaptionTextBlockStyle}" FontWeight="SemiBold" Opacity="0.6" Margin="0,0,0,6"/>
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Action"   Style="{StaticResource CaptionTextBlockStyle}" FontWeight="SemiBold" Opacity="0.6" Margin="0,0,0,6"/>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="快捷键" Style="{StaticResource CaptionTextBlockStyle}" FontWeight="SemiBold" Opacity="0.6" Margin="0,0,0,6"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="操作"   Style="{StaticResource CaptionTextBlockStyle}" FontWeight="SemiBold" Opacity="0.6" Margin="0,0,0,6"/>
 
                     <!-- Rows -->
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Ctrl + N"  Style="{StaticResource BodyTextBlockStyle}" FontFamily="Consolas"/>
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="New Task"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="新建任务"/>
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Ctrl + E"  Style="{StaticResource BodyTextBlockStyle}" FontFamily="Consolas"/>
-                    <TextBlock Grid.Row="2" Grid.Column="1" Text="Edit Selected Task"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="编辑所选任务"/>
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Ctrl + R"  Style="{StaticResource BodyTextBlockStyle}" FontFamily="Consolas"/>
-                    <TextBlock Grid.Row="3" Grid.Column="1" Text="Run Selected Task"/>
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="运行所选任务"/>
                     <TextBlock Grid.Row="4" Grid.Column="0" Text="Delete"    Style="{StaticResource BodyTextBlockStyle}" FontFamily="Consolas"/>
-                    <TextBlock Grid.Row="4" Grid.Column="1" Text="Delete Selected Task"/>
+                    <TextBlock Grid.Row="4" Grid.Column="1" Text="删除所选任务"/>
                     <TextBlock Grid.Row="5" Grid.Column="0" Text="F5"        Style="{StaticResource BodyTextBlockStyle}" FontFamily="Consolas"/>
-                    <TextBlock Grid.Row="5" Grid.Column="1" Text="Refresh Task List"/>
+                    <TextBlock Grid.Row="5" Grid.Column="1" Text="刷新任务列表"/>
                     <TextBlock Grid.Row="6" Grid.Column="0" Text="Esc"       Style="{StaticResource BodyTextBlockStyle}" FontFamily="Consolas"/>
-                    <TextBlock Grid.Row="6" Grid.Column="1" Text="Close Dialogs / Clear Selection"/>
+                    <TextBlock Grid.Row="6" Grid.Column="1" Text="关闭对话框 / 清除选择"/>
                     <TextBlock Grid.Row="7" Grid.Column="0" Text="F1"        Style="{StaticResource BodyTextBlockStyle}" FontFamily="Consolas"/>
-                    <TextBlock Grid.Row="7" Grid.Column="1" Text="Show This Dialog"/>
+                    <TextBlock Grid.Row="7" Grid.Column="1" Text="显示此对话框"/>
                 </Grid>
             </StackPanel>
         </ContentDialog>
@@ -554,10 +554,10 @@
                 <StackPanel Spacing="16" Width="750" Margin="0,8,12,8">
                 <TextBlock x:Uid="DialogTitle" Text="Add or edit task" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
                 <InfoBar x:Name="EditTaskErrorBar" IsOpen="False" Severity="Error" Margin="0,0,0,8" />
-                <TextBox x:Name="EditTaskName" x:Uid="TaskNameHeader" PlaceholderText="Enter task name">
+                <TextBox x:Name="EditTaskName" x:Uid="TaskNameHeader" PlaceholderText="输入任务名称">
                     <TextBox.Header>
                         <StackPanel Orientation="Horizontal" Spacing="4">
-                            <TextBlock Text="Task Name" VerticalAlignment="Center"/>
+                            <TextBlock Text="任务名称" VerticalAlignment="Center"/>
                             <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
                                       ToolTipService.ToolTip="The unique identifier for this task. It must be distinct within its folder in Windows Task Scheduler."/>
                         </StackPanel>
@@ -566,7 +566,7 @@
                 <TextBox x:Name="EditTaskDescription" x:Uid="DescriptionHeader" AcceptsReturn="True" Height="80">
                     <TextBox.Header>
                         <StackPanel Orientation="Horizontal" Spacing="4">
-                            <TextBlock Text="Description" VerticalAlignment="Center"/>
+                            <TextBlock Text="描述" VerticalAlignment="Center"/>
                             <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
                                       ToolTipService.ToolTip="A human-readable note that explains what this task does. Visible in Task Scheduler and the details panel."/>
                         </StackPanel>
@@ -575,7 +575,7 @@
                 <TextBox x:Name="EditTaskAuthor" x:Uid="AuthorHeader">
                     <TextBox.Header>
                         <StackPanel Orientation="Horizontal" Spacing="4">
-                            <TextBlock Text="Author" VerticalAlignment="Center"/>
+                            <TextBlock Text="作者" VerticalAlignment="Center"/>
                             <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
                                       ToolTipService.ToolTip="The person or system that owns this task. Stored in the task XML; not enforced by Windows."/>
                         </StackPanel>
@@ -587,7 +587,7 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <AutoSuggestBox x:Name="EditTaskCategory" PlaceholderText="e.g. Work" 
+                    <AutoSuggestBox x:Name="EditTaskCategory" PlaceholderText="例如：工作" 
                                    ItemsSource="{x:Bind ViewModel.SavedCategories}"
                                    QueryIcon="Find" 
                                    GotFocus="EditTaskCategory_GotFocus"
@@ -596,13 +596,13 @@
                                    SuggestionChosen="EditTaskCategory_SuggestionChosen">
                         <AutoSuggestBox.Header>
                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                <TextBlock Text="Category" VerticalAlignment="Center"/>
+                                <TextBlock Text="分类" VerticalAlignment="Center"/>
                                 <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
                                           ToolTipService.ToolTip="Groups tasks together for filtering in the main list. Stored inside the task XML as the task's category label."/>
                             </StackPanel>
                         </AutoSuggestBox.Header>
                     </AutoSuggestBox>
-                    <AutoSuggestBox x:Name="EditTaskTags" Grid.Column="1" PlaceholderText="e.g. urgent, sync (comma separated)"
+                    <AutoSuggestBox x:Name="EditTaskTags" Grid.Column="1" PlaceholderText="例如：urgent, sync（逗号分隔）"
                                    QueryIcon="Find"
                                    GotFocus="EditTaskTags_GotFocus"
                                    Tapped="EditTaskTags_GotFocus"
@@ -610,7 +610,7 @@
                                    SuggestionChosen="EditTaskTags_SuggestionChosen">
                         <AutoSuggestBox.Header>
                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                <TextBlock Text="Tags" VerticalAlignment="Center"/>
+                                <TextBlock Text="标签" VerticalAlignment="Center"/>
                                 <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
                                           ToolTipService.ToolTip="Custom comma-separated labels used for filtering inside this app. Tags are stored in the task Description field and are NOT a native Windows Task Scheduler feature."/>
                             </StackPanel>
@@ -800,35 +800,35 @@
 
                 <!-- Event Log Trigger -->
                 <StackPanel x:Name="PanelEvent" Visibility="Collapsed" Spacing="8" Margin="0,4,0,0">
-                    <TextBox x:Name="EditTaskEventLog" Header="Log" PlaceholderText="Application, System, Security, etc." Text="Application"/>
-                    <TextBox x:Name="EditTaskEventSource" Header="Source" PlaceholderText="e.g., VSS, Outlook (Optional)"/>
-                    <TextBox x:Name="EditTaskEventId" Header="Event ID" PlaceholderText="e.g., 1000 (Optional)" InputScope="Number"/>
+                    <TextBox x:Name="EditTaskEventLog" Header="日志" PlaceholderText="Application、System、Security 等" Text="Application"/>
+                    <TextBox x:Name="EditTaskEventSource" Header="来源" PlaceholderText="例如：VSS、Outlook（可选）"/>
+                    <TextBox x:Name="EditTaskEventId" Header="事件 ID" PlaceholderText="例如：1000（可选）" InputScope="Number"/>
                 </StackPanel>
 
                 <!-- Idle Trigger -->
                 <StackPanel x:Name="PanelIdle" Visibility="Collapsed" Spacing="8" Margin="0,4,0,0">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Text="Wait for the computer to be idle for:" VerticalAlignment="Center"/>
-                        <TextBox x:Name="EditTaskIdleDuration" PlaceholderText="e.g., 10m" Width="100" Text="PT10M"/>
-                        <TextBlock Text="(e.g. 5m, 10m, 30m)" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                        <TextBlock Text="等待计算机空闲时长：" VerticalAlignment="Center"/>
+                        <TextBox x:Name="EditTaskIdleDuration" PlaceholderText="例如：10m" Width="100" Text="PT10M"/>
+                        <TextBlock Text="（例如：5m、10m、30m）" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
                     </StackPanel>
                 </StackPanel>
 
                 <!-- Session State Change Trigger -->
                 <StackPanel x:Name="PanelSessionState" Visibility="Collapsed" Spacing="8" Margin="0,4,0,0">
-                    <ComboBox x:Name="EditTaskSessionStateType" Header="Trigger on" SelectedIndex="0" SelectionChanged="EditTaskSessionStateType_SelectionChanged">
-                        <ComboBoxItem Content="Workstation Lock" Tag="Lock"/>
-                        <ComboBoxItem Content="Workstation Unlock" Tag="Unlock"/>
-                        <ComboBoxItem Content="Remote Desktop Connect" Tag="RemoteConnect"/>
-                        <ComboBoxItem Content="Remote Desktop Disconnect" Tag="RemoteDisconnect"/>
+                    <ComboBox x:Name="EditTaskSessionStateType" Header="触发时机" SelectedIndex="0" SelectionChanged="EditTaskSessionStateType_SelectionChanged">
+                        <ComboBoxItem Content="工作站锁定" Tag="Lock"/>
+                        <ComboBoxItem Content="工作站解锁" Tag="Unlock"/>
+                        <ComboBoxItem Content="远程桌面连接" Tag="RemoteConnect"/>
+                        <ComboBoxItem Content="远程桌面断开" Tag="RemoteDisconnect"/>
                     </ComboBox>
                 </StackPanel>
 
                 <StackPanel Spacing="8" Margin="0,12,0,0">
                      <StackPanel Orientation="Horizontal" Spacing="4">
-                         <CheckBox x:Name="EditTaskExpires" Content="Expire task on:" Click="EditTaskExpires_Click"/>
+                         <CheckBox x:Name="EditTaskExpires" Content="到期时间：" Click="EditTaskExpires_Click"/>
                          <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
-                                   ToolTipService.ToolTip="After this date and time the trigger will stop firing. The task itself remains; only the trigger is deactivated."/>
+                                   ToolTipService.ToolTip="超过该日期时间后将不再触发，任务本身仍保留，仅触发器被停用。"/>
                      </StackPanel>
                      <StackPanel Spacing="8" Margin="28,0,0,0">
                          <DatePicker x:Name="EditTaskExpirationDate" HorizontalAlignment="Left"/>
@@ -851,7 +851,7 @@
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <TextBlock Text="Run:" FontWeight="SemiBold"/>
+                                     <TextBlock Text="运行：" FontWeight="SemiBold"/>
                                     <TextBlock Text="{Binding Command}" TextTrimming="CharacterEllipsis"/>
                                 </StackPanel>
                             </DataTemplate>
@@ -859,18 +859,18 @@
                     </ListView>
                     
                     <StackPanel Grid.Column="1" Spacing="4">
-                        <Button x:Name="BtnAddAction" Content="+" Width="32" ToolTipService.ToolTip="Add Action">
+                        <Button x:Name="BtnAddAction" Content="+" Width="32" ToolTipService.ToolTip="添加操作">
                             <Button.Flyout>
                                 <MenuFlyout>
-                                    <MenuFlyoutItem Text="Run Program" Click="BtnAddAction_Click" />
-                                    <MenuFlyoutItem Text="Send Email" Click="AddAction_SendEmail_Click" />
-                                    <MenuFlyoutItem Text="Show Notification" Click="AddAction_ShowNotification_Click" />
+                                    <MenuFlyoutItem Text="运行程序" Click="BtnAddAction_Click" />
+                                    <MenuFlyoutItem Text="发送邮件" Click="AddAction_SendEmail_Click" />
+                                    <MenuFlyoutItem Text="显示通知" Click="AddAction_ShowNotification_Click" />
                                 </MenuFlyout>
                             </Button.Flyout>
                         </Button>
-                        <Button x:Name="BtnRemoveAction" Content="-" Width="32" Click="BtnRemoveAction_Click" ToolTipService.ToolTip="Remove Action"/>
-                        <Button x:Name="BtnMoveActionUp" Content="^" Width="32" Click="BtnMoveActionUp_Click" ToolTipService.ToolTip="Move Up" FontSize="12"/>
-                        <Button x:Name="BtnMoveActionDown" Content="v" Width="32" Click="BtnMoveActionDown_Click" ToolTipService.ToolTip="Move Down" FontSize="11"/>
+                        <Button x:Name="BtnRemoveAction" Content="-" Width="32" Click="BtnRemoveAction_Click" ToolTipService.ToolTip="移除操作"/>
+                        <Button x:Name="BtnMoveActionUp" Content="^" Width="32" Click="BtnMoveActionUp_Click" ToolTipService.ToolTip="上移" FontSize="12"/>
+                        <Button x:Name="BtnMoveActionDown" Content="v" Width="32" Click="BtnMoveActionDown_Click" ToolTipService.ToolTip="下移" FontSize="11"/>
                     </StackPanel>
                 </Grid>
 
@@ -883,9 +883,9 @@
                         <TextBox x:Name="EditTaskActionCommand" x:Uid="ProgramScriptHeader" PlaceholderText="e.g., notepad.exe or C:\Scripts\myscript.ps1" Grid.Column="0" TextChanged="EditTaskActionCommand_TextChanged">
                             <TextBox.Header>
                                 <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <TextBlock Text="Program / Script" VerticalAlignment="Center"/>
+                                    <TextBlock Text="程序 / 脚本" VerticalAlignment="Center"/>
                                     <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
-                                              ToolTipService.ToolTip="The full path or name of the executable, script, or document to launch. Use 'powershell.exe' with arguments for PowerShell scripts."/>
+                                              ToolTipService.ToolTip="可执行文件、脚本或文档的完整路径/名称。PowerShell 脚本请使用 powershell.exe 并配合参数。"/>
                                 </StackPanel>
                             </TextBox.Header>
                         </TextBox>
@@ -894,64 +894,64 @@
                     <TextBox x:Name="EditTaskArguments" x:Uid="ArgumentsHeader" PlaceholderText="e.g., /c echo hello or -File script.ps1" TextChanged="EditTaskArguments_TextChanged" Margin="0,8,0,0">
                         <TextBox.Header>
                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                <TextBlock Text="Arguments (optional)" VerticalAlignment="Center"/>
+                                <TextBlock Text="参数（可选）" VerticalAlignment="Center"/>
                                 <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
-                                          ToolTipService.ToolTip="Command-line parameters passed directly to the program. For PowerShell: -ExecutionPolicy Bypass -File &quot;C:\path\to\script.ps1&quot;"/>
+                                          ToolTipService.ToolTip="传递给程序的命令行参数。PowerShell 示例：-ExecutionPolicy Bypass -File &quot;C:\path\to\script.ps1&quot;"/>
                             </StackPanel>
                         </TextBox.Header>
                     </TextBox>
                     <TextBox x:Name="EditTaskWorkingDirectory" x:Uid="WorkingDirectoryHeader" PlaceholderText="e.g., C:\Scripts" TextChanged="EditTaskWorkingDirectory_TextChanged" Margin="0,8,0,0">
                         <TextBox.Header>
                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                <TextBlock Text="Run in (optional)" VerticalAlignment="Center"/>
+                                <TextBlock Text="运行目录（可选）" VerticalAlignment="Center"/>
                                 <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
-                                          ToolTipService.ToolTip="Sets the working directory (current folder) for the process. Relative paths in the program or script will resolve relative to this folder."/>
+                                          ToolTipService.ToolTip="设置进程工作目录（当前文件夹）。程序或脚本中的相对路径将相对此目录解析。"/>
                             </StackPanel>
                         </TextBox.Header>
                     </TextBox>
-                    <TextBlock Text="Tip: For PowerShell scripts, use 'powershell.exe' as Program and '-ExecutionPolicy Bypass -File &quot;C:\path\to\script.ps1&quot;' as Arguments" 
+                    <TextBlock Text="提示：PowerShell 脚本请将“程序”设为 powershell.exe，并将“参数”设为 -ExecutionPolicy Bypass -File &quot;C:\path\to\script.ps1&quot;" 
                                Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" TextWrapping="Wrap" Margin="0,4,0,0"/>
                 </StackPanel>
                 
                 <!-- Repetition Section -->
                 <Rectangle Height="2" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,12,0,4"/>
-                <TextBlock Text="Repetition" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,4"/>
+                <TextBlock Text="重复" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,4"/>
                 <StackPanel Spacing="12">
                     <ComboBox x:Name="EditTaskRepetitionInterval" SelectedIndex="0" SelectionChanged="EditTaskRepetitionInterval_SelectionChanged">
                         <ComboBox.Header>
                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                <TextBlock Text="Repeat task every" VerticalAlignment="Center"/>
+                                <TextBlock Text="重复间隔" VerticalAlignment="Center"/>
                                 <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
-                                          ToolTipService.ToolTip="After the task starts, re-trigger it at this interval until the 'For a duration of' limit is reached. Useful for tasks that must run repeatedly within a window."/>
+                                          ToolTipService.ToolTip="任务启动后按该间隔重复触发，直到达到“持续时长”限制。适用于时间窗口内重复执行的任务。"/>
                             </StackPanel>
                         </ComboBox.Header>
-                        <ComboBoxItem Content="(No repetition)" Tag=""/>
-                        <ComboBoxItem Content="5 minutes" Tag="PT5M"/>
-                        <ComboBoxItem Content="10 minutes" Tag="PT10M"/>
-                        <ComboBoxItem Content="15 minutes" Tag="PT15M"/>
-                        <ComboBoxItem Content="30 minutes" Tag="PT30M"/>
-                        <ComboBoxItem Content="1 hour" Tag="PT1H"/>
-                        <ComboBoxItem Content="2 hours" Tag="PT2H"/>
-                        <ComboBoxItem Content="4 hours" Tag="PT4H"/>
-                        <ComboBoxItem Content="6 hours" Tag="PT6H"/>
-                        <ComboBoxItem Content="12 hours" Tag="PT12H"/>
+                        <ComboBoxItem Content="（不重复）" Tag=""/>
+                        <ComboBoxItem Content="5 分钟" Tag="PT5M"/>
+                        <ComboBoxItem Content="10 分钟" Tag="PT10M"/>
+                        <ComboBoxItem Content="15 分钟" Tag="PT15M"/>
+                        <ComboBoxItem Content="30 分钟" Tag="PT30M"/>
+                        <ComboBoxItem Content="1 小时" Tag="PT1H"/>
+                        <ComboBoxItem Content="2 小时" Tag="PT2H"/>
+                        <ComboBoxItem Content="4 小时" Tag="PT4H"/>
+                        <ComboBoxItem Content="6 小时" Tag="PT6H"/>
+                        <ComboBoxItem Content="12 小时" Tag="PT12H"/>
                     </ComboBox>
                     <ComboBox x:Name="EditTaskRepetitionDuration" x:Uid="RepetitionDurationHeader" SelectedIndex="0" SelectionChanged="EditTaskRepetitionDuration_SelectionChanged">
                         <ComboBox.Header>
                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                <TextBlock Text="For a duration of" VerticalAlignment="Center"/>
+                                <TextBlock Text="持续时长" VerticalAlignment="Center"/>
                                 <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
-                                          ToolTipService.ToolTip="How long the repetition continues. 'Indefinitely' means the task keeps repeating until the trigger itself expires. A finite duration caps the total repetition window."/>
+                                          ToolTipService.ToolTip="重复持续时间。“无限期”表示一直重复，直到触发器过期。有限时长会限制总重复窗口。"/>
                             </StackPanel>
                         </ComboBox.Header>
-                        <ComboBoxItem Content="Indefinitely" Tag=""/>
-                        <ComboBoxItem Content="1 hour" Tag="PT1H"/>
-                        <ComboBoxItem Content="2 hours" Tag="PT2H"/>
-                        <ComboBoxItem Content="4 hours" Tag="PT4H"/>
-                        <ComboBoxItem Content="6 hours" Tag="PT6H"/>
-                        <ComboBoxItem Content="12 hours" Tag="PT12H"/>
-                        <ComboBoxItem Content="24 hours" Tag="PT24H"/>
-                        <ComboBoxItem Content="1 day" Tag="P1D"/>
+                        <ComboBoxItem Content="无限期" Tag=""/>
+                        <ComboBoxItem Content="1 小时" Tag="PT1H"/>
+                        <ComboBoxItem Content="2 小时" Tag="PT2H"/>
+                        <ComboBoxItem Content="4 小时" Tag="PT4H"/>
+                        <ComboBoxItem Content="6 小时" Tag="PT6H"/>
+                        <ComboBoxItem Content="12 小时" Tag="PT12H"/>
+                        <ComboBoxItem Content="24 小时" Tag="PT24H"/>
+                        <ComboBoxItem Content="1 天" Tag="P1D"/>
                     </ComboBox>
                 </StackPanel>
                 

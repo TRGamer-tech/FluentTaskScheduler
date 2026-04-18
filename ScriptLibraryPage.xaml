@@ -15,8 +15,8 @@
 
                 <!-- Header row -->
                 <StackPanel Orientation="Horizontal" Spacing="12">
-                    <TextBlock Text="Script Library" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
-                    <Button x:Name="CreateTemplateButton" Content="+ New Template" Click="CreateTemplateButton_Click"/>
+                    <TextBlock Text="脚本库" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
+                    <Button x:Name="CreateTemplateButton" Content="+ 新建模板" Click="CreateTemplateButton_Click"/>
                 </StackPanel>
 
                 <!-- Template cards grid -->
@@ -51,14 +51,14 @@
                                             BorderThickness="0"
                                             Padding="4"
                                             VerticalAlignment="Top"
-                                            ToolTipService.ToolTip="Delete template">
+                                            ToolTipService.ToolTip="删除模板">
                                         <FontIcon Glyph="&#xE74D;" FontSize="12" Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
                                     </Button>
                                 </Grid>
                                 
                                 <TextBlock Grid.Row="1" Text="{x:Bind Description}" TextWrapping="Wrap" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
                                 
-                                <Button Grid.Row="2" Content="Schedule This" HorizontalAlignment="Stretch" Click="ScheduleButton_Click" Tag="{x:Bind}"/>
+                                <Button Grid.Row="2" Content="使用此模板创建任务" HorizontalAlignment="Stretch" Click="ScheduleButton_Click" Tag="{x:Bind}"/>
                             </Grid>
                         </DataTemplate>
                     </GridView.ItemTemplate>
@@ -68,17 +68,17 @@
 
         <!-- Create Template Dialog -->
         <ContentDialog x:Name="CreateTemplateDialog"
-                       Title="New Template"
-                       PrimaryButtonText="Save"
-                       CloseButtonText="Cancel"
+                       Title="新建模板"
+                       PrimaryButtonText="保存"
+                       CloseButtonText="取消"
                        DefaultButton="Primary"
                        PrimaryButtonClick="CreateTemplateDialog_PrimaryButtonClick">
             <StackPanel Spacing="12" MinWidth="400">
-                <TextBox x:Name="TemplateName"     Header="Name"        PlaceholderText="e.g. Cleanup Script"/>
-                <TextBox x:Name="TemplateDesc"     Header="Description" PlaceholderText="What does this template do?" TextWrapping="Wrap" AcceptsReturn="True" Height="72"/>
-                <TextBox x:Name="TemplateCommand"  Header="Command"     PlaceholderText="e.g. powershell.exe"/>
-                <TextBox x:Name="TemplateArgs"     Header="Arguments"   PlaceholderText="e.g. -File C:\scripts\cleanup.ps1"/>
-                <CheckBox x:Name="TemplateAdmin"   Content="Run with highest privileges"/>
+                <TextBox x:Name="TemplateName"     Header="名称"        PlaceholderText="例如：清理脚本"/>
+                <TextBox x:Name="TemplateDesc"     Header="描述" PlaceholderText="这个模板用于做什么？" TextWrapping="Wrap" AcceptsReturn="True" Height="72"/>
+                <TextBox x:Name="TemplateCommand"  Header="命令"     PlaceholderText="例如：powershell.exe"/>
+                <TextBox x:Name="TemplateArgs"     Header="参数"   PlaceholderText="例如：-File C:\scripts\cleanup.ps1"/>
+                <CheckBox x:Name="TemplateAdmin"   Content="以最高权限运行"/>
             </StackPanel>
         </ContentDialog>
     </Grid>

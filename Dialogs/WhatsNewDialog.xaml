@@ -2,6 +2,7 @@
     x:Class="FluentTaskScheduler.Dialogs.WhatsNewDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Uid="WhatsNewDialog"
     CloseButtonText="Got it"
     DefaultButton="Close"
     CornerRadius="16">
@@ -68,7 +69,7 @@
                          Padding="0">
             <StackPanel Orientation="Horizontal" Spacing="6">
                 <FontIcon Glyph="&#xE8A7;" FontSize="13"/>
-                <TextBlock Text="View full release on GitHub" FontSize="13"/>
+                <TextBlock x:Uid="WhatsNewViewOnGitHub" Text="View full release on GitHub" FontSize="13"/>
             </StackPanel>
         </HyperlinkButton>
 

@@ -15,7 +15,7 @@
                 <Button x:Name="DashboardReloadBtn" Click="DashboardReload_Click" HorizontalAlignment="Right" Margin="0,0,0,-12">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <SymbolIcon Symbol="Refresh" />
-                        <TextBlock Text="Reload Dashboard" />
+                        <TextBlock Text="刷新仪表盘" />
                     </StackPanel>
                 </Button>
 
@@ -28,7 +28,7 @@
                     
                     <!-- Category Filter -->
                     <StackPanel Spacing="8">
-                        <TextBlock Text="Filter by category" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="4,0,0,0"/>
+                        <TextBlock Text="按分类筛选" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="4,0,0,0"/>
                         <ItemsControl ItemsSource="{x:Bind ViewModel.AvailableCategories, Mode=OneWay}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -48,7 +48,7 @@
 
                     <!-- Tag Filter -->
                     <StackPanel Grid.Column="1" Spacing="8">
-                        <TextBlock Text="Filter by tag" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="4,0,0,0"/>
+                        <TextBlock Text="按标签筛选" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="4,0,0,0"/>
                         <ItemsControl ItemsSource="{x:Bind ViewModel.AvailableTags, Mode=OneWay}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -79,15 +79,15 @@
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE8F1;" FontSize="16" Opacity="0.7"/>
-                                <TextBlock Text="Total Tasks" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBlock Text="任务总数" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                             </StackPanel>
                             <TextBlock Text="{x:Bind ViewModel.TotalTasks, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
                             <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0" Opacity="0.7">
                                 <TextBlock Text="{x:Bind ViewModel.EnabledTasks, Mode=OneWay}" Foreground="{ThemeResource SystemFillColorSuccessBrush}"/>
-                                <TextBlock Text="Active"/>
+                                <TextBlock Text="启用"/>
                                 <TextBlock Text="|" Opacity="0.3"/>
                                 <TextBlock Text="{x:Bind ViewModel.DisabledTasks, Mode=OneWay}" Foreground="LightGray"/>
-                                <TextBlock Text="Disabled"/>
+                                <TextBlock Text="禁用"/>
                             </StackPanel>
                         </StackPanel>
                     </Grid>
@@ -97,10 +97,10 @@
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE76F;" FontSize="16" Opacity="0.7" Foreground="MediumSeaGreen"/>
-                                <TextBlock Text="Running Now" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBlock Text="正在运行" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                             </StackPanel>
                             <TextBlock Text="{x:Bind ViewModel.RunningTasks, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0" Foreground="MediumSeaGreen"/>
-                            <TextBlock Text="Active processes" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Margin="0,4,0,0"/>
+                            <TextBlock Text="活跃进程" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Grid>
 
@@ -109,7 +109,7 @@
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE9D9;" FontSize="16" Opacity="0.7"/>
-                                <TextBlock Text="Health Score" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBlock Text="健康评分" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                             </StackPanel>
                             <TextBlock Text="{x:Bind ViewModel.HealthScore, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0" Foreground="{ThemeResource SystemFillColorSuccessBrush}"/>
                             <ProgressBar Value="{x:Bind ViewModel.HealthScore, Mode=OneWay}" Maximum="100" Margin="0,12,0,0" Height="4"/>
@@ -130,10 +130,10 @@
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE73E;" FontSize="16" Opacity="0.7" Foreground="{ThemeResource SystemFillColorSuccessBrush}"/>
-                                <TextBlock Text="Recent Success" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBlock Text="近期成功" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                             </StackPanel>
                             <TextBlock Text="{x:Bind ViewModel.LastRunSuccess, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
-                            <TextBlock Text="Last checked tasks" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Margin="0,4,0,0"/>
+                            <TextBlock Text="最近检查的任务" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Grid>
 
@@ -142,10 +142,10 @@
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE711;" FontSize="16" Opacity="0.7" Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
-                                <TextBlock Text="Recent Failures" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBlock Text="近期失败" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                             </StackPanel>
                             <TextBlock Text="{x:Bind ViewModel.LastRunFailed, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0" Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
-                            <TextBlock Text="Attention needed" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Margin="0,4,0,0"/>
+                            <TextBlock Text="需要关注" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Grid>
 
@@ -156,7 +156,7 @@
                 <!-- Currently Running Tasks -->
                 <StackPanel Spacing="6">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Text="Currently Running" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                        <TextBlock Text="当前运行中" Style="{StaticResource SubtitleTextBlockStyle}"/>
                         <ProgressRing IsActive="{x:Bind ViewModel.HasRunningTasks, Mode=OneWay}" Width="16" Height="16" VerticalAlignment="Center"/>
                     </StackPanel>
                     <ListView x:Name="RunningTasksListView" ItemsSource="{x:Bind ViewModel.RunningTasksList, Mode=OneWay}" SelectionMode="None" IsItemClickEnabled="True" ItemClick="RunningTask_ItemClick" Padding="0">
@@ -196,13 +196,13 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
-                    <TextBlock Text="No tasks currently running" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5"
+                    <TextBlock Text="当前没有正在运行的任务" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5"
                                Visibility="{x:Bind ViewModel.NoRunningTasksVisible, Mode=OneWay}"/>
                 </StackPanel>
 
                 <!-- Recently Failed Tasks -->
                 <StackPanel Spacing="6">
-                    <TextBlock Text="Recently Failed" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                    <TextBlock Text="最近失败任务" Style="{StaticResource SubtitleTextBlockStyle}"/>
                     <ListView x:Name="FailedTasksListView" ItemsSource="{x:Bind ViewModel.FailedTasksList, Mode=OneWay}" SelectionMode="None" IsItemClickEnabled="True" ItemClick="FailedTask_ItemClick" Padding="0">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
@@ -228,14 +228,14 @@
                                     <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="12,0,0,0">
                                         <TextBlock Text="{x:Bind LastRunTime}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" HorizontalAlignment="Right"/>
                                         <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" HorizontalAlignment="Right">
-                                            <Run Text="Exit code: "/><Run Text="{x:Bind ExitCode}"/>
+                                            <Run Text="退出码："/><Run Text="{x:Bind ExitCode}"/>
                                         </TextBlock>
                                     </StackPanel>
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
-                    <TextBlock Text="No recent failures — all tasks healthy" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Foreground="{ThemeResource SystemFillColorSuccessBrush}"
+                    <TextBlock Text="近期无失败，任务状态良好" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Foreground="{ThemeResource SystemFillColorSuccessBrush}"
                                Visibility="{x:Bind ViewModel.NoFailedTasksVisible, Mode=OneWay}"/>
                 </StackPanel>
 
@@ -247,7 +247,7 @@
 
                     <!-- Upcoming Schedule -->
                     <StackPanel Grid.Column="0" Spacing="6">
-                        <TextBlock Text="Upcoming Schedule" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                        <TextBlock Text="即将运行计划" Style="{StaticResource SubtitleTextBlockStyle}"/>
                         <ListView ItemsSource="{x:Bind ViewModel.UpcomingTasks, Mode=OneWay}" SelectionMode="None" Padding="0">
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="ListViewItem">
@@ -281,7 +281,7 @@
 
                     <!-- Recent Activity Stream -->
                     <StackPanel Grid.Column="1" Spacing="6">
-                        <TextBlock Text="Activity Stream" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                        <TextBlock Text="活动流" Style="{StaticResource SubtitleTextBlockStyle}"/>
                         <ListView ItemsSource="{x:Bind ViewModel.RecentHistory, Mode=OneWay}" SelectionMode="None" Padding="0" IsItemClickEnabled="True" ItemClick="ActivityList_ItemClick">
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="ListViewItem">
@@ -311,12 +311,12 @@
                 <StackPanel Spacing="10">
                     <!-- Header + Legend -->
                     <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
-                        <TextBlock Text="Run History — Last 7 Days" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                        <TextBlock Text="运行历史 — 最近 7 天" Style="{StaticResource SubtitleTextBlockStyle}"/>
                         <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                             <Rectangle Width="12" Height="12" Fill="{ThemeResource SystemFillColorSuccessBrush}" RadiusX="2" RadiusY="2"/>
-                            <TextBlock Text="Success" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" VerticalAlignment="Center"/>
+                            <TextBlock Text="成功" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" VerticalAlignment="Center"/>
                             <Rectangle Width="12" Height="12" Fill="{ThemeResource SystemFillColorCriticalBrush}" RadiusX="2" RadiusY="2" Margin="8,0,0,0"/>
-                            <TextBlock Text="Failure" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" VerticalAlignment="Center"/>
+                            <TextBlock Text="失败" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" VerticalAlignment="Center"/>
                         </StackPanel>
                     </StackPanel>
 
