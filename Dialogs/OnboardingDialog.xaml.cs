@@ -8,6 +8,8 @@ namespace FluentTaskScheduler.Dialogs
 {
     public sealed partial class OnboardingDialog : ContentDialog
     {
+        private static string L(string key, string fallback) => Services.LocalizationService.GetString(key, fallback);
+
         // ── Step Definitions ─────────────────────────────────────────────────────
         private readonly struct Step
         {
@@ -23,56 +25,56 @@ namespace FluentTaskScheduler.Dialogs
             new Step
             {
                 Icon          = "\uE8A1",   // Calendar / Scheduler
-                Title         = "Welcome to FluentTaskScheduler",
-                Body          = "Manage Windows Task Scheduler with a modern, fluent interface — no XML, no fuss.",
+                Title         = L("Onboarding.Step1.Title", "Welcome to FluentTaskScheduler"),
+                Body          = L("Onboarding.Step1.Body", "Manage Windows Task Scheduler with a modern, fluent interface — no XML, no fuss."),
                 ShowHint      = false,
                 ShowAdminWarn = false
             },
             new Step
             {
                 Icon          = "\uE710",   // Add / Plus
-                Title         = "Create your first task",
-                Body          = "Hit + New Task to schedule any program, script, or command to run automatically — daily, on login, on an event, and more.",
+                Title         = L("Onboarding.Step2.Title", "Create your first task"),
+                Body          = L("Onboarding.Step2.Body", "Hit + New Task to schedule any program, script, or command to run automatically — daily, on login, on an event, and more."),
                 ShowHint      = false,
                 ShowAdminWarn = false
             },
             new Step
             {
                 Icon          = "\uE8B7",   // Folder
-                Title         = "Organise with folders",
-                Body          = "Group related tasks into folders using the sidebar, just like Windows Explorer. Your last folder is remembered across restarts.",
+                Title         = L("Onboarding.Step3.Title", "Organise with folders"),
+                Body          = L("Onboarding.Step3.Body", "Group related tasks into folders using the sidebar, just like Windows Explorer. Your last folder is remembered across restarts."),
                 ShowHint      = false,
                 ShowAdminWarn = false
             },
             new Step
             {
                 Icon          = "\uE9F9",   // Chart / History
-                Title         = "Track history & status",
-                Body          = "Click any task to see its run history, success and failure counts, and live running status — all in one place.",
+                Title         = L("Onboarding.Step4.Title", "Track history & status"),
+                Body          = L("Onboarding.Step4.Body", "Click any task to see its run history, success and failure counts, and live running status — all in one place."),
                 ShowHint      = false,
                 ShowAdminWarn = false
             },
             new Step
             {
                 Icon          = "\uE895",   // Sync / Updates
-                Title         = "Always up to date",
-                Body          = "FluentTaskScheduler checks for updates automatically every time it starts. You can also trigger a manual check at any time from Settings → About → Check for Updates.",
+                Title         = L("Onboarding.Step5.Title", "Always up to date"),
+                Body          = L("Onboarding.Step5.Body", "FluentTaskScheduler checks for updates automatically every time it starts. You can also trigger a manual check at any time from Settings → About → Check for Updates."),
                 ShowHint      = false,
                 ShowAdminWarn = false
             },
             new Step
             {
                 Icon          = "\uE773",   // Search
-                Title         = "Discover existing tasks",
-                Body          = "Use Task Discovery to scan the Windows Event Log and automatically import tasks created by other applications — no manual recreation needed.",
+                Title         = L("Onboarding.Step6.Title", "Discover existing tasks"),
+                Body          = L("Onboarding.Step6.Body", "Use Task Discovery to scan the Windows Event Log and automatically import tasks created by other applications — no manual recreation needed."),
                 ShowHint      = false,
                 ShowAdminWarn = true        // admin required for Event Log access
             },
             new Step
             {
                 Icon          = "\uE713",   // Settings
-                Title         = "Tune it to your liking",
-                Body          = "Head to Settings to enable Mica backdrop, minimise to tray, configure logging, run on startup, and more.",
+                Title         = L("Onboarding.Step7.Title", "Tune it to your liking"),
+                Body          = L("Onboarding.Step7.Body", "Head to Settings to enable Mica backdrop, minimise to tray, configure logging, run on startup, and more."),
                 ShowHint      = true,       // last slide gets the Settings hint
                 ShowAdminWarn = false
             }
@@ -125,7 +127,7 @@ namespace FluentTaskScheduler.Dialogs
 
             // Next / Get Started button
             bool isLast = _currentStep == Steps.Length - 1;
-            NextButton.Content = isLast ? "Get Started" : "Next";
+            NextButton.Content = isLast ? L("Dialog.GetStarted", "Get Started") : L("Dialog.Next", "Next");
 
             // Highlight active dot
             for (int i = 0; i < _dots.Length; i++)

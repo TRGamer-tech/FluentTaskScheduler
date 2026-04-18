@@ -7,6 +7,7 @@ namespace FluentTaskScheduler
     public sealed partial class ScriptLibraryPage : Page
     {
         public ScriptLibraryViewModel ViewModel { get; } = new();
+        private static string L(string key, string fallback) => Services.LocalizationService.GetString(key, fallback);
 
         private MainPage? _ownerMainPage;
 
@@ -67,10 +68,10 @@ namespace FluentTaskScheduler
 
             var confirm = new ContentDialog
             {
-                Title           = "Delete Template",
-                Content         = $"Delete '{template.Name}'?",
-                PrimaryButtonText = "Delete",
-                CloseButtonText = "Cancel",
+                Title           = L("ScriptLibrary.DeleteTemplate.Title", "Delete Template"),
+                Content         = string.Format(L("ScriptLibrary.DeleteTemplate.Content", "Delete '{0}'?"), template.Name),
+                PrimaryButtonText = L("Dialog.Delete", "Delete"),
+                CloseButtonText = L("Dialog.Cancel", "Cancel"),
                 DefaultButton   = ContentDialogButton.Close,
                 XamlRoot        = this.XamlRoot
             };

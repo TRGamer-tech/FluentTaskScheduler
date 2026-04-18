@@ -11,7 +11,7 @@ namespace FluentTaskScheduler.Services
         public string Theme { get; set; } = "Default";
         public bool IsOledMode { get; set; } = false;
         public bool IsMicaEnabled { get; set; } = true;
-        public string Language { get; set; } = "en-US";
+        public string Language { get; set; } = "zh-CN";
         public bool ConfirmDelete { get; set; } = true;
         public bool ShowNotifications { get; set; } = true;
         public bool EnableTrayIcon { get; set; } = true;

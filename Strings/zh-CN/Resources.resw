@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <data name="AppHeader.Header" xml:space="preserve"><value>计划任务</value></data>
+  <data name="NewTaskButton.Text" xml:space="preserve"><value>新建任务</value></data>
+  <data name="NavAllTasks.Content" xml:space="preserve"><value>全部任务</value></data>
+  <data name="NavRunning.Content" xml:space="preserve"><value>运行中</value></data>
+  <data name="NavEnabled.Content" xml:space="preserve"><value>已启用</value></data>
+  <data name="RefreshButton.Content" xml:space="preserve"><value>刷新</value></data>
+  <data name="SearchBox.PlaceholderText" xml:space="preserve"><value>搜索任务...</value></data>
+  <data name="TaskNameHeader.Header" xml:space="preserve"><value>任务名称</value></data>
+  <data name="DescriptionHeader.Header" xml:space="preserve"><value>描述</value></data>
+  <data name="AuthorHeader.Header" xml:space="preserve"><value>作者</value></data>
+  <data name="EnabledSwitch.Header" xml:space="preserve"><value>启用</value></data>
+  <data name="ActionTitle.Text" xml:space="preserve"><value>操作</value></data>
+  <data name="ProgramScriptHeader.Header" xml:space="preserve"><value>程序/脚本</value></data>
+  <data name="BrowseButton.Content" xml:space="preserve"><value>浏览...</value></data>
+  <data name="ArgumentsHeader.Header" xml:space="preserve"><value>参数（可选）</value></data>
+  <data name="DialogTitle.Text" xml:space="preserve"><value>添加或编辑任务</value></data>
+  <data name="TriggerTitle.Text" xml:space="preserve"><value>触发器</value></data>
+  <data name="TriggerTypeHeader.Header" xml:space="preserve"><value>触发类型</value></data>
+  <data name="TimeHeader.Header" xml:space="preserve"><value>时间（HH:mm）</value></data>
+  <data name="RepetitionTitle.Text" xml:space="preserve"><value>重复</value></data>
+  <data name="RepetitionIntervalHeader.Header" xml:space="preserve"><value>每隔</value></data>
+  <data name="RepetitionDurationHeader.Header" xml:space="preserve"><value>持续时长</value></data>
+  <data name="ConditionsTitle.Text" xml:space="preserve"><value>条件</value></data>
+  <data name="ConditionIdle.Content" xml:space="preserve"><value>计算机空闲时</value></data>
+  <data name="ConditionAC.Content" xml:space="preserve"><value>仅在交流电源下</value></data>
+  <data name="ConditionNetwork.Content" xml:space="preserve"><value>网络可用时</value></data>
+  <data name="ConditionWake.Content" xml:space="preserve"><value>唤醒计算机以运行任务</value></data>
+  <data name="ConditionBattery.Content" xml:space="preserve"><value>切换到电池供电时停止</value></data>
+  <data name="SettingsTitle.Text" xml:space="preserve"><value>设置</value></data>
+  <data name="StopIfRunsLongerHeader.Header" xml:space="preserve"><value>任务运行超过以下时长后停止</value></data>
+  <data name="RunIfMissed.Content" xml:space="preserve"><value>错过计划启动后尽快运行任务</value></data>
+  <data name="RestartOnFailure.Content" xml:space="preserve"><value>任务失败时每隔以下时间重启：</value></data>
+  <data name="RestartCountText1.Text" xml:space="preserve"><value>最多重试：</value></data>
+  <data name="RestartCountText2.Text" xml:space="preserve"><value>次</value></data>
+  <data name="CancelButton.CloseButtonText" xml:space="preserve"><value>取消</value></data>
+  <data name="SaveButton.PrimaryButtonText" xml:space="preserve"><value>保存</value></data>
+  <data name="CloseButton.CloseButtonText" xml:space="preserve"><value>关闭</value></data>
+  <data name="RunNowButton.Content" xml:space="preserve"><value>立即运行</value></data>
+  <data name="StopButton.Content" xml:space="preserve"><value>停止</value></data>
+  <data name="DeleteButton.Content" xml:space="preserve"><value>删除</value></data>
+  <data name="ExportButton.Content" xml:space="preserve"><value>导出</value></data>
+  <data name="EditButton.Content" xml:space="preserve"><value>编辑</value></data>
+
+  <data name="SettingsHeader.Text" xml:space="preserve"><value>设置</value></data>
+  <data name="AppearanceHeader.Text" xml:space="preserve"><value>外观</value></data>
+  <data name="ThemeCombo.Header" xml:space="preserve"><value>应用主题</value></data>
+  <data name="ThemeDefault.Content" xml:space="preserve"><value>跟随系统</value></data>
+  <data name="ThemeLight.Content" xml:space="preserve"><value>浅色</value></data>
+  <data name="ThemeDark.Content" xml:space="preserve"><value>深色</value></data>
+  <data name="OledToggle.Header" xml:space="preserve"><value>OLED 模式</value></data>
+  <data name="OledHint.Text" xml:space="preserve"><value>仅在深色主题时可用。</value></data>
+  <data name="LanguageHeader.Text" xml:space="preserve"><value>语言</value></data>
+  <data name="LanguageCombo.Header" xml:space="preserve"><value>选择语言</value></data>
+  <data name="LanguageHint.Text" xml:space="preserve"><value>注意：语言切换需要重启应用。</value></data>
+  <data name="GeneralHeader.Text" xml:space="preserve"><value>通用</value></data>
+  <data name="ConfirmDelete.Header" xml:space="preserve"><value>删除任务前确认</value></data>
+  <data name="AboutHeader.Text" xml:space="preserve"><value>关于</value></data>
+  <data name="AboutTitle.Text" xml:space="preserve"><value>Fluent Task Scheduler</value></data>
+  <data name="AboutBuilt.Text" xml:space="preserve"><value>基于 WinUI 3 构建</value></data>
+
+  <data name="Dialog.Close" xml:space="preserve"><value>关闭</value></data>
+  <data name="Dialog.Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="Dialog.OK" xml:space="preserve"><value>确定</value></data>
+  <data name="Dialog.Delete" xml:space="preserve"><value>删除</value></data>
+  <data name="Dialog.Import" xml:space="preserve"><value>导入</value></data>
+  <data name="Dialog.Create" xml:space="preserve"><value>创建</value></data>
+  <data name="Dialog.Rename" xml:space="preserve"><value>重命名</value></data>
+  <data name="Dialog.RestartNow" xml:space="preserve"><value>立即重启</value></data>
+  <data name="Dialog.Later" xml:space="preserve"><value>稍后</value></data>
+  <data name="Dialog.Next" xml:space="preserve"><value>下一步</value></data>
+  <data name="Dialog.GetStarted" xml:space="preserve"><value>开始使用</value></data>
+
+  <data name="App.UnhandledException.Title" xml:space="preserve"><value>未处理异常</value></data>
+  <data name="App.UpdateAvailable.Title" xml:space="preserve"><value>发现更新</value></data>
+  <data name="App.UpdateAvailable.Content" xml:space="preserve"><value>版本 {0} 已下载完成并可安装。
+是否立即重启以应用更新？</value></data>
+
+  <data name="Main.HistoryCopied" xml:space="preserve"><value>✅ 已复制！</value></data>
+  <data name="Main.HistoryCopy" xml:space="preserve"><value>📋 复制</value></data>
+  <data name="Main.ConfirmDelete.Title" xml:space="preserve"><value>确认删除</value></data>
+  <data name="Main.ConfirmDelete.Content" xml:space="preserve"><value>确定要删除“{0}”吗？</value></data>
+  <data name="Main.ImportTask.Title" xml:space="preserve"><value>导入任务</value></data>
+  <data name="Main.ImportTask.SelectFolder" xml:space="preserve"><value>请选择要导入到的文件夹：</value></data>
+  <data name="Main.AnyNetwork" xml:space="preserve"><value>任意网络</value></data>
+  <data name="Main.PermissionEnableDenied" xml:space="preserve"><value>当前账户没有权限启用以下任务：
+
+{0}
+
+这些任务受保护，即使管理员权限也无法修改。</value></data>
+  <data name="Main.PermissionDisableDenied" xml:space="preserve"><value>当前账户没有权限禁用以下任务：
+
+{0}
+
+这些任务受保护，即使管理员权限也无法修改。</value></data>
+  <data name="Main.BatchDelete.Content" xml:space="preserve"><value>确定删除 {0} 个任务吗？</value></data>
+  <data name="Main.NewFolder.Title" xml:space="preserve"><value>新建文件夹</value></data>
+  <data name="Main.NewFolder.NamePlaceholder" xml:space="preserve"><value>名称</value></data>
+  <data name="Main.RenameFolder.Title" xml:space="preserve"><value>重命名文件夹</value></data>
+  <data name="Main.RenameFolder.NamePlaceholder" xml:space="preserve"><value>新名称</value></data>
+  <data name="Main.DeleteFolder.Title" xml:space="preserve"><value>删除文件夹</value></data>
+  <data name="Main.DeleteFolder.Content" xml:space="preserve"><value>确定删除“{0}”及其中全部任务吗？</value></data>
+  <data name="Main.MoveTasksPartialError" xml:space="preserve"><value>部分任务移动失败：
+
+</value></data>
+  <data name="Main.MoveFolderError" xml:space="preserve"><value>移动文件夹失败：{0}</value></data>
+  <data name="Main.Error.Title" xml:space="preserve"><value>错误</value></data>
+
+  <data name="ScriptLibrary.DeleteTemplate.Title" xml:space="preserve"><value>删除模板</value></data>
+  <data name="ScriptLibrary.DeleteTemplate.Content" xml:space="preserve"><value>确定删除“{0}”吗？</value></data>
+
+  <data name="SettingsLanguageTitle.Text" xml:space="preserve"><value>语言</value></data>
+  <data name="SettingsLanguageHint.Text" xml:space="preserve"><value>选择界面语言。重启应用后将完全生效。</value></data>
+  <data name="SettingsLanguageEnglish.Content" xml:space="preserve"><value>English</value></data>
+  <data name="SettingsLanguageChinese.Content" xml:space="preserve"><value>简体中文</value></data>
+  <data name="Settings.Language.Changed.Title" xml:space="preserve"><value>语言已更新</value></data>
+  <data name="Settings.Language.Changed.Content" xml:space="preserve"><value>语言偏好已保存。请重启应用以应用全部文字变更。</value></data>
+  <data name="Settings.Export.Success.Title" xml:space="preserve"><value>导出成功</value></data>
+  <data name="Settings.Export.Success.Content" xml:space="preserve"><value>设置已导出到：
+{0}</value></data>
+  <data name="Settings.Export.Failed.Title" xml:space="preserve"><value>导出失败</value></data>
+  <data name="Settings.Import.Success.Title" xml:space="preserve"><value>导入成功</value></data>
+  <data name="Settings.Import.Success.Content" xml:space="preserve"><value>设置已恢复，部分变更可能需要重启应用。</value></data>
+  <data name="Settings.Import.Failed.Title" xml:space="preserve"><value>导入失败</value></data>
+  <data name="Settings.WhatsNew.Title" xml:space="preserve"><value>更新说明</value></data>
+  <data name="Settings.WhatsNew.FetchFailed" xml:space="preserve"><value>无法获取发行说明，请检查网络后重试。</value></data>
+  <data name="Settings.Update.ErrorTitle" xml:space="preserve"><value>更新检查失败</value></data>
+  <data name="Settings.Update.ErrorContent" xml:space="preserve"><value>检查更新时发生错误：
+{0}</value></data>
+  <data name="Settings.Update.UpToDate.Title" xml:space="preserve"><value>已是最新版本</value></data>
+  <data name="Settings.Update.UpToDate.Content" xml:space="preserve"><value>当前已经是最新版本。</value></data>
+  <data name="Settings.Update.Available.Title" xml:space="preserve"><value>发现更新</value></data>
+  <data name="Settings.Update.Available.Content" xml:space="preserve"><value>版本 {0} 已下载完成并可安装。
+是否立即重启以应用更新？</value></data>
+
+  <data name="OnboardingHint.Text" xml:space="preserve"><value>你可以随时在设置中再次查看此引导。</value></data>
+  <data name="OnboardingWarn.Text" xml:space="preserve"><value>部分任务通过事件日志发现，因此不可编辑。
+若要编辑，请使用管理员身份运行。</value></data>
+  <data name="OnboardingBackButton.Content" xml:space="preserve"><value>上一步</value></data>
+  <data name="OnboardingNextButton.Content" xml:space="preserve"><value>下一步</value></data>
+  <data name="Onboarding.Step1.Title" xml:space="preserve"><value>欢迎使用 FluentTaskScheduler</value></data>
+  <data name="Onboarding.Step1.Body" xml:space="preserve"><value>使用现代 Fluent 界面管理 Windows 任务计划程序——无需 XML，简单高效。</value></data>
+  <data name="Onboarding.Step2.Title" xml:space="preserve"><value>创建你的第一个任务</value></data>
+  <data name="Onboarding.Step2.Body" xml:space="preserve"><value>点击“新建任务”即可自动调度任意程序、脚本或命令——支持每日、登录时、事件触发等。</value></data>
+  <data name="Onboarding.Step3.Title" xml:space="preserve"><value>使用文件夹组织任务</value></data>
+  <data name="Onboarding.Step3.Body" xml:space="preserve"><value>像资源管理器一样在侧栏按文件夹分组任务，应用会记住你上次所在文件夹。</value></data>
+  <data name="Onboarding.Step4.Title" xml:space="preserve"><value>跟踪历史与状态</value></data>
+  <data name="Onboarding.Step4.Body" xml:space="preserve"><value>点击任意任务即可查看运行历史、成功/失败次数与实时状态。</value></data>
+  <data name="Onboarding.Step5.Title" xml:space="preserve"><value>始终保持最新</value></data>
+  <data name="Onboarding.Step5.Body" xml:space="preserve"><value>应用启动时会自动检查更新，你也可以在 设置 → 关于 中手动检查更新。</value></data>
+  <data name="Onboarding.Step6.Title" xml:space="preserve"><value>发现已有任务</value></data>
+  <data name="Onboarding.Step6.Body" xml:space="preserve"><value>通过任务发现功能扫描事件日志，自动导入其他应用创建的任务，无需手动重建。</value></data>
+  <data name="Onboarding.Step7.Title" xml:space="preserve"><value>按你的偏好定制</value></data>
+  <data name="Onboarding.Step7.Body" xml:space="preserve"><value>在设置中可启用 Mica、最小化到托盘、配置日志、开机启动等功能。</value></data>
+
+  <data name="WhatsNewDialog.CloseButtonText" xml:space="preserve"><value>知道了</value></data>
+  <data name="WhatsNewViewOnGitHub.Text" xml:space="preserve"><value>在 GitHub 查看完整发布说明</value></data>
+</root>

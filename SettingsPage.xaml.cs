@@ -15,6 +15,7 @@ namespace FluentTaskScheduler
         private StackPanel[]? _panels;
 
         private static readonly int[] _leadMinuteOptions = { 1, 5, 10, 15, 30 };
+        private static string L(string key, string fallback) => LocalizationService.GetString(key, fallback);
 
         public SettingsPage()
         {
@@ -33,6 +34,7 @@ namespace FluentTaskScheduler
                 ElementTheme.Dark => 1,
                 _ => 2
             };
+            LanguageComboBox.SelectedIndex = SettingsService.Language == "zh-CN" ? 1 : 0;
             OledModeToggle.IsOn = SettingsService.IsOledMode;
             MicaModeToggle.IsOn = SettingsService.IsMicaEnabled;
             UpdateOledToggleState();
@@ -116,6 +118,27 @@ namespace FluentTaskScheduler
             (Application.Current as App)?.ApplyTheme(SettingsService.Theme);
             UpdateOledToggleState();
             LogService.Info($"App Theme: {SettingsService.Theme}");
+        }
+
+        private async void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!_isLoaded) return;
+
+            string newLanguage = LanguageComboBox.SelectedIndex == 1 ? "zh-CN" : "en-US";
+            if (SettingsService.Language == newLanguage) return;
+
+            SettingsService.Language = newLanguage;
+            try
+            {
+                Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = newLanguage;
+            }
+            catch
+            {
+            }
+
+            await ShowDialog(
+                L("Settings.Language.Changed.Title", "Language Updated"),
+                L("Settings.Language.Changed.Content", "Language preference has been saved. Restart the app to apply all text changes."));
         }
 
         private void MicaModeToggle_Toggled(object sender, RoutedEventArgs e)
@@ -268,12 +291,14 @@ namespace FluentTaskScheduler
                 if (file != null)
                 {
                     SettingsService.ExportSettings(file.Path);
-                    await ShowDialog("Export Successful", $"Settings exported to:\n{file.Path}");
+                    await ShowDialog(
+                        L("Settings.Export.Success.Title", "Export Successful"),
+                        string.Format(L("Settings.Export.Success.Content", "Settings exported to:\n{0}"), file.Path));
                 }
             }
             catch (Exception ex)
             {
-                await ShowDialog("Export Failed", ex.Message);
+                await ShowDialog(L("Settings.Export.Failed.Title", "Export Failed"), ex.Message);
             }
         }
 
@@ -300,12 +325,14 @@ namespace FluentTaskScheduler
                     TrayIconService.UpdateVisibility();
                     StartupService.UpdateFromSettings();
 
-                    await ShowDialog("Import Successful", "Settings have been restored. Some changes may require an app restart.");
+                    await ShowDialog(
+                        L("Settings.Import.Success.Title", "Import Successful"),
+                        L("Settings.Import.Success.Content", "Settings have been restored. Some changes may require an app restart."));
                 }
             }
             catch (Exception ex)
             {
-                await ShowDialog("Import Failed", ex.Message);
+                await ShowDialog(L("Settings.Import.Failed.Title", "Import Failed"), ex.Message);
             }
         }
 
@@ -316,7 +343,9 @@ namespace FluentTaskScheduler
             var release = await Services.GitHubReleaseService.GetLatestReleaseAsync();
             if (release == null)
             {
-                await ShowDialog("What's New", "Could not fetch release notes. Check your internet connection and try again.");
+                await ShowDialog(
+                    L("Settings.WhatsNew.Title", "What's New"),
+                    L("Settings.WhatsNew.FetchFailed", "Could not fetch release notes. Check your internet connection and try again."));
                 return;
             }
             var dialog = new Dialogs.WhatsNewDialog(release) { XamlRoot = this.XamlRoot };
@@ -337,22 +366,28 @@ namespace FluentTaskScheduler
 
             if (result.Status == Services.VeloPackUpdateService.UpdateResultStatus.Error)
             {
-                await ShowDialog("Update Error", $"An error occurred while checking for updates:\n{result.ErrorMessage}");
+                await ShowDialog(
+                    L("Settings.Update.ErrorTitle", "Update Error"),
+                    string.Format(L("Settings.Update.ErrorContent", "An error occurred while checking for updates:\n{0}"), result.ErrorMessage));
                 return;
             }
 
             if (result.Status == Services.VeloPackUpdateService.UpdateResultStatus.NoUpdate || result.Info == null)
             {
-                await ShowDialog("Up to Date", "You're already running the latest version.");
+                await ShowDialog(
+                    L("Settings.Update.UpToDate.Title", "Up to Date"),
+                    L("Settings.Update.UpToDate.Content", "You're already running the latest version."));
                 return;
             }
 
             var dialog = new ContentDialog
             {
-                Title = "Update Available",
-                Content = $"Version {result.NewVersion} has been downloaded and is ready to install.\nRestart now to apply the update?",
-                PrimaryButtonText = "Restart Now",
-                CloseButtonText = "Later",
+                Title = L("Settings.Update.Available.Title", "Update Available"),
+                Content = string.Format(
+                    L("Settings.Update.Available.Content", "Version {0} has been downloaded and is ready to install.\nRestart now to apply the update?"),
+                    result.NewVersion),
+                PrimaryButtonText = L("Dialog.RestartNow", "Restart Now"),
+                CloseButtonText = L("Dialog.Later", "Later"),
                 XamlRoot = this.XamlRoot,
                 RequestedTheme = SettingsService.Theme
             };
@@ -377,7 +412,7 @@ namespace FluentTaskScheduler
             {
                 Title = title,
                 Content = message,
-                CloseButtonText = "OK",
+                CloseButtonText = L("Dialog.OK", "OK"),
                 XamlRoot = this.XamlRoot,
                 RequestedTheme = SettingsService.Theme
             };

@@ -37,6 +37,7 @@ namespace FluentTaskScheduler
         // Current folder path for new task creation
         private string _currentFolderPath = "\\";
         private Dictionary<string, bool> _folderExpandedState = new();
+        private static string L(string key, string fallback) => LocalizationService.GetString(key, fallback);
 
         public static MainPage? Current { get; private set; }
 
@@ -619,9 +620,9 @@ namespace FluentTaskScheduler
              var dp = new DataPackage();
              dp.SetText(string.Join("\n", _fullHistory.Select(h => $"{h.Time}\t{h.Result}\t{h.Message}")));
              Clipboard.SetContent(dp);
-             CopyHistoryBtn.Content = "✅ Copied!";
+             CopyHistoryBtn.Content = L("Main.HistoryCopied", "✅ Copied!");
              await Task.Delay(2000);
-             CopyHistoryBtn.Content = "📋 Copy";
+             CopyHistoryBtn.Content = L("Main.HistoryCopy", "📋 Copy");
         }
         
         private void StatTotal_Tapped(object sender, TappedRoutedEventArgs e) { _historyStatusFilter = "Total"; UpdateHistoryList(); }
@@ -732,10 +733,10 @@ namespace FluentTaskScheduler
 
             var dialog = new ContentDialog 
             { 
-                Title = "Confirm Delete", 
-                Content = $"Are you sure you want to delete '{ViewModel.SelectedTask.Name}'?", 
-                PrimaryButtonText = "Delete", 
-                CloseButtonText = "Cancel", 
+                Title = L("Main.ConfirmDelete.Title", "Confirm Delete"), 
+                Content = string.Format(L("Main.ConfirmDelete.Content", "Are you sure you want to delete '{0}'?"), ViewModel.SelectedTask.Name), 
+                PrimaryButtonText = L("Dialog.Delete", "Delete"), 
+                CloseButtonText = L("Dialog.Cancel", "Cancel"), 
                 DefaultButton = ContentDialogButton.Close, 
                 XamlRoot = this.XamlRoot 
             };
@@ -812,15 +813,15 @@ namespace FluentTaskScheduler
                 };
 
                 var panel = new StackPanel();
-                panel.Children.Add(new TextBlock { Text = "Select the folder to import this task into:" });
+                panel.Children.Add(new TextBlock { Text = L("Main.ImportTask.SelectFolder", "Select the folder to import this task into:") });
                 panel.Children.Add(comboBox);
 
                 var dialog = new ContentDialog
                 {
-                    Title = "Import Task",
+                    Title = L("Main.ImportTask.Title", "Import Task"),
                     Content = panel,
-                    PrimaryButtonText = "Import",
-                    CloseButtonText = "Cancel",
+                    PrimaryButtonText = L("Dialog.Import", "Import"),
+                    CloseButtonText = L("Dialog.Cancel", "Cancel"),
                     DefaultButton = ContentDialogButton.Primary,
                     XamlRoot = this.XamlRoot
                 };
@@ -1137,7 +1138,7 @@ namespace FluentTaskScheduler
                 // Non-admin: disable dropdown and show explanation notice
                 EditTaskNetworkSelection.IsEnabled = false;
                 EditTaskNetworkSelection.Items.Clear();
-                EditTaskNetworkSelection.Items.Add(new ComboBoxItem { Content = "Any network", Tag = "" });
+                EditTaskNetworkSelection.Items.Add(new ComboBoxItem { Content = L("Main.AnyNetwork", "Any network"), Tag = "" });
                 EditTaskNetworkSelection.SelectedIndex = 0;
                 NetworkAdminNotice.IsOpen = true;
                 return;
@@ -1147,7 +1148,7 @@ namespace FluentTaskScheduler
             NetworkAdminNotice.IsOpen = false;
             EditTaskNetworkSelection.IsEnabled = true;
             EditTaskNetworkSelection.Items.Clear();
-            EditTaskNetworkSelection.Items.Add(new ComboBoxItem { Content = "Any network", Tag = "" });
+            EditTaskNetworkSelection.Items.Add(new ComboBoxItem { Content = L("Main.AnyNetwork", "Any network"), Tag = "" });
 
             try
             {
@@ -1344,12 +1345,12 @@ namespace FluentTaskScheduler
             }
         }
         private void BatchStop_Click(object sender, RoutedEventArgs e) => PerformBatchAction(t => { ViewModel.TaskService.StopTask(t.Path); t.State = "Ready"; });
-        private async void BatchEnable_Click(object sender, RoutedEventArgs e) { var denied = PerformBatchActionWithErrors(t => { if (!t.IsEnabled) { ViewModel.TaskService.SetTaskEnabled(t.Path, true); t.IsEnabled = true; } }); UpdateBatchActionsState(); if (denied.Count > 0) await ShowErrorDialog($"The user account under which you are performing this action does not have permission to enable the following task(s):\n\n{string.Join("\n", denied)}\n\nThese tasks are protected and cannot be modified, even with administrator privileges."); }
-        private async void BatchDisable_Click(object sender, RoutedEventArgs e) { var denied = PerformBatchActionWithErrors(t => { if (t.IsEnabled) { ViewModel.TaskService.SetTaskEnabled(t.Path, false); t.IsEnabled = false; } }); UpdateBatchActionsState(); if (denied.Count > 0) await ShowErrorDialog($"The user account under which you are performing this action does not have permission to disable the following task(s):\n\n{string.Join("\n", denied)}\n\nThese tasks are protected and cannot be modified, even with administrator privileges."); }
+        private async void BatchEnable_Click(object sender, RoutedEventArgs e) { var denied = PerformBatchActionWithErrors(t => { if (!t.IsEnabled) { ViewModel.TaskService.SetTaskEnabled(t.Path, true); t.IsEnabled = true; } }); UpdateBatchActionsState(); if (denied.Count > 0) await ShowErrorDialog(string.Format(L("Main.PermissionEnableDenied", "The user account under which you are performing this action does not have permission to enable the following task(s):\n\n{0}\n\nThese tasks are protected and cannot be modified, even with administrator privileges."), string.Join("\n", denied))); }
+        private async void BatchDisable_Click(object sender, RoutedEventArgs e) { var denied = PerformBatchActionWithErrors(t => { if (t.IsEnabled) { ViewModel.TaskService.SetTaskEnabled(t.Path, false); t.IsEnabled = false; } }); UpdateBatchActionsState(); if (denied.Count > 0) await ShowErrorDialog(string.Format(L("Main.PermissionDisableDenied", "The user account under which you are performing this action does not have permission to disable the following task(s):\n\n{0}\n\nThese tasks are protected and cannot be modified, even with administrator privileges."), string.Join("\n", denied))); }
         private async void BatchDelete_Click(object sender, RoutedEventArgs e) 
         { 
              var tasks = TaskListView.SelectedItems.Cast<ScheduledTaskModel>().ToList();
-             var dialog = new ContentDialog { Title = "Confirm Delete", Content = $"Delete {tasks.Count} tasks?", PrimaryButtonText = "Delete", CloseButtonText = "Cancel", DefaultButton = ContentDialogButton.Close, XamlRoot = this.XamlRoot };
+             var dialog = new ContentDialog { Title = L("Main.ConfirmDelete.Title", "Confirm Delete"), Content = string.Format(L("Main.BatchDelete.Content", "Delete {0} tasks?"), tasks.Count), PrimaryButtonText = L("Dialog.Delete", "Delete"), CloseButtonText = L("Dialog.Cancel", "Cancel"), DefaultButton = ContentDialogButton.Close, XamlRoot = this.XamlRoot };
              if (await dialog.ShowAsync() == ContentDialogResult.Primary)
              {
                  foreach(var t in tasks) try { ViewModel.TaskService.DeleteTask(t.Path); } catch {}
@@ -1478,7 +1479,7 @@ namespace FluentTaskScheduler
 
         private async void CreateFolder_Click(string parentPath)
         {
-            var dialog = new ContentDialog { Title="New Folder", Content=new TextBox{PlaceholderText="Name"}, PrimaryButtonText="Create", CloseButtonText="Cancel", DefaultButton=ContentDialogButton.Primary, XamlRoot=this.XamlRoot, RequestedTheme=Services.SettingsService.Theme };
+            var dialog = new ContentDialog { Title=L("Main.NewFolder.Title", "New Folder"), Content=new TextBox{PlaceholderText=L("Main.NewFolder.NamePlaceholder", "Name")}, PrimaryButtonText=L("Dialog.Create", "Create"), CloseButtonText=L("Dialog.Cancel", "Cancel"), DefaultButton=ContentDialogButton.Primary, XamlRoot=this.XamlRoot, RequestedTheme=Services.SettingsService.Theme };
             if (await dialog.ShowAsync() == ContentDialogResult.Primary && dialog.Content is TextBox tb && !string.IsNullOrWhiteSpace(tb.Text)) 
             { 
                 try 
@@ -1495,15 +1496,15 @@ namespace FluentTaskScheduler
 
         private async void RenameFolder_Click(string path, string oldName)
         {
-            var tb = new TextBox { Text = oldName, PlaceholderText = "New Name" };
+            var tb = new TextBox { Text = oldName, PlaceholderText = L("Main.RenameFolder.NamePlaceholder", "New Name") };
             tb.SelectAll();
             
             var dialog = new ContentDialog
             {
-                Title = "Rename Folder",
+                Title = L("Main.RenameFolder.Title", "Rename Folder"),
                 Content = tb,
-                PrimaryButtonText = "Rename",
-                CloseButtonText = "Cancel",
+                PrimaryButtonText = L("Dialog.Rename", "Rename"),
+                CloseButtonText = L("Dialog.Cancel", "Cancel"),
                 DefaultButton = ContentDialogButton.Primary,
                 XamlRoot = this.XamlRoot,
                 RequestedTheme = Services.SettingsService.Theme
@@ -1532,7 +1533,7 @@ namespace FluentTaskScheduler
 
         private async void DeleteFolder_Click(string path)
         {
-            var dialog = new ContentDialog { Title="Delete Folder", Content=$"Delete '{path}' and ALL tasks in it?", PrimaryButtonText="Delete", CloseButtonText="Cancel", DefaultButton=ContentDialogButton.Close, XamlRoot=this.XamlRoot, RequestedTheme=Services.SettingsService.Theme };
+            var dialog = new ContentDialog { Title=L("Main.DeleteFolder.Title", "Delete Folder"), Content=string.Format(L("Main.DeleteFolder.Content", "Delete '{0}' and ALL tasks in it?"), path), PrimaryButtonText=L("Dialog.Delete", "Delete"), CloseButtonText=L("Dialog.Cancel", "Cancel"), DefaultButton=ContentDialogButton.Close, XamlRoot=this.XamlRoot, RequestedTheme=Services.SettingsService.Theme };
             if (await dialog.ShowAsync() == ContentDialogResult.Primary) 
             { 
                 try 
@@ -1856,7 +1857,7 @@ namespace FluentTaskScheduler
             LoadFolderStructure();
 
             if (errors.Count > 0)
-                await ShowErrorDialog("Some tasks could not be moved:\n\n" + string.Join("\n", errors));
+                await ShowErrorDialog(L("Main.MoveTasksPartialError", "Some tasks could not be moved:\n\n") + string.Join("\n", errors));
         }
 
         private async System.Threading.Tasks.Task MoveDraggedFolderAsync(string sourceFolderPath, string targetFolderPath)
@@ -1870,7 +1871,7 @@ namespace FluentTaskScheduler
                 LoadFolderStructure();
                 await ViewModel.LoadTasksAsync();
             }
-            catch (Exception ex) { await ShowErrorDialog($"Could not move folder: {ex.Message}"); }
+            catch (Exception ex) { await ShowErrorDialog(string.Format(L("Main.MoveFolderError", "Could not move folder: {0}"), ex.Message)); }
         }
 
 
@@ -1882,9 +1883,9 @@ namespace FluentTaskScheduler
             { 
                 var dialog = new ContentDialog 
                 { 
-                    Title = "Error", 
+                    Title = L("Main.Error.Title", "Error"), 
                     Content = message, 
-                    CloseButtonText = "OK", 
+                    CloseButtonText = L("Dialog.OK", "OK"), 
                     XamlRoot = this.XamlRoot, 
                     RequestedTheme = Services.SettingsService.Theme 
                 };

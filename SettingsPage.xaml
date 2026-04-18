@@ -96,6 +96,21 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock x:Uid="SettingsLanguageTitle" Text="Language" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Uid="SettingsLanguageHint" Text="Select UI language. Restart the app to apply all text changes." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <ComboBox x:Name="LanguageComboBox" Grid.Column="1" VerticalAlignment="Center"
+                                          SelectionChanged="LanguageComboBox_SelectionChanged" Width="160">
+                                    <ComboBoxItem x:Uid="SettingsLanguageEnglish" Content="English"/>
+                                    <ComboBoxItem x:Uid="SettingsLanguageChinese" Content="简体中文"/>
+                                </ComboBox>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
                                     <TextBlock Text="Mica Effect" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                                     <TextBlock Text="Apply the Mica translucent background material." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>

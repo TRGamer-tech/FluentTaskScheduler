@@ -56,10 +56,11 @@ namespace FluentTaskScheduler
 
         public App()
         {
-            // Force English language
+            // Apply persisted language, fallback to English.
             try
             {
-                Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "en-US";
+                Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride =
+                    string.IsNullOrWhiteSpace(SS.Language) ? "en-US" : SS.Language;
             }
             catch { }
 
@@ -113,9 +114,9 @@ namespace FluentTaskScheduler
                             {
                                 var dialog = new ContentDialog
                                 {
-                                    Title = "Unhandled Exception",
+                                    Title = Services.LocalizationService.GetString("App.UnhandledException.Title", "Unhandled Exception"),
                                     Content = errorMessage,
-                                    CloseButtonText = "Close",
+                                    CloseButtonText = Services.LocalizationService.GetString("Dialog.Close", "Close"),
                                     XamlRoot = m_window.Content?.XamlRoot
                                 };
                                 await dialog.ShowAsync();
@@ -516,10 +517,12 @@ namespace FluentTaskScheduler
                     {
                         var dialog = new ContentDialog
                         {
-                            Title = "Update Available",
-                            Content = $"Version {result.NewVersion} has been downloaded and is ready to install.\nRestart now to apply the update?",
-                            PrimaryButtonText = "Restart Now",
-                            CloseButtonText = "Later",
+                            Title = Services.LocalizationService.GetString("App.UpdateAvailable.Title", "Update Available"),
+                            Content = string.Format(
+                                Services.LocalizationService.GetString("App.UpdateAvailable.Content", "Version {0} has been downloaded and is ready to install.\nRestart now to apply the update?"),
+                                result.NewVersion),
+                            PrimaryButtonText = Services.LocalizationService.GetString("Dialog.RestartNow", "Restart Now"),
+                            CloseButtonText = Services.LocalizationService.GetString("Dialog.Later", "Later"),
                             XamlRoot = m_window.Content?.XamlRoot,
                             RequestedTheme = SS.Theme
                         };
