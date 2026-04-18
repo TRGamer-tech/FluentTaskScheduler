@@ -314,7 +314,7 @@ namespace FluentTaskScheduler
                 ViewModel.SetFilter(folder.Path);
                 
                 // Restore Task View
-                NavView.Header = "Scheduled Tasks";
+                NavView.Header = "计划任务";
                 TasksViewGrid.Visibility = Visibility.Visible;
                 ContentFrame.Visibility = Visibility.Collapsed;
                 
@@ -327,7 +327,7 @@ namespace FluentTaskScheduler
         {
             if (args.IsSettingsSelected || (args.SelectedItem is NavigationViewItem settingsItem && settingsItem.Tag?.ToString() == "settings")) 
             {
-                 NavView.Header = "Settings";
+                 NavView.Header = "设置";
                  ContentFrame.Visibility = Visibility.Visible;
                  TasksViewGrid.Visibility = Visibility.Collapsed;
                  ContentFrame.Navigate(typeof(SettingsPage));
@@ -338,7 +338,7 @@ namespace FluentTaskScheduler
 
                 if (tag == "Dashboard")
                 {
-                    NavView.Header = "Dashboard";
+                    NavView.Header = "仪表盘";
                     TasksViewGrid.Visibility = Visibility.Collapsed;
                     ContentFrame.Visibility = Visibility.Visible;
                     ContentFrame.Navigate(typeof(DashboardPage));
@@ -346,7 +346,7 @@ namespace FluentTaskScheduler
                 }
                 else if (tag == "ScriptLibrary")
                 {
-                    NavView.Header = "Script Library";
+                    NavView.Header = "脚本库";
                     TasksViewGrid.Visibility = Visibility.Collapsed;
                     ContentFrame.Visibility = Visibility.Visible;
                     ContentFrame.Navigate(typeof(ScriptLibraryPage), this);
@@ -355,7 +355,7 @@ namespace FluentTaskScheduler
                 else
                 {
                     // Standard Task Views (if any)
-                    NavView.Header = "Scheduled Tasks";
+                    NavView.Header = "计划任务";
                     TasksViewGrid.Visibility = Visibility.Visible;
                     ContentFrame.Visibility = Visibility.Collapsed;
                     FolderTreeView.SelectedItem = null;
@@ -389,7 +389,7 @@ namespace FluentTaskScheduler
         {
             // Switch to Tasks View
             NavView.SelectedItem = null; // Clear selection to indicate custom state or select "All Tasks"
-            NavView.Header = "Scheduled Tasks";
+            NavView.Header = "计划任务";
             TasksViewGrid.Visibility = Visibility.Visible;
             ContentFrame.Visibility = Visibility.Collapsed;
             FolderTreeView.SelectedItem = null;
@@ -453,7 +453,7 @@ namespace FluentTaskScheduler
             if (BatchActionBar != null)
             {
                 BatchActionBar.Visibility = count > 1 ? Visibility.Visible : Visibility.Collapsed;
-                if (BatchCountText != null) BatchCountText.Text = $"{count} selected";
+                if (BatchCountText != null) BatchCountText.Text = $"已选择 {count} 项";
                 UpdateBatchActionsState();
             }
             if (count == 1) ViewModel.SelectedTask = (ScheduledTaskModel)TaskListView.SelectedItem;
@@ -1396,12 +1396,12 @@ namespace FluentTaskScheduler
                 flyout.Items.Add(item);
             }
 
-            AddItem("Name",         "Name");
-            AddItem("Status",       "Status");
-            AddItem("Next Run",     "NextRun");
-            AddItem("Last Run",     "LastRun");
+            AddItem("名称",         "Name");
+            AddItem("状态",       "Status");
+            AddItem("下次运行",     "NextRun");
+            AddItem("上次运行",     "LastRun");
             flyout.Items.Add(new MenuFlyoutSeparator());
-            var clear = new MenuFlyoutItem { Text = "Clear Sort" };
+            var clear = new MenuFlyoutItem { Text = "清除排序" };
             clear.Click += (s, _) => { ViewModel.ClearSort(); UpdateSortButtonText(); };
             flyout.Items.Add(clear);
 
@@ -1412,8 +1412,8 @@ namespace FluentTaskScheduler
         {
             string arrow = ViewModel.SortAscending ? "â–²" : "â–¼";
             SortButton.Content = string.IsNullOrEmpty(ViewModel.SortColumn)
-                ? "Sort \u2195"
-                : $"Sort {arrow} {ViewModel.SortColumn}";
+                ? "排序 \u2195"
+                : $"排序 {arrow} {ViewModel.SortColumn}";
         }
 
         private async void ReloadFolders_Click(object sender, RoutedEventArgs e)

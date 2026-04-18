@@ -29,37 +29,37 @@
                         Padding="0">
             
             <NavigationView.MenuItems>
-                <NavigationViewItem Tag="Appearance" Content="Appearance" IsSelected="True">
+                <NavigationViewItem Tag="Appearance" Content="外观" IsSelected="True">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE790;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Tag="Notifications" Content="Notifications">
+                <NavigationViewItem Tag="Notifications" Content="通知">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE7E7;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Tag="System" Content="System">
+                <NavigationViewItem Tag="System" Content="系统">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE770;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Tag="Advanced" Content="Advanced">
+                <NavigationViewItem Tag="Advanced" Content="高级">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE90F;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Tag="Data" Content="Data">
+                <NavigationViewItem Tag="Data" Content="数据">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE8B5;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Tag="Categories" Content="Categories &amp; Tags">
+                <NavigationViewItem Tag="Categories" Content="分类与标签">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE8EC;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Tag="About" Content="About">
+                <NavigationViewItem Tag="About" Content="关于">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE946;"/>
                     </NavigationViewItem.Icon>
@@ -74,20 +74,20 @@
 
                     <!-- ── Appearance ── -->
                     <StackPanel x:Name="PanelAppearance" Spacing="4">
-                        <TextBlock Text="Appearance" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
+                        <TextBlock Text="外观" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
 
                         <Border Style="{StaticResource SettingsCardStyle}">
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="App Theme" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Choose Light, Dark, or follow the system setting." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock Text="应用主题" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="可选择浅色、深色，或跟随系统设置。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ComboBox x:Name="ThemeComboBox" Grid.Column="1" VerticalAlignment="Center"
                                           SelectionChanged="ThemeComboBox_SelectionChanged" Width="160">
-                                    <ComboBoxItem Content="Light"/>
-                                    <ComboBoxItem Content="Dark"/>
-                                    <ComboBoxItem Content="System Default"/>
+                                    <ComboBoxItem Content="浅色"/>
+                                    <ComboBoxItem Content="深色"/>
+                                    <ComboBoxItem Content="跟随系统"/>
                                 </ComboBox>
                             </Grid>
                         </Border>
@@ -96,8 +96,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock x:Uid="SettingsLanguageTitle" Text="Language" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock x:Uid="SettingsLanguageHint" Text="Select UI language. Restart the app to apply all text changes." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock x:Uid="SettingsLanguageTitle" Text="语言" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Uid="SettingsLanguageHint" Text="选择界面语言。重启应用后将完全生效。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ComboBox x:Name="LanguageComboBox" Grid.Column="1" VerticalAlignment="Center"
                                           SelectionChanged="LanguageComboBox_SelectionChanged" Width="160">
@@ -111,8 +111,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Mica Effect" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Apply the Mica translucent background material." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock Text="Mica 效果" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="启用 Mica 半透明背景材质。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ToggleSwitch x:Name="MicaModeToggle" Grid.Column="1" VerticalAlignment="Center"
                                              OffContent="" OnContent="" IsOn="True" Toggled="MicaModeToggle_Toggled"/>
@@ -123,8 +123,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="OLED Mode" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Pure black background to save power on OLED displays. Requires Dark theme." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock Text="OLED 模式" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="纯黑背景可降低 OLED 屏幕功耗（需深色主题）。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ToggleSwitch x:Name="OledModeToggle" Grid.Column="1" VerticalAlignment="Center"
                                              OffContent="" OnContent="" Toggled="OledModeToggle_Toggled"/>
@@ -134,14 +134,14 @@
 
                     <!-- ── Notifications ── -->
                     <StackPanel x:Name="PanelNotifications" Spacing="4" Visibility="Collapsed">
-                        <TextBlock Text="Notifications" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
+                        <TextBlock Text="通知" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
 
                         <Border Style="{StaticResource SettingsCardStyle}">
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Task Notifications" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Show a toast when a task starts or fails." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock Text="任务通知" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="任务开始或失败时显示通知。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ToggleSwitch x:Name="NotificationsToggle" Grid.Column="1" VerticalAlignment="Center"
                                              OffContent="" OnContent="" IsOn="True" Toggled="NotificationsToggle_Toggled"/>
@@ -152,8 +152,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Upcoming Task Reminders" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Show a reminder toast before a scheduled task is about to run." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock Text="即将运行提醒" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="计划任务即将运行前显示提醒通知。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ToggleSwitch x:Name="UpcomingRemindersToggle" Grid.Column="1" VerticalAlignment="Center"
                                              OffContent="" OnContent="" IsOn="True" Toggled="UpcomingRemindersToggle_Toggled"/>
@@ -164,16 +164,16 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Reminder Timing" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="How far in advance to send the reminder." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock Text="提醒时间" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="设置提前多久发送提醒。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ComboBox x:Name="ReminderLeadTimeComboBox" Grid.Column="1" VerticalAlignment="Center"
                                           SelectionChanged="ReminderLeadTimeComboBox_SelectionChanged" Width="160">
-                                    <ComboBoxItem Content="1 minute before"/>
-                                    <ComboBoxItem Content="5 minutes before"/>
-                                    <ComboBoxItem Content="10 minutes before"/>
-                                    <ComboBoxItem Content="15 minutes before"/>
-                                    <ComboBoxItem Content="30 minutes before"/>
+                                    <ComboBoxItem Content="提前 1 分钟"/>
+                                    <ComboBoxItem Content="提前 5 分钟"/>
+                                    <ComboBoxItem Content="提前 10 分钟"/>
+                                    <ComboBoxItem Content="提前 15 分钟"/>
+                                    <ComboBoxItem Content="提前 30 分钟"/>
                                 </ComboBox>
                             </Grid>
                         </Border>
@@ -181,14 +181,14 @@
 
                     <!-- ── System ── -->
                     <StackPanel x:Name="PanelSystem" Spacing="4" Visibility="Collapsed">
-                        <TextBlock Text="System" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
+                        <TextBlock Text="系统" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
 
                         <Border Style="{StaticResource SettingsCardStyle}">
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Run on Startup" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Automatically launch the app when you sign in to Windows." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock Text="开机启动" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="登录 Windows 后自动启动应用。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ToggleSwitch x:Name="RunOnStartupToggle" Grid.Column="1" VerticalAlignment="Center"
                                              OffContent="" OnContent="" IsOn="False" Toggled="RunOnStartupToggle_Toggled"/>
@@ -199,8 +199,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Minimize to Tray" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Hide the window to the system tray instead of closing." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock Text="最小化到托盘" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="关闭窗口时隐藏到系统托盘而不是退出。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ToggleSwitch x:Name="TrayIconToggle" Grid.Column="1" VerticalAlignment="Center"
                                              OffContent="" OnContent="" IsOn="True" Toggled="TrayIconToggle_Toggled"/>
@@ -211,8 +211,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Smooth Scrolling" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Enable inertia-based scrolling throughout the app." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock Text="平滑滚动" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="在应用中启用惯性滚动效果。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ToggleSwitch x:Name="SmoothScrollingToggle" Grid.Column="1" VerticalAlignment="Center"
                                              OffContent="" OnContent="" IsOn="False" Toggled="SmoothScrollingToggle_Toggled"/>
@@ -223,8 +223,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Show Hidden Tasks" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Display tasks that are marked as hidden in the Windows Task Scheduler." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock Text="显示隐藏任务" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="显示在 Windows 任务计划程序中被标记为隐藏的任务。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ToggleSwitch x:Name="ShowHiddenTasksToggle" Grid.Column="1" VerticalAlignment="Center"
                                              OffContent="" OnContent="" IsOn="True" Toggled="ShowHiddenTasksToggle_Toggled"/>
@@ -234,14 +234,14 @@
 
                     <!-- ── Advanced ── -->
                     <StackPanel x:Name="PanelAdvanced" Spacing="4" Visibility="Collapsed">
-                        <TextBlock Text="Advanced" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
+                        <TextBlock Text="高级" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
 
                         <Border Style="{StaticResource SettingsCardStyle}">
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Confirm Before Deleting" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Show a confirmation dialog before removing a task." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock Text="删除前确认" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="删除任务前弹出确认对话框。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ToggleSwitch x:Name="ConfirmDeleteToggle" Grid.Column="1" VerticalAlignment="Center"
                                              OffContent="" OnContent="" Toggled="ConfirmDeleteToggle_Toggled"/>
@@ -252,8 +252,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Application Logging" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Write internal events and errors to a log file for troubleshooting." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock Text="应用日志" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="将内部事件和错误写入日志文件，便于排查问题。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                                     <ToggleSwitch x:Name="LoggingToggle" OffContent="" OnContent="" IsOn="True" Toggled="LoggingToggle_Toggled"/>
@@ -265,8 +265,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Separate Log Files" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Store error and crash logs in dedicated files instead of the main log." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock Text="分离日志文件" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="错误与崩溃日志单独存储，不写入主日志文件。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ToggleSwitch x:Name="SeparateLogsToggle" Grid.Column="1" VerticalAlignment="Center"
                                              OffContent="" OnContent="" IsOn="True" Toggled="SeparateLogsToggle_Toggled"/>
@@ -277,13 +277,13 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Specific Logs" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Direct access to error and crash records." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock Text="专项日志" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="快速访问错误与崩溃日志。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                                    <Button x:Name="OpenLogButton" Content="Open Log" Click="OpenLogButton_Click"/>
-                                    <Button x:Name="OpenErrorLogButton" Content="Open Error Log" Click="OpenErrorLogButton_Click"/>
-                                    <Button x:Name="OpenCrashLogButton" Content="Open Crash Log" Click="OpenCrashLogButton_Click"/>
+                                    <Button x:Name="OpenLogButton" Content="打开日志" Click="OpenLogButton_Click"/>
+                                    <Button x:Name="OpenErrorLogButton" Content="打开错误日志" Click="OpenErrorLogButton_Click"/>
+                                    <Button x:Name="OpenCrashLogButton" Content="打开崩溃日志" Click="OpenCrashLogButton_Click"/>
                                 </StackPanel>
                             </Grid>
                         </Border>
@@ -291,16 +291,16 @@
 
                     <!-- ── Data ── -->
                     <StackPanel x:Name="PanelData" Spacing="4" Visibility="Collapsed">
-                        <TextBlock Text="Data" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
+                        <TextBlock Text="数据" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
 
                         <Border Style="{StaticResource SettingsCardStyle}">
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Export Settings" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Save your current settings to a JSON file." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock Text="导出设置" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="将当前设置保存为 JSON 文件。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
-                                <Button x:Name="ExportSettingsButton" Grid.Column="1" Content="Export" VerticalAlignment="Center" Click="ExportSettings_Click"/>
+                                <Button x:Name="ExportSettingsButton" Grid.Column="1" Content="导出" VerticalAlignment="Center" Click="ExportSettings_Click"/>
                             </Grid>
                         </Border>
 
@@ -308,30 +308,30 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Import Settings" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Restore settings from a previously exported file." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock Text="导入设置" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="从之前导出的文件恢复设置。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
-                                <Button x:Name="ImportSettingsButton" Grid.Column="1" Content="Import" VerticalAlignment="Center" Click="ImportSettings_Click"/>
+                                <Button x:Name="ImportSettingsButton" Grid.Column="1" Content="导入" VerticalAlignment="Center" Click="ImportSettings_Click"/>
                             </Grid>
                         </Border>
                     </StackPanel>
 
                     <!-- ── Categories & Tags ── -->
                     <StackPanel x:Name="PanelCategories" Spacing="16" Visibility="Collapsed">
-                        <TextBlock Text="Categories &amp; Tags" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
+                        <TextBlock Text="分类与标签" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
 
                         <!-- Categories Section -->
                         <Border Style="{StaticResource SettingsCardStyle}">
                             <StackPanel Spacing="12">
-                                <TextBlock Text="Manage Categories" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                <TextBlock Text="Predefined categories for your tasks." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
+                                <TextBlock Text="管理分类" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBlock Text="为任务预设分类。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
                                 <Grid ColumnSpacing="8">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBox x:Name="NewCategoryBox" PlaceholderText="New category name..." KeyDown="NewCategoryBox_KeyDown"/>
-                                    <Button x:Name="AddCategoryBtn" Grid.Column="1" Content="Add" Click="AddCategory_Click"/>
+                                    <TextBox x:Name="NewCategoryBox" PlaceholderText="新分类名称..." KeyDown="NewCategoryBox_KeyDown"/>
+                                    <Button x:Name="AddCategoryBtn" Grid.Column="1" Content="添加" Click="AddCategory_Click"/>
                                 </Grid>
                                 <ItemsControl x:Name="CategoriesItemsControl">
                                     <ItemsControl.ItemsPanel>
@@ -360,15 +360,15 @@
                         <!-- Tags Section -->
                         <Border Style="{StaticResource SettingsCardStyle}">
                             <StackPanel Spacing="12">
-                                <TextBlock Text="Manage Tags" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                <TextBlock Text="Predefined tags for your tasks." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
+                                <TextBlock Text="管理标签" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBlock Text="为任务预设标签。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
                                 <Grid ColumnSpacing="8">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBox x:Name="NewTagBox" PlaceholderText="New tag name..." KeyDown="NewTagBox_KeyDown"/>
-                                    <Button x:Name="AddTagBtn" Grid.Column="1" Content="Add" Click="AddTag_Click"/>
+                                    <TextBox x:Name="NewTagBox" PlaceholderText="新标签名称..." KeyDown="NewTagBox_KeyDown"/>
+                                    <Button x:Name="AddTagBtn" Grid.Column="1" Content="添加" Click="AddTag_Click"/>
                                 </Grid>
                                 <ItemsControl x:Name="TagsItemsControl">
                                     <ItemsControl.ItemsPanel>
@@ -397,18 +397,18 @@
 
                     <!-- ── About ── -->
                     <StackPanel x:Name="PanelAbout" Spacing="4" Visibility="Collapsed">
-                        <TextBlock Text="About" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
+                        <TextBlock Text="关于" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
 
                         <Border Style="{StaticResource SettingsCardStyle}">
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Fluent Task Scheduler" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Built with WinUI 3 · Windows App SDK" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
+                                     <TextBlock Text="Fluent Task Scheduler" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                     <TextBlock Text="基于 WinUI 3 · Windows App SDK 构建" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
                                 </StackPanel>
                                 <Button x:Name="VersionButton" Grid.Column="1" Click="VersionButton_Click"
                                         Background="Transparent" BorderThickness="0" Padding="8,6"
-                                        VerticalAlignment="Center" ToolTipService.ToolTip="See What's New">
+                                         VerticalAlignment="Center" ToolTipService.ToolTip="查看更新内容">
                                     <StackPanel Orientation="Horizontal" Spacing="4">
                                         <TextBlock x:Uid="AboutVersion" Text="Version 1.8.1"
                                                    Style="{StaticResource CaptionTextBlockStyle}"
@@ -424,15 +424,15 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Check for Updates" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Check if a newer version is available." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock Text="检查更新" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="检查是否有可用的新版本。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                                     <ProgressRing x:Name="UpdateCheckProgressRing" IsActive="False" Width="20" Height="20" Visibility="Collapsed"/>
                                     <Button x:Name="CheckForUpdatesButton" Click="CheckForUpdates_Click">
                                         <StackPanel Orientation="Horizontal" Spacing="8">
                                             <FontIcon Glyph="&#xE895;" FontSize="13"/>
-                                            <TextBlock Text="Check"/>
+                                            <TextBlock Text="检查"/>
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>
@@ -443,14 +443,14 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Onboarding" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Replay the welcome walkthrough from first launch." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock Text="新手引导" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="重新播放首次启动时的欢迎引导。" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <Button x:Name="ReplayOnboardingButton" Grid.Column="1" VerticalAlignment="Center"
                                         Click="ReplayOnboardingButton_Click">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <FontIcon Glyph="&#xE7C3;" FontSize="13"/>
-                                        <TextBlock Text="View Again"/>
+                                        <TextBlock Text="再次查看"/>
                                     </StackPanel>
                                 </Button>
                             </Grid>

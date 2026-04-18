@@ -87,10 +87,10 @@ namespace FluentTaskScheduler.ViewModels
             DailyHistory = new ObservableCollection<DailyChartPoint>();
             RunningTasksList = new ObservableCollection<RunningTaskInfo>();
             FailedTasksList = new ObservableCollection<FailedTaskInfo>();
-            AvailableTags = new ObservableCollection<FilterItem> { new FilterItem { Name = "All Tags", IsSelected = true } };
-            _selectedTag = "All Tags";
-            AvailableCategories = new ObservableCollection<FilterItem> { new FilterItem { Name = "All Categories", IsSelected = true } };
-            _selectedCategory = "All Categories";
+            AvailableTags = new ObservableCollection<FilterItem> { new FilterItem { Name = "全部标签", IsSelected = true } };
+            _selectedTag = "全部标签";
+            AvailableCategories = new ObservableCollection<FilterItem> { new FilterItem { Name = "全部分类", IsSelected = true } };
+            _selectedCategory = "全部分类";
         }
 
         public int RunningTasks
@@ -153,7 +153,7 @@ namespace FluentTaskScheduler.ViewModels
         public ObservableCollection<FilterItem> AvailableTags { get; }
         public ObservableCollection<FilterItem> AvailableCategories { get; }
 
-        private string _selectedTag = "All Tags";
+        private string _selectedTag = "全部标签";
         public string SelectedTag
         {
             get => _selectedTag;
@@ -161,7 +161,7 @@ namespace FluentTaskScheduler.ViewModels
             {
                 if (_selectedTag != value)
                 {
-                    _selectedTag = value ?? "All Tags";
+                    _selectedTag = value ?? "全部标签";
                     OnPropertyChanged();
 
                     foreach (var tag in AvailableTags) tag.IsSelected = (tag.Name == _selectedTag);
@@ -170,7 +170,7 @@ namespace FluentTaskScheduler.ViewModels
             }
         }
 
-        private string _selectedCategory = "All Categories";
+        private string _selectedCategory = "全部分类";
         public string SelectedCategory
         {
             get => _selectedCategory;
@@ -178,7 +178,7 @@ namespace FluentTaskScheduler.ViewModels
             {
                 if (_selectedCategory != value)
                 {
-                    _selectedCategory = value ?? "All Categories";
+                    _selectedCategory = value ?? "全部分类";
                     OnPropertyChanged();
 
                     foreach (var cat in AvailableCategories) cat.IsSelected = (cat.Name == _selectedCategory);
@@ -216,11 +216,11 @@ namespace FluentTaskScheduler.ViewModels
 
                     // 3. Filter tasks if needed
                     var allTasks = allTasksRaw;
-                    if (!string.IsNullOrEmpty(SelectedTag) && SelectedTag != "All Tags")
+                    if (!string.IsNullOrEmpty(SelectedTag) && SelectedTag != "全部标签")
                     {
                         allTasks = allTasks.Where(t => t.Tags != null && t.Tags.Contains(SelectedTag, StringComparer.OrdinalIgnoreCase)).ToList();
                     }
-                    if (!string.IsNullOrEmpty(SelectedCategory) && SelectedCategory != "All Categories")
+                    if (!string.IsNullOrEmpty(SelectedCategory) && SelectedCategory != "全部分类")
                     {
                         allTasks = allTasks.Where(t => string.Equals(t.Category, SelectedCategory, StringComparison.OrdinalIgnoreCase)).ToList();
                     }
@@ -238,7 +238,7 @@ namespace FluentTaskScheduler.ViewModels
                         var actionCmd = task.ActionCommand;
                         var processName = "";
                         var processAlive = false;
-                        var processStatus = "Unknown";
+                        var processStatus = "未知";
 
                         if (!string.IsNullOrEmpty(actionCmd))
                         {
@@ -315,7 +315,7 @@ namespace FluentTaskScheduler.ViewModels
                                 DateTime.TryParse(h.Time, out var dt) && dt.Date == day);
                             return new DailyChartPoint
                             {
-                                Label = day == today ? "Today" : day.ToString("ddd"),
+                                Label = day == today ? "今天" : day.ToString("ddd"),
                                 Successes = dayEntries.Count(e => e.Result == "Task Completed"),
                                 Failures  = dayEntries.Count(e => e.Result != "Task Completed"
                                                                 && !string.IsNullOrEmpty(e.Result)),
@@ -376,7 +376,7 @@ namespace FluentTaskScheduler.ViewModels
 
                         // Update available tags
                         var currentTags = AvailableTags.Select(t => t.Name).ToList();
-                        var newTags = new List<string> { "All Tags" };
+                        var newTags = new List<string> { "全部标签" };
                         newTags.AddRange(uniqueTags);
 
                         if (!currentTags.SequenceEqual(newTags))
@@ -388,7 +388,7 @@ namespace FluentTaskScheduler.ViewModels
 
                         // Update available categories
                         var currentCats = AvailableCategories.Select(t => t.Name).ToList();
-                        var newCats = new List<string> { "All Categories" };
+                        var newCats = new List<string> { "全部分类" };
                         newCats.AddRange(uniqueCategories);
 
                         if (!currentCats.SequenceEqual(newCats))
