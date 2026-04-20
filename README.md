@@ -17,8 +17,8 @@ If you like what this project is for, I would really appreciate a (optional!) do
 Go to the [Releases Page](https://github.com/TRGamer-tech/FluentTaskScheduler/releases) and download the newest Version from there :)
 
 ### Winget
-**Coming Soon, I'm working on it!**
 ```
+winget install -e --id TRGamer-tech.FluentTaskScheduler
 ```
 
 ### Scoop
