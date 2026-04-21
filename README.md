@@ -171,53 +171,15 @@ FluentTaskScheduler.exe --export-history "MyTaskName" --output "C:\logs\history.
 - **Architectures**: Support for x64 and ARM64.
 - **Language**: C#
 
-## Building from Source
+## Building from Source / Publishing with VeloPack / Winget / Choco / Scoop
 
-1. **Prerequisites**:
-   - Visual Studio 2022 (17.8 or later) with "Windows application development" workload.
-   - .NET 8 SDK.
-
-2. **Clone & Build**:
-
-   ```bash
-   git clone https://github.com/TRGamer-tech/FluentTaskScheduler.git
-   cd FluentTaskScheduler
-   dotnet build -c Release
-   ```
+See [CONTRIBUTING](CONTRIBUTING.md) for details
 
 ## 🛠️ Troubleshooting
 
 - **Crash Logs**: If the application encounters a critical error, a `crash_log.txt` file is generated in the application directory.
 - **Admin Rights**: Some features (like "Run as SYSTEM") require the application to be run as Administrator.
 - **Preferences storage**: The application stores its preferences as well as the log and custom script files in a JSON file in "%localappdata%\FluentTaskScheduler".
-
-3. **Publishing with VeloPack**:
-
-   The project uses [VeloPack](https://velopack.io/) for packaging and auto-updates. 
-   A single MSI installer is built per architecture — end users can choose *Per User* or *Machine-Wide* installation from the standard MSI UI. 
-   Requires vpk **0.0.1444-gc245055** or later.
-
-   ```bash
-   # Install / update the VeloPack CLI (0.0.1444-gc245055+)
-   dotnet tool install -g vpk
-   # or, if already installed:
-   dotnet tool update -g vpk
-
-   # x64
-   dotnet publish -c Release -r win-x64 --self-contained
-   vpk pack -u FluentTaskScheduler -v 1.X.X -p bin/x64/Release/net8.0-windows10.0.19041.0/win-x64/publish -e FluentTaskScheduler.exe --msi
-
-   # ARM64
-   dotnet publish -c Release -r win-arm64 --self-contained
-   vpk pack -u FluentTaskScheduler -v 1.X.X -p bin/ARM64/Release/net8.0-windows10.0.19041.0/win-arm64/publish -e FluentTaskScheduler.exe --msi
-   ```
-
-   This generates a `Setup.msi` installer and delta/full `.nupkg` files in the `Releases` folder. Upload the `.msi` and `.nupkg` files to a GitHub Release and the app will auto-update for users.
-
-   End users simply run `Setup.msi` and the installer UI lets them choose between a per-user or machine-wide installation.
-
-4. **Single File Deployment**:
-   The project also supports publishing as a single, self-contained executable for portable distribution.
 
 ## Star History
 
