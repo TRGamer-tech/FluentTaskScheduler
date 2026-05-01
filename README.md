@@ -89,7 +89,7 @@ choco install fluenttaskscheduler
 - **Mica Effect**: Enable or disable the Mica effect for a more premium look.
 - **Animated Icons**: UI elements that come to life, like the Settings icon that reacts to your touch.
 - **Title Bar Integration**: Modern, customized title bar with proper drag regions that actually work (unlike some other apps we won't mention).
-- **Languages**: Native English (en-US) support.
+- **Multilingual**: Support for **English**, **German**, **Chinese**, and **Japanese** with a runtime language switcher.
 - **Smooth Scrolling**: Optional smooth/inertia scrolling throughout the app, disabled by default for a snappier feel.
 - **Window Size Memory**: The app remembers your last window size and restores it on next launch.
 
