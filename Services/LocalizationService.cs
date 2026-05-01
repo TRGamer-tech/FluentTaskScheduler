@@ -10,6 +10,7 @@ namespace FluentTaskScheduler.Services
         private static readonly HashSet<string> _supportedLanguages = new(StringComparer.OrdinalIgnoreCase)
         {
             "en-US",
+            "de-DE",
             "zh-CN"
         };
 

@@ -140,7 +140,7 @@
   <data name="Dialog.RenameFolder.Title" xml:space="preserve"><value>重命名文件夹</value></data>
   <data name="Dialog.RenameFolder.NewNamePlaceholder" xml:space="preserve"><value>新名称</value></data>
   <data name="Dialog.DeleteFolder.Title" xml:space="preserve"><value>删除文件夹</value></data>
-  <data name="Dialog.DeleteFolder.ContentFormat" xml:space="preserve"><value>删除“{0}”及其所有任务？</value></data>
+  <data name="Dialog.DeleteFolder.ContentFormat" xml:space="preserve"><value>删除“{0}”以及所有相关任务和文件夹吗？</value></data>
   <data name="Dialog.UpdateAvailable.Title" xml:space="preserve"><value>有可用更新</value></data>
   <data name="Dialog.UpdateAvailable.ContentFormat" xml:space="preserve"><value>版本 {0} 已下载并可安装。
 是否立即重启以应用更新？</value></data>

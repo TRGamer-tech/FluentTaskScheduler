@@ -25,6 +25,7 @@
                         PaneDisplayMode="Left"
                         IsBackButtonVisible="Collapsed"
                         IsSettingsVisible="False"
+                        AlwaysShowHeader="False"
                         SelectionChanged="SettingsNav_SelectionChanged"
                         Padding="0">
             
@@ -101,6 +102,7 @@
                                 </StackPanel>
                                 <ComboBox x:Name="LanguageComboBox" Grid.Column="1" VerticalAlignment="Center" Width="160" SelectionChanged="LanguageComboBox_SelectionChanged">
                                     <ComboBoxItem Tag="en-US" Content="English"/>
+                                    <ComboBoxItem Tag="de-DE" Content="Deutsch"/>
                                     <ComboBoxItem Tag="zh-CN" Content="简体中文"/>
                                 </ComboBox>
                             </Grid>

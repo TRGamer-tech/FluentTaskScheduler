@@ -54,7 +54,12 @@ namespace FluentTaskScheduler
             };
             OledModeToggle.IsOn = SettingsService.IsOledMode;
             MicaModeToggle.IsOn = SettingsService.IsMicaEnabled;
-            LanguageComboBox.SelectedIndex = SettingsService.Language == "zh-CN" ? 1 : 0;
+            LanguageComboBox.SelectedIndex = SettingsService.Language switch
+            {
+                "de-DE" => 1,
+                "zh-CN" => 2,
+                _ => 0
+            };
             UpdateOledToggleState();
 
             // Notifications
@@ -111,10 +116,7 @@ namespace FluentTaskScheduler
 
             string tag = selectedItem.Tag?.ToString() ?? "";
 
-            if (_sectionTitles.TryGetValue(tag, out var title))
-            {
-                SettingsNav.Header = title;
-            }
+            // Header assignment removed as AlwaysShowHeader is False
             
             PanelAppearance.Visibility = tag == "Appearance" ? Visibility.Visible : Visibility.Collapsed;
             PanelNotifications.Visibility = tag == "Notifications" ? Visibility.Visible : Visibility.Collapsed;

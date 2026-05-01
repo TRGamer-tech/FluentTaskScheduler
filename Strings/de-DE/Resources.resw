@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppHeader.Header" xml:space="preserve"><value>Geplante Aufgaben</value></data>
+  <data name="NewTaskButton.Text" xml:space="preserve"><value>Neue Aufgabe</value></data>
+  <data name="NavAllTasks.Content" xml:space="preserve"><value>Alle Aufgaben</value></data>
+  <data name="NavRunning.Content" xml:space="preserve"><value>Wird ausgeführt</value></data>
+  <data name="NavEnabled.Content" xml:space="preserve"><value>Aktiviert</value></data>
+  <data name="RefreshButton.Content" xml:space="preserve"><value>Neu laden</value></data>
+  <data name="SearchBox.PlaceholderText" xml:space="preserve"><value>Nach Aufgaben suchen...</value></data>
+  <data name="TaskNameHeader.Header" xml:space="preserve"><value>Name der Aufgabe</value></data>
+  <data name="DescriptionHeader.Header" xml:space="preserve"><value>Beschreibung</value></data>
+  <data name="AuthorHeader.Header" xml:space="preserve"><value>Ersteller</value></data>
+  <data name="EnabledSwitch.Header" xml:space="preserve"><value>Aktiviert</value></data>
+  <data name="ActionTitle.Text" xml:space="preserve"><value>Aktionen</value></data>
+  <data name="ProgramScriptHeader.Header" xml:space="preserve"><value>Programm/Skript</value></data>
+  <data name="BrowseButton.Content" xml:space="preserve"><value>Durchsuchen...</value></data>
+  <data name="ArgumentsHeader.Header" xml:space="preserve"><value>Argumente (optional)</value></data>
+  <data name="DialogTitle.Text" xml:space="preserve"><value>Aufgabe hinzufügen oder bearbeiten</value></data>
+  <data name="TriggerTitle.Text" xml:space="preserve"><value>Auslöser</value></data>
+  <data name="TriggerTypeHeader.Header" xml:space="preserve"><value>Typ</value></data>
+  <data name="TimeHeader.Header" xml:space="preserve"><value>Uhrzeit (HH:mm)</value></data>
+  <data name="RepetitionTitle.Text" xml:space="preserve"><value>Wiederholung</value></data>
+  <data name="RepetitionIntervalHeader.Header" xml:space="preserve"><value>Wiederhole Aufgabe alle</value></data>
+  <data name="RepetitionDurationHeader.Header" xml:space="preserve"><value>For a duration of</value></data>
+  <data name="ConditionsTitle.Text" xml:space="preserve"><value>Bedingungen</value></data>
+  <data name="ConditionIdle.Content" xml:space="preserve"><value>Computer im Leerlauf</value></data>
+  <data name="ConditionAC.Content" xml:space="preserve"><value>Computer am Stromnetz angeschlossen</value></data>
+  <data name="ConditionNetwork.Content" xml:space="preserve"><value>Netzwerk verfügbar</value></data>
+  <data name="ConditionWake.Content" xml:space="preserve"><value>Computer zum Ausführen der Aufgabe aufwecken</value></data>
+  <data name="ConditionBattery.Content" xml:space="preserve"><value>Bei Umstellung auf Akkubetrieb beenden</value></data>
+  <data name="SettingsTitle.Text" xml:space="preserve"><value>Einstellungen</value></data>
+  <data name="StopIfRunsLongerHeader.Header" xml:space="preserve"><value>Aufgabe stoppen, wenn sie länger läuft als</value></data>
+  <data name="RunIfMissed.Content" xml:space="preserve"><value>Aufgabe so bald wie möglich nach verpasstem Start ausführen</value></data>
+  <data name="RestartOnFailure.Content" xml:space="preserve"><value>Bei Fehler, jede ... neustarten:</value></data>
+  <data name="RestartCountText1.Text" xml:space="preserve"><value>Neustart versuchen bis:</value></data>
+  <data name="RestartCountText2.Text" xml:space="preserve"><value>mal</value></data>
+  <data name="CancelButton.CloseButtonText" xml:space="preserve"><value>Abbrechen</value></data>
+  <data name="SaveButton.PrimaryButtonText" xml:space="preserve"><value>Speichern</value></data>
+  <data name="CloseButton.CloseButtonText" xml:space="preserve"><value>Schließen</value></data>
+  <data name="RunNowButton.Content" xml:space="preserve"><value>Jetzt starten</value></data>
+  <data name="StopButton.Content" xml:space="preserve"><value>Stop</value></data>
+  <data name="DeleteButton.Content" xml:space="preserve"><value>Löschen</value></data>
+  <data name="ExportButton.Content" xml:space="preserve"><value>Exportieren</value></data>
+  <data name="EditButton.Content" xml:space="preserve"><value>Bearbeiten</value></data>
+
+  <!-- Settings Page Strings -->
+  <data name="SettingsHeader.Text" xml:space="preserve"><value>Einstellungen</value></data>
+  <data name="AppearanceHeader.Text" xml:space="preserve"><value>Erscheinungsbild</value></data>
+  <data name="ThemeCombo.Header" xml:space="preserve"><value>App Design</value></data>
+  <data name="ThemeDefault.Content" xml:space="preserve"><value>Systemeinstellung verwenden</value></data>
+  <data name="ThemeLight.Content" xml:space="preserve"><value>Hell</value></data>
+  <data name="ThemeDark.Content" xml:space="preserve"><value>Dunkel</value></data>
+  <data name="OledToggle.Header" xml:space="preserve"><value>OLED Modus</value></data>
+  <data name="OledHint.Text" xml:space="preserve"><value>Der OLED-Modus ist nur verfügbar, wenn das dunkle Design aktiviert ist.</value></data>
+  <data name="LanguageHeader.Text" xml:space="preserve"><value>Sprache</value></data>
+  <data name="LanguageCombo.Header" xml:space="preserve"><value>Sprache auswählen</value></data>
+  <data name="LanguageHint.Text" xml:space="preserve"><value>Hinweis: Spracheinstellungen erfordern einen Neustart.</value></data>
+  <data name="GeneralHeader.Text" xml:space="preserve"><value>Allgemeines</value></data>
+  <data name="ConfirmDelete.Header" xml:space="preserve"><value>Aufgabe löschen bestätigen</value></data>
+  <data name="AboutHeader.Text" xml:space="preserve"><value>Informationen</value></data>
+  <data name="AboutTitle.Text" xml:space="preserve"><value>Fluent Task Scheduler</value></data>
+  <data name="AboutBuilt.Text" xml:space="preserve"><value>Entwickelt mit WinUI 3</value></data>
+  <data name="App.WindowTitle" xml:space="preserve"><value>FluentTaskScheduler</value></data>
+  <data name="Dialog.Common.OK" xml:space="preserve"><value>OK</value></data>
+  <data name="Dialog.Common.Close" xml:space="preserve"><value>Schließen</value></data>
+  <data name="Dialog.Common.Cancel" xml:space="preserve"><value>Abbrechen</value></data>
+  <data name="Dialog.Common.Delete" xml:space="preserve"><value>Löschen</value></data>
+  <data name="Dialog.Common.Import" xml:space="preserve"><value>Importieren</value></data>
+  <data name="Dialog.Common.Create" xml:space="preserve"><value>Erstellen</value></data>
+  <data name="Dialog.Common.Rename" xml:space="preserve"><value>Umbenennen</value></data>
+  <data name="Dialog.Common.Later" xml:space="preserve"><value>Später</value></data>
+  <data name="Dialog.Common.Save" xml:space="preserve"><value>Speichern</value></data>
+  <data name="Dialog.Error.Title" xml:space="preserve"><value>Fehler</value></data>
+  <data name="Dialog.ConfirmDelete.Title" xml:space="preserve"><value>Löschen bestätigen</value></data>
+  <data name="Dialog.DeleteTask.ContentFormat" xml:space="preserve"><value>Bist du sicher, dass du '{0}' löschen möchtest?</value></data>
+  <data name="Dialog.BatchDelete.ContentFormat" xml:space="preserve"><value>{0} Aufgaben löschen?</value></data>
+  <data name="Dialog.ImportTask.Title" xml:space="preserve"><value>Aufgabe importieren</value></data>
+  <data name="Dialog.ImportTask.SelectFolder" xml:space="preserve"><value>Wähle den Ordner aus, in den diese Aufgabe importiert werden soll:</value></data>
+  <data name="Dialog.NewFolder.Title" xml:space="preserve"><value>Neuer Ordner</value></data>
+  <data name="Dialog.NewFolder.NamePlaceholder" xml:space="preserve"><value>Name</value></data>
+  <data name="Dialog.RenameFolder.Title" xml:space="preserve"><value>Ordner umbenennen</value></data>
+  <data name="Dialog.RenameFolder.NewNamePlaceholder" xml:space="preserve"><value>Neuer Name</value></data>
+  <data name="Dialog.DeleteFolder.Title" xml:space="preserve"><value>Ordner löschen</value></data>
+  <data name="Dialog.DeleteFolder.ContentFormat" xml:space="preserve"><value>'{0}' und alle Aufgaben und Ordner darin wirklich löschen?</value></data>
+  <data name="Dialog.UpdateAvailable.Title" xml:space="preserve"><value>Update verfügbar</value></data>
+  <data name="Dialog.UpdateAvailable.ContentFormat" xml:space="preserve"><value>Version {0} wurde heruntergeladen und kann installiert werden.
+Jetzt App neustarten?</value></data>
+  <data name="Dialog.UpdateAvailable.RestartNow" xml:space="preserve"><value>Neustarten</value></data>
+  <data name="Main.Nav.Dashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="Main.Nav.ScriptLibrary" xml:space="preserve"><value>Script Bibliothek</value></data>
+  <data name="Main.Nav.NewTask" xml:space="preserve"><value>Neue Aufgabe</value></data>
+  <data name="Main.Nav.AllTasks" xml:space="preserve"><value>Alle Aufgaben</value></data>
+  <data name="Main.Nav.Running" xml:space="preserve"><value>Laufend</value></data>
+  <data name="Main.Nav.Enabled" xml:space="preserve"><value>Aktiviert</value></data>
+  <data name="Main.Nav.Disabled" xml:space="preserve"><value>Deaktiviert</value></data>
+  <data name="Main.Nav.Settings" xml:space="preserve"><value>Einstellungen</value></data>
+  <data name="Main.Header.ScheduledTasks" xml:space="preserve"><value>Geplante Aufgaben</value></data>
+  <data name="Main.Header.Settings" xml:space="preserve"><value>Einstellungen</value></data>
+  <data name="Main.Header.Dashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="Main.Header.ScriptLibrary" xml:space="preserve"><value>Script Bibliothek</value></data>
+  <data name="Main.Toolbar.ImportTask" xml:space="preserve"><value>Aufgabe importieren</value></data>
+  <data name="Main.Toolbar.Refresh" xml:space="preserve"><value>Aktualisieren</value></data>
+  <data name="Main.Toolbar.ShortcutsButton" xml:space="preserve"><value>?</value></data>
+  <data name="Main.Toolbar.ShortcutsTooltip" xml:space="preserve"><value>Tastenkombinationen (F1)</value></data>
+  <data name="Main.Toolbar.SortButton" xml:space="preserve"><value>Sortieren ↕</value></data>
+  <data name="Main.Toolbar.SortActiveFormat" xml:space="preserve"><value>Sortieren nach {0} {1}</value></data>
+  <data name="Main.Sort.Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Main.Sort.Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Main.Sort.NextRun" xml:space="preserve"><value>Nächster Start</value></data>
+  <data name="Main.Sort.LastRun" xml:space="preserve"><value>Letzter Start</value></data>
+  <data name="Main.Sort.Clear" xml:space="preserve"><value>Sortierung zurücksetzen</value></data>
+  <data name="Main.Task.RunNow" xml:space="preserve"><value>Jetzt ausführen</value></data>
+  <data name="Main.Task.Stop" xml:space="preserve"><value>Beenden</value></data>
+  <data name="Main.Task.Edit" xml:space="preserve"><value>Bearbeiten</value></data>
+  <data name="Main.Task.Export" xml:space="preserve"><value>Exportieren</value></data>
+  <data name="Main.Task.Delete" xml:space="preserve"><value>Löschen</value></data>
+  <data name="Main.HistoryDialog.Title" xml:space="preserve"><value>Aufgabenverlauf</value></data>
+  <data name="Main.History.Copy" xml:space="preserve"><value>📋 Kopieren</value></data>
+  <data name="Main.History.Copied" xml:space="preserve"><value>✅ Kopiert!</value></data>
+  <data name="Main.ShortcutsDialog.Title" xml:space="preserve"><value>Tastenkombinationen</value></data>
+  <data name="Main.AdminDragWarning.Title" xml:space="preserve"><value>Drag &amp; Drop nicht möglich</value></data>
+  <data name="Main.AdminDragWarning.Message" xml:space="preserve"><value>Windows unterstützt keine Drag-and-Drop-Vorgänge, wenn die App als Administrator ausgeführt wird.</value></data>
+  <data name="Main.Network.Any" xml:space="preserve"><value>Beliebiges Netzwerk</value></data>
+  <data name="Settings.Nav.Appearance" xml:space="preserve"><value>Erscheinungsbild</value></data>
+  <data name="Settings.Nav.Notifications" xml:space="preserve"><value>Benachrichtigungen</value></data>
+  <data name="Settings.Nav.System" xml:space="preserve"><value>System</value></data>
+  <data name="Settings.Nav.Advanced" xml:space="preserve"><value>Erweitert</value></data>
+  <data name="Settings.Nav.Data" xml:space="preserve"><value>Daten</value></data>
+  <data name="Settings.Nav.Categories" xml:space="preserve"><value>Kategorien &amp; Tags</value></data>
+  <data name="Settings.Nav.About" xml:space="preserve"><value>Über</value></data>
+  <data name="Settings.Section.Appearance" xml:space="preserve"><value>Erscheinungsbild</value></data>
+  <data name="Settings.Section.Notifications" xml:space="preserve"><value>Benachrichtigungen</value></data>
+  <data name="Settings.Section.System" xml:space="preserve"><value>System</value></data>
+  <data name="Settings.Section.Advanced" xml:space="preserve"><value>Erweitert</value></data>
+  <data name="Settings.Section.Data" xml:space="preserve"><value>Daten</value></data>
+  <data name="Settings.Section.Categories" xml:space="preserve"><value>Kategorien &amp; Tags</value></data>
+  <data name="Settings.Section.About" xml:space="preserve"><value>Über</value></data>
+  <data name="Settings.Appearance.Language.Title" xml:space="preserve"><value>Sprache</value></data>
+  <data name="Settings.Appearance.Language.Description" xml:space="preserve"><value>Wähle die Anzeigesprache der App.</value></data>
+  <data name="Settings.Export.Success.Title" xml:space="preserve"><value>Export erfolgreich</value></data>
+  <data name="Settings.Export.Success.ContentFormat" xml:space="preserve"><value>Exportiert nach:
+{0}</value></data>
+  <data name="Settings.Export.Failed.Title" xml:space="preserve"><value>Export fehlgeschlagen</value></data>
+  <data name="Settings.Import.Success.Title" xml:space="preserve"><value>Import erfolgreich</value></data>
+  <data name="Settings.Import.Success.Content" xml:space="preserve"><value>Einstellungen wurden wiederhergestellt. Einige Änderungen erfordern möglicherweise einen Neustart der App.</value></data>
+  <data name="Settings.Import.Failed.Title" xml:space="preserve"><value>Import fehlgeschlagen</value></data>
+  <data name="Settings.WhatsNew.Title" xml:space="preserve"><value>Neuigkeiten</value></data>
+  <data name="Settings.WhatsNew.FetchFailed" xml:space="preserve"><value>Konnte Versionshinweise nicht abrufen. Überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.</value></data>
+  <data name="Settings.UpdateError.Title" xml:space="preserve"><value>Fehler beim Update</value></data>
+  <data name="Settings.UpdateError.ContentFormat" xml:space="preserve"><value>Ein Fehler ist beim Überprüfen auf Updates aufgetreten:
+{0}</value></data>
+  <data name="Settings.UpToDate.Title" xml:space="preserve"><value>Auf dem neuesten Stand</value></data>
+  <data name="Settings.UpToDate.Content" xml:space="preserve"><value>Sie verwenden bereits die neueste Version.</value></data>
+</root>
