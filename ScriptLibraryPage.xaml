@@ -1,4 +1,4 @@
-﻿<Page
+<Page
     x:Class="FluentTaskScheduler.ScriptLibraryPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -69,15 +69,13 @@
         <!-- Create Template Dialog -->
         <ContentDialog x:Name="CreateTemplateDialog"
                        x:Uid="ScriptLibraryNewTemplateDialog"
-                       x:Uid="ScriptLibrarySaveBtn"
-                       x:Uid="ScriptLibraryCancelBtn"
                        DefaultButton="Primary"
                        PrimaryButtonClick="CreateTemplateDialog_PrimaryButtonClick">
             <StackPanel Spacing="12" MinWidth="400">
-                <TextBox x:Name="TemplateName"     x:Uid="ScriptLibraryNameHeader"        x:Uid="ScriptLibraryNamePlaceholder"/>
-                <TextBox x:Name="TemplateDesc"     x:Uid="ScriptLibraryDescHeader" x:Uid="ScriptLibraryDescPlaceholder" TextWrapping="Wrap" AcceptsReturn="True" Height="72"/>
-                <TextBox x:Name="TemplateCommand"  x:Uid="ScriptLibraryCommandHeader"     x:Uid="ScriptLibraryCommandPlaceholder"/>
-                <TextBox x:Name="TemplateArgs"     x:Uid="ScriptLibraryArgsHeader"   x:Uid="ScriptLibraryArgsPlaceholder"/>
+                <TextBox x:Name="TemplateName"     x:Uid="ScriptLibraryName"/>
+                <TextBox x:Name="TemplateDesc"     x:Uid="ScriptLibraryDesc" TextWrapping="Wrap" AcceptsReturn="True" Height="72"/>
+                <TextBox x:Name="TemplateCommand"  x:Uid="ScriptLibraryCommand"/>
+                <TextBox x:Name="TemplateArgs"     x:Uid="ScriptLibraryArgs"/>
                 <CheckBox x:Name="TemplateAdmin"   x:Uid="ScriptLibraryAdminContent"/>
             </StackPanel>
         </ContentDialog>
