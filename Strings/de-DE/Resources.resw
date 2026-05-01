@@ -203,16 +203,16 @@ Jetzt App neustarten?</value></data>
   <data name="Settings.Import.Success.Content" xml:space="preserve"><value>Einstellungen wurden wiederhergestellt. Einige Änderungen erfordern möglicherweise einen Neustart der App.</value></data>
   <data name="Settings.Import.Failed.Title" xml:space="preserve"><value>Import fehlgeschlagen</value></data>
   <data name="Settings.WhatsNew.Title" xml:space="preserve"><value>Neuigkeiten</value></data>
-  <data name="Settings.WhatsNew.FetchFailed" xml:space="preserve"><value>Konnte Versionshinweise nicht abrufen. Überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.</value></data>
+  <data name="Settings.WhatsNew.FetchFailed" xml:space="preserve"><value>Konnte Versionshinweise nicht abrufen. Überprüfe deine Internetverbindung und versuche es erneut.</value></data>
   <data name="Settings.UpdateError.Title" xml:space="preserve"><value>Fehler beim Update</value></data>
   <data name="Settings.UpdateError.ContentFormat" xml:space="preserve"><value>Ein Fehler ist beim Überprüfen auf Updates aufgetreten:
 {0}</value></data>
   <data name="Settings.UpToDate.Title" xml:space="preserve"><value>Auf dem neuesten Stand</value></data>
-  <data name="Settings.UpToDate.Content" xml:space="preserve"><value>Sie verwenden bereits die neueste Version.</value></data>
+  <data name="Settings.UpToDate.Content" xml:space="preserve"><value>Du verwendest bereits die neueste Version.</value></data>
   <data name="Settings.Appearance.Theme.Title" xml:space="preserve"><value>App-Design</value></data>
-  <data name="Settings.Appearance.Theme.Description" xml:space="preserve"><value>Wählen Sie Hell, Dunkel oder folgen Sie der Systemeinstellung.</value></data>
+  <data name="Settings.Appearance.Theme.Description" xml:space="preserve"><value>Wähle Hell, Dunkel oder folge der Systemeinstellung.</value></data>
   <data name="Settings.Appearance.Mica.Title" xml:space="preserve"><value>Mica-Effekt</value></data>
-  <data name="Settings.Appearance.Mica.Description" xml:space="preserve"><value>Wenden Sie das durchscheinende Mica-Hintergrundmaterial an.</value></data>
+  <data name="Settings.Appearance.Mica.Description" xml:space="preserve"><value>Mica-Hintergrundmaterial anwenden.</value></data>
   <data name="Settings.Appearance.Oled.Title" xml:space="preserve"><value>OLED-Modus</value></data>
   <data name="Settings.Appearance.Oled.Description" xml:space="preserve"><value>Rein schwarzer Hintergrund, um auf OLED-Displays Strom zu sparen. Erfordert dunkles Design.</value></data>
   <data name="DashboardRefreshBtn.Text" xml:space="preserve"><value>Dashboard aktualisieren</value></data>
@@ -341,7 +341,7 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.ProgramScript" xml:space="preserve"><value>Programm / Skript</value></data>
   <data name="Dialog.Arguments" xml:space="preserve"><value>Argumente (optional)</value></data>
   <data name="Dialog.WorkingDir" xml:space="preserve"><value>Ausführen in (optional)</value></data>
-  <data name="Dialog.PsTip" xml:space="preserve"><value>Tipp: Für PowerShell-Skripte verwenden Sie 'powershell.exe' als Programm und '-ExecutionPolicy Bypass -File "C:\Pfad\zum\Skript.ps1"' als Argumente</value></data>
+  <data name="Dialog.PsTip" xml:space="preserve"><value>Tipp: Verwende für Powershell-Skripte 'powershell.exe' als Programm und '-ExecutionPolicy Bypass -File "C:\Pfad\zum\Skript.ps1"' als Argumente</value></data>
   <data name="Dialog.HighPriv" xml:space="preserve"><value>Mit höchsten Berechtigungen ausführen</value></data>
   <data name="Dialog.Hidden" xml:space="preserve"><value>Versteckte Aufgabe</value></data>
   <data name="Dialog.DeleteExpired" xml:space="preserve"><value>Aufgabe löschen, wenn sie nicht erneut geplant ist</value></data>
