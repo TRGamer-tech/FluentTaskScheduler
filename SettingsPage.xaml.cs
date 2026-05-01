@@ -212,6 +212,65 @@ namespace FluentTaskScheduler
             OledTitleText.Text = L("Settings.Appearance.Oled.Title", "OLED Mode");
             OledDescriptionText.Text = L("Settings.Appearance.Oled.Description", "Pure black background to save power on OLED displays. Requires Dark theme.");
 
+            // Notifications
+            NotifTaskTitle.Text = L("Settings.Notif.Task.Title", "Task Notifications");
+            NotifTaskDesc.Text = L("Settings.Notif.Task.Desc", "Show a toast when a task starts or fails.");
+            NotifRemindersTitle.Text = L("Settings.Notif.Reminders.Title", "Upcoming Task Reminders");
+            NotifRemindersDesc.Text = L("Settings.Notif.Reminders.Desc", "Show a reminder toast before a scheduled task is about to run.");
+            NotifTimingTitle.Text = L("Settings.Notif.Timing.Title", "Reminder Timing");
+            NotifTimingDesc.Text = L("Settings.Notif.Timing.Desc", "How far in advance to send the reminder.");
+
+            // System
+            SysStartupTitle.Text = L("Settings.Sys.Startup.Title", "Run on Startup");
+            SysStartupDesc.Text = L("Settings.Sys.Startup.Desc", "Automatically launch the app when you sign in to Windows.");
+            SysTrayTitle.Text = L("Settings.Sys.Tray.Title", "Minimize to Tray");
+            SysTrayDesc.Text = L("Settings.Sys.Tray.Desc", "Hide the window to the system tray instead of closing.");
+            SysSmoothTitle.Text = L("Settings.Sys.Smooth.Title", "Smooth Scrolling");
+            SysSmoothDesc.Text = L("Settings.Sys.Smooth.Desc", "Enable inertia-based scrolling throughout the app.");
+            SysHiddenTitle.Text = L("Settings.Sys.Hidden.Title", "Show Hidden Tasks");
+            SysHiddenDesc.Text = L("Settings.Sys.Hidden.Desc", "Display tasks that are marked as hidden in the Windows Task Scheduler.");
+
+            // Advanced
+            AdvConfirmTitle.Text = L("Settings.Adv.Confirm.Title", "Confirm Before Deleting");
+            AdvConfirmDesc.Text = L("Settings.Adv.Confirm.Desc", "Show a confirmation dialog before removing a task.");
+            AdvLoggingTitle.Text = L("Settings.Adv.Logging.Title", "Application Logging");
+            AdvLoggingDesc.Text = L("Settings.Adv.Logging.Desc", "Write internal events and errors to a log file for troubleshooting.");
+            AdvSepLogsTitle.Text = L("Settings.Adv.SepLogs.Title", "Separate Log Files");
+            AdvSepLogsDesc.Text = L("Settings.Adv.SepLogs.Desc", "Store error and crash logs in dedicated files instead of the main log.");
+            AdvSpecLogsTitle.Text = L("Settings.Adv.SpecLogs.Title", "Specific Logs");
+            AdvSpecLogsDesc.Text = L("Settings.Adv.SpecLogs.Desc", "Direct access to error and crash records.");
+            OpenLogButton.Content = L("Settings.Adv.OpenLog", "Open Log");
+            OpenErrorLogButton.Content = L("Settings.Adv.ErrorLog", "Error Log");
+            OpenCrashLogButton.Content = L("Settings.Adv.CrashLog", "Crash Log");
+
+            // Data
+            DataExportTitle.Text = L("Settings.Data.Export.Title", "Export Settings");
+            DataExportDesc.Text = L("Settings.Data.Export.Desc", "Save your current settings to a JSON file.");
+            ExportSettingsButton.Content = L("Settings.Data.ExportBtn", "Export");
+            DataImportTitle.Text = L("Settings.Data.Import.Title", "Import Settings");
+            DataImportDesc.Text = L("Settings.Data.Import.Desc", "Restore settings from a previously exported file.");
+            ImportSettingsButton.Content = L("Settings.Data.ImportBtn", "Import");
+
+            // Categories & Tags
+            CatManageTitle.Text = L("Settings.Cat.Manage.Title", "Manage Categories");
+            CatManageDesc.Text = L("Settings.Cat.Manage.Desc", "Predefined categories for your tasks.");
+            NewCategoryBox.PlaceholderText = L("Settings.Cat.Placeholder", "New category name...");
+            AddCategoryBtn.Content = L("Settings.Cat.AddBtn", "Add");
+            TagManageTitle.Text = L("Settings.Tag.Manage.Title", "Manage Tags");
+            TagManageDesc.Text = L("Settings.Tag.Manage.Desc", "Predefined tags for your tasks.");
+            NewTagBox.PlaceholderText = L("Settings.Tag.Placeholder", "New tag name...");
+            AddTagBtn.Content = L("Settings.Tag.AddBtn", "Add");
+
+            // About
+            AboutAppTitle.Text = L("Settings.About.App.Title", "Fluent Task Scheduler");
+            AboutAppDesc.Text = L("Settings.About.App.Desc", "Built with WinUI 3 · Windows App SDK");
+            AboutUpdateTitle.Text = L("Settings.About.Update.Title", "Check for Updates");
+            AboutUpdateDesc.Text = L("Settings.About.Update.Desc", "Check if a newer version is available.");
+            AboutCheckBtnText.Text = L("Settings.About.CheckBtn", "Check");
+            AboutOnboardTitle.Text = L("Settings.About.Onboard.Title", "Onboarding");
+            AboutOnboardDesc.Text = L("Settings.About.Onboard.Desc", "Replay the welcome walkthrough from first launch.");
+            AboutViewAgainText.Text = L("Settings.About.ViewAgain", "View Again");
+
             _sectionTitles["Appearance"] = L("Settings.Section.Appearance", "Appearance");
             _sectionTitles["Notifications"] = L("Settings.Section.Notifications", "Notifications");
             _sectionTitles["System"] = L("Settings.Section.System", "System");

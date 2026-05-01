@@ -141,8 +141,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Task Notifications" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Show a toast when a task starts or fails." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="NotifTaskTitle" Text="Task Notifications" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="NotifTaskDesc" Text="Show a toast when a task starts or fails." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ToggleSwitch x:Name="NotificationsToggle" Grid.Column="1" VerticalAlignment="Center"
                                              OffContent="" OnContent="" IsOn="True" Toggled="NotificationsToggle_Toggled"/>
@@ -153,8 +153,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Upcoming Task Reminders" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Show a reminder toast before a scheduled task is about to run." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="NotifRemindersTitle" Text="Upcoming Task Reminders" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="NotifRemindersDesc" Text="Show a reminder toast before a scheduled task is about to run." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ToggleSwitch x:Name="UpcomingRemindersToggle" Grid.Column="1" VerticalAlignment="Center"
                                              OffContent="" OnContent="" IsOn="True" Toggled="UpcomingRemindersToggle_Toggled"/>
@@ -165,8 +165,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Reminder Timing" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="How far in advance to send the reminder." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="NotifTimingTitle" Text="Reminder Timing" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="NotifTimingDesc" Text="How far in advance to send the reminder." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ComboBox x:Name="ReminderLeadTimeComboBox" Grid.Column="1" VerticalAlignment="Center"
                                           SelectionChanged="ReminderLeadTimeComboBox_SelectionChanged" Width="160">
@@ -188,8 +188,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Run on Startup" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Automatically launch the app when you sign in to Windows." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="SysStartupTitle" Text="Run on Startup" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="SysStartupDesc" Text="Automatically launch the app when you sign in to Windows." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ToggleSwitch x:Name="RunOnStartupToggle" Grid.Column="1" VerticalAlignment="Center"
                                              OffContent="" OnContent="" IsOn="False" Toggled="RunOnStartupToggle_Toggled"/>
@@ -200,8 +200,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Minimize to Tray" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Hide the window to the system tray instead of closing." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="SysTrayTitle" Text="Minimize to Tray" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="SysTrayDesc" Text="Hide the window to the system tray instead of closing." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ToggleSwitch x:Name="TrayIconToggle" Grid.Column="1" VerticalAlignment="Center"
                                              OffContent="" OnContent="" IsOn="True" Toggled="TrayIconToggle_Toggled"/>
@@ -212,8 +212,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Smooth Scrolling" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Enable inertia-based scrolling throughout the app." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="SysSmoothTitle" Text="Smooth Scrolling" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="SysSmoothDesc" Text="Enable inertia-based scrolling throughout the app." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ToggleSwitch x:Name="SmoothScrollingToggle" Grid.Column="1" VerticalAlignment="Center"
                                              OffContent="" OnContent="" IsOn="False" Toggled="SmoothScrollingToggle_Toggled"/>
@@ -224,8 +224,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Show Hidden Tasks" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Display tasks that are marked as hidden in the Windows Task Scheduler." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="SysHiddenTitle" Text="Show Hidden Tasks" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="SysHiddenDesc" Text="Display tasks that are marked as hidden in the Windows Task Scheduler." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ToggleSwitch x:Name="ShowHiddenTasksToggle" Grid.Column="1" VerticalAlignment="Center"
                                              OffContent="" OnContent="" IsOn="True" Toggled="ShowHiddenTasksToggle_Toggled"/>
@@ -241,8 +241,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Confirm Before Deleting" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Show a confirmation dialog before removing a task." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="AdvConfirmTitle" Text="Confirm Before Deleting" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="AdvConfirmDesc" Text="Show a confirmation dialog before removing a task." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ToggleSwitch x:Name="ConfirmDeleteToggle" Grid.Column="1" VerticalAlignment="Center"
                                              OffContent="" OnContent="" Toggled="ConfirmDeleteToggle_Toggled"/>
@@ -253,8 +253,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Application Logging" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Write internal events and errors to a log file for troubleshooting." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="AdvLoggingTitle" Text="Application Logging" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="AdvLoggingDesc" Text="Write internal events and errors to a log file for troubleshooting." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                                     <ToggleSwitch x:Name="LoggingToggle" OffContent="" OnContent="" IsOn="True" Toggled="LoggingToggle_Toggled"/>
@@ -266,8 +266,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Separate Log Files" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Store error and crash logs in dedicated files instead of the main log." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="AdvSepLogsTitle" Text="Separate Log Files" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="AdvSepLogsDesc" Text="Store error and crash logs in dedicated files instead of the main log." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ToggleSwitch x:Name="SeparateLogsToggle" Grid.Column="1" VerticalAlignment="Center"
                                              OffContent="" OnContent="" IsOn="True" Toggled="SeparateLogsToggle_Toggled"/>
@@ -275,18 +275,17 @@
                         </Border>
 
                         <Border Style="{StaticResource SettingsCardStyle}" x:Name="SpecificLogsCard">
-                            <Grid>
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Specific Logs" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Direct access to error and crash records." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                            <StackPanel Spacing="12">
+                                <StackPanel>
+                                    <TextBlock x:Name="AdvSpecLogsTitle" Text="Specific Logs" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="AdvSpecLogsDesc" Text="Direct access to error and crash records." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
-                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
                                     <Button x:Name="OpenLogButton" Content="Open Log" Click="OpenLogButton_Click"/>
-                                    <Button x:Name="OpenErrorLogButton" Content="Open Error Log" Click="OpenErrorLogButton_Click"/>
-                                    <Button x:Name="OpenCrashLogButton" Content="Open Crash Log" Click="OpenCrashLogButton_Click"/>
+                                    <Button x:Name="OpenErrorLogButton" Content="Error Log" Click="OpenErrorLogButton_Click"/>
+                                    <Button x:Name="OpenCrashLogButton" Content="Crash Log" Click="OpenCrashLogButton_Click"/>
                                 </StackPanel>
-                            </Grid>
+                            </StackPanel>
                         </Border>
                     </StackPanel>
 
@@ -298,8 +297,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Export Settings" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Save your current settings to a JSON file." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="DataExportTitle" Text="Export Settings" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="DataExportDesc" Text="Save your current settings to a JSON file." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <Button x:Name="ExportSettingsButton" Grid.Column="1" Content="Export" VerticalAlignment="Center" Click="ExportSettings_Click"/>
                             </Grid>
@@ -309,8 +308,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Import Settings" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Restore settings from a previously exported file." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="DataImportTitle" Text="Import Settings" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="DataImportDesc" Text="Restore settings from a previously exported file." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <Button x:Name="ImportSettingsButton" Grid.Column="1" Content="Import" VerticalAlignment="Center" Click="ImportSettings_Click"/>
                             </Grid>
@@ -324,8 +323,8 @@
                         <!-- Categories Section -->
                         <Border Style="{StaticResource SettingsCardStyle}">
                             <StackPanel Spacing="12">
-                                <TextBlock Text="Manage Categories" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                <TextBlock Text="Predefined categories for your tasks." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
+                                <TextBlock x:Name="CatManageTitle" Text="Manage Categories" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBlock x:Name="CatManageDesc" Text="Predefined categories for your tasks." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
                                 <Grid ColumnSpacing="8">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
@@ -361,8 +360,8 @@
                         <!-- Tags Section -->
                         <Border Style="{StaticResource SettingsCardStyle}">
                             <StackPanel Spacing="12">
-                                <TextBlock Text="Manage Tags" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                <TextBlock Text="Predefined tags for your tasks." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
+                                <TextBlock x:Name="TagManageTitle" Text="Manage Tags" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBlock x:Name="TagManageDesc" Text="Predefined tags for your tasks." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
                                 <Grid ColumnSpacing="8">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
@@ -404,8 +403,8 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Fluent Task Scheduler" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Built with WinUI 3 · Windows App SDK" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
+                                    <TextBlock x:Name="AboutAppTitle" Text="Fluent Task Scheduler" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="AboutAppDesc" Text="Built with WinUI 3 · Windows App SDK" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"/>
                                 </StackPanel>
                                 <Button x:Name="VersionButton" Grid.Column="1" Click="VersionButton_Click"
                                         Background="Transparent" BorderThickness="0" Padding="8,6"
@@ -425,15 +424,15 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Check for Updates" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Check if a newer version is available." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="AboutUpdateTitle" Text="Check for Updates" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="AboutUpdateDesc" Text="Check if a newer version is available." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                                     <ProgressRing x:Name="UpdateCheckProgressRing" IsActive="False" Width="20" Height="20" Visibility="Collapsed"/>
                                     <Button x:Name="CheckForUpdatesButton" Click="CheckForUpdates_Click">
                                         <StackPanel Orientation="Horizontal" Spacing="8">
                                             <FontIcon Glyph="&#xE895;" FontSize="13"/>
-                                            <TextBlock Text="Check"/>
+                                            <TextBlock x:Name="AboutCheckBtnText" Text="Check"/>
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>
@@ -444,14 +443,14 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <TextBlock Text="Onboarding" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="Replay the welcome walkthrough from first launch." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="AboutOnboardTitle" Text="Onboarding" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="AboutOnboardDesc" Text="Replay the welcome walkthrough from first launch." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <Button x:Name="ReplayOnboardingButton" Grid.Column="1" VerticalAlignment="Center"
                                         Click="ReplayOnboardingButton_Click">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <FontIcon Glyph="&#xE7C3;" FontSize="13"/>
-                                        <TextBlock Text="View Again"/>
+                                        <TextBlock x:Name="AboutViewAgainText" Text="View Again"/>
                                     </StackPanel>
                                 </Button>
                             </Grid>

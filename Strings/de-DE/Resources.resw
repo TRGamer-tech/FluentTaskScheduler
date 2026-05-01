@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
@@ -268,6 +268,59 @@ Jetzt App neustarten?</value></data>
   <data name="ConditionOnBattery.Content" xml:space="preserve"><value>Computer ist im Akkubetrieb</value></data>
   <data name="ConditionSpecificNetwork.Text" xml:space="preserve"><value>Spezifisches Netzwerk:</value></data>
   <data name="ConditionAnyNetwork.Content" xml:space="preserve"><value>Beliebiges Netzwerk</value></data>
+
+  <data name="Settings.Notif.Task.Title" xml:space="preserve"><value>Aufgabenbenachrichtigungen</value></data>
+  <data name="Settings.Notif.Task.Desc" xml:space="preserve"><value>Zeige eine Benachrichtigung, wenn eine Aufgabe startet oder fehlschlägt.</value></data>
+  <data name="Settings.Notif.Reminders.Title" xml:space="preserve"><value>Erinnerungen für anstehende Aufgaben</value></data>
+  <data name="Settings.Notif.Reminders.Desc" xml:space="preserve"><value>Zeige eine Erinnerung, bevor eine geplante Aufgabe ausgeführt wird.</value></data>
+  <data name="Settings.Notif.Timing.Title" xml:space="preserve"><value>Erinnerungszeitpunkt</value></data>
+  <data name="Settings.Notif.Timing.Desc" xml:space="preserve"><value>Wie weit im Voraus die Erinnerung gesendet werden soll.</value></data>
+  <data name="Settings.Sys.Startup.Title" xml:space="preserve"><value>Beim Start ausführen</value></data>
+  <data name="Settings.Sys.Startup.Desc" xml:space="preserve"><value>Die App automatisch starten, wenn Sie sich bei Windows anmelden.</value></data>
+  <data name="Settings.Sys.Tray.Title" xml:space="preserve"><value>In den Infobereich minimieren</value></data>
+  <data name="Settings.Sys.Tray.Desc" xml:space="preserve"><value>Das Fenster in den Infobereich ausblenden, anstatt es zu schliessen.</value></data>
+  <data name="Settings.Sys.Smooth.Title" xml:space="preserve"><value>Sanftes Scrollen</value></data>
+  <data name="Settings.Sys.Smooth.Desc" xml:space="preserve"><value>Trägheitsbasiertes Scrollen in der gesamten App aktivieren.</value></data>
+  <data name="Settings.Sys.Hidden.Title" xml:space="preserve"><value>Versteckte Aufgaben anzeigen</value></data>
+  <data name="Settings.Sys.Hidden.Desc" xml:space="preserve"><value>Aufgaben anzeigen, die in der Windows-Aufgabenplanung als versteckt markiert sind.</value></data>
+  <data name="Settings.Adv.Confirm.Title" xml:space="preserve"><value>Vor dem Löschen bestätigen</value></data>
+  <data name="Settings.Adv.Confirm.Desc" xml:space="preserve"><value>Einen Bestätigungsdialog anzeigen, bevor eine Aufgabe entfernt wird.</value></data>
+  <data name="Settings.Adv.Logging.Title" xml:space="preserve"><value>Anwendungsprotokollierung</value></data>
+  <data name="Settings.Adv.Logging.Desc" xml:space="preserve"><value>Interne Ereignisse und Fehler in eine Protokolldatei zur Fehlerbehebung schreiben.</value></data>
+  <data name="Settings.Adv.SepLogs.Title" xml:space="preserve"><value>Getrennte Protokolldateien</value></data>
+  <data name="Settings.Adv.SepLogs.Desc" xml:space="preserve"><value>Fehler- und Absturzprotokolle in eigenen Dateien statt im Hauptprotokoll speichern.</value></data>
+  <data name="Settings.Adv.SpecLogs.Title" xml:space="preserve"><value>Spezifische Protokolle</value></data>
+  <data name="Settings.Adv.SpecLogs.Desc" xml:space="preserve"><value>Direkter Zugriff auf Fehler- und Absturzaufzeichnungen.</value></data>
+  <data name="Settings.Adv.OpenLog" xml:space="preserve"><value>Protokoll öffnen</value></data>
+  <data name="Settings.Adv.ErrorLog" xml:space="preserve"><value>Fehlerprotokoll</value></data>
+  <data name="Settings.Adv.CrashLog" xml:space="preserve"><value>Absturzprotokoll</value></data>
+  <data name="Settings.Data.Export.Title" xml:space="preserve"><value>Einstellungen exportieren</value></data>
+  <data name="Settings.Data.Export.Desc" xml:space="preserve"><value>Aktuelle Einstellungen in eine JSON-Datei speichern.</value></data>
+  <data name="Settings.Data.ExportBtn" xml:space="preserve"><value>Exportieren</value></data>
+  <data name="Settings.Data.Import.Title" xml:space="preserve"><value>Einstellungen importieren</value></data>
+  <data name="Settings.Data.Import.Desc" xml:space="preserve"><value>Einstellungen aus einer zuvor exportierten Datei wiederherstellen.</value></data>
+  <data name="Settings.Data.ImportBtn" xml:space="preserve"><value>Importieren</value></data>
+  <data name="Settings.Cat.Manage.Title" xml:space="preserve"><value>Kategorien verwalten</value></data>
+  <data name="Settings.Cat.Manage.Desc" xml:space="preserve"><value>Vordefinierte Kategorien für Ihre Aufgaben.</value></data>
+  <data name="Settings.Cat.Placeholder" xml:space="preserve"><value>Neuer Kategoriename...</value></data>
+  <data name="Settings.Cat.AddBtn" xml:space="preserve"><value>Hinzufügen</value></data>
+  <data name="Settings.Tag.Manage.Title" xml:space="preserve"><value>Tags verwalten</value></data>
+  <data name="Settings.Tag.Manage.Desc" xml:space="preserve"><value>Vordefinierte Tags für Ihre Aufgaben.</value></data>
+  <data name="Settings.Tag.Placeholder" xml:space="preserve"><value>Neuer Tagname...</value></data>
+  <data name="Settings.Tag.AddBtn" xml:space="preserve"><value>Hinzufügen</value></data>
+  <data name="Settings.About.App.Title" xml:space="preserve"><value>Fluent Task Scheduler</value></data>
+  <data name="Settings.About.App.Desc" xml:space="preserve"><value>Erstellt mit WinUI 3 · Windows App SDK</value></data>
+  <data name="Settings.About.Update.Title" xml:space="preserve"><value>Nach Updates suchen</value></data>
+  <data name="Settings.About.Update.Desc" xml:space="preserve"><value>Prüfen, ob eine neuere Version verfügbar ist.</value></data>
+  <data name="Settings.About.CheckBtn" xml:space="preserve"><value>Prüfen</value></data>
+  <data name="Settings.About.Onboard.Title" xml:space="preserve"><value>Einführung</value></data>
+  <data name="Settings.About.Onboard.Desc" xml:space="preserve"><value>Die Willkommensführung vom ersten Start erneut abspielen.</value></data>
+  <data name="Settings.About.ViewAgain" xml:space="preserve"><value>Erneut ansehen</value></data>
+  <data name="Dashboard.AllTags" xml:space="preserve"><value>Alle Tags</value></data>
+  <data name="Dashboard.AllCategories" xml:space="preserve"><value>Alle Kategorien</value></data>
+  <data name="Dashboard.Today" xml:space="preserve"><value>Heute</value></data>
+  <data name="Dashboard.Unknown" xml:space="preserve"><value>Unbekannt</value></data>
 </root>
+
 
 

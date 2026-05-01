@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
@@ -271,6 +271,59 @@
   <data name="ConditionOnBattery.Content" xml:space="preserve"><value>计算机由电池供电</value></data>
   <data name="ConditionSpecificNetwork.Text" xml:space="preserve"><value>指定网络：</value></data>
   <data name="ConditionAnyNetwork.Content" xml:space="preserve"><value>任意网络</value></data>
+
+  <data name="Settings.Notif.Task.Title" xml:space="preserve"><value>任务通知</value></data>
+  <data name="Settings.Notif.Task.Desc" xml:space="preserve"><value>当任务启动或失败时显示提示。</value></data>
+  <data name="Settings.Notif.Reminders.Title" xml:space="preserve"><value>即将执行的任务提醒</value></data>
+  <data name="Settings.Notif.Reminders.Desc" xml:space="preserve"><value>在计划任务即将执行前显示提醒。</value></data>
+  <data name="Settings.Notif.Timing.Title" xml:space="preserve"><value>提醒时间</value></data>
+  <data name="Settings.Notif.Timing.Desc" xml:space="preserve"><value>提前多久发送提醒。</value></data>
+  <data name="Settings.Sys.Startup.Title" xml:space="preserve"><value>开机启动</value></data>
+  <data name="Settings.Sys.Startup.Desc" xml:space="preserve"><value>登录 Windows 时自动启动应用。</value></data>
+  <data name="Settings.Sys.Tray.Title" xml:space="preserve"><value>最小化到托盘</value></data>
+  <data name="Settings.Sys.Tray.Desc" xml:space="preserve"><value>将窗口隐藏到系统托盘而不是关闭。</value></data>
+  <data name="Settings.Sys.Smooth.Title" xml:space="preserve"><value>平滑滚动</value></data>
+  <data name="Settings.Sys.Smooth.Desc" xml:space="preserve"><value>在整个应用中启用惯性滚动。</value></data>
+  <data name="Settings.Sys.Hidden.Title" xml:space="preserve"><value>显示隐藏任务</value></data>
+  <data name="Settings.Sys.Hidden.Desc" xml:space="preserve"><value>显示在 Windows 任务计划程序中标记为隐藏的任务。</value></data>
+  <data name="Settings.Adv.Confirm.Title" xml:space="preserve"><value>删除前确认</value></data>
+  <data name="Settings.Adv.Confirm.Desc" xml:space="preserve"><value>删除任务前显示确认对话框。</value></data>
+  <data name="Settings.Adv.Logging.Title" xml:space="preserve"><value>应用日志记录</value></data>
+  <data name="Settings.Adv.Logging.Desc" xml:space="preserve"><value>将内部事件和错误写入日志文件以便排查问题。</value></data>
+  <data name="Settings.Adv.SepLogs.Title" xml:space="preserve"><value>独立日志文件</value></data>
+  <data name="Settings.Adv.SepLogs.Desc" xml:space="preserve"><value>将错误和崩溃日志存储在单独的文件中。</value></data>
+  <data name="Settings.Adv.SpecLogs.Title" xml:space="preserve"><value>专用日志</value></data>
+  <data name="Settings.Adv.SpecLogs.Desc" xml:space="preserve"><value>直接访问错误和崩溃记录。</value></data>
+  <data name="Settings.Adv.OpenLog" xml:space="preserve"><value>打开日志</value></data>
+  <data name="Settings.Adv.ErrorLog" xml:space="preserve"><value>错误日志</value></data>
+  <data name="Settings.Adv.CrashLog" xml:space="preserve"><value>崩溃日志</value></data>
+  <data name="Settings.Data.Export.Title" xml:space="preserve"><value>导出设置</value></data>
+  <data name="Settings.Data.Export.Desc" xml:space="preserve"><value>将当前设置保存到 JSON 文件。</value></data>
+  <data name="Settings.Data.ExportBtn" xml:space="preserve"><value>导出</value></data>
+  <data name="Settings.Data.Import.Title" xml:space="preserve"><value>导入设置</value></data>
+  <data name="Settings.Data.Import.Desc" xml:space="preserve"><value>从之前导出的文件恢复设置。</value></data>
+  <data name="Settings.Data.ImportBtn" xml:space="preserve"><value>导入</value></data>
+  <data name="Settings.Cat.Manage.Title" xml:space="preserve"><value>管理分类</value></data>
+  <data name="Settings.Cat.Manage.Desc" xml:space="preserve"><value>任务的预定义分类。</value></data>
+  <data name="Settings.Cat.Placeholder" xml:space="preserve"><value>新分类名称...</value></data>
+  <data name="Settings.Cat.AddBtn" xml:space="preserve"><value>添加</value></data>
+  <data name="Settings.Tag.Manage.Title" xml:space="preserve"><value>管理标签</value></data>
+  <data name="Settings.Tag.Manage.Desc" xml:space="preserve"><value>任务的预定义标签。</value></data>
+  <data name="Settings.Tag.Placeholder" xml:space="preserve"><value>新标签名称...</value></data>
+  <data name="Settings.Tag.AddBtn" xml:space="preserve"><value>添加</value></data>
+  <data name="Settings.About.App.Title" xml:space="preserve"><value>Fluent Task Scheduler</value></data>
+  <data name="Settings.About.App.Desc" xml:space="preserve"><value>使用 WinUI 3 · Windows App SDK 构建</value></data>
+  <data name="Settings.About.Update.Title" xml:space="preserve"><value>检查更新</value></data>
+  <data name="Settings.About.Update.Desc" xml:space="preserve"><value>检查是否有更新版本可用。</value></data>
+  <data name="Settings.About.CheckBtn" xml:space="preserve"><value>检查</value></data>
+  <data name="Settings.About.Onboard.Title" xml:space="preserve"><value>新手引导</value></data>
+  <data name="Settings.About.Onboard.Desc" xml:space="preserve"><value>重新播放首次启动时的欢迎引导。</value></data>
+  <data name="Settings.About.ViewAgain" xml:space="preserve"><value>再次查看</value></data>
+  <data name="Dashboard.AllTags" xml:space="preserve"><value>全部标签</value></data>
+  <data name="Dashboard.AllCategories" xml:space="preserve"><value>全部分类</value></data>
+  <data name="Dashboard.Today" xml:space="preserve"><value>今天</value></data>
+  <data name="Dashboard.Unknown" xml:space="preserve"><value>未知</value></data>
 </root>
+
 
 

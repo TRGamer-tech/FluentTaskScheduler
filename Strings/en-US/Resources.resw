@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
@@ -268,6 +268,59 @@ Restart now to apply the update?</value></data>
   <data name="ConditionOnBattery.Content" xml:space="preserve"><value>Computer is on battery power</value></data>
   <data name="ConditionSpecificNetwork.Text" xml:space="preserve"><value>Specific network:</value></data>
   <data name="ConditionAnyNetwork.Content" xml:space="preserve"><value>Any network</value></data>
+
+  <data name="Settings.Notif.Task.Title" xml:space="preserve"><value>Task Notifications</value></data>
+  <data name="Settings.Notif.Task.Desc" xml:space="preserve"><value>Show a toast when a task starts or fails.</value></data>
+  <data name="Settings.Notif.Reminders.Title" xml:space="preserve"><value>Upcoming Task Reminders</value></data>
+  <data name="Settings.Notif.Reminders.Desc" xml:space="preserve"><value>Show a reminder toast before a scheduled task is about to run.</value></data>
+  <data name="Settings.Notif.Timing.Title" xml:space="preserve"><value>Reminder Timing</value></data>
+  <data name="Settings.Notif.Timing.Desc" xml:space="preserve"><value>How far in advance to send the reminder.</value></data>
+  <data name="Settings.Sys.Startup.Title" xml:space="preserve"><value>Run on Startup</value></data>
+  <data name="Settings.Sys.Startup.Desc" xml:space="preserve"><value>Automatically launch the app when you sign in to Windows.</value></data>
+  <data name="Settings.Sys.Tray.Title" xml:space="preserve"><value>Minimize to Tray</value></data>
+  <data name="Settings.Sys.Tray.Desc" xml:space="preserve"><value>Hide the window to the system tray instead of closing.</value></data>
+  <data name="Settings.Sys.Smooth.Title" xml:space="preserve"><value>Smooth Scrolling</value></data>
+  <data name="Settings.Sys.Smooth.Desc" xml:space="preserve"><value>Enable inertia-based scrolling throughout the app.</value></data>
+  <data name="Settings.Sys.Hidden.Title" xml:space="preserve"><value>Show Hidden Tasks</value></data>
+  <data name="Settings.Sys.Hidden.Desc" xml:space="preserve"><value>Display tasks that are marked as hidden in the Windows Task Scheduler.</value></data>
+  <data name="Settings.Adv.Confirm.Title" xml:space="preserve"><value>Confirm Before Deleting</value></data>
+  <data name="Settings.Adv.Confirm.Desc" xml:space="preserve"><value>Show a confirmation dialog before removing a task.</value></data>
+  <data name="Settings.Adv.Logging.Title" xml:space="preserve"><value>Application Logging</value></data>
+  <data name="Settings.Adv.Logging.Desc" xml:space="preserve"><value>Write internal events and errors to a log file for troubleshooting.</value></data>
+  <data name="Settings.Adv.SepLogs.Title" xml:space="preserve"><value>Separate Log Files</value></data>
+  <data name="Settings.Adv.SepLogs.Desc" xml:space="preserve"><value>Store error and crash logs in dedicated files instead of the main log.</value></data>
+  <data name="Settings.Adv.SpecLogs.Title" xml:space="preserve"><value>Specific Logs</value></data>
+  <data name="Settings.Adv.SpecLogs.Desc" xml:space="preserve"><value>Direct access to error and crash records.</value></data>
+  <data name="Settings.Adv.OpenLog" xml:space="preserve"><value>Open Log</value></data>
+  <data name="Settings.Adv.ErrorLog" xml:space="preserve"><value>Error Log</value></data>
+  <data name="Settings.Adv.CrashLog" xml:space="preserve"><value>Crash Log</value></data>
+  <data name="Settings.Data.Export.Title" xml:space="preserve"><value>Export Settings</value></data>
+  <data name="Settings.Data.Export.Desc" xml:space="preserve"><value>Save your current settings to a JSON file.</value></data>
+  <data name="Settings.Data.ExportBtn" xml:space="preserve"><value>Export</value></data>
+  <data name="Settings.Data.Import.Title" xml:space="preserve"><value>Import Settings</value></data>
+  <data name="Settings.Data.Import.Desc" xml:space="preserve"><value>Restore settings from a previously exported file.</value></data>
+  <data name="Settings.Data.ImportBtn" xml:space="preserve"><value>Import</value></data>
+  <data name="Settings.Cat.Manage.Title" xml:space="preserve"><value>Manage Categories</value></data>
+  <data name="Settings.Cat.Manage.Desc" xml:space="preserve"><value>Predefined categories for your tasks.</value></data>
+  <data name="Settings.Cat.Placeholder" xml:space="preserve"><value>New category name...</value></data>
+  <data name="Settings.Cat.AddBtn" xml:space="preserve"><value>Add</value></data>
+  <data name="Settings.Tag.Manage.Title" xml:space="preserve"><value>Manage Tags</value></data>
+  <data name="Settings.Tag.Manage.Desc" xml:space="preserve"><value>Predefined tags for your tasks.</value></data>
+  <data name="Settings.Tag.Placeholder" xml:space="preserve"><value>New tag name...</value></data>
+  <data name="Settings.Tag.AddBtn" xml:space="preserve"><value>Add</value></data>
+  <data name="Settings.About.App.Title" xml:space="preserve"><value>Fluent Task Scheduler</value></data>
+  <data name="Settings.About.App.Desc" xml:space="preserve"><value>Built with WinUI 3 · Windows App SDK</value></data>
+  <data name="Settings.About.Update.Title" xml:space="preserve"><value>Check for Updates</value></data>
+  <data name="Settings.About.Update.Desc" xml:space="preserve"><value>Check if a newer version is available.</value></data>
+  <data name="Settings.About.CheckBtn" xml:space="preserve"><value>Check</value></data>
+  <data name="Settings.About.Onboard.Title" xml:space="preserve"><value>Onboarding</value></data>
+  <data name="Settings.About.Onboard.Desc" xml:space="preserve"><value>Replay the welcome walkthrough from first launch.</value></data>
+  <data name="Settings.About.ViewAgain" xml:space="preserve"><value>View Again</value></data>
+  <data name="Dashboard.AllTags" xml:space="preserve"><value>All Tags</value></data>
+  <data name="Dashboard.AllCategories" xml:space="preserve"><value>All Categories</value></data>
+  <data name="Dashboard.Today" xml:space="preserve"><value>Today</value></data>
+  <data name="Dashboard.Unknown" xml:space="preserve"><value>Unknown</value></data>
 </root>
+
 
 
