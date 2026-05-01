@@ -167,7 +167,7 @@ Jetzt App neustarten?</value></data>
   <data name="Main.Sort.NextRun" xml:space="preserve"><value>Nächster Start</value></data>
   <data name="Main.Sort.LastRun" xml:space="preserve"><value>Letzter Start</value></data>
   <data name="Main.Sort.Clear" xml:space="preserve"><value>Sortierung zurücksetzen</value></data>
-  <data name="Main.Task.RunNow" xml:space="preserve"><value>Jetzt ausführen</value></data>
+  <data name="Main.Task.RunNow" xml:space="preserve"><value>Ausführen</value></data>
   <data name="Main.Task.Stop" xml:space="preserve"><value>Beenden</value></data>
   <data name="Main.Task.Edit" xml:space="preserve"><value>Bearbeiten</value></data>
   <data name="Main.Task.Export" xml:space="preserve"><value>Exportieren</value></data>
