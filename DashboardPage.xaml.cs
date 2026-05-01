@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using FluentTaskScheduler.ViewModels;
+using FluentTaskScheduler.Services;
 
 namespace FluentTaskScheduler
 {
@@ -13,6 +14,42 @@ namespace FluentTaskScheduler
             this.InitializeComponent();
             ViewModel = new DashboardViewModel();
             this.NavigationCacheMode = Microsoft.UI.Xaml.Navigation.NavigationCacheMode.Required;
+            LocalizationService.LanguageChanged += LocalizationService_LanguageChanged;
+            ApplyLocalizedUi();
+        }
+
+        private void LocalizationService_LanguageChanged(object? sender, System.EventArgs e)
+        {
+            if (DispatcherQueue == null) return;
+            DispatcherQueue.TryEnqueue(ApplyLocalizedUi);
+        }
+
+        private void ApplyLocalizedUi()
+        {
+            string L(string key, string fallback) => LocalizationService.GetString(key, fallback);
+
+            DashboardRefreshBtn.Text = L("DashboardRefreshBtn.Text", "Refresh Dashboard");
+            DashboardFilterCategory.Text = L("DashboardFilterCategory.Text", "Filter by Category");
+            DashboardFilterTag.Text = L("DashboardFilterTag.Text", "Filter by Tag");
+            DashboardTotalTasks.Text = L("DashboardTotalTasks.Text", "Total Tasks");
+            DashboardEnabled.Text = L("DashboardEnabled.Text", "Enabled");
+            DashboardDisabled.Text = L("DashboardDisabled.Text", "Disabled");
+            DashboardRunning.Text = L("DashboardRunning.Text", "Running");
+            DashboardActiveProcesses.Text = L("DashboardActiveProcesses.Text", "Active Processes");
+            DashboardHealthScore.Text = L("DashboardHealthScore.Text", "Health Score");
+            DashboardRecentSuccess.Text = L("DashboardRecentSuccess.Text", "Recent Success");
+            DashboardRecentChecked.Text = L("DashboardRecentChecked.Text", "Tasks Checked Recently");
+            DashboardRecentFailure.Text = L("DashboardRecentFailure.Text", "Recent Failure");
+            DashboardNeedsAttention.Text = L("DashboardNeedsAttention.Text", "Needs Attention");
+            DashboardCurrentlyRunning.Text = L("DashboardCurrentlyRunning.Text", "Currently Running Tasks");
+            DashboardNoRunningTasks.Text = L("DashboardNoRunningTasks.Text", "No tasks running currently");
+            DashboardRecentlyFailed.Text = L("DashboardRecentlyFailed.Text", "Recently Failed Tasks");
+            DashboardNoRecentFailures.Text = L("DashboardNoRecentFailures.Text", "No recent failures, tasks are in good health");
+            DashboardUpcomingSchedule.Text = L("DashboardUpcomingSchedule.Text", "Upcoming Schedule");
+            DashboardActivityStream.Text = L("DashboardActivityStream.Text", "Recent Activity Stream");
+            DashboardRunHistory.Text = L("DashboardRunHistory.Text", "Run History - Last 7 Days");
+            DashboardSuccess.Text = L("DashboardSuccess.Text", "Success");
+            DashboardFailure.Text = L("DashboardFailure.Text", "Failure");
         }
 
         protected override async void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)

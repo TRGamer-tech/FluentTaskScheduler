@@ -87,10 +87,37 @@ namespace FluentTaskScheduler.ViewModels
             DailyHistory = new ObservableCollection<DailyChartPoint>();
             RunningTasksList = new ObservableCollection<RunningTaskInfo>();
             FailedTasksList = new ObservableCollection<FailedTaskInfo>();
-            AvailableTags = new ObservableCollection<FilterItem> { new FilterItem { Name = AllTagsLabel, IsSelected = true } };
-            _selectedTag = AllTagsLabel;
-            AvailableCategories = new ObservableCollection<FilterItem> { new FilterItem { Name = AllCategoriesLabel, IsSelected = true } };
-            _selectedCategory = AllCategoriesLabel;
+            AvailableTags = new ObservableCollection<FilterItem>();
+            AvailableCategories = new ObservableCollection<FilterItem>();
+            
+            RefreshFilterLabels();
+            
+            LocalizationService.LanguageChanged += LocalizationService_LanguageChanged;
+        }
+
+        private void LocalizationService_LanguageChanged(object? sender, EventArgs e)
+        {
+            RefreshFilterLabels();
+            _ = LoadDashboardData();
+        }
+
+        private void RefreshFilterLabels()
+        {
+            // Update SelectedTag/Category if they were the "All" labels
+            // We just reset them to the current localized "All" label if they were null or any of the hardcoded defaults
+            // This is a bit of a heuristic but it works for language switching
+            if (string.IsNullOrEmpty(_selectedTag) || _selectedTag == "All Tags" || _selectedTag == "所有标签" || _selectedTag == "Alle Tags") 
+            {
+                _selectedTag = AllTagsLabel;
+            }
+            if (string.IsNullOrEmpty(_selectedCategory) || _selectedCategory == "All Categories" || _selectedCategory == "所有分类" || _selectedCategory == "Alle Kategorien")
+            {
+                _selectedCategory = AllCategoriesLabel;
+            }
+
+            OnPropertyChanged(nameof(SelectedTag));
+            OnPropertyChanged(nameof(SelectedCategory));
+            OnPropertyChanged(nameof(ExitCodePrefix));
         }
 
         public int RunningTasks
@@ -153,8 +180,9 @@ namespace FluentTaskScheduler.ViewModels
         public ObservableCollection<FilterItem> AvailableTags { get; }
         public ObservableCollection<FilterItem> AvailableCategories { get; }
 
-        private static string AllTagsLabel => LocalizationService.GetString("Dashboard.AllTags", "All Tags");
-        private static string AllCategoriesLabel => LocalizationService.GetString("Dashboard.AllCategories", "All Categories");
+        public string AllTagsLabel => LocalizationService.GetString("Dashboard.AllTags", "All Tags");
+        public string AllCategoriesLabel => LocalizationService.GetString("Dashboard.AllCategories", "All Categories");
+        public string ExitCodePrefix => LocalizationService.GetString("DashboardExitCode.Text", "Exit Code: ");
 
         private string _selectedTag = LocalizationService.GetString("Dashboard.AllTags", "All Tags");
         public string SelectedTag

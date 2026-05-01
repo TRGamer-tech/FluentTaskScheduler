@@ -59,12 +59,20 @@ namespace FluentTaskScheduler.Models
         {
             get
             {
-                if (TriggerType == "SessionStateChange") return $"At {SessionStateChangeType}";
-                if (TriggerType == "OnIdle") return "On Idle";
-                if (TriggerType == "AtLogon") return "At Logon";
-                if (TriggerType == "AtStartup") return "At Startup";
-                if (string.IsNullOrEmpty(ScheduleInfo)) return TriggerType;
-                return $"{TriggerType} at {ScheduleInfo}";
+                if (TriggerType == "SessionStateChange") 
+                {
+                    string sess = Services.LocalizationService.GetString("Dialog.Sess." + SessionStateChangeType, SessionStateChangeType);
+                    return string.Format(Services.LocalizationService.GetString("Trigger.SessionStateChange", "At {0}"), sess);
+                }
+                if (TriggerType == "OnIdle") return Services.LocalizationService.GetString("Trigger.OnIdle", "On Idle");
+                if (TriggerType == "AtLogon") return Services.LocalizationService.GetString("Trigger.AtLogon", "At Logon");
+                if (TriggerType == "AtStartup") return Services.LocalizationService.GetString("Trigger.AtStartup", "At Startup");
+                
+                string typeLoc = Services.LocalizationService.GetString("Dialog.Trigger." + TriggerType, TriggerType);
+                if (string.IsNullOrEmpty(ScheduleInfo)) return typeLoc;
+                
+                string at = Services.LocalizationService.GetString("Trigger.At", "at");
+                return $"{typeLoc} {at} {ScheduleInfo}";
             }
         }
     }

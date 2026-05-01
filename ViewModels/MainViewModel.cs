@@ -20,6 +20,8 @@ namespace FluentTaskScheduler.ViewModels
         private string _currentFolderPath = "\\";
         private string _filterTag = "all";
         private ScheduledTaskModel? _selectedTask;
+        
+        public string ActionRunPrefix => Services.LocalizationService.GetString("Trigger.Run", "Run:");
 
         // Sorting
         public string SortColumn { get; private set; } = "";
@@ -68,6 +70,9 @@ namespace FluentTaskScheduler.ViewModels
 
         public MainViewModel()
         {
+            Services.LocalizationService.LanguageChanged += (s, e) => {
+                OnPropertyChanged(nameof(ActionRunPrefix));
+            };
         }
 
         public bool IsTrayIconVisible => Services.SettingsService.EnableTrayIcon;

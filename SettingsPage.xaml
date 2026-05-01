@@ -86,9 +86,9 @@
                                 </StackPanel>
                                 <ComboBox x:Name="ThemeComboBox" Grid.Column="1" VerticalAlignment="Center"
                                           SelectionChanged="ThemeComboBox_SelectionChanged" Width="160">
-                                    <ComboBoxItem Content="Light"/>
-                                    <ComboBoxItem Content="Dark"/>
-                                    <ComboBoxItem Content="System Default"/>
+                                    <ComboBoxItem x:Name="ThemeLightItem" Content="Light"/>
+                                    <ComboBoxItem x:Name="ThemeDarkItem" Content="Dark"/>
+                                    <ComboBoxItem x:Name="ThemeSystemItem" Content="System Default"/>
                                 </ComboBox>
                             </Grid>
                         </Border>
@@ -170,11 +170,11 @@
                                 </StackPanel>
                                 <ComboBox x:Name="ReminderLeadTimeComboBox" Grid.Column="1" VerticalAlignment="Center"
                                           SelectionChanged="ReminderLeadTimeComboBox_SelectionChanged" Width="160">
-                                    <ComboBoxItem Content="1 minute before"/>
-                                    <ComboBoxItem Content="5 minutes before"/>
-                                    <ComboBoxItem Content="10 minutes before"/>
-                                    <ComboBoxItem Content="15 minutes before"/>
-                                    <ComboBoxItem Content="30 minutes before"/>
+                                    <ComboBoxItem x:Name="Lead1mItem" Content="1 minute before"/>
+                                    <ComboBoxItem x:Name="Lead5mItem" Content="5 minutes before"/>
+                                    <ComboBoxItem x:Name="Lead10mItem" Content="10 minutes before"/>
+                                    <ComboBoxItem x:Name="Lead15mItem" Content="15 minutes before"/>
+                                    <ComboBoxItem x:Name="Lead30mItem" Content="30 minutes before"/>
                                 </ComboBox>
                             </Grid>
                         </Border>
@@ -280,10 +280,16 @@
                                     <TextBlock x:Name="AdvSpecLogsTitle" Text="Specific Logs" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                                     <TextBlock x:Name="AdvSpecLogsDesc" Text="Direct access to error and crash records." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <Button x:Name="OpenLogButton" Content="Open Log" Click="OpenLogButton_Click"/>
-                                    <Button x:Name="OpenErrorLogButton" Content="Error Log" Click="OpenErrorLogButton_Click"/>
-                                    <Button x:Name="OpenCrashLogButton" Content="Crash Log" Click="OpenCrashLogButton_Click"/>
+                                <StackPanel Spacing="8">
+                                    <Button x:Name="OpenLogButton" Content="Open Log" HorizontalAlignment="Stretch" Click="OpenLogButton_Click"/>
+                                    <Grid ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Button x:Name="OpenErrorLogButton" Content="Error Log" HorizontalAlignment="Stretch" Click="OpenErrorLogButton_Click"/>
+                                        <Button x:Name="OpenCrashLogButton" Grid.Column="1" Content="Crash Log" HorizontalAlignment="Stretch" Click="OpenCrashLogButton_Click"/>
+                                    </Grid>
                                 </StackPanel>
                             </StackPanel>
                         </Border>

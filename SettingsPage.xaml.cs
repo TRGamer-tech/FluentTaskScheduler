@@ -278,6 +278,17 @@ namespace FluentTaskScheduler
             _sectionTitles["Data"] = L("Settings.Section.Data", "Data");
             _sectionTitles["Categories"] = L("Settings.Section.Categories", "Categories & Tags");
             _sectionTitles["About"] = L("Settings.Section.About", "About");
+
+            // Dropdown items
+            ThemeLightItem.Content = L("Settings.Theme.Light", "Light");
+            ThemeDarkItem.Content = L("Settings.Theme.Dark", "Dark");
+            ThemeSystemItem.Content = L("Settings.Theme.System", "System Default");
+
+            Lead1mItem.Content = L("Settings.Lead.1m", "1 minute before");
+            Lead5mItem.Content = L("Settings.Lead.5m", "5 minutes before");
+            Lead10mItem.Content = L("Settings.Lead.10m", "10 minutes before");
+            Lead15mItem.Content = L("Settings.Lead.15m", "15 minutes before");
+            Lead30mItem.Content = L("Settings.Lead.30m", "30 minutes before");
         }
 
         // ── Notifications ──────────────────────────────────────────────────────

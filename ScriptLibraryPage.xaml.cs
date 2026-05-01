@@ -14,6 +14,35 @@ namespace FluentTaskScheduler
         public ScriptLibraryPage()
         {
             this.InitializeComponent();
+            Services.LocalizationService.LanguageChanged += LocalizationService_LanguageChanged;
+            ApplyLocalizedUi();
+        }
+
+        private void LocalizationService_LanguageChanged(object? sender, System.EventArgs e)
+        {
+            if (DispatcherQueue == null) return;
+            DispatcherQueue.TryEnqueue(ApplyLocalizedUi);
+        }
+
+        private void ApplyLocalizedUi()
+        {
+            ScriptLibraryTitle.Text = L("ScriptLibraryTitle.Text", "Script Library");
+            CreateTemplateButton.Content = L("ScriptLibraryCreateBtn.Content", "+ New Template");
+            ToolTipService.SetToolTip(CreateTemplateButton, L("ScriptLibraryCreateBtn.Content", "+ New Template"));
+            
+            CreateTemplateDialog.Title = L("ScriptLibraryNewTemplateDialog.Title", "New Template");
+            CreateTemplateDialog.PrimaryButtonText = L("ScriptLibrarySaveBtn.PrimaryButtonText", "Save");
+            CreateTemplateDialog.CloseButtonText = L("ScriptLibraryCancelBtn.CloseButtonText", "Cancel");
+            
+            TemplateName.Header = L("ScriptLibraryNameHeader.Header", "Name");
+            TemplateName.PlaceholderText = L("ScriptLibraryNamePlaceholder.PlaceholderText", "e.g. Cleanup Script");
+            TemplateDesc.Header = L("ScriptLibraryDescHeader.Header", "Description");
+            TemplateDesc.PlaceholderText = L("ScriptLibraryDescPlaceholder.PlaceholderText", "What does this template do?");
+            TemplateCommand.Header = L("ScriptLibraryCommandHeader.Header", "Command");
+            TemplateCommand.PlaceholderText = L("ScriptLibraryCommandPlaceholder.PlaceholderText", "e.g. powershell.exe");
+            TemplateArgs.Header = L("ScriptLibraryArgsHeader.Header", "Arguments");
+            TemplateArgs.PlaceholderText = L("ScriptLibraryArgsPlaceholder.PlaceholderText", "e.g. -File C:\\scripts\\cleanup.ps1");
+            TemplateAdmin.Content = L("ScriptLibraryAdminContent.Content", "Run with highest privileges");
         }
 
         protected override void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)

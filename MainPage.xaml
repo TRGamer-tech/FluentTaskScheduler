@@ -1,5 +1,6 @@
 <Page
     x:Class="FluentTaskScheduler.MainPage"
+    x:Name="PageRoot"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:FluentTaskScheduler"
@@ -554,7 +555,7 @@
                 <StackPanel Spacing="16" Width="750" Margin="0,8,12,8">
                 <TextBlock x:Uid="DialogTitle" Text="Add or edit task" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
                 <InfoBar x:Name="EditTaskErrorBar" IsOpen="False" Severity="Error" Margin="0,0,0,8" />
-                <TextBox x:Name="EditTaskName" x:Uid="TaskNameHeader" PlaceholderText="Enter task name">
+                <TextBox x:Name="EditTaskName" x:Uid="TaskNameHeader" PlaceholderText="Enter task name" Tag="ph">
                     <TextBox.Header>
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <TextBlock x:Name="DlgTaskNameLabel" Text="Task Name" VerticalAlignment="Center"/>
@@ -587,7 +588,7 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <AutoSuggestBox x:Name="EditTaskCategory" PlaceholderText="e.g. Work" 
+                    <AutoSuggestBox x:Name="EditTaskCategory" PlaceholderText="e.g. Work" Tag="ph" 
                                    ItemsSource="{x:Bind ViewModel.SavedCategories}"
                                    QueryIcon="Find" 
                                    GotFocus="EditTaskCategory_GotFocus"
@@ -602,7 +603,7 @@
                             </StackPanel>
                         </AutoSuggestBox.Header>
                     </AutoSuggestBox>
-                    <AutoSuggestBox x:Name="EditTaskTags" Grid.Column="1" PlaceholderText="e.g. urgent, sync (comma separated)"
+                    <AutoSuggestBox x:Name="EditTaskTags" Grid.Column="1" PlaceholderText="e.g. urgent, sync (comma separated)" Tag="ph"
                                    QueryIcon="Find"
                                    GotFocus="EditTaskTags_GotFocus"
                                    Tapped="EditTaskTags_GotFocus"
@@ -642,9 +643,7 @@
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <TextBlock Text="{Binding TriggerType}" FontWeight="SemiBold"/>
-                                    <TextBlock Text="at" Opacity="0.7"/>
-                                    <TextBlock Text="{Binding ScheduleInfo}" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding Descriptor}" TextTrimming="CharacterEllipsis"/>
                                 </StackPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -686,8 +685,8 @@
                         <CheckBox x:Name="EditTaskRandomDelay" Content="Delay task for up to (random delay):" Click="EditTaskRandomDelay_Click"/>
                         <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
                                   ToolTipService.ToolTip="Adds a random wait (between 0 and the specified value) before the task actually starts. Useful to stagger tasks that trigger at the same time across many machines."/>
-                        <TextBox x:Name="EditTaskRandomDelayVal" PlaceholderText="e.g. 1 hour" Width="120"/>
-                        <TextBlock Text="(e.g. 30s, 1m, 1h)" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                        <TextBox x:Name="EditTaskRandomDelayVal" PlaceholderText="e.g. 1 hour" Width="120" Tag="ph"/>
+                        <TextBlock x:Name="DlgDelayHint" Text="(e.g. 30s, 1m, 1h)" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Spacing="8">
@@ -695,17 +694,17 @@
                          <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
                                    ToolTipService.ToolTip="Automatically terminates the task process if it has been running longer than the chosen duration. Helps prevent runaway processes."/>
                          <ComboBox x:Name="EditTaskStopAfterVal" IsEditable="True" Width="120">
-                             <ComboBoxItem Content="15 minutes" Tag="PT15M"/>
-                             <ComboBoxItem Content="30 minutes" Tag="PT30M"/>
-                             <ComboBoxItem Content="1 hour" Tag="PT1H"/>
-                             <ComboBoxItem Content="2 hours" Tag="PT2H"/>
-                             <ComboBoxItem Content="4 hours" Tag="PT4H"/>
-                             <ComboBoxItem Content="8 hours" Tag="PT8H"/>
-                             <ComboBoxItem Content="12 hours" Tag="PT12H"/>
-                             <ComboBoxItem Content="1 day" Tag="P1D"/>
-                             <ComboBoxItem Content="2 days" Tag="P2D"/>
-                             <ComboBoxItem Content="3 days" Tag="P3D"/>
-                             <ComboBoxItem Content="5 days" Tag="P5D"/>
+                             <ComboBoxItem x:Name="DlgStop15m" Content="15 minutes" Tag="PT15M"/>
+                             <ComboBoxItem x:Name="DlgStop30m" Content="30 minutes" Tag="PT30M"/>
+                             <ComboBoxItem x:Name="DlgStop1h" Content="1 hour" Tag="PT1H"/>
+                             <ComboBoxItem x:Name="DlgStop2h" Content="2 hours" Tag="PT2H"/>
+                             <ComboBoxItem x:Name="DlgStop4h" Content="4 hours" Tag="PT4H"/>
+                             <ComboBoxItem x:Name="DlgStop8h" Content="8 hours" Tag="PT8H"/>
+                             <ComboBoxItem x:Name="DlgStop12h" Content="12 hours" Tag="PT12H"/>
+                             <ComboBoxItem x:Name="DlgStop1d" Content="1 day" Tag="P1D"/>
+                             <ComboBoxItem x:Name="DlgStop2d" Content="2 days" Tag="P2D"/>
+                             <ComboBoxItem x:Name="DlgStop3d" Content="3 days" Tag="P3D"/>
+                             <ComboBoxItem x:Name="DlgStop5d" Content="5 days" Tag="P5D"/>
                          </ComboBox>
                     </StackPanel>
                 </StackPanel>
@@ -715,16 +714,16 @@
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <CheckBox x:Name="EditTaskDailyRecurrence" Content="Recur every" IsChecked="True" Checked="EditTaskDailyRecurrence_Checked" Unchecked="EditTaskDailyRecurrence_Checked" VerticalAlignment="Center"/>
                         <TextBox x:Name="DailyInterval" Width="80" Text="1" VerticalAlignment="Center"/>
-                        <TextBlock Text="day(s)" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="DlgDaysSuffix" Text="day(s)" VerticalAlignment="Center"/>
                     </StackPanel>
                 </StackPanel>
 
                 <!-- Weekly Trigger -->
                 <StackPanel x:Name="PanelWeekly" Visibility="Collapsed" Spacing="8" Margin="0,4,0,0">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Text="Recur every" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="DlgWeeklyRecur" Text="Recur every" VerticalAlignment="Center"/>
                         <TextBox x:Name="WeeklyInterval" Text="1" InputScope="Number" Width="60"/>
-                        <TextBlock Text="weeks on:" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="DlgWeeksOn" Text="weeks on:" VerticalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="12">
                         <CheckBox x:Name="WeeklyMon" Content="Mon"/>
@@ -741,7 +740,7 @@
 
                 <!-- Monthly Trigger -->
                 <StackPanel x:Name="PanelMonthly" Visibility="Collapsed" Spacing="12" Margin="0,4,0,0">
-                    <TextBlock Text="Months:" Style="{StaticResource CaptionTextBlockStyle}"/>
+                    <TextBlock x:Name="DlgMonthsLabel" Text="Months:" Style="{StaticResource CaptionTextBlockStyle}"/>
                     <Grid ColumnSpacing="8" RowSpacing="8">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -771,62 +770,62 @@
                         <CheckBox x:Name="MonthDec" Content="Dec" Grid.Row="1" Grid.Column="5"/>
                     </Grid>
 
-                    <RadioButton x:Name="MonthlyRadioDays" Content="Days" IsChecked="True" GroupName="MonthlyMode"/>
+                    <RadioButton x:Name="MonthlyRadioDays" Content="Days" IsChecked="True" GroupName="MonthlyMode" Tag="loc"/>
                     <StackPanel Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
-                         <TextBox x:Name="MonthlyDaysInput" PlaceholderText="e.g. 1, 15, Last" Width="200"/>
-                         <TextBlock Text="(comma separated, use 'Last' for last day)" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                         <TextBox x:Name="MonthlyDaysInput" PlaceholderText="e.g. 1, 15, Last" Width="200" Tag="ph"/>
+                         <TextBlock x:Name="DlgMonthlyDaysHint" Text="(comma separated, use 'Last' for last day)" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
                     </StackPanel>
 
-                    <RadioButton x:Name="MonthlyRadioOn" Content="On" GroupName="MonthlyMode"/>
+                    <RadioButton x:Name="MonthlyRadioOn" Content="On" GroupName="MonthlyMode" Tag="loc"/>
                     <StackPanel Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
                         <ComboBox x:Name="MonthlyWeekCombo" SelectedIndex="0">
-                            <ComboBoxItem Content="First"/>
-                            <ComboBoxItem Content="Second"/>
-                            <ComboBoxItem Content="Third"/>
-                            <ComboBoxItem Content="Fourth"/>
-                            <ComboBoxItem Content="Last"/>
+                            <ComboBoxItem x:Name="DlgWeekFirst" Content="First"/>
+                            <ComboBoxItem x:Name="DlgWeekSecond" Content="Second"/>
+                            <ComboBoxItem x:Name="DlgWeekThird" Content="Third"/>
+                            <ComboBoxItem x:Name="DlgWeekFourth" Content="Fourth"/>
+                            <ComboBoxItem x:Name="DlgWeekLast" Content="Last"/>
                         </ComboBox>
                         <ComboBox x:Name="MonthlyDayCombo" SelectedIndex="0">
-                            <ComboBoxItem Content="Monday"/>
-                            <ComboBoxItem Content="Tuesday"/>
-                            <ComboBoxItem Content="Wednesday"/>
-                            <ComboBoxItem Content="Thursday"/>
-                            <ComboBoxItem Content="Friday"/>
-                            <ComboBoxItem Content="Saturday"/>
-                            <ComboBoxItem Content="Sunday"/>
+                            <ComboBoxItem x:Name="DlgDayMon" Content="Monday"/>
+                            <ComboBoxItem x:Name="DlgDayTue" Content="Tuesday"/>
+                            <ComboBoxItem x:Name="DlgDayWed" Content="Wednesday"/>
+                            <ComboBoxItem x:Name="DlgDayThu" Content="Thursday"/>
+                            <ComboBoxItem x:Name="DlgDayFri" Content="Friday"/>
+                            <ComboBoxItem x:Name="DlgDaySat" Content="Saturday"/>
+                            <ComboBoxItem x:Name="DlgDaySun" Content="Sunday"/>
                         </ComboBox>
                     </StackPanel>
                 </StackPanel>
 
                 <!-- Event Log Trigger -->
                 <StackPanel x:Name="PanelEvent" Visibility="Collapsed" Spacing="8" Margin="0,4,0,0">
-                    <TextBox x:Name="EditTaskEventLog" Header="Log" PlaceholderText="Application, System, Security, etc." Text="Application"/>
-                    <TextBox x:Name="EditTaskEventSource" Header="Source" PlaceholderText="e.g., VSS, Outlook (Optional)"/>
-                    <TextBox x:Name="EditTaskEventId" Header="Event ID" PlaceholderText="e.g., 1000 (Optional)" InputScope="Number"/>
+                    <TextBox x:Name="EditTaskEventLog" Header="Log" PlaceholderText="Application, System, Security, etc." Text="Application" Tag="ph"/>
+                    <TextBox x:Name="EditTaskEventSource" Header="Source" PlaceholderText="e.g., VSS, Outlook (Optional)" Tag="ph"/>
+                    <TextBox x:Name="EditTaskEventId" Header="Event ID" PlaceholderText="e.g., 1000 (Optional)" InputScope="Number" Tag="ph"/>
                 </StackPanel>
 
                 <!-- Idle Trigger -->
                 <StackPanel x:Name="PanelIdle" Visibility="Collapsed" Spacing="8" Margin="0,4,0,0">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Text="Wait for the computer to be idle for:" VerticalAlignment="Center"/>
-                        <TextBox x:Name="EditTaskIdleDuration" PlaceholderText="e.g., 10m" Width="100" Text="PT10M"/>
-                        <TextBlock Text="(e.g. 5m, 10m, 30m)" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                        <TextBlock x:Name="DlgIdleWait" Text="Wait for the computer to be idle for:" VerticalAlignment="Center"/>
+                        <TextBox x:Name="EditTaskIdleDuration" PlaceholderText="e.g., 10m" Width="100" Text="PT10M" Tag="ph"/>
+                        <TextBlock x:Name="DlgIdleHint" Text="(e.g. 5m, 10m, 30m)" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
                     </StackPanel>
                 </StackPanel>
 
                 <!-- Session State Change Trigger -->
                 <StackPanel x:Name="PanelSessionState" Visibility="Collapsed" Spacing="8" Margin="0,4,0,0">
-                    <ComboBox x:Name="EditTaskSessionStateType" Header="Trigger on" SelectedIndex="0" SelectionChanged="EditTaskSessionStateType_SelectionChanged">
-                        <ComboBoxItem Content="Workstation Lock" Tag="Lock"/>
-                        <ComboBoxItem Content="Workstation Unlock" Tag="Unlock"/>
-                        <ComboBoxItem Content="Remote Desktop Connect" Tag="RemoteConnect"/>
-                        <ComboBoxItem Content="Remote Desktop Disconnect" Tag="RemoteDisconnect"/>
+                    <ComboBox x:Name="EditTaskSessionStateType" Header="Trigger on" SelectedIndex="0" SelectionChanged="EditTaskSessionStateType_SelectionChanged" Tag="hdr">
+                        <ComboBoxItem x:Name="DlgSessLock" Content="Workstation Lock" Tag="Lock"/>
+                        <ComboBoxItem x:Name="DlgSessUnlock" Content="Workstation Unlock" Tag="Unlock"/>
+                        <ComboBoxItem x:Name="DlgSessRdpOn" Content="Remote Desktop Connect" Tag="RemoteConnect"/>
+                        <ComboBoxItem x:Name="DlgSessRdpOff" Content="Remote Desktop Disconnect" Tag="RemoteDisconnect"/>
                     </ComboBox>
                 </StackPanel>
 
                 <StackPanel Spacing="8" Margin="0,12,0,0">
                      <StackPanel Orientation="Horizontal" Spacing="4">
-                         <CheckBox x:Name="EditTaskExpires" Content="Expire task on:" Click="EditTaskExpires_Click"/>
+                         <CheckBox x:Name="EditTaskExpires" Content="Expire task on:" Click="EditTaskExpires_Click" Tag="loc"/>
                          <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
                                    ToolTipService.ToolTip="After this date and time the trigger will stop firing. The task itself remains; only the trigger is deactivated."/>
                      </StackPanel>
@@ -851,7 +850,7 @@
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <TextBlock Text="Run:" FontWeight="SemiBold"/>
+                                    <TextBlock x:Name="DlgRunPrefix" Text="{Binding ElementName=PageRoot, Path=ViewModel.ActionRunPrefix}" FontWeight="SemiBold"/>
                                     <TextBlock Text="{Binding Command}" TextTrimming="CharacterEllipsis"/>
                                 </StackPanel>
                             </DataTemplate>
@@ -862,9 +861,9 @@
                         <Button x:Name="BtnAddAction" Content="+" Width="32" ToolTipService.ToolTip="Add Action">
                             <Button.Flyout>
                                 <MenuFlyout>
-                                    <MenuFlyoutItem Text="Run Program" Click="BtnAddAction_Click" />
-                                    <MenuFlyoutItem Text="Send Email" Click="AddAction_SendEmail_Click" />
-                                    <MenuFlyoutItem Text="Show Notification" Click="AddAction_ShowNotification_Click" />
+                                    <MenuFlyoutItem x:Name="DlgActionRunProg" Text="Run Program" Click="BtnAddAction_Click" />
+                                    <MenuFlyoutItem x:Name="DlgActionEmail" Text="Send Email" Click="AddAction_SendEmail_Click" />
+                                    <MenuFlyoutItem x:Name="DlgActionNotif" Text="Show Notification" Click="AddAction_ShowNotification_Click" />
                                 </MenuFlyout>
                             </Button.Flyout>
                         </Button>
@@ -880,7 +879,7 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox x:Name="EditTaskActionCommand" x:Uid="ProgramScriptHeader" PlaceholderText="e.g., notepad.exe or C:\Scripts\myscript.ps1" Grid.Column="0" TextChanged="EditTaskActionCommand_TextChanged">
+                        <TextBox x:Name="EditTaskActionCommand" x:Uid="ProgramScriptHeader" PlaceholderText="e.g., notepad.exe or C:\Scripts\myscript.ps1" Grid.Column="0" TextChanged="EditTaskActionCommand_TextChanged" Tag="ph">
                             <TextBox.Header>
                                 <StackPanel Orientation="Horizontal" Spacing="4">
                                     <TextBlock x:Name="DlgProgramLabel" Text="Program / Script" VerticalAlignment="Center"/>
@@ -889,9 +888,9 @@
                                 </StackPanel>
                             </TextBox.Header>
                         </TextBox>
-                        <Button x:Name="BrowseActionButton" x:Uid="BrowseButton" Content="Browse..." Click="BrowseAction_Click" VerticalAlignment="Bottom" Margin="0,0,0,6" Grid.Column="1"/>
+                        <Button x:Name="BrowseActionButton" x:Uid="BrowseButton" Content="Browse..." Click="BrowseAction_Click" VerticalAlignment="Bottom" Margin="0,0,0,6" Grid.Column="1" Tag="loc"/>
                     </Grid>
-                    <TextBox x:Name="EditTaskArguments" x:Uid="ArgumentsHeader" PlaceholderText="e.g., /c echo hello or -File script.ps1" TextChanged="EditTaskArguments_TextChanged" Margin="0,8,0,0">
+                    <TextBox x:Name="EditTaskArguments" x:Uid="ArgumentsHeader" PlaceholderText="e.g., /c echo hello or -File script.ps1" TextChanged="EditTaskArguments_TextChanged" Margin="0,8,0,0" Tag="ph">
                         <TextBox.Header>
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <TextBlock x:Name="DlgArgsLabel" Text="Arguments (optional)" VerticalAlignment="Center"/>
@@ -900,7 +899,7 @@
                             </StackPanel>
                         </TextBox.Header>
                     </TextBox>
-                    <TextBox x:Name="EditTaskWorkingDirectory" x:Uid="WorkingDirectoryHeader" PlaceholderText="e.g., C:\Scripts" TextChanged="EditTaskWorkingDirectory_TextChanged" Margin="0,8,0,0">
+                    <TextBox x:Name="EditTaskWorkingDirectory" x:Uid="WorkingDirectoryHeader" PlaceholderText="e.g., C:\Scripts" TextChanged="EditTaskWorkingDirectory_TextChanged" Margin="0,8,0,0" Tag="ph">
                         <TextBox.Header>
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <TextBlock x:Name="DlgWorkDirLabel" Text="Run in (optional)" VerticalAlignment="Center"/>
@@ -926,15 +925,15 @@
                             </StackPanel>
                         </ComboBox.Header>
                         <ComboBoxItem x:Uid="RepetitionNone" Tag=""/>
-                        <ComboBoxItem Content="5 minutes" Tag="PT5M"/>
-                        <ComboBoxItem Content="10 minutes" Tag="PT10M"/>
-                        <ComboBoxItem Content="15 minutes" Tag="PT15M"/>
-                        <ComboBoxItem Content="30 minutes" Tag="PT30M"/>
-                        <ComboBoxItem Content="1 hour" Tag="PT1H"/>
-                        <ComboBoxItem Content="2 hours" Tag="PT2H"/>
-                        <ComboBoxItem Content="4 hours" Tag="PT4H"/>
-                        <ComboBoxItem Content="6 hours" Tag="PT6H"/>
-                        <ComboBoxItem Content="12 hours" Tag="PT12H"/>
+                        <ComboBoxItem x:Name="DlgRep5m" Content="5 minutes" Tag="PT5M"/>
+                        <ComboBoxItem x:Name="DlgRep10m" Content="10 minutes" Tag="PT10M"/>
+                        <ComboBoxItem x:Name="DlgRep15m" Content="15 minutes" Tag="PT15M"/>
+                        <ComboBoxItem x:Name="DlgRep30m" Content="30 minutes" Tag="PT30M"/>
+                        <ComboBoxItem x:Name="DlgRep1h" Content="1 hour" Tag="PT1H"/>
+                        <ComboBoxItem x:Name="DlgRep2h" Content="2 hours" Tag="PT2H"/>
+                        <ComboBoxItem x:Name="DlgRep4h" Content="4 hours" Tag="PT4H"/>
+                        <ComboBoxItem x:Name="DlgRep6h" Content="6 hours" Tag="PT6H"/>
+                        <ComboBoxItem x:Name="DlgRep12h" Content="12 hours" Tag="PT12H"/>
                     </ComboBox>
                     <ComboBox x:Name="EditTaskRepetitionDuration" x:Uid="RepetitionDurationHeader" SelectedIndex="0" SelectionChanged="EditTaskRepetitionDuration_SelectionChanged">
                         <ComboBox.Header>
@@ -945,13 +944,13 @@
                             </StackPanel>
                         </ComboBox.Header>
                         <ComboBoxItem x:Uid="RepetitionIndefinitely" Tag=""/>
-                        <ComboBoxItem Content="1 hour" Tag="PT1H"/>
-                        <ComboBoxItem Content="2 hours" Tag="PT2H"/>
-                        <ComboBoxItem Content="4 hours" Tag="PT4H"/>
-                        <ComboBoxItem Content="6 hours" Tag="PT6H"/>
-                        <ComboBoxItem Content="12 hours" Tag="PT12H"/>
-                        <ComboBoxItem Content="24 hours" Tag="PT24H"/>
-                        <ComboBoxItem Content="1 day" Tag="P1D"/>
+                        <ComboBoxItem x:Name="DlgDur1h" Content="1 hour" Tag="PT1H"/>
+                        <ComboBoxItem x:Name="DlgDur2h" Content="2 hours" Tag="PT2H"/>
+                        <ComboBoxItem x:Name="DlgDur4h" Content="4 hours" Tag="PT4H"/>
+                        <ComboBoxItem x:Name="DlgDur6h" Content="6 hours" Tag="PT6H"/>
+                        <ComboBoxItem x:Name="DlgDur12h" Content="12 hours" Tag="PT12H"/>
+                        <ComboBoxItem x:Name="DlgDur24h" Content="24 hours" Tag="PT24H"/>
+                        <ComboBoxItem x:Name="DlgDur1d" Content="1 day" Tag="P1D"/>
                     </ComboBox>
                 </StackPanel>
                 
@@ -1003,7 +1002,7 @@
                         </StackPanel>
                         <InfoBar x:Name="NetworkAdminNotice" Severity="Informational" IsOpen="False" IsClosable="False"
                                  Title="Administrator required"
-                                 Message="Specific network selection requires the app to run as administrator."/>
+                                 Message="Specific network selection requires the app to run as administrator." Tag="loc"/>
                     </StackPanel>
                     
                     <StackPanel Orientation="Horizontal" Spacing="4">
@@ -1055,12 +1054,12 @@
                                           ToolTipService.ToolTip="Sets the Windows thread scheduling priority for the task process. Higher priority tasks get more CPU time. 'Normal (7)' is recommended for most tasks; avoid Realtime unless absolutely necessary as it can starve other system processes."/>
                             </StackPanel>
                         </ComboBox.Header>
-                        <ComboBoxItem Content="Realtime (0)" Tag="0"/>
-                        <ComboBoxItem Content="High (1)" Tag="1"/>
-                        <ComboBoxItem Content="Above Normal (3)" Tag="3"/>
-                        <ComboBoxItem Content="Normal (7)" Tag="7"/>
-                        <ComboBoxItem Content="Below Normal (9)" Tag="9"/>
-                        <ComboBoxItem Content="Idle (10)" Tag="10"/>
+                        <ComboBoxItem x:Name="DlgPri0" Content="Realtime (0)" Tag="0"/>
+                        <ComboBoxItem x:Name="DlgPri1" Content="High (1)" Tag="1"/>
+                        <ComboBoxItem x:Name="DlgPri3" Content="Above Normal (3)" Tag="3"/>
+                        <ComboBoxItem x:Name="DlgPri7" Content="Normal (7)" Tag="7"/>
+                        <ComboBoxItem x:Name="DlgPri9" Content="Below Normal (9)" Tag="9"/>
+                        <ComboBoxItem x:Name="DlgPri10" Content="Idle (10)" Tag="10"/>
                     </ComboBox>
                     
                     <StackPanel Orientation="Horizontal" Spacing="4">
@@ -1080,8 +1079,8 @@
                                   ToolTipService.ToolTip="Automatically re-runs the task if it exits with a non-zero exit code (failure). Configure the interval and maximum number of attempts below."/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
-                        <TextBox x:Name="EditTaskRestartInterval" PlaceholderText="e.g. 1 minute" Width="120"/>
-                        <TextBlock Text="(e.g. 30s, 1m, 5m)" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                        <TextBox x:Name="EditTaskRestartInterval" PlaceholderText="e.g. 1 minute" Width="120" Tag="ph"/>
+                        <TextBlock x:Name="DlgRestartHint" Text="(e.g. 30s, 1m, 5m)" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
                         <TextBlock x:Name="DlgRestartUpTo" Text="Attempt to restart up to:" VerticalAlignment="Center"/>
                         <NumberBox x:Name="EditTaskRestartCount" Width="80" Value="3" Minimum="0" Maximum="999"/>
                         <TextBlock x:Name="DlgRestartTimes" Text="times" VerticalAlignment="Center"/>
@@ -1102,7 +1101,7 @@
                         <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
                                   ToolTipService.ToolTip="Runs under a specific user account. Enter the username below. The task runs only when that user is logged in (unless 'Run with highest privileges' is also set)."/>
                     </StackPanel>
-                    <TextBox x:Name="EditTaskRunAsUser" Header="Username" PlaceholderText="DOMAIN\Username or username@domain.com" Margin="24,0,0,0" IsEnabled="False"/>
+                    <TextBox x:Name="EditTaskRunAsUser" Header="Username" PlaceholderText="DOMAIN\Username or username@domain.com" Margin="24,0,0,0" IsEnabled="False" Tag="ph"/>
                     <StackPanel Orientation="Horizontal" Spacing="4">
                         <RadioButton x:Name="RunAsSystem" Content="Run as SYSTEM (requires admin)" GroupName="UserContext" Click="RunAsSystem_Click" Checked="UserContextRadio_Checked"/>
                         <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"

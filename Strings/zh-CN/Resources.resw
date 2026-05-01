@@ -361,7 +361,133 @@
   <data name="Dialog.RunAsCurrent" xml:space="preserve"><value>以当前用户身份运行</value></data>
   <data name="Dialog.RunAsSpecific" xml:space="preserve"><value>以指定用户身份运行</value></data>
   <data name="Dialog.RunAsSystem" xml:space="preserve"><value>以 SYSTEM 身份运行（需要管理员权限）</value></data>
+
+  <data name="Trigger.At" xml:space="preserve"><value>在</value></data>
+  <data name="Trigger.OnIdle" xml:space="preserve"><value>空闲时</value></data>
+  <data name="Trigger.AtLogon" xml:space="preserve"><value>登录时</value></data>
+  <data name="Trigger.AtStartup" xml:space="preserve"><value>启动时</value></data>
+  <data name="Trigger.SessionStateChange" xml:space="preserve"><value>在 {0} 时</value></data>
+
+  <data name="Dialog.Ph.TaskName" xml:space="preserve"><value>输入任务名称</value></data>
+  <data name="Dialog.Ph.Category" xml:space="preserve"><value>例如：工作</value></data>
+  <data name="Dialog.Ph.Tags" xml:space="preserve"><value>例如：紧急, 同步 (逗号分隔)</value></data>
+  <data name="Dialog.Ph.Command" xml:space="preserve"><value>例如：notepad.exe 或 C:\Scripts\myscript.ps1</value></data>
+  <data name="Dialog.Ph.Args" xml:space="preserve"><value>例如：/c echo hello 或 -File script.ps1</value></data>
+  <data name="Dialog.Ph.WorkDir" xml:space="preserve"><value>例如：C:\Scripts</value></data>
+  <data name="Dialog.Ph.Delay" xml:space="preserve"><value>例如：1 小时</value></data>
+  <data name="Dialog.Ph.Idle" xml:space="preserve"><value>例如：10m</value></data>
+  <data name="Dialog.Ph.MonthDays" xml:space="preserve"><value>例如：1, 15, 最后一天</value></data>
+  <data name="Dialog.Ph.RestartInt" xml:space="preserve"><value>例如：1 分钟</value></data>
+  <data name="Dialog.Ph.Username" xml:space="preserve"><value>DOMAIN\用户名 或 username@domain.com</value></data>
+  <data name="Dialog.UsernameHeader" xml:space="preserve"><value>用户名</value></data>
+  <data name="Dialog.EventLog" xml:space="preserve"><value>日志</value></data>
+  <data name="Dialog.EventSource" xml:space="preserve"><value>源</value></data>
+  <data name="Dialog.EventId" xml:space="preserve"><value>事件 ID</value></data>
+  <data name="Dialog.Ph.EventLog" xml:space="preserve"><value>Application, System, Security 等</value></data>
+  <data name="Dialog.Ph.EventSource" xml:space="preserve"><value>例如：VSS, Outlook (可选)</value></data>
+  <data name="Dialog.Ph.EventId" xml:space="preserve"><value>例如：1000 (可选)</value></data>
+
+  <data name="Dialog.Hint.Delay" xml:space="preserve"><value>(例如：30s, 1m, 1h)</value></data>
+  <data name="Dialog.Hint.Idle" xml:space="preserve"><value>(例如：5m, 10m, 30m)</value></data>
+  <data name="Dialog.Hint.Restart" xml:space="preserve"><value>(例如：30s, 1m, 5m)</value></data>
+  <data name="Dialog.Hint.MonthDays" xml:space="preserve"><value>(逗号分隔，使用 'Last' 表示最后一天)</value></data>
+
+  <data name="Dialog.RecurEvery" xml:space="preserve"><value>每隔</value></data>
+  <data name="Dialog.DaysSuffix" xml:space="preserve"><value>天重复</value></data>
+  <data name="Dialog.WeeksOn" xml:space="preserve"><value>周的以下日期：</value></data>
+  <data name="Dialog.Months" xml:space="preserve"><value>月份：</value></data>
+  <data name="Dialog.Days" xml:space="preserve"><value>天</value></data>
+  <data name="Dialog.On" xml:space="preserve"><value>在</value></data>
+  <data name="Dialog.IdleWait" xml:space="preserve"><value>等待计算机空闲达：</value></data>
+  <data name="Dialog.TriggerAt" xml:space="preserve"><value>于</value></data>
+
+  <data name="Dialog.Day.Mon" xml:space="preserve"><value>周一</value></data>
+  <data name="Dialog.Day.Tue" xml:space="preserve"><value>周二</value></data>
+  <data name="Dialog.Day.Wed" xml:space="preserve"><value>周三</value></data>
+  <data name="Dialog.Day.Thu" xml:space="preserve"><value>周四</value></data>
+  <data name="Dialog.Day.Fri" xml:space="preserve"><value>周五</value></data>
+  <data name="Dialog.Day.Sat" xml:space="preserve"><value>周六</value></data>
+  <data name="Dialog.Day.Sun" xml:space="preserve"><value>周日</value></data>
+
+  <data name="Dialog.Month.Jan" xml:space="preserve"><value>一月</value></data>
+  <data name="Dialog.Month.Feb" xml:space="preserve"><value>二月</value></data>
+  <data name="Dialog.Month.Mar" xml:space="preserve"><value>三月</value></data>
+  <data name="Dialog.Month.Apr" xml:space="preserve"><value>四月</value></data>
+  <data name="Dialog.Month.May" xml:space="preserve"><value>五月</value></data>
+  <data name="Dialog.Month.Jun" xml:space="preserve"><value>六月</value></data>
+  <data name="Dialog.Month.Jul" xml:space="preserve"><value>七月</value></data>
+  <data name="Dialog.Month.Aug" xml:space="preserve"><value>八月</value></data>
+  <data name="Dialog.Month.Sep" xml:space="preserve"><value>九月</value></data>
+  <data name="Dialog.Month.Oct" xml:space="preserve"><value>十月</value></data>
+  <data name="Dialog.Month.Nov" xml:space="preserve"><value>十一月</value></data>
+  <data name="Dialog.Month.Dec" xml:space="preserve"><value>十二月</value></data>
+
+  <data name="Dialog.Week.First" xml:space="preserve"><value>第一个</value></data>
+  <data name="Dialog.Week.Second" xml:space="preserve"><value>第二个</value></data>
+  <data name="Dialog.Week.Third" xml:space="preserve"><value>第三个</value></data>
+  <data name="Dialog.Week.Fourth" xml:space="preserve"><value>第四个</value></data>
+  <data name="Dialog.Week.Last" xml:space="preserve"><value>最后一个</value></data>
+
+  <data name="Dialog.Weekday.Mon" xml:space="preserve"><value>星期一</value></data>
+  <data name="Dialog.Weekday.Tue" xml:space="preserve"><value>星期二</value></data>
+  <data name="Dialog.Weekday.Wed" xml:space="preserve"><value>星期三</value></data>
+  <data name="Dialog.Weekday.Thu" xml:space="preserve"><value>星期四</value></data>
+  <data name="Dialog.Weekday.Fri" xml:space="preserve"><value>星期五</value></data>
+  <data name="Dialog.Weekday.Sat" xml:space="preserve"><value>星期六</value></data>
+  <data name="Dialog.Weekday.Sun" xml:space="preserve"><value>星期日</value></data>
+
+  <data name="Dialog.TriggerOn" xml:space="preserve"><value>触发于</value></data>
+  <data name="Dialog.Sess.Lock" xml:space="preserve"><value>工作站锁定</value></data>
+  <data name="Dialog.Sess.Unlock" xml:space="preserve"><value>工作站解锁</value></data>
+  <data name="Dialog.Sess.RdpConnect" xml:space="preserve"><value>远程桌面连接</value></data>
+  <data name="Dialog.Sess.RdpDisconnect" xml:space="preserve"><value>远程桌面断开</value></data>
+  <data name="Dialog.Expire" xml:space="preserve"><value>任务过期时间：</value></data>
+
+  <data name="Dialog.Action.RunProg" xml:space="preserve"><value>启动程序</value></data>
+  <data name="Dialog.Action.Email" xml:space="preserve"><value>发送电子邮件</value></data>
+  <data name="Dialog.Action.Notif" xml:space="preserve"><value>显示通知</value></data>
+  <data name="Dialog.Browse" xml:space="preserve"><value>浏览...</value></data>
+  <data name="Dialog.RunPrefix" xml:space="preserve"><value>运行：</value></data>
+
+  <data name="Dialog.Time.5m" xml:space="preserve"><value>5 分钟</value></data>
+  <data name="Dialog.Time.10m" xml:space="preserve"><value>10 分钟</value></data>
+  <data name="Dialog.Time.15m" xml:space="preserve"><value>15 分钟</value></data>
+  <data name="Dialog.Time.30m" xml:space="preserve"><value>30 分钟</value></data>
+  <data name="Dialog.Time.1h" xml:space="preserve"><value>1 小时</value></data>
+  <data name="Dialog.Time.2h" xml:space="preserve"><value>2 小时</value></data>
+  <data name="Dialog.Time.4h" xml:space="preserve"><value>4 小时</value></data>
+  <data name="Dialog.Time.6h" xml:space="preserve"><value>6 小时</value></data>
+  <data name="Dialog.Time.8h" xml:space="preserve"><value>8 小时</value></data>
+  <data name="Dialog.Time.12h" xml:space="preserve"><value>12 小时</value></data>
+  <data name="Dialog.Time.24h" xml:space="preserve"><value>24 小时</value></data>
+  <data name="Dialog.Time.1d" xml:space="preserve"><value>1 天</value></data>
+  <data name="Dialog.Time.2d" xml:space="preserve"><value>2 天</value></data>
+  <data name="Dialog.Time.3d" xml:space="preserve"><value>3 天</value></data>
+  <data name="Dialog.Time.5d" xml:space="preserve"><value>5 天</value></data>
+
+  <data name="Dialog.Pri.Realtime" xml:space="preserve"><value>实时 (0)</value></data>
+  <data name="Dialog.Pri.High" xml:space="preserve"><value>高 (1)</value></data>
+  <data name="Dialog.Pri.AboveNormal" xml:space="preserve"><value>高于标准 (3)</value></data>
+  <data name="Dialog.Pri.Normal" xml:space="preserve"><value>标准 (7)</value></data>
+  <data name="Dialog.Pri.BelowNormal" xml:space="preserve"><value>低于标准 (9)</value></data>
+  <data name="Dialog.Pri.Idle" xml:space="preserve"><value>空闲 (10)</value></data>
+
+  <data name="Dialog.NetAdmin.Title" xml:space="preserve"><value>需要管理员权限</value></data>
+  <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>选择特定网络需要以管理员身份运行应用程序。</value></data>
+  <data name="Dialog.SysWarn.Title" xml:space="preserve"><value>需要管理员权限</value></data>
+  <data name="Dialog.SysWarn.Msg" xml:space="preserve"><value>要创建以 SYSTEM 身份运行的任务，必须以管理员权限运行此应用程序。请右键单击该应用并选择“以管理员身份运行”。</value></data>
+
+  <data name="Settings.Theme.Light" xml:space="preserve"><value>浅色</value></data>
+  <data name="Settings.Theme.Dark" xml:space="preserve"><value>深色</value></data>
+  <data name="Settings.Theme.System" xml:space="preserve"><value>系统默认</value></data>
+
+  <data name="Settings.Lead.1m" xml:space="preserve"><value>提前 1 分钟</value></data>
+  <data name="Settings.Lead.5m" xml:space="preserve"><value>提前 5 分钟</value></data>
+  <data name="Settings.Lead.10m" xml:space="preserve"><value>提前 10 分钟</value></data>
+  <data name="Settings.Lead.15m" xml:space="preserve"><value>提前 15 分钟</value></data>
+  <data name="Settings.Lead.30m" xml:space="preserve"><value>提前 30 分钟</value></data>
 </root>
+
 
 
 

@@ -357,8 +357,134 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.UserContext" xml:space="preserve"><value>Benutzerkontext</value></data>
   <data name="Dialog.RunAsCurrent" xml:space="preserve"><value>Als aktueller Benutzer ausführen</value></data>
   <data name="Dialog.RunAsSpecific" xml:space="preserve"><value>Als bestimmter Benutzer ausführen</value></data>
-  <data name="Dialog.RunAsSystem" xml:space="preserve"><value>Als SYSTEM ausführen (Admin erforderlich)</value></data>
+  <data name="Dialog.RunAsSystem" xml:space="preserve"><value>Als SYSTEM ausfuehren (Admin erforderlich)</value></data>
+
+  <data name="Trigger.At" xml:space="preserve"><value>um</value></data>
+  <data name="Trigger.OnIdle" xml:space="preserve"><value>Bei Leerlauf</value></data>
+  <data name="Trigger.AtLogon" xml:space="preserve"><value>Bei Anmeldung</value></data>
+  <data name="Trigger.AtStartup" xml:space="preserve"><value>Beim Systemstart</value></data>
+  <data name="Trigger.SessionStateChange" xml:space="preserve"><value>Bei {0}</value></data>
+
+  <data name="Dialog.Ph.TaskName" xml:space="preserve"><value>Aufgabenname eingeben</value></data>
+  <data name="Dialog.Ph.Category" xml:space="preserve"><value>z.B. Arbeit</value></data>
+  <data name="Dialog.Ph.Tags" xml:space="preserve"><value>z.B. dringend, synchronisieren (kommagetrennt)</value></data>
+  <data name="Dialog.Ph.Command" xml:space="preserve"><value>z.B. notepad.exe oder C:\Scripts\myscript.ps1</value></data>
+  <data name="Dialog.Ph.Args" xml:space="preserve"><value>z.B. /c echo hallo oder -File script.ps1</value></data>
+  <data name="Dialog.Ph.WorkDir" xml:space="preserve"><value>z.B. C:\Scripts</value></data>
+  <data name="Dialog.Ph.Delay" xml:space="preserve"><value>z.B. 1 Stunde</value></data>
+  <data name="Dialog.Ph.Idle" xml:space="preserve"><value>z.B. 10m</value></data>
+  <data name="Dialog.Ph.MonthDays" xml:space="preserve"><value>z.B. 1, 15, Letzter</value></data>
+  <data name="Dialog.Ph.RestartInt" xml:space="preserve"><value>z.B. 1 Minute</value></data>
+  <data name="Dialog.Ph.Username" xml:space="preserve"><value>DOMAIN\Benutzername oder benutzer@domain.com</value></data>
+  <data name="Dialog.UsernameHeader" xml:space="preserve"><value>Benutzername</value></data>
+  <data name="Dialog.EventLog" xml:space="preserve"><value>Protokoll</value></data>
+  <data name="Dialog.EventSource" xml:space="preserve"><value>Quelle</value></data>
+  <data name="Dialog.EventId" xml:space="preserve"><value>Ereignis-ID</value></data>
+  <data name="Dialog.Ph.EventLog" xml:space="preserve"><value>Anwendung, System, Sicherheit, etc.</value></data>
+  <data name="Dialog.Ph.EventSource" xml:space="preserve"><value>z.B. VSS, Outlook (Optional)</value></data>
+  <data name="Dialog.Ph.EventId" xml:space="preserve"><value>z.B. 1000 (Optional)</value></data>
+
+  <data name="Dialog.Hint.Delay" xml:space="preserve"><value>(z.B. 30s, 1m, 1h)</value></data>
+  <data name="Dialog.Hint.Idle" xml:space="preserve"><value>(z.B. 5m, 10m, 30m)</value></data>
+  <data name="Dialog.Hint.Restart" xml:space="preserve"><value>(z.B. 30s, 1m, 5m)</value></data>
+  <data name="Dialog.Hint.MonthDays" xml:space="preserve"><value>(kommagetrennt, 'Letzter' fuer den letzten Tag)</value></data>
+
+  <data name="Dialog.RecurEvery" xml:space="preserve"><value>Wiederholen alle</value></data>
+  <data name="Dialog.DaysSuffix" xml:space="preserve"><value>Tag(e)</value></data>
+  <data name="Dialog.WeeksOn" xml:space="preserve"><value>Wochen am:</value></data>
+  <data name="Dialog.Months" xml:space="preserve"><value>Monate:</value></data>
+  <data name="Dialog.Days" xml:space="preserve"><value>Tage</value></data>
+  <data name="Dialog.On" xml:space="preserve"><value>Am</value></data>
+  <data name="Dialog.IdleWait" xml:space="preserve"><value>Warten, bis der Computer leerlaufend ist fuer:</value></data>
+  <data name="Dialog.TriggerAt" xml:space="preserve"><value>um</value></data>
+
+  <data name="Dialog.Day.Mon" xml:space="preserve"><value>Mo</value></data>
+  <data name="Dialog.Day.Tue" xml:space="preserve"><value>Di</value></data>
+  <data name="Dialog.Day.Wed" xml:space="preserve"><value>Mi</value></data>
+  <data name="Dialog.Day.Thu" xml:space="preserve"><value>Do</value></data>
+  <data name="Dialog.Day.Fri" xml:space="preserve"><value>Fr</value></data>
+  <data name="Dialog.Day.Sat" xml:space="preserve"><value>Sa</value></data>
+  <data name="Dialog.Day.Sun" xml:space="preserve"><value>So</value></data>
+
+  <data name="Dialog.Month.Jan" xml:space="preserve"><value>Jan</value></data>
+  <data name="Dialog.Month.Feb" xml:space="preserve"><value>Feb</value></data>
+  <data name="Dialog.Month.Mar" xml:space="preserve"><value>Mär</value></data>
+  <data name="Dialog.Month.Apr" xml:space="preserve"><value>Apr</value></data>
+  <data name="Dialog.Month.May" xml:space="preserve"><value>Mai</value></data>
+  <data name="Dialog.Month.Jun" xml:space="preserve"><value>Jun</value></data>
+  <data name="Dialog.Month.Jul" xml:space="preserve"><value>Jul</value></data>
+  <data name="Dialog.Month.Aug" xml:space="preserve"><value>Aug</value></data>
+  <data name="Dialog.Month.Sep" xml:space="preserve"><value>Sep</value></data>
+  <data name="Dialog.Month.Oct" xml:space="preserve"><value>Okt</value></data>
+  <data name="Dialog.Month.Nov" xml:space="preserve"><value>Nov</value></data>
+  <data name="Dialog.Month.Dec" xml:space="preserve"><value>Dez</value></data>
+
+  <data name="Dialog.Week.First" xml:space="preserve"><value>Erster</value></data>
+  <data name="Dialog.Week.Second" xml:space="preserve"><value>Zweiter</value></data>
+  <data name="Dialog.Week.Third" xml:space="preserve"><value>Dritter</value></data>
+  <data name="Dialog.Week.Fourth" xml:space="preserve"><value>Vierter</value></data>
+  <data name="Dialog.Week.Last" xml:space="preserve"><value>Letzter</value></data>
+
+  <data name="Dialog.Weekday.Mon" xml:space="preserve"><value>Montag</value></data>
+  <data name="Dialog.Weekday.Tue" xml:space="preserve"><value>Dienstag</value></data>
+  <data name="Dialog.Weekday.Wed" xml:space="preserve"><value>Mittwoch</value></data>
+  <data name="Dialog.Weekday.Thu" xml:space="preserve"><value>Donnerstag</value></data>
+  <data name="Dialog.Weekday.Fri" xml:space="preserve"><value>Freitag</value></data>
+  <data name="Dialog.Weekday.Sat" xml:space="preserve"><value>Samstag</value></data>
+  <data name="Dialog.Weekday.Sun" xml:space="preserve"><value>Sonntag</value></data>
+
+  <data name="Dialog.TriggerOn" xml:space="preserve"><value>Ausloesen bei</value></data>
+  <data name="Dialog.Sess.Lock" xml:space="preserve"><value>Arbeitsstation sperren</value></data>
+  <data name="Dialog.Sess.Unlock" xml:space="preserve"><value>Arbeitsstation entsperren</value></data>
+  <data name="Dialog.Sess.RdpConnect" xml:space="preserve"><value>Remote-Desktop-Verbindung</value></data>
+  <data name="Dialog.Sess.RdpDisconnect" xml:space="preserve"><value>Remote-Desktop-Trennung</value></data>
+  <data name="Dialog.Expire" xml:space="preserve"><value>Aufgabe ablaufen lassen am:</value></data>
+
+  <data name="Dialog.Action.RunProg" xml:space="preserve"><value>Programm starten</value></data>
+  <data name="Dialog.Action.Email" xml:space="preserve"><value>E-Mail senden</value></data>
+  <data name="Dialog.Action.Notif" xml:space="preserve"><value>Benachrichtigung anzeigen</value></data>
+  <data name="Dialog.Browse" xml:space="preserve"><value>Durchsuchen...</value></data>
+  <data name="Dialog.RunPrefix" xml:space="preserve"><value>Ausfuehren:</value></data>
+
+  <data name="Dialog.Time.5m" xml:space="preserve"><value>5 Minuten</value></data>
+  <data name="Dialog.Time.10m" xml:space="preserve"><value>10 Minuten</value></data>
+  <data name="Dialog.Time.15m" xml:space="preserve"><value>15 Minuten</value></data>
+  <data name="Dialog.Time.30m" xml:space="preserve"><value>30 Minuten</value></data>
+  <data name="Dialog.Time.1h" xml:space="preserve"><value>1 Stunde</value></data>
+  <data name="Dialog.Time.2h" xml:space="preserve"><value>2 Stunden</value></data>
+  <data name="Dialog.Time.4h" xml:space="preserve"><value>4 Stunden</value></data>
+  <data name="Dialog.Time.6h" xml:space="preserve"><value>6 Stunden</value></data>
+  <data name="Dialog.Time.8h" xml:space="preserve"><value>8 Stunden</value></data>
+  <data name="Dialog.Time.12h" xml:space="preserve"><value>12 Stunden</value></data>
+  <data name="Dialog.Time.24h" xml:space="preserve"><value>24 Stunden</value></data>
+  <data name="Dialog.Time.1d" xml:space="preserve"><value>1 Tag</value></data>
+  <data name="Dialog.Time.2d" xml:space="preserve"><value>2 Tage</value></data>
+  <data name="Dialog.Time.3d" xml:space="preserve"><value>3 Tage</value></data>
+  <data name="Dialog.Time.5d" xml:space="preserve"><value>5 Tage</value></data>
+
+  <data name="Dialog.Pri.Realtime" xml:space="preserve"><value>Echtzeit (0)</value></data>
+  <data name="Dialog.Pri.High" xml:space="preserve"><value>Hoch (1)</value></data>
+  <data name="Dialog.Pri.AboveNormal" xml:space="preserve"><value>Ueber Normal (3)</value></data>
+  <data name="Dialog.Pri.Normal" xml:space="preserve"><value>Normal (7)</value></data>
+  <data name="Dialog.Pri.BelowNormal" xml:space="preserve"><value>Unter Normal (9)</value></data>
+  <data name="Dialog.Pri.Idle" xml:space="preserve"><value>Niedrig (10)</value></data>
+
+  <data name="Dialog.NetAdmin.Title" xml:space="preserve"><value>Administrator erforderlich</value></data>
+  <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>Die Auswahl eines spezifischen Netzwerks erfordert, dass die App als Administrator ausgefuehrt wird.</value></data>
+  <data name="Dialog.SysWarn.Title" xml:space="preserve"><value>Administratorrechte erforderlich</value></data>
+  <data name="Dialog.SysWarn.Msg" xml:space="preserve"><value>Um Aufgaben zu erstellen, die als SYSTEM ausgefuehrt werden, muss diese Anwendung mit Administratorrechten ausgefuehrt werden. Rechtsklick auf die App und 'Als Administrator ausfuehren' waehlen.</value></data>
+
+  <data name="Settings.Theme.Light" xml:space="preserve"><value>Hell</value></data>
+  <data name="Settings.Theme.Dark" xml:space="preserve"><value>Dunkel</value></data>
+  <data name="Settings.Theme.System" xml:space="preserve"><value>Systemstandard</value></data>
+
+  <data name="Settings.Lead.1m" xml:space="preserve"><value>1 Minute vorher</value></data>
+  <data name="Settings.Lead.5m" xml:space="preserve"><value>5 Minuten vorher</value></data>
+  <data name="Settings.Lead.10m" xml:space="preserve"><value>10 Minuten vorher</value></data>
+  <data name="Settings.Lead.15m" xml:space="preserve"><value>15 Minuten vorher</value></data>
+  <data name="Settings.Lead.30m" xml:space="preserve"><value>30 Minuten vorher</value></data>
 </root>
+
 
 
 

@@ -15,7 +15,7 @@
 
                 <!-- Header row -->
                 <StackPanel Orientation="Horizontal" Spacing="12">
-                    <TextBlock x:Uid="ScriptLibraryTitle" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="ScriptLibraryTitle" x:Uid="ScriptLibraryTitle" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
                     <Button x:Name="CreateTemplateButton" x:Uid="ScriptLibraryCreateBtn" Click="CreateTemplateButton_Click"/>
                 </StackPanel>
 
@@ -72,10 +72,10 @@
                        DefaultButton="Primary"
                        PrimaryButtonClick="CreateTemplateDialog_PrimaryButtonClick">
             <StackPanel Spacing="12" MinWidth="400">
-                <TextBox x:Name="TemplateName"     x:Uid="ScriptLibraryName"/>
-                <TextBox x:Name="TemplateDesc"     x:Uid="ScriptLibraryDesc" TextWrapping="Wrap" AcceptsReturn="True" Height="72"/>
-                <TextBox x:Name="TemplateCommand"  x:Uid="ScriptLibraryCommand"/>
-                <TextBox x:Name="TemplateArgs"     x:Uid="ScriptLibraryArgs"/>
+                <TextBox x:Name="TemplateName"     x:Uid="ScriptLibraryNameHeader"/>
+                <TextBox x:Name="TemplateDesc"     x:Uid="ScriptLibraryDescHeader" TextWrapping="Wrap" AcceptsReturn="True" Height="72"/>
+                <TextBox x:Name="TemplateCommand"  x:Uid="ScriptLibraryCommandHeader"/>
+                <TextBox x:Name="TemplateArgs"     x:Uid="ScriptLibraryArgsHeader"/>
                 <CheckBox x:Name="TemplateAdmin"   x:Uid="ScriptLibraryAdminContent"/>
             </StackPanel>
         </ContentDialog>
