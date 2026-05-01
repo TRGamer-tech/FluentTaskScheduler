@@ -215,5 +215,59 @@ Jetzt App neustarten?</value></data>
   <data name="Settings.Appearance.Mica.Description" xml:space="preserve"><value>Wenden Sie das durchscheinende Mica-Hintergrundmaterial an.</value></data>
   <data name="Settings.Appearance.Oled.Title" xml:space="preserve"><value>OLED-Modus</value></data>
   <data name="Settings.Appearance.Oled.Description" xml:space="preserve"><value>Rein schwarzer Hintergrund, um auf OLED-Displays Strom zu sparen. Erfordert dunkles Design.</value></data>
+  <data name="DashboardRefreshBtn.Text" xml:space="preserve"><value>Dashboard aktualisieren</value></data>
+  <data name="DashboardFilterCategory.Text" xml:space="preserve"><value>Nach Kategorie filtern</value></data>
+  <data name="DashboardFilterTag.Text" xml:space="preserve"><value>Nach Tag filtern</value></data>
+  <data name="DashboardTotalTasks.Text" xml:space="preserve"><value>Aufgaben gesamt</value></data>
+  <data name="DashboardEnabled.Text" xml:space="preserve"><value>Aktiviert</value></data>
+  <data name="DashboardDisabled.Text" xml:space="preserve"><value>Deaktiviert</value></data>
+  <data name="DashboardRunning.Text" xml:space="preserve"><value>Wird ausgeführt</value></data>
+  <data name="DashboardActiveProcesses.Text" xml:space="preserve"><value>Aktive Prozesse</value></data>
+  <data name="DashboardHealthScore.Text" xml:space="preserve"><value>Bewertung</value></data>
+  <data name="DashboardRecentSuccess.Text" xml:space="preserve"><value>Zuletzt erfolgreich</value></data>
+  <data name="DashboardRecentChecked.Text" xml:space="preserve"><value>Kürzlich geprüfte Aufgaben</value></data>
+  <data name="DashboardRecentFailure.Text" xml:space="preserve"><value>Zuletzt fehlgeschlagen</value></data>
+  <data name="DashboardNeedsAttention.Text" xml:space="preserve"><value>Erfordert Aufmerksamkeit</value></data>
+  <data name="DashboardCurrentlyRunning.Text" xml:space="preserve"><value>Aktuell ausgeführte Aufgaben</value></data>
+  <data name="DashboardNoRunningTasks.Text" xml:space="preserve"><value>Aktuell keine Aufgaben</value></data>
+  <data name="DashboardRecentlyFailed.Text" xml:space="preserve"><value>Kürzlich fehlgeschlagene Aufgaben</value></data>
+  <data name="DashboardExitCode.Text" xml:space="preserve"><value>Exit-Code: </value></data>
+  <data name="DashboardNoRecentFailures.Text" xml:space="preserve"><value>Keine kürzlichen Fehler, Aufgaben im guten Zustand</value></data>
+  <data name="DashboardUpcomingSchedule.Text" xml:space="preserve"><value>Nächste Starts</value></data>
+  <data name="DashboardActivityStream.Text" xml:space="preserve"><value>Aktivitäts-Stream</value></data>
+  <data name="DashboardRunHistory.Text" xml:space="preserve"><value>Verlauf - Letzte 7 Tage</value></data>
+  <data name="DashboardSuccess.Text" xml:space="preserve"><value>Erfolgreich</value></data>
+  <data name="DashboardFailure.Text" xml:space="preserve"><value>Fehlgeschlagen</value></data>
+
+  <data name="ScriptLibraryTitle.Text" xml:space="preserve"><value>Skriptbibliothek</value></data>
+  <data name="ScriptLibraryCreateBtn.Content" xml:space="preserve"><value>+ Neue Vorlage</value></data>
+  <data name="ScriptLibraryDeleteBtn.ToolTipService.ToolTip" xml:space="preserve"><value>Vorlage löschen</value></data>
+  <data name="ScriptLibraryUseTemplateBtn.Content" xml:space="preserve"><value>Aufgabe aus Vorlage erstellen</value></data>
+  <data name="ScriptLibraryNewTemplateDialog.Title" xml:space="preserve"><value>Neue Vorlage</value></data>
+  <data name="ScriptLibrarySaveBtn.PrimaryButtonText" xml:space="preserve"><value>Speichern</value></data>
+  <data name="ScriptLibraryCancelBtn.CloseButtonText" xml:space="preserve"><value>Abbrechen</value></data>
+  <data name="ScriptLibraryNameHeader.Header" xml:space="preserve"><value>Name</value></data>
+  <data name="ScriptLibraryNamePlaceholder.PlaceholderText" xml:space="preserve"><value>z. B. Bereinigungsskript</value></data>
+  <data name="ScriptLibraryDescHeader.Header" xml:space="preserve"><value>Beschreibung</value></data>
+  <data name="ScriptLibraryDescPlaceholder.PlaceholderText" xml:space="preserve"><value>Was macht diese Vorlage?</value></data>
+  <data name="ScriptLibraryCommandHeader.Header" xml:space="preserve"><value>Befehl</value></data>
+  <data name="ScriptLibraryCommandPlaceholder.PlaceholderText" xml:space="preserve"><value>z. B. powershell.exe</value></data>
+  <data name="ScriptLibraryArgsHeader.Header" xml:space="preserve"><value>Argumente</value></data>
+  <data name="ScriptLibraryArgsPlaceholder.PlaceholderText" xml:space="preserve"><value>z. B. -File C:\scripts\cleanup.ps1</value></data>
+  <data name="ScriptLibraryAdminContent.Content" xml:space="preserve"><value>Mit höchsten Privilegien ausführen</value></data>
+
+  <data name="RepetitionSectionTitle.Text" xml:space="preserve"><value>Wiederholung</value></data>
+  <data name="RepetitionIntervalText.Text" xml:space="preserve"><value>Aufgabe wiederholen alle</value></data>
+  <data name="RepetitionNone.Content" xml:space="preserve"><value>(Keine Wiederholung)</value></data>
+  <data name="RepetitionDurationText.Text" xml:space="preserve"><value>Für die Dauer von</value></data>
+  <data name="RepetitionIndefinitely.Content" xml:space="preserve"><value>Unbegrenzt</value></data>
+  <data name="ConditionStartOnlyIf.Text" xml:space="preserve"><value>Aufgabe nur starten, wenn:</value></data>
+  <data name="ConditionIdleFor.Text" xml:space="preserve"><value>Im Leerlauf seit:</value></data>
+  <data name="ConditionStopOnIdleEnd.Content" xml:space="preserve"><value>Beenden, wenn Leerlauf endet</value></data>
+  <data name="ConditionStopBatterySwitch.Content" xml:space="preserve"><value>Beenden, wenn auf Akkubetrieb gewechselt wird</value></data>
+  <data name="ConditionOnBattery.Content" xml:space="preserve"><value>Computer ist im Akkubetrieb</value></data>
+  <data name="ConditionSpecificNetwork.Text" xml:space="preserve"><value>Spezifisches Netzwerk:</value></data>
+  <data name="ConditionAnyNetwork.Content" xml:space="preserve"><value>Beliebiges Netzwerk</value></data>
 </root>
+
 

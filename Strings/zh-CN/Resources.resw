@@ -218,5 +218,59 @@
   <data name="Settings.Appearance.Mica.Description" xml:space="preserve"><value>应用云母半透明背景材质。</value></data>
   <data name="Settings.Appearance.Oled.Title" xml:space="preserve"><value>OLED 模式</value></data>
   <data name="Settings.Appearance.Oled.Description" xml:space="preserve"><value>纯黑背景，以便在 OLED 显示器上省电。需要深色主题。</value></data>
+  <data name="DashboardRefreshBtn.Text" xml:space="preserve"><value>刷新仪表盘</value></data>
+  <data name="DashboardFilterCategory.Text" xml:space="preserve"><value>按分类筛选</value></data>
+  <data name="DashboardFilterTag.Text" xml:space="preserve"><value>按标签筛选</value></data>
+  <data name="DashboardTotalTasks.Text" xml:space="preserve"><value>任务总数</value></data>
+  <data name="DashboardEnabled.Text" xml:space="preserve"><value>启用</value></data>
+  <data name="DashboardDisabled.Text" xml:space="preserve"><value>禁用</value></data>
+  <data name="DashboardRunning.Text" xml:space="preserve"><value>正在运行</value></data>
+  <data name="DashboardActiveProcesses.Text" xml:space="preserve"><value>活跃进程</value></data>
+  <data name="DashboardHealthScore.Text" xml:space="preserve"><value>健康评分</value></data>
+  <data name="DashboardRecentSuccess.Text" xml:space="preserve"><value>近期成功</value></data>
+  <data name="DashboardRecentChecked.Text" xml:space="preserve"><value>最近检查的任务</value></data>
+  <data name="DashboardRecentFailure.Text" xml:space="preserve"><value>近期失败</value></data>
+  <data name="DashboardNeedsAttention.Text" xml:space="preserve"><value>需要关注</value></data>
+  <data name="DashboardCurrentlyRunning.Text" xml:space="preserve"><value>当前运行中</value></data>
+  <data name="DashboardNoRunningTasks.Text" xml:space="preserve"><value>当前没有正在运行的任务</value></data>
+  <data name="DashboardRecentlyFailed.Text" xml:space="preserve"><value>最近失败任务</value></data>
+  <data name="DashboardExitCode.Text" xml:space="preserve"><value>退出码：</value></data>
+  <data name="DashboardNoRecentFailures.Text" xml:space="preserve"><value>近期无失败，任务状态良好</value></data>
+  <data name="DashboardUpcomingSchedule.Text" xml:space="preserve"><value>即将运行计划</value></data>
+  <data name="DashboardActivityStream.Text" xml:space="preserve"><value>活动流</value></data>
+  <data name="DashboardRunHistory.Text" xml:space="preserve"><value>运行历史 — 最近 7 天</value></data>
+  <data name="DashboardSuccess.Text" xml:space="preserve"><value>成功</value></data>
+  <data name="DashboardFailure.Text" xml:space="preserve"><value>失败</value></data>
+
+  <data name="ScriptLibraryTitle.Text" xml:space="preserve"><value>脚本库</value></data>
+  <data name="ScriptLibraryCreateBtn.Content" xml:space="preserve"><value>+ 新建模板</value></data>
+  <data name="ScriptLibraryDeleteBtn.ToolTipService.ToolTip" xml:space="preserve"><value>删除模板</value></data>
+  <data name="ScriptLibraryUseTemplateBtn.Content" xml:space="preserve"><value>使用此模板创建任务</value></data>
+  <data name="ScriptLibraryNewTemplateDialog.Title" xml:space="preserve"><value>新建模板</value></data>
+  <data name="ScriptLibrarySaveBtn.PrimaryButtonText" xml:space="preserve"><value>保存</value></data>
+  <data name="ScriptLibraryCancelBtn.CloseButtonText" xml:space="preserve"><value>取消</value></data>
+  <data name="ScriptLibraryNameHeader.Header" xml:space="preserve"><value>名称</value></data>
+  <data name="ScriptLibraryNamePlaceholder.PlaceholderText" xml:space="preserve"><value>例如：清理脚本</value></data>
+  <data name="ScriptLibraryDescHeader.Header" xml:space="preserve"><value>描述</value></data>
+  <data name="ScriptLibraryDescPlaceholder.PlaceholderText" xml:space="preserve"><value>这个模板用于做什么？</value></data>
+  <data name="ScriptLibraryCommandHeader.Header" xml:space="preserve"><value>命令</value></data>
+  <data name="ScriptLibraryCommandPlaceholder.PlaceholderText" xml:space="preserve"><value>例如：powershell.exe</value></data>
+  <data name="ScriptLibraryArgsHeader.Header" xml:space="preserve"><value>参数</value></data>
+  <data name="ScriptLibraryArgsPlaceholder.PlaceholderText" xml:space="preserve"><value>例如：-File C:\scripts\cleanup.ps1</value></data>
+  <data name="ScriptLibraryAdminContent.Content" xml:space="preserve"><value>以最高权限运行</value></data>
+
+  <data name="RepetitionSectionTitle.Text" xml:space="preserve"><value>重复</value></data>
+  <data name="RepetitionIntervalText.Text" xml:space="preserve"><value>任务重复间隔</value></data>
+  <data name="RepetitionNone.Content" xml:space="preserve"><value>(无重复)</value></data>
+  <data name="RepetitionDurationText.Text" xml:space="preserve"><value>持续时长</value></data>
+  <data name="RepetitionIndefinitely.Content" xml:space="preserve"><value>无限期</value></data>
+  <data name="ConditionStartOnlyIf.Text" xml:space="preserve"><value>仅在以下情况启动任务：</value></data>
+  <data name="ConditionIdleFor.Text" xml:space="preserve"><value>空闲时长：</value></data>
+  <data name="ConditionStopOnIdleEnd.Content" xml:space="preserve"><value>空闲结束时停止</value></data>
+  <data name="ConditionStopBatterySwitch.Content" xml:space="preserve"><value>切换到电池供电时停止</value></data>
+  <data name="ConditionOnBattery.Content" xml:space="preserve"><value>计算机由电池供电</value></data>
+  <data name="ConditionSpecificNetwork.Text" xml:space="preserve"><value>指定网络：</value></data>
+  <data name="ConditionAnyNetwork.Content" xml:space="preserve"><value>任意网络</value></data>
 </root>
+
 

@@ -1,4 +1,4 @@
-<Page
+﻿<Page
     x:Class="FluentTaskScheduler.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -915,17 +915,17 @@
                 
                 <!-- Repetition Section -->
                 <Rectangle Height="2" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,12,0,4"/>
-                <TextBlock Text="Repetition" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,4"/>
+                <TextBlock x:Uid="RepetitionSectionTitle" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,4"/>
                 <StackPanel Spacing="12">
                     <ComboBox x:Name="EditTaskRepetitionInterval" SelectedIndex="0" SelectionChanged="EditTaskRepetitionInterval_SelectionChanged">
                         <ComboBox.Header>
                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                <TextBlock Text="Repeat task every" VerticalAlignment="Center"/>
+                                <TextBlock x:Uid="RepetitionIntervalText" VerticalAlignment="Center"/>
                                 <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
                                           ToolTipService.ToolTip="After the task starts, re-trigger it at this interval until the 'For a duration of' limit is reached. Useful for tasks that must run repeatedly within a window."/>
                             </StackPanel>
                         </ComboBox.Header>
-                        <ComboBoxItem Content="(No repetition)" Tag=""/>
+                        <ComboBoxItem x:Uid="RepetitionNone" Tag=""/>
                         <ComboBoxItem Content="5 minutes" Tag="PT5M"/>
                         <ComboBoxItem Content="10 minutes" Tag="PT10M"/>
                         <ComboBoxItem Content="15 minutes" Tag="PT15M"/>
@@ -939,12 +939,12 @@
                     <ComboBox x:Name="EditTaskRepetitionDuration" x:Uid="RepetitionDurationHeader" SelectedIndex="0" SelectionChanged="EditTaskRepetitionDuration_SelectionChanged">
                         <ComboBox.Header>
                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                <TextBlock Text="For a duration of" VerticalAlignment="Center"/>
+                                <TextBlock x:Uid="RepetitionDurationText" VerticalAlignment="Center"/>
                                 <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
                                           ToolTipService.ToolTip="How long the repetition continues. 'Indefinitely' means the task keeps repeating until the trigger itself expires. A finite duration caps the total repetition window."/>
                             </StackPanel>
                         </ComboBox.Header>
-                        <ComboBoxItem Content="Indefinitely" Tag=""/>
+                        <ComboBoxItem x:Uid="RepetitionIndefinitely" Tag=""/>
                         <ComboBoxItem Content="1 hour" Tag="PT1H"/>
                         <ComboBoxItem Content="2 hours" Tag="PT2H"/>
                         <ComboBoxItem Content="4 hours" Tag="PT4H"/>
@@ -959,7 +959,7 @@
                 <Rectangle Height="2" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,12,0,4"/>
                 <TextBlock x:Uid="ConditionsTitle" Text="Conditions" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,12,0,4"/>
                 <StackPanel Spacing="8">
-                    <TextBlock Text="Start the task only if:" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                    <TextBlock x:Uid="ConditionStartOnlyIf" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
                     
                     <StackPanel Orientation="Horizontal" Spacing="4">
                         <CheckBox x:Name="EditTaskOnlyIfIdle" x:Uid="ConditionIdle" Content="Computer is idle"/>
@@ -967,9 +967,9 @@
                                   ToolTipService.ToolTip="Only starts the task if the computer has had no user input for the specified idle period. Prevents the task from interrupting active work."/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
-                        <TextBlock Text="Idle for:" VerticalAlignment="Center"/>
+                        <TextBlock x:Uid="ConditionIdleFor" VerticalAlignment="Center"/>
                         <TextBox x:Name="EditTaskIdleDurationSetting" PlaceholderText="e.g., 10m" Width="100" Text="PT10M"/>
-                        <CheckBox x:Name="EditTaskStopOnIdleEnd" Content="Stop when idle ends" VerticalAlignment="Center"/>
+                        <CheckBox x:Name="EditTaskStopOnIdleEnd" x:Uid="ConditionStopOnIdleEnd" VerticalAlignment="Center"/>
                     </StackPanel>
                     
                     <StackPanel Orientation="Horizontal" Spacing="4">
@@ -978,13 +978,13 @@
                                   ToolTipService.ToolTip="Prevents the task from starting when the device is running on battery. Ideal for power-intensive operations."/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="4" Margin="24,0,0,0">
-                        <CheckBox x:Name="EditTaskStopBatterySwitch" Content="Stop if switching to battery power"/>
+                        <CheckBox x:Name="EditTaskStopBatterySwitch" x:Uid="ConditionStopBatterySwitch"/>
                         <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
                                   ToolTipService.ToolTip="If the task is running and the power source switches from AC to battery, the task will be automatically stopped."/>
                     </StackPanel>
                     
                     <StackPanel Orientation="Horizontal" Spacing="4">
-                        <CheckBox x:Name="EditTaskOnBattery" Content="Computer is on battery power"/>
+                        <CheckBox x:Name="EditTaskOnBattery" x:Uid="ConditionOnBattery"/>
                         <FontIcon Glyph="&#xE946;" FontSize="12" VerticalAlignment="Center" Opacity="0.6" Tapped="InfoIcon_Tapped"
                                   ToolTipService.ToolTip="Only starts the task when the device is running on battery (i.e., not plugged in to AC power)."/>
                     </StackPanel>
@@ -996,9 +996,9 @@
                     </StackPanel>
                     <StackPanel Spacing="4" Margin="24,0,0,0">
                         <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="Specific network:" VerticalAlignment="Center"/>
+                            <TextBlock x:Uid="ConditionSpecificNetwork" VerticalAlignment="Center"/>
                             <ComboBox x:Name="EditTaskNetworkSelection" Width="250" MaxDropDownHeight="280">
-                                <ComboBoxItem Content="Any network" Tag="" IsSelected="True"/>
+                                <ComboBoxItem x:Uid="ConditionAnyNetwork" Tag="" IsSelected="True"/>
                             </ComboBox>
                         </StackPanel>
                         <InfoBar x:Name="NetworkAdminNotice" Severity="Informational" IsOpen="False" IsClosable="False"

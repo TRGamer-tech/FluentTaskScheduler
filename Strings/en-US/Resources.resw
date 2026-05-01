@@ -215,5 +215,59 @@ Restart now to apply the update?</value></data>
   <data name="Settings.Appearance.Mica.Description" xml:space="preserve"><value>Apply the Mica translucent background material.</value></data>
   <data name="Settings.Appearance.Oled.Title" xml:space="preserve"><value>OLED Mode</value></data>
   <data name="Settings.Appearance.Oled.Description" xml:space="preserve"><value>Pure black background to save power on OLED displays. Requires Dark theme.</value></data>
+  <data name="DashboardRefreshBtn.Text" xml:space="preserve"><value>Refresh Dashboard</value></data>
+  <data name="DashboardFilterCategory.Text" xml:space="preserve"><value>Filter by category</value></data>
+  <data name="DashboardFilterTag.Text" xml:space="preserve"><value>Filter by tag</value></data>
+  <data name="DashboardTotalTasks.Text" xml:space="preserve"><value>Total tasks</value></data>
+  <data name="DashboardEnabled.Text" xml:space="preserve"><value>Enabled</value></data>
+  <data name="DashboardDisabled.Text" xml:space="preserve"><value>Disabled</value></data>
+  <data name="DashboardRunning.Text" xml:space="preserve"><value>Running</value></data>
+  <data name="DashboardActiveProcesses.Text" xml:space="preserve"><value>Active processes</value></data>
+  <data name="DashboardHealthScore.Text" xml:space="preserve"><value>Health score</value></data>
+  <data name="DashboardRecentSuccess.Text" xml:space="preserve"><value>Recent success</value></data>
+  <data name="DashboardRecentChecked.Text" xml:space="preserve"><value>Recently checked tasks</value></data>
+  <data name="DashboardRecentFailure.Text" xml:space="preserve"><value>Recent failures</value></data>
+  <data name="DashboardNeedsAttention.Text" xml:space="preserve"><value>Needs attention</value></data>
+  <data name="DashboardCurrentlyRunning.Text" xml:space="preserve"><value>Currently running tasks</value></data>
+  <data name="DashboardNoRunningTasks.Text" xml:space="preserve"><value>No currently running tasks</value></data>
+  <data name="DashboardRecentlyFailed.Text" xml:space="preserve"><value>Recently failed tasks</value></data>
+  <data name="DashboardExitCode.Text" xml:space="preserve"><value>Exit code: </value></data>
+  <data name="DashboardNoRecentFailures.Text" xml:space="preserve"><value>No recent failures, tasks are in good state</value></data>
+  <data name="DashboardUpcomingSchedule.Text" xml:space="preserve"><value>Upcoming schedule</value></data>
+  <data name="DashboardActivityStream.Text" xml:space="preserve"><value>Activity stream</value></data>
+  <data name="DashboardRunHistory.Text" xml:space="preserve"><value>Run history - Last 7 days</value></data>
+  <data name="DashboardSuccess.Text" xml:space="preserve"><value>Success</value></data>
+  <data name="DashboardFailure.Text" xml:space="preserve"><value>Failure</value></data>
+
+  <data name="ScriptLibraryTitle.Text" xml:space="preserve"><value>Script Library</value></data>
+  <data name="ScriptLibraryCreateBtn.Content" xml:space="preserve"><value>+ New Template</value></data>
+  <data name="ScriptLibraryDeleteBtn.ToolTipService.ToolTip" xml:space="preserve"><value>Delete template</value></data>
+  <data name="ScriptLibraryUseTemplateBtn.Content" xml:space="preserve"><value>Use this template to create task</value></data>
+  <data name="ScriptLibraryNewTemplateDialog.Title" xml:space="preserve"><value>New Template</value></data>
+  <data name="ScriptLibrarySaveBtn.PrimaryButtonText" xml:space="preserve"><value>Save</value></data>
+  <data name="ScriptLibraryCancelBtn.CloseButtonText" xml:space="preserve"><value>Cancel</value></data>
+  <data name="ScriptLibraryNameHeader.Header" xml:space="preserve"><value>Name</value></data>
+  <data name="ScriptLibraryNamePlaceholder.PlaceholderText" xml:space="preserve"><value>e.g., Cleanup Script</value></data>
+  <data name="ScriptLibraryDescHeader.Header" xml:space="preserve"><value>Description</value></data>
+  <data name="ScriptLibraryDescPlaceholder.PlaceholderText" xml:space="preserve"><value>What does this template do?</value></data>
+  <data name="ScriptLibraryCommandHeader.Header" xml:space="preserve"><value>Command</value></data>
+  <data name="ScriptLibraryCommandPlaceholder.PlaceholderText" xml:space="preserve"><value>e.g., powershell.exe</value></data>
+  <data name="ScriptLibraryArgsHeader.Header" xml:space="preserve"><value>Arguments</value></data>
+  <data name="ScriptLibraryArgsPlaceholder.PlaceholderText" xml:space="preserve"><value>e.g., -File C:\scripts\cleanup.ps1</value></data>
+  <data name="ScriptLibraryAdminContent.Content" xml:space="preserve"><value>Run with highest privileges</value></data>
+
+  <data name="RepetitionSectionTitle.Text" xml:space="preserve"><value>Repetition</value></data>
+  <data name="RepetitionIntervalText.Text" xml:space="preserve"><value>Repeat task every</value></data>
+  <data name="RepetitionNone.Content" xml:space="preserve"><value>(No repetition)</value></data>
+  <data name="RepetitionDurationText.Text" xml:space="preserve"><value>For a duration of</value></data>
+  <data name="RepetitionIndefinitely.Content" xml:space="preserve"><value>Indefinitely</value></data>
+  <data name="ConditionStartOnlyIf.Text" xml:space="preserve"><value>Start the task only if:</value></data>
+  <data name="ConditionIdleFor.Text" xml:space="preserve"><value>Idle for:</value></data>
+  <data name="ConditionStopOnIdleEnd.Content" xml:space="preserve"><value>Stop when idle ends</value></data>
+  <data name="ConditionStopBatterySwitch.Content" xml:space="preserve"><value>Stop if switching to battery power</value></data>
+  <data name="ConditionOnBattery.Content" xml:space="preserve"><value>Computer is on battery power</value></data>
+  <data name="ConditionSpecificNetwork.Text" xml:space="preserve"><value>Specific network:</value></data>
+  <data name="ConditionAnyNetwork.Content" xml:space="preserve"><value>Any network</value></data>
 </root>
+
 
