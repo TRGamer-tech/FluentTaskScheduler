@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
+using Microsoft.UI.Text;
 using SS = global::FluentTaskScheduler.Services.SettingsService;
 
 namespace FluentTaskScheduler
@@ -137,13 +139,38 @@ namespace FluentTaskScheduler
                         {
                             try
                             {
+                                var reb = new RichEditBox
+                                {
+                                    IsReadOnly = true,
+                                    AcceptsReturn = true,
+                                    Width = 500,
+                                    Height = 300,
+                                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                                    Margin = new Thickness(0, 10, 0, 10),
+                                    FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Consolas")
+                                };
+                                reb.Document.SetText(TextSetOptions.None, errorMessage);
+
                                 var dialog = new ContentDialog
                                 {
-                                    Title = "Unhandled Exception",
-                                    Content = errorMessage,
-                                    CloseButtonText = "Close",
-                                    XamlRoot = m_window.Content?.XamlRoot
+                                    Title = Services.LocalizationService.GetString("Dialog.Crash.Title", "Unhandled Exception"),
+                                    Content = reb,
+                                    PrimaryButtonText = Services.LocalizationService.GetString("Dialog.Crash.Copy", "Copy to Clipboard"),
+                                    CloseButtonText = Services.LocalizationService.GetString("Dialog.Common.Close", "Close"),
+                                    XamlRoot = m_window.Content?.XamlRoot,
+                                    RequestedTheme = SS.Theme
                                 };
+
+                                dialog.PrimaryButtonClick += (s, args) =>
+                                {
+                                    var dataPackage = new DataPackage();
+                                    dataPackage.SetText(errorMessage);
+                                    Clipboard.SetContent(dataPackage);
+                                    
+                                    // Optionally prevent closing if you want the user to stay, 
+                                    // but usually copying is the final action.
+                                };
+
                                 await dialog.ShowAsync();
                             }
                             catch (Exception nestedEx)

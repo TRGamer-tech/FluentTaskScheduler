@@ -520,6 +520,8 @@
   <data name="ScriptEditor.SaveDialog.Title" xml:space="preserve"><value>将脚本保存到库</value></data>
   <data name="ScriptEditor.SaveDialog.NameHeader" xml:space="preserve"><value>模板名称</value></data>
   <data name="ScriptEditor.SaveDialog.DescHeader" xml:space="preserve"><value>描述</value></data>
+  <data name="Dialog.Crash.Title" xml:space="preserve"><value>未处理的异常</value></data>
+  <data name="Dialog.Crash.Copy" xml:space="preserve"><value>复制到剪贴板</value></data>
 </root>
 
 

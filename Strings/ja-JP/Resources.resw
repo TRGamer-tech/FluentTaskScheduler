@@ -517,4 +517,6 @@
   <data name="ScriptEditor.SaveDialog.Title" xml:space="preserve"><value>スクリプトをライブラリに保存</value></data>
   <data name="ScriptEditor.SaveDialog.NameHeader" xml:space="preserve"><value>テンプレート名</value></data>
   <data name="ScriptEditor.SaveDialog.DescHeader" xml:space="preserve"><value>説明</value></data>
+  <data name="Dialog.Crash.Title" xml:space="preserve"><value>予期せぬエラー</value></data>
+  <data name="Dialog.Crash.Copy" xml:space="preserve"><value>クリップボードにコピー</value></data>
 </root>

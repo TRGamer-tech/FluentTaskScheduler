@@ -518,5 +518,7 @@ Restart now to apply the update?</value></data>
   <data name="ScriptEditor.SaveDialog.Title" xml:space="preserve"><value>Save Script to Library</value></data>
   <data name="ScriptEditor.SaveDialog.NameHeader" xml:space="preserve"><value>Template Name</value></data>
   <data name="ScriptEditor.SaveDialog.DescHeader" xml:space="preserve"><value>Description</value></data>
+  <data name="Dialog.Crash.Title" xml:space="preserve"><value>Unhandled Exception</value></data>
+  <data name="Dialog.Crash.Copy" xml:space="preserve"><value>Copy to Clipboard</value></data>
 </root>
 
