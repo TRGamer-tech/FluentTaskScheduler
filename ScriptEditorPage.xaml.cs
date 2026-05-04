@@ -47,7 +47,7 @@ namespace FluentTaskScheduler
                 if (_runningProcess != null && !_runningProcess.HasExited)
                 {
                     _runningProcess.Kill(true);
-                    AppendOutput("\n[Stopped by user]\n", Colors.Red);
+                    AppendOutput("\n" + LocalizationService.GetString("ScriptEditor.Status.Stopped", "[Stopped by user]") + "\n", Colors.Red);
                 }
             }
             catch { }
@@ -66,16 +66,16 @@ namespace FluentTaskScheduler
 
             var dialog = new ContentDialog
             {
-                Title = "Save Script to Library",
-                PrimaryButtonText = "Save",
-                CloseButtonText = "Cancel",
+                Title = LocalizationService.GetString("ScriptEditor.SaveDialog.Title", "Save Script to Library"),
+                PrimaryButtonText = LocalizationService.GetString("Dialog.Common.Save", "Save"),
+                CloseButtonText = LocalizationService.GetString("Dialog.Common.Cancel", "Cancel"),
                 DefaultButton = ContentDialogButton.Primary,
                 XamlRoot = this.XamlRoot
             };
 
             var stack = new StackPanel { Spacing = 12 };
-            var nameBox = new TextBox { Header = "Template Name", PlaceholderText = "e.g. My Custom Cleanup" };
-            var descBox = new TextBox { Header = "Description", PlaceholderText = "What does this script do?" };
+            var nameBox = new TextBox { Header = LocalizationService.GetString("ScriptEditor.SaveDialog.NameHeader", "Template Name"), PlaceholderText = "e.g. My Custom Cleanup" };
+            var descBox = new TextBox { Header = LocalizationService.GetString("ScriptEditor.SaveDialog.DescHeader", "Description"), PlaceholderText = "What does this script do?" };
             stack.Children.Add(nameBox);
             stack.Children.Add(descBox);
             dialog.Content = stack;
@@ -99,7 +99,7 @@ namespace FluentTaskScheduler
                     IsUserTemplate = true
                 });
 
-                AppendOutput($"\n[Saved to Library as '{nameBox.Text}']\n", Colors.Green);
+                AppendOutput("\n" + string.Format(LocalizationService.GetString("ScriptEditor.Status.Saved", "[Saved to Library as '{0}']"), nameBox.Text) + "\n", Colors.Green);
             }
         }
 
@@ -107,7 +107,7 @@ namespace FluentTaskScheduler
         {
             RunButton.IsEnabled = false;
             StopButton.IsEnabled = true;
-            OutputConsole.Text = "[Starting PowerShell...]\n";
+            OutputConsole.Text = LocalizationService.GetString("ScriptEditor.Status.Starting", "[Starting PowerShell...]") + "\n";
 
             string tempFile = Path.Combine(Path.GetTempPath(), $"ft_temp_{Guid.NewGuid()}.ps1");
             File.WriteAllText(tempFile, code);
@@ -147,7 +147,7 @@ namespace FluentTaskScheduler
                 if (File.Exists(tempFile)) File.Delete(tempFile);
                 RunButton.IsEnabled = true;
                 StopButton.IsEnabled = false;
-                AppendOutput("\n[Process Exited]\n", Colors.Gray);
+                AppendOutput("\n" + LocalizationService.GetString("ScriptEditor.Status.Exited", "[Process Exited]") + "\n", Colors.Gray);
             }
         }
 

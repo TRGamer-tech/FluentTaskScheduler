@@ -503,11 +503,18 @@
   <data name="QuickActions.Status.Error" xml:space="preserve"><value>エラー</value></data>
   <data name="Main.Nav.QuickActions" xml:space="preserve"><value>クイックアクション</value></data>
   <data name="Main.Header.ScriptEditor.Text" xml:space="preserve"><value>スクリプトエディタ</value></data>
-  <data name="ScriptEditor.Title.Text" xml:space="preserve"><value>スクリプトエディタ</value></data>
-  <data name="ScriptEditor.RunBtn.Label" xml:space="preserve"><value>実行</value></data>
-  <data name="ScriptEditor.StopBtn.Label" xml:space="preserve"><value>停止</value></data>
-  <data name="ScriptEditor.SaveBtn.Label" xml:space="preserve"><value>ライブラリに保存</value></data>
-  <data name="ScriptEditor.ClearBtn.Label" xml:space="preserve"><value>コンソールをクリア</value></data>
-  <data name="ScriptEditor.OutputHeader.Text" xml:space="preserve"><value>出力コンソール</value></data>
-  <data name="ScriptEditor.Placeholder.PlaceholderText" xml:space="preserve"><value>ここにPowerShellスクリプトを入力してください...</value></data>
+  <data name="ScriptEditor_RunBtn.Label" xml:space="preserve"><value>実行</value></data>
+  <data name="ScriptEditor_StopBtn.Label" xml:space="preserve"><value>停止</value></data>
+  <data name="ScriptEditor_SaveBtn.Label" xml:space="preserve"><value>ライブラリに保存</value></data>
+  <data name="ScriptEditor_ClearBtn.Label" xml:space="preserve"><value>コンソールをクリア</value></data>
+  <data name="ScriptEditor_OutputHeader.Text" xml:space="preserve"><value>出力コンソール</value></data>
+  <data name="ScriptEditor_CodeEditor.PlaceholderText" xml:space="preserve"><value>ここにPowerShellスクリプトを入力してください...</value></data>
+  <data name="ScriptEditor_CodeEditor.Header" xml:space="preserve"><value>PowerShellスクリプト</value></data>
+  <data name="ScriptEditor.Status.Starting" xml:space="preserve"><value>[PowerShellを起動中...]</value></data>
+  <data name="ScriptEditor.Status.Stopped" xml:space="preserve"><value>[ユーザーによって停止されました]</value></data>
+  <data name="ScriptEditor.Status.Exited" xml:space="preserve"><value>[プロセスが終了しました]</value></data>
+  <data name="ScriptEditor.Status.Saved" xml:space="preserve"><value>['{0}'としてライブラリに保存されました]</value></data>
+  <data name="ScriptEditor.SaveDialog.Title" xml:space="preserve"><value>スクリプトをライブラリに保存</value></data>
+  <data name="ScriptEditor.SaveDialog.NameHeader" xml:space="preserve"><value>テンプレート名</value></data>
+  <data name="ScriptEditor.SaveDialog.DescHeader" xml:space="preserve"><value>説明</value></data>
 </root>

@@ -504,13 +504,19 @@ Restart now to apply the update?</value></data>
   <data name="Main.Nav.QuickActions" xml:space="preserve"><value>Quick Actions</value></data>
   <data name="Main.Header.QuickActions" xml:space="preserve"><value>Quick Actions</value></data>
   <data name="Main.Header.ScriptEditor.Text" xml:space="preserve"><value>Script Editor</value></data>
-  <data name="ScriptEditor.Title.Text" xml:space="preserve"><value>Script Editor</value></data>
-  <data name="ScriptEditor.RunBtn.Label" xml:space="preserve"><value>Run</value></data>
-  <data name="ScriptEditor.RunBtnTip.Content" xml:space="preserve"><value>Run Script (Ctrl+R)</value></data>
-  <data name="ScriptEditor.StopBtn.Label" xml:space="preserve"><value>Stop</value></data>
-  <data name="ScriptEditor.SaveBtn.Label" xml:space="preserve"><value>Save to Library</value></data>
-  <data name="ScriptEditor.ClearBtn.Label" xml:space="preserve"><value>Clear Console</value></data>
-  <data name="ScriptEditor.OutputHeader.Text" xml:space="preserve"><value>Output Console</value></data>
-  <data name="ScriptEditor.Placeholder.PlaceholderText" xml:space="preserve"><value>Write your PowerShell script here...</value></data>
+  <data name="ScriptEditor_RunBtn.Label" xml:space="preserve"><value>Run</value></data>
+  <data name="ScriptEditor_StopBtn.Label" xml:space="preserve"><value>Stop</value></data>
+  <data name="ScriptEditor_SaveBtn.Label" xml:space="preserve"><value>Save to Library</value></data>
+  <data name="ScriptEditor_ClearBtn.Label" xml:space="preserve"><value>Clear Console</value></data>
+  <data name="ScriptEditor_OutputHeader.Text" xml:space="preserve"><value>Output Console</value></data>
+  <data name="ScriptEditor_CodeEditor.PlaceholderText" xml:space="preserve"><value>Write your PowerShell script here...</value></data>
+  <data name="ScriptEditor_CodeEditor.Header" xml:space="preserve"><value>PowerShell Script</value></data>
+  <data name="ScriptEditor.Status.Starting" xml:space="preserve"><value>[Starting PowerShell...]</value></data>
+  <data name="ScriptEditor.Status.Stopped" xml:space="preserve"><value>[Stopped by user]</value></data>
+  <data name="ScriptEditor.Status.Exited" xml:space="preserve"><value>[Process Exited]</value></data>
+  <data name="ScriptEditor.Status.Saved" xml:space="preserve"><value>[Saved to Library as '{0}']</value></data>
+  <data name="ScriptEditor.SaveDialog.Title" xml:space="preserve"><value>Save Script to Library</value></data>
+  <data name="ScriptEditor.SaveDialog.NameHeader" xml:space="preserve"><value>Template Name</value></data>
+  <data name="ScriptEditor.SaveDialog.DescHeader" xml:space="preserve"><value>Description</value></data>
 </root>
 

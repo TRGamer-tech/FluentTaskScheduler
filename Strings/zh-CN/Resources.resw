@@ -506,13 +506,20 @@
   <data name="QuickActions.Status.Error" xml:space="preserve"><value>错误</value></data>
   <data name="Main.Nav.QuickActions" xml:space="preserve"><value>快速操作</value></data>
   <data name="Main.Header.ScriptEditor.Text" xml:space="preserve"><value>脚本编辑器</value></data>
-  <data name="ScriptEditor.Title.Text" xml:space="preserve"><value>脚本编辑器</value></data>
-  <data name="ScriptEditor.RunBtn.Label" xml:space="preserve"><value>运行</value></data>
-  <data name="ScriptEditor.StopBtn.Label" xml:space="preserve"><value>停止</value></data>
-  <data name="ScriptEditor.SaveBtn.Label" xml:space="preserve"><value>保存到库</value></data>
-  <data name="ScriptEditor.ClearBtn.Label" xml:space="preserve"><value>清除控制台</value></data>
-  <data name="ScriptEditor.OutputHeader.Text" xml:space="preserve"><value>输出控制台</value></data>
-  <data name="ScriptEditor.Placeholder.PlaceholderText" xml:space="preserve"><value>在此处编写您的 PowerShell 脚本...</value></data>
+  <data name="ScriptEditor_RunBtn.Label" xml:space="preserve"><value>运行</value></data>
+  <data name="ScriptEditor_StopBtn.Label" xml:space="preserve"><value>停止</value></data>
+  <data name="ScriptEditor_SaveBtn.Label" xml:space="preserve"><value>保存到库</value></data>
+  <data name="ScriptEditor_ClearBtn.Label" xml:space="preserve"><value>清除控制台</value></data>
+  <data name="ScriptEditor_OutputHeader.Text" xml:space="preserve"><value>输出控制台</value></data>
+  <data name="ScriptEditor_CodeEditor.PlaceholderText" xml:space="preserve"><value>在此处编写您的 PowerShell 脚本...</value></data>
+  <data name="ScriptEditor_CodeEditor.Header" xml:space="preserve"><value>PowerShell 脚本</value></data>
+  <data name="ScriptEditor.Status.Starting" xml:space="preserve"><value>[正在启动 PowerShell...]</value></data>
+  <data name="ScriptEditor.Status.Stopped" xml:space="preserve"><value>[用户已停止]</value></data>
+  <data name="ScriptEditor.Status.Exited" xml:space="preserve"><value>[进程已退出]</value></data>
+  <data name="ScriptEditor.Status.Saved" xml:space="preserve"><value>[已保存到库为 “{0}”]</value></data>
+  <data name="ScriptEditor.SaveDialog.Title" xml:space="preserve"><value>将脚本保存到库</value></data>
+  <data name="ScriptEditor.SaveDialog.NameHeader" xml:space="preserve"><value>模板名称</value></data>
+  <data name="ScriptEditor.SaveDialog.DescHeader" xml:space="preserve"><value>描述</value></data>
 </root>
 
 

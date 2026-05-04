@@ -387,7 +387,7 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.Hint.Delay" xml:space="preserve"><value>(z.B. 30s, 1m, 1h)</value></data>
   <data name="Dialog.Hint.Idle" xml:space="preserve"><value>(z.B. 5m, 10m, 30m)</value></data>
   <data name="Dialog.Hint.Restart" xml:space="preserve"><value>(z.B. 30s, 1m, 5m)</value></data>
-  <data name="Dialog.Hint.MonthDays" xml:space="preserve"><value>(kommagetrennt, 'Letzter' fuer den letzten Tag)</value></data>
+  <data name="Dialog.Hint.MonthDays" xml:space="preserve"><value>(kommagetrennt, 'Letzter' für den letzten Tag)</value></data>
 
   <data name="Dialog.RecurEvery" xml:space="preserve"><value>Wiederholen alle</value></data>
   <data name="Dialog.DaysSuffix" xml:space="preserve"><value>Tag(e)</value></data>
@@ -395,7 +395,7 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.Months" xml:space="preserve"><value>Monate:</value></data>
   <data name="Dialog.Days" xml:space="preserve"><value>Tage</value></data>
   <data name="Dialog.On" xml:space="preserve"><value>Am</value></data>
-  <data name="Dialog.IdleWait" xml:space="preserve"><value>Warten, bis der Computer leerlaufend ist fuer:</value></data>
+  <data name="Dialog.IdleWait" xml:space="preserve"><value>Warten, bis der Computer leerlaufend ist für:</value></data>
   <data name="Dialog.TriggerAt" xml:space="preserve"><value>um</value></data>
 
   <data name="Dialog.Day.Mon" xml:space="preserve"><value>Mo</value></data>
@@ -433,7 +433,7 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.Weekday.Sat" xml:space="preserve"><value>Samstag</value></data>
   <data name="Dialog.Weekday.Sun" xml:space="preserve"><value>Sonntag</value></data>
 
-  <data name="Dialog.TriggerOn" xml:space="preserve"><value>Ausloesen bei</value></data>
+  <data name="Dialog.TriggerOn" xml:space="preserve"><value>Auslösen bei</value></data>
   <data name="Dialog.Sess.Lock" xml:space="preserve"><value>Arbeitsstation sperren</value></data>
   <data name="Dialog.Sess.Unlock" xml:space="preserve"><value>Arbeitsstation entsperren</value></data>
   <data name="Dialog.Sess.RdpConnect" xml:space="preserve"><value>Remote-Desktop-Verbindung</value></data>
@@ -464,7 +464,7 @@ Jetzt App neustarten?</value></data>
 
   <data name="Dialog.Pri.Realtime" xml:space="preserve"><value>Echtzeit (0)</value></data>
   <data name="Dialog.Pri.High" xml:space="preserve"><value>Hoch (1)</value></data>
-  <data name="Dialog.Pri.AboveNormal" xml:space="preserve"><value>Ueber Normal (3)</value></data>
+  <data name="Dialog.Pri.AboveNormal" xml:space="preserve"><value>Über Normal (3)</value></data>
   <data name="Dialog.Pri.Normal" xml:space="preserve"><value>Normal (7)</value></data>
   <data name="Dialog.Pri.BelowNormal" xml:space="preserve"><value>Unter Normal (9)</value></data>
   <data name="Dialog.Pri.Idle" xml:space="preserve"><value>Niedrig (10)</value></data>
@@ -472,7 +472,7 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.NetAdmin.Title" xml:space="preserve"><value>Administrator erforderlich</value></data>
   <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>Die Auswahl eines spezifischen Netzwerks erfordert, dass die App als Administrator ausgefuehrt wird.</value></data>
   <data name="Dialog.SysWarn.Title" xml:space="preserve"><value>Administratorrechte erforderlich</value></data>
-  <data name="Dialog.SysWarn.Msg" xml:space="preserve"><value>Um Aufgaben zu erstellen, die als SYSTEM ausgefuehrt werden, muss diese Anwendung mit Administratorrechten ausgefuehrt werden. Rechtsklick auf die App und 'Als Administrator ausfuehren' waehlen.</value></data>
+  <data name="Dialog.SysWarn.Msg" xml:space="preserve"><value>Um Aufgaben zu erstellen, die als SYSTEM ausgefuehrt werden, muss diese Anwendung mit Administratorrechten ausgefuehrt werden. Rechtsklick auf die App und 'Als Administrator ausfuehren' wählen.</value></data>
 
   <data name="Settings.Theme.Light" xml:space="preserve"><value>Hell</value></data>
   <data name="Settings.Theme.Dark" xml:space="preserve"><value>Dunkel</value></data>
@@ -484,30 +484,37 @@ Jetzt App neustarten?</value></data>
   <data name="Settings.Lead.15m" xml:space="preserve"><value>15 Minuten vorher</value></data>
   <data name="Settings.Lead.30m" xml:space="preserve"><value>30 Minuten vorher</value></data>
   <data name="QuickActions.Title.Text" xml:space="preserve"><value>Schnellaktionen</value></data>
-  <data name="QuickActions.Description.Text" xml:space="preserve"><value>Fueren Sie gaengige Systemwartungsaufgaben mit einem Klick aus.</value></data>
+  <data name="QuickActions.Description.Text" xml:space="preserve"><value>Führen Sie gängige Systemwartungsaufgaben mit einem Klick aus.</value></data>
   <data name="QuickActions.FlushDNS.Title" xml:space="preserve"><value>DNS-Cache leeren</value></data>
-  <data name="QuickActions.FlushDNS.Desc" xml:space="preserve"><value>Loescht den DNS-Aufloesungscache.</value></data>
-  <data name="QuickActions.ClearTemp.Title" xml:space="preserve"><value>Temporaere Dateien loeschen</value></data>
-  <data name="QuickActions.ClearTemp.Desc" xml:space="preserve"><value>Loescht Dateien aus den temporaeren Ordnern.</value></data>
+  <data name="QuickActions.FlushDNS.Desc" xml:space="preserve"><value>Löscht den DNS-Auflösungscache.</value></data>
+  <data name="QuickActions.ClearTemp.Title" xml:space="preserve"><value>Temporäre Dateien löschen</value></data>
+  <data name="QuickActions.ClearTemp.Desc" xml:space="preserve"><value>Löscht Dateien aus den temporären Ordnern.</value></data>
   <data name="QuickActions.RestartExplorer.Title" xml:space="preserve"><value>Explorer neu starten</value></data>
   <data name="QuickActions.RestartExplorer.Desc" xml:space="preserve"><value>Startet den Windows Explorer-Prozess neu.</value></data>
   <data name="QuickActions.IPReleaseRenew.Title" xml:space="preserve"><value>IP-Adresse erneuern</value></data>
   <data name="QuickActions.IPReleaseRenew.Desc" xml:space="preserve"><value>Gibt die aktuelle IP-Adresse frei und erneuert sie.</value></data>
-  <data name="QuickActions.SfcScannow.Title" xml:space="preserve"><value>Systemdateipruefung (SFC)</value></data>
-  <data name="QuickActions.SfcScannow.Desc" xml:space="preserve"><value>Scannt und repariert beschaedigte Systemdateien (erfordert Admin).</value></data>
-  <data name="QuickActions.DismHealth.Title" xml:space="preserve"><value>DISM-Gesundheitspruefung</value></data>
-  <data name="QuickActions.DismHealth.Desc" xml:space="preserve"><value>Prueft auf Beschaedigungen im Komponentenspeicher (erfordert Admin).</value></data>
-  <data name="QuickActions.RunBtn" xml:space="preserve"><value>Ausfuehren</value></data>
-  <data name="QuickActions.Status.Running" xml:space="preserve"><value>Wird ausgefuehrt...</value></data>
+  <data name="QuickActions.SfcScannow.Title" xml:space="preserve"><value>Systemdateiprüfung (SFC)</value></data>
+  <data name="QuickActions.SfcScannow.Desc" xml:space="preserve"><value>Scannt und repariert beschädigte Systemdateien (erfordert Admin).</value></data>
+  <data name="QuickActions.DismHealth.Title" xml:space="preserve"><value>DISM-Gesundheitsprüfung</value></data>
+  <data name="QuickActions.DismHealth.Desc" xml:space="preserve"><value>Prüft auf Beschädigungen im Komponentenspeicher (erfordert Admin).</value></data>
+  <data name="QuickActions.RunBtn" xml:space="preserve"><value>Ausführen</value></data>
+  <data name="QuickActions.Status.Running" xml:space="preserve"><value>Wird ausgeführt...</value></data>
   <data name="QuickActions.Status.Success" xml:space="preserve"><value>Erfolgreich</value></data>
   <data name="QuickActions.Status.Error" xml:space="preserve"><value>Fehler</value></data>
   <data name="Main.Nav.QuickActions" xml:space="preserve"><value>Schnellaktionen</value></data>
   <data name="Main.Header.ScriptEditor.Text" xml:space="preserve"><value>Skript-Editor</value></data>
-  <data name="ScriptEditor.Title.Text" xml:space="preserve"><value>Skript-Editor</value></data>
-  <data name="ScriptEditor.RunBtn.Label" xml:space="preserve"><value>Ausfuehren</value></data>
-  <data name="ScriptEditor.StopBtn.Label" xml:space="preserve"><value>Stoppen</value></data>
-  <data name="ScriptEditor.SaveBtn.Label" xml:space="preserve"><value>In Bibliothek speichern</value></data>
-  <data name="ScriptEditor.ClearBtn.Label" xml:space="preserve"><value>Konsole leeren</value></data>
-  <data name="ScriptEditor.OutputHeader.Text" xml:space="preserve"><value>Ausgabekonsole</value></data>
-  <data name="ScriptEditor.Placeholder.PlaceholderText" xml:space="preserve"><value>Schreiben Sie hier Ihr PowerShell-Skript...</value></data>
+  <data name="ScriptEditor_RunBtn.Label" xml:space="preserve"><value>Ausführen</value></data>
+  <data name="ScriptEditor_StopBtn.Label" xml:space="preserve"><value>Stoppen</value></data>
+  <data name="ScriptEditor_SaveBtn.Label" xml:space="preserve"><value>In Bibliothek speichern</value></data>
+  <data name="ScriptEditor_ClearBtn.Label" xml:space="preserve"><value>Konsole leeren</value></data>
+  <data name="ScriptEditor_OutputHeader.Text" xml:space="preserve"><value>Ausgabekonsole</value></data>
+  <data name="ScriptEditor_CodeEditor.PlaceholderText" xml:space="preserve"><value>Schreib hier Dein PowerShell-Skript...</value></data>
+  <data name="ScriptEditor_CodeEditor.Header" xml:space="preserve"><value>PowerShell-Skript</value></data>
+  <data name="ScriptEditor.Status.Starting" xml:space="preserve"><value>[PowerShell wird gestartet...]</value></data>
+  <data name="ScriptEditor.Status.Stopped" xml:space="preserve"><value>[Vom Benutzer gestoppt]</value></data>
+  <data name="ScriptEditor.Status.Exited" xml:space="preserve"><value>[Prozess beendet]</value></data>
+  <data name="ScriptEditor.Status.Saved" xml:space="preserve"><value>[In Bibliothek als '{0}' gespeichert]</value></data>
+  <data name="ScriptEditor.SaveDialog.Title" xml:space="preserve"><value>Skript in Bibliothek speichern</value></data>
+  <data name="ScriptEditor.SaveDialog.NameHeader" xml:space="preserve"><value>Vorlagenname</value></data>
+  <data name="ScriptEditor.SaveDialog.DescHeader" xml:space="preserve"><value>Beschreibung</value></data>
 </root>
