@@ -23,7 +23,7 @@ A clear and concise description of what you expected to happen.
 ### Environment
 - OS Version: [e.g. Windows 11 23H2]
 - App Version: [e.g. 1.5.0]
-- Install Method: [e.g. Single File, Source]
+- Install Method: [e.g. MSI Installer, Portable ZIP, winget, Scoop, Chocolatey, Source]
 
 ### Screenshots
 If applicable, add screenshots to help explain your problem. 

@@ -14,7 +14,9 @@ If you like what this project is for, I would really appreciate a (optional!) do
 
 ## Installation instructions
 ### Manually
-Go to the [Releases Page](https://github.com/TRGamer-tech/FluentTaskScheduler/releases) and download the newest Version from there :)
+Go to the [Releases Page](https://github.com/TRGamer-tech/FluentTaskScheduler/releases) and download the newest version. Two formats are available per architecture (x64 / ARM64):
+- **Setup MSI** — Traditional installer with per-user or machine-wide options.
+- **Portable ZIP** — Extract anywhere and run. No installation required.
 
 ### Winget
 ```
@@ -166,7 +168,7 @@ FluentTaskScheduler.exe --export-history "MyTaskName" --output "C:\logs\history.
 - **Framework**: [.NET 8](https://dotnet.microsoft.com/download/dotnet/8.0)
 - **UI Architecture**: [WinUI 3](https://learn.microsoft.com/en-us/windows/apps/winui/winui3/) (Windows App SDK)
 - **Core Logic**: [TaskScheduler Managed Wrapper](https://github.com/dahall/TaskScheduler)
-- **CI/CD**: Fully automated GitHub Actions for x86 and ARM64 builds (thanks, TalyNone).
+- **CI/CD**: Fully automated GitHub Actions for x64 and ARM64 builds (thanks, TalyNone).
 - **Auto-Update**: [VeloPack](https://velopack.io/) for seamless in-app updates via GitHub Releases.
 - **Architectures**: Support for x64 and ARM64.
 - **Language**: C#
@@ -180,6 +182,7 @@ See [CONTRIBUTING](CONTRIBUTING.md) for details
 - **Crash Logs**: If the application encounters a critical error, a `crash_log.txt` file is generated in the application directory.
 - **Admin Rights**: Some features (like "Run as SYSTEM") require the application to be run as Administrator.
 - **Preferences storage**: The application stores its preferences as well as the log and custom script files in a JSON file in "%localappdata%\FluentTaskScheduler".
+- **Portable distribution**: The portable release is a **ZIP archive** (folder), not a single `.exe`. WinUI 3 requires its native runtime DLLs to be present alongside the executable; single-file bundling is not supported and will crash on startup.
 
 ## Star History
 

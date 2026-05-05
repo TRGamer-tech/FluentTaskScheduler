@@ -71,12 +71,7 @@ namespace FluentTaskScheduler
 
             try
             {
-                // XamlCheckProcessRequirements is a native call in Microsoft.ui.xaml.dll.
-                // We check if the DLL exists first to avoid a hard DllNotFoundException on some ARM64 systems.
-                if (System.IO.File.Exists(System.IO.Path.Combine(appDir, "Microsoft.ui.xaml.dll")))
-                {
-                    XamlCheckProcessRequirements();
-                }
+                XamlCheckProcessRequirements();
             }
             catch (Exception ex)
             {

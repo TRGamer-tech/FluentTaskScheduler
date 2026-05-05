@@ -22,14 +22,10 @@
         <XamlCompilerSkipSavedState>true</XamlCompilerSkipSavedState>
         <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
         <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
-        <_NativeExecutableIncludeAllContentForSelfExtract>true</_NativeExecutableIncludeAllContentForSelfExtract>
         <PublishReadyToRun>false</PublishReadyToRun>
         <DebugType>none</DebugType>
         <DebugSymbols>false</DebugSymbols>
-        <PublishSingleFile>true</PublishSingleFile>
         <SelfContained>true</SelfContained>
-        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-        <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
     </PropertyGroup>
 
     <ItemGroup>
