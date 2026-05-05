@@ -26,9 +26,6 @@ If you like what this project is for, I would really appreciate a (optional!) do
   <img src="Assets/5-ScriptEditor.png" width="400" alt="Script Editor">
   <img src="Assets/6-Settings.png" width="400" alt="Settings">
 </p>
-<p align="center">
-  <img src="Assets/7-Add-And-Edit.png" width="400" alt="Task Editor">
-</p>
 
 
 ## Installation instructions
