@@ -317,6 +317,7 @@ namespace FluentTaskScheduler
 
             Services.LogService.Info("Application started");
             Services.ReminderService.Start();
+            Services.ExecutionHistoryLogService.Start();
 
             // Check for VeloPack auto-updates in the background
             _ = CheckForVeloPackUpdateAsync();

@@ -60,6 +60,17 @@ namespace FluentTaskScheduler
                 await ViewModel.LoadDashboardData();
             }
             ViewModel.StartAutoRefresh();
+            RefreshFilterScrollArrows();
+        }
+
+        private void RefreshFilterScrollArrows()
+        {
+            // Defer one frame so the ItemsControls have measured their (possibly new) content width.
+            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
+            {
+                UpdateFilterScrollArrows(CategoryScrollViewer, CategoryScrollLeftBtn, CategoryScrollRightBtn);
+                UpdateFilterScrollArrows(TagScrollViewer, TagScrollLeftBtn, TagScrollRightBtn);
+            });
         }
 
         protected override void OnNavigatedFrom(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
@@ -75,6 +86,7 @@ namespace FluentTaskScheduler
         private async void DashboardReload_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             await ViewModel.LoadDashboardData();
+            RefreshFilterScrollArrows();
         }
 
         private void ActivityList_ItemClick(object sender, ItemClickEventArgs e)
@@ -115,6 +127,40 @@ namespace FluentTaskScheduler
             {
                 ViewModel.SelectedTag = filterItem.Name;
             }
+        }
+
+        private const double FilterScrollStep = 150;
+
+        private void CategoryScrollLeft_Click(object sender, RoutedEventArgs e) =>
+            CategoryScrollViewer.ChangeView(System.Math.Max(0, CategoryScrollViewer.HorizontalOffset - FilterScrollStep), null, null);
+
+        private void CategoryScrollRight_Click(object sender, RoutedEventArgs e) =>
+            CategoryScrollViewer.ChangeView(System.Math.Min(CategoryScrollViewer.ScrollableWidth, CategoryScrollViewer.HorizontalOffset + FilterScrollStep), null, null);
+
+        private void CategoryScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e) =>
+            UpdateFilterScrollArrows(CategoryScrollViewer, CategoryScrollLeftBtn, CategoryScrollRightBtn);
+
+        private void CategoryScrollViewer_SizeChanged(object sender, Microsoft.UI.Xaml.SizeChangedEventArgs e) =>
+            UpdateFilterScrollArrows(CategoryScrollViewer, CategoryScrollLeftBtn, CategoryScrollRightBtn);
+
+        private void TagScrollLeft_Click(object sender, RoutedEventArgs e) =>
+            TagScrollViewer.ChangeView(System.Math.Max(0, TagScrollViewer.HorizontalOffset - FilterScrollStep), null, null);
+
+        private void TagScrollRight_Click(object sender, RoutedEventArgs e) =>
+            TagScrollViewer.ChangeView(System.Math.Min(TagScrollViewer.ScrollableWidth, TagScrollViewer.HorizontalOffset + FilterScrollStep), null, null);
+
+        private void TagScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e) =>
+            UpdateFilterScrollArrows(TagScrollViewer, TagScrollLeftBtn, TagScrollRightBtn);
+
+        private void TagScrollViewer_SizeChanged(object sender, Microsoft.UI.Xaml.SizeChangedEventArgs e) =>
+            UpdateFilterScrollArrows(TagScrollViewer, TagScrollLeftBtn, TagScrollRightBtn);
+
+        private static void UpdateFilterScrollArrows(ScrollViewer sv, Button left, Button right)
+        {
+            if (sv == null || left == null || right == null) return;
+            bool overflowing = sv.ScrollableWidth > 0.5;
+            left.Visibility = overflowing && sv.HorizontalOffset > 0.5 ? Visibility.Visible : Visibility.Collapsed;
+            right.Visibility = overflowing && sv.HorizontalOffset < sv.ScrollableWidth - 0.5 ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }

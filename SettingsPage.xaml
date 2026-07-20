@@ -294,6 +294,29 @@
                                 </StackPanel>
                             </StackPanel>
                         </Border>
+
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock x:Name="AdvExecHistoryTitle" Text="Execution History Log" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="AdvExecHistoryDesc" Text="Record every task run to a durable log file on disk, independent of the Windows Task Scheduler event log's limited retention." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <ToggleSwitch x:Name="ExecHistoryLogToggle" Grid.Column="1" VerticalAlignment="Center"
+                                             OffContent="" OnContent="" Toggled="ExecHistoryLogToggle_Toggled"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsCardStyle}" x:Name="ExecHistoryFolderCard" Visibility="Collapsed">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock x:Name="AdvExecHistoryFolderTitle" Text="Execution History Folder" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="AdvExecHistoryFolderDesc" Text="Open the folder containing the monthly execution-history log files." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <Button x:Name="OpenExecHistoryFolderButton" Grid.Column="1" Content="Open Folder" Click="OpenExecHistoryFolderButton_Click"/>
+                            </Grid>
+                        </Border>
                     </StackPanel>
 
                     <!-- Data -->

@@ -83,6 +83,8 @@ namespace FluentTaskScheduler
             LoggingToggle.IsOn = SettingsService.EnableLogging;
             SeparateLogsToggle.IsOn = SettingsService.SeparateLogFiles;
             SpecificLogsCard.Visibility = SettingsService.EnableLogging ? Visibility.Visible : Visibility.Collapsed;
+            ExecHistoryLogToggle.IsOn = SettingsService.EnableExecutionHistoryLog;
+            ExecHistoryFolderCard.Visibility = SettingsService.EnableExecutionHistoryLog ? Visibility.Visible : Visibility.Collapsed;
 
             // Init sidebar panels — sync visibility with current selection
             _panels = new[] { PanelAppearance, PanelNotifications, PanelSystem, PanelAdvanced, PanelData, PanelCategories, PanelAbout };
@@ -388,6 +390,28 @@ namespace FluentTaskScheduler
         private void OpenLogButton_Click(object sender, RoutedEventArgs e)
         {
             LogService.OpenLogFile();
+        }
+
+        private void ExecHistoryLogToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!_isLoaded) return;
+            SettingsService.EnableExecutionHistoryLog = ExecHistoryLogToggle.IsOn;
+            ExecHistoryFolderCard.Visibility = ExecHistoryLogToggle.IsOn ? Visibility.Visible : Visibility.Collapsed;
+            if (ExecHistoryLogToggle.IsOn)
+            {
+                ExecutionHistoryLogService.Start();
+                LogService.Info("Execution History Log: enabled");
+            }
+            else
+            {
+                ExecutionHistoryLogService.Stop();
+                LogService.Info("Execution History Log: disabled");
+            }
+        }
+
+        private void OpenExecHistoryFolderButton_Click(object sender, RoutedEventArgs e)
+        {
+            ExecutionHistoryLogService.OpenLogFolder();
         }
 
         private void OpenErrorLogButton_Click(object sender, RoutedEventArgs e)

@@ -796,6 +796,81 @@ namespace FluentTaskScheduler.Services
             return history;
         }
 
+        /// <summary>Looks up logon/logoff/shutdown/reboot/sleep events from the Windows "System" log
+        /// within +/- <paramref name="window"/> of <paramref name="centerTime"/>, so a task run can be
+        /// correlated with "was the machine restarted or the user logged off around this time?".</summary>
+        public List<SystemEventEntry> GetSystemEventsNear(DateTime centerTime, TimeSpan window)
+        {
+            var events = new List<SystemEventEntry>();
+            try
+            {
+                DateTime start = centerTime - window;
+                DateTime end = centerTime + window;
+                string startIso = start.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
+                string endIso = end.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
+
+                // 6005/6006/6008: EventLog service started/stopped/unexpected shutdown
+                // 1074: restart/shutdown initiated by a user or process (User32)
+                // 41: system rebooted without a clean shutdown (Kernel-Power)
+                // 42/107: entering sleep / resumed from sleep (Kernel-Power)
+                // 7001/7002: user logon/logoff (Winlogon)
+                string query = $"*[System[TimeCreated[@SystemTime>='{startIso}'] and TimeCreated[@SystemTime<='{endIso}'] " +
+                                "and (EventID=6005 or EventID=6006 or EventID=6008 or EventID=1074 or EventID=41 or EventID=42 or EventID=107 or EventID=7001 or EventID=7002)]]";
+
+                var eventsQuery = new EventLogQuery("System", PathType.LogName, query);
+                using var logReader = new EventLogReader(eventsQuery);
+
+                EventRecord record;
+                while ((record = logReader.ReadEvent()) != null)
+                {
+                    using (record)
+                    {
+                        events.Add(new SystemEventEntry
+                        {
+                            Time = record.TimeCreated?.ToString("yyyy-MM-dd HH:mm:ss") ?? "Unknown",
+                            EventId = record.Id,
+                            EventType = GetSystemEventType(record.Id),
+                            Description = GetSystemEventDescription(record.Id)
+                        });
+                    }
+                }
+                events = events.OrderBy(ev => ev.Time).ToList();
+            }
+            catch (Exception ex)
+            {
+                LogService.Warn($"Could not read nearby system events: {ex.Message}");
+            }
+            return events;
+        }
+
+        private string GetSystemEventType(int eventId) => eventId switch
+        {
+            6005 => "System Startup",
+            6006 => "Clean Shutdown",
+            6008 => "Unexpected Shutdown",
+            1074 => "Restart/Shutdown Requested",
+            41 => "Unclean Reboot",
+            42 => "Sleep",
+            107 => "Resume From Sleep",
+            7001 => "User Logon",
+            7002 => "User Logoff",
+            _ => $"Event {eventId}"
+        };
+
+        private string GetSystemEventDescription(int eventId) => eventId switch
+        {
+            6005 => "The Event Log service started (system booted up).",
+            6006 => "The Event Log service stopped (clean system shutdown).",
+            6008 => "The previous system shutdown was unexpected.",
+            1074 => "A restart or shutdown was requested by a user or process.",
+            41 => "The system rebooted without a clean shutdown (e.g. power loss or crash).",
+            42 => "The system entered sleep/standby.",
+            107 => "The system resumed from sleep/standby.",
+            7001 => "A user logged on to the system.",
+            7002 => "A user logged off the system.",
+            _ => "System event."
+        };
+
         private string GetEventResult(int eventId) => eventId switch
         {
             100 => "Task Started",

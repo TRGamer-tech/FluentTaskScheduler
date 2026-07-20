@@ -56,11 +56,37 @@
             <!-- Log Message -->
             <StackPanel Spacing="8">
                 <TextBlock Text="General Message:" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
-                        BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" 
+                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         CornerRadius="8" Padding="12">
                     <TextBlock Text="{x:Bind Entry.Message}" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
                 </Border>
+            </StackPanel>
+
+            <!-- Nearby System Events (logon/logoff/reboot/sleep within +/- 10 minutes) -->
+            <StackPanel Spacing="8" Visibility="{x:Bind HasNearbySystemEvents}">
+                <TextBlock Text="Nearby System Events (within 10 minutes):" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                <ItemsControl ItemsSource="{x:Bind NearbySystemEvents}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="models:SystemEventEntry">
+                            <Border Background="{ThemeResource SystemFillColorCautionBackgroundBrush}" CornerRadius="6" Padding="10,6" Margin="0,0,0,6">
+                                <Grid ColumnSpacing="10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <FontIcon Grid.Column="0" Glyph="&#xE7BA;" FontSize="14" VerticalAlignment="Center" Foreground="{ThemeResource SystemFillColorCautionBrush}"/>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{x:Bind EventType}" FontWeight="SemiBold" FontSize="12"/>
+                                        <TextBlock Text="{x:Bind Description}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="2" Text="{x:Bind Time}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12" Margin="0,16,0,0">

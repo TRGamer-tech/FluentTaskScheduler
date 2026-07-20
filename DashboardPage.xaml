@@ -30,45 +30,79 @@
                     <!-- Category Filter -->
                     <StackPanel Spacing="8">
                         <TextBlock x:Name="DashboardFilterCategory" x:Uid="DashboardFilterCategory" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="4,0,0,0"/>
-                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" HorizontalScrollMode="Auto" VerticalScrollMode="Disabled" IsScrollInertiaEnabled="False">
-                            <ItemsControl ItemsSource="{x:Bind ViewModel.AvailableCategories, Mode=OneWay}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal" Spacing="8"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="viewmodels:FilterItem">
-                                        <ToggleButton Content="{x:Bind Name}"
-                                                      IsChecked="{x:Bind IsSelected, Mode=OneWay}"
-                                                      Click="CategoryToggle_Click"
-                                                      CornerRadius="4" />
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="CategoryScrollLeftBtn" Grid.Column="0" Click="CategoryScrollLeft_Click" Visibility="Collapsed"
+                                    Padding="4" Background="Transparent" BorderThickness="0" VerticalAlignment="Center" Margin="0,0,4,0">
+                                <SymbolIcon Symbol="Back" />
+                            </Button>
+                            <ScrollViewer x:Name="CategoryScrollViewer" Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled"
+                                          HorizontalScrollMode="Auto" VerticalScrollMode="Disabled" IsScrollInertiaEnabled="False"
+                                          ViewChanged="CategoryScrollViewer_ViewChanged" SizeChanged="CategoryScrollViewer_SizeChanged">
+                                <ItemsControl ItemsSource="{x:Bind ViewModel.AvailableCategories, Mode=OneWay}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="8"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="viewmodels:FilterItem">
+                                            <ToggleButton Content="{x:Bind Name}"
+                                                          IsChecked="{x:Bind IsSelected, Mode=OneWay}"
+                                                          Click="CategoryToggle_Click"
+                                                          CornerRadius="4" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                            <Button x:Name="CategoryScrollRightBtn" Grid.Column="2" Click="CategoryScrollRight_Click" Visibility="Collapsed"
+                                    Padding="4" Background="Transparent" BorderThickness="0" VerticalAlignment="Center" Margin="4,0,0,0">
+                                <SymbolIcon Symbol="Forward" />
+                            </Button>
+                        </Grid>
                     </StackPanel>
 
                     <!-- Tag Filter -->
                     <StackPanel Grid.Column="1" Spacing="8">
                         <TextBlock x:Name="DashboardFilterTag" x:Uid="DashboardFilterTag" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="4,0,0,0"/>
-                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" HorizontalScrollMode="Auto" VerticalScrollMode="Disabled" IsScrollInertiaEnabled="False">
-                            <ItemsControl ItemsSource="{x:Bind ViewModel.AvailableTags, Mode=OneWay}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal" Spacing="8"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="viewmodels:FilterItem">
-                                        <ToggleButton Content="{x:Bind Name}"
-                                                      IsChecked="{x:Bind IsSelected, Mode=OneWay}"
-                                                      Click="TagToggle_Click"
-                                                      CornerRadius="4" />
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="TagScrollLeftBtn" Grid.Column="0" Click="TagScrollLeft_Click" Visibility="Collapsed"
+                                    Padding="4" Background="Transparent" BorderThickness="0" VerticalAlignment="Center" Margin="0,0,4,0">
+                                <SymbolIcon Symbol="Back" />
+                            </Button>
+                            <ScrollViewer x:Name="TagScrollViewer" Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled"
+                                          HorizontalScrollMode="Auto" VerticalScrollMode="Disabled" IsScrollInertiaEnabled="False"
+                                          ViewChanged="TagScrollViewer_ViewChanged" SizeChanged="TagScrollViewer_SizeChanged">
+                                <ItemsControl ItemsSource="{x:Bind ViewModel.AvailableTags, Mode=OneWay}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="8"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="viewmodels:FilterItem">
+                                            <ToggleButton Content="{x:Bind Name}"
+                                                          IsChecked="{x:Bind IsSelected, Mode=OneWay}"
+                                                          Click="TagToggle_Click"
+                                                          CornerRadius="4" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                            <Button x:Name="TagScrollRightBtn" Grid.Column="2" Click="TagScrollRight_Click" Visibility="Collapsed"
+                                    Padding="4" Background="Transparent" BorderThickness="0" VerticalAlignment="Center" Margin="4,0,0,0">
+                                <SymbolIcon Symbol="Forward" />
+                            </Button>
+                        </Grid>
                     </StackPanel>
                 </Grid>
                 <!-- Row 1: Task counts -->
