@@ -232,13 +232,13 @@
                     <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center" Margin="16,0,0,0">
                         <TextBlock x:Name="BatchCountText" Text="0 selected" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         <Rectangle Width="1" Height="24" Fill="{ThemeResource DividerStrokeColorDefaultBrush}"/>
-                        <Button x:Name="BatchRunBtn" Click="BatchRun_Click">
+                        <Button x:Name="BatchRunBtn" Click="BatchRun_Click" IsEnabled="{x:Bind ViewModel.CanBatchRunStop, Mode=OneWay}">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <SymbolIcon Symbol="Play"/>
                                 <TextBlock x:Name="BatchRunBtnText" Text="Run"/>
                             </StackPanel>
                         </Button>
-                        <Button x:Name="BatchStopBtn" Click="BatchStop_Click">
+                        <Button x:Name="BatchStopBtn" Click="BatchStop_Click" IsEnabled="{x:Bind ViewModel.CanBatchRunStop, Mode=OneWay}">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <SymbolIcon Symbol="Stop"/>
                                 <TextBlock x:Name="BatchStopBtnText" Text="Stop"/>
@@ -288,7 +288,7 @@
 
                     <Button x:Name="RefreshButton" Content="Refresh" Click="RefreshButton_Click" />
                     <Button x:Name="ImportTaskButton" Content="Import Task" Click="ImportTask_Click" />
-                    <Button x:Name="SortButton" Content="Sort ↕" Click="SortButton_Click" />
+                    <Button x:Name="SortButton" Content="{x:Bind ViewModel.SortButtonText, Mode=OneWay}" Click="SortButton_Click" />
 
                     <!-- Global snooze lives next to Sort so it sits with the other list-wide actions -->
                     <Button x:Name="SnoozeToolbarButton" Click="SnoozeToolbarButton_Click">
@@ -938,8 +938,8 @@
                                    ToolTipService.ToolTip="After this date and time the trigger will stop firing. The task itself remains; only the trigger is deactivated."/>
                      </StackPanel>
                      <StackPanel Spacing="8" Margin="28,0,0,0">
-                         <DatePicker x:Name="EditTaskExpirationDate" HorizontalAlignment="Left"/>
-                         <TimePicker x:Name="EditTaskExpirationTime" HorizontalAlignment="Left" ClockIdentifier="24HourClock"/>
+                         <DatePicker x:Name="EditTaskExpirationDate" HorizontalAlignment="Left" SelectedDateChanged="EditTaskExpirationDate_SelectedDateChanged"/>
+                         <TimePicker x:Name="EditTaskExpirationTime" HorizontalAlignment="Left" ClockIdentifier="24HourClock" TimeChanged="EditTaskExpirationTime_TimeChanged"/>
                      </StackPanel>
                 </StackPanel>
                 </StackPanel> <!-- End TriggerDetailsPanel -->

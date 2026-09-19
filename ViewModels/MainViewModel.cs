@@ -6,6 +6,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using FluentTaskScheduler.Models;
 using FluentTaskScheduler.Models.Enums;
 using FluentTaskScheduler.Services;
@@ -14,7 +16,7 @@ using Microsoft.UI.Dispatching;
 
 namespace FluentTaskScheduler.ViewModels
 {
-    public class MainViewModel : INotifyPropertyChanged
+    public partial class MainViewModel : ObservableObject
     {
         private readonly ITaskService _taskService = App.Container.GetRequiredService<ITaskService>();
         private ISettingsService Settings => App.Container.GetRequiredService<ISettingsService>();
@@ -30,9 +32,6 @@ namespace FluentTaskScheduler.ViewModels
         // Sorting
         public SortColumn SortColumn { get; private set; } = SortColumn.None;
         public bool SortAscending { get; private set; } = true;
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
         public ObservableCollection<ScheduledTaskModel> FilteredTasks { get; } = new();
         
         // Expose service for direct calls from UI where Command isn't appropriate yet
@@ -80,6 +79,7 @@ namespace FluentTaskScheduler.ViewModels
         private void LocalizationService_LanguageChanged(object? sender, EventArgs e)
         {
             OnPropertyChanged(nameof(ActionRunPrefix));
+            OnPropertyChanged(nameof(SortButtonText));
         }
 
         /// <summary>
@@ -192,18 +192,22 @@ namespace FluentTaskScheduler.ViewModels
         }
 
         /// <summary>Cycles sort: same column toggles Asc/Desc, new column defaults to Asc.</summary>
+        [RelayCommand]
         public void SortBy(SortColumn column)
         {
             if (SortColumn == column) SortAscending = !SortAscending;
             else { SortColumn = column; SortAscending = true; }
+            OnPropertyChanged(nameof(SortButtonText));
             ApplyFilters();
         }
 
         /// <summary>Clears any active sort.</summary>
+        [RelayCommand]
         public void ClearSort()
         {
             SortColumn = SortColumn.None;
             SortAscending = true;
+            OnPropertyChanged(nameof(SortButtonText));
             ApplyFilters();
         }
 
@@ -320,11 +324,6 @@ namespace FluentTaskScheduler.ViewModels
                     }
                 }
             }
-        }
-
-        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
