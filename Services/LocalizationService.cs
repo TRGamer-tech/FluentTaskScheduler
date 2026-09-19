@@ -125,7 +125,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Warn($"Could not apply the WinRT language override for '{language}': {ex.Message}");
+                Serilog.Log.Warning("{Message}", $"Could not apply the WinRT language override for '{language}': {ex.Message}");
             }
 
             ApplyCulture(language);
@@ -162,7 +162,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Warn($"Could not switch the .NET culture to '{language}': {ex.Message}");
+                Serilog.Log.Warning("{Message}", $"Could not switch the .NET culture to '{language}': {ex.Message}");
             }
         }
 

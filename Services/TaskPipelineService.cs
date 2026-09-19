@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace FluentTaskScheduler.Services
     /// </summary>
     public static class TaskPipelineService
     {
+        private static ISettingsService Settings => App.Container.GetRequiredService<ISettingsService>();
         private const int MaxChainStartsPerMinute = 20;
         private const int MaxRememberedRecords = 500;
         private static readonly TimeSpan AncestryLifetime = TimeSpan.FromHours(1);
@@ -57,9 +59,9 @@ namespace FluentTaskScheduler.Services
             {
                 if (_isRunning) return;
 
-                if (!SettingsService.EnableTaskPipelines)
+                if (!Settings.EnableTaskPipelines)
                 {
-                    LogService.Info("Task pipelines are disabled in settings; watcher not started.");
+                    Serilog.Log.Information("{Message}", "Task pipelines are disabled in settings; watcher not started.");
                     return;
                 }
 
@@ -74,22 +76,22 @@ namespace FluentTaskScheduler.Services
                     _watcher.EventRecordWritten += OnEventRecordWritten;
                     _watcher.Enabled = true;
                     _isRunning = true;
-                    LogService.Info("TaskPipelineService started (event-driven, no polling).");
+                    Serilog.Log.Information("{Message}", "TaskPipelineService started (event-driven, no polling).");
                 }
                 catch (EventLogNotFoundException ex)
                 {
                     DisposeWatcher();
-                    LogService.Error("Task pipelines unavailable: the Task Scheduler operational log was not found.", ex);
+                    Serilog.Log.Error(ex, "{Message}", "Task pipelines unavailable: the Task Scheduler operational log was not found.");
                 }
                 catch (UnauthorizedAccessException ex)
                 {
                     DisposeWatcher();
-                    LogService.Error("Task pipelines unavailable: access denied subscribing to the Task Scheduler operational log.", ex);
+                    Serilog.Log.Error(ex, "{Message}", "Task pipelines unavailable: access denied subscribing to the Task Scheduler operational log.");
                 }
                 catch (Exception ex)
                 {
                     DisposeWatcher();
-                    LogService.Error("Failed to start TaskPipelineService.", ex);
+                    Serilog.Log.Error(ex, "{Message}", "Failed to start TaskPipelineService.");
                 }
             }
         }
@@ -100,14 +102,14 @@ namespace FluentTaskScheduler.Services
             {
                 DisposeWatcher();
                 _isRunning = false;
-                LogService.Info("TaskPipelineService stopped.");
+                Serilog.Log.Information("{Message}", "TaskPipelineService stopped.");
             }
         }
 
         /// <summary>Applies a settings change without requiring an app restart.</summary>
         public static void ApplyEnabledSetting()
         {
-            if (SettingsService.EnableTaskPipelines) Start();
+            if (Settings.EnableTaskPipelines) Start();
             else Stop();
         }
 
@@ -128,7 +130,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Error("Error while disposing the pipeline event watcher.", ex);
+                Serilog.Log.Error(ex, "{Message}", "Error while disposing the pipeline event watcher.");
             }
             finally
             {
@@ -143,7 +145,7 @@ namespace FluentTaskScheduler.Services
             // A null record means the subscription dropped events; EventException carries the reason.
             if (e.EventRecord == null)
             {
-                LogService.Warn($"Pipeline watcher dropped events: {e.EventException?.Message ?? "unknown reason"}");
+                Serilog.Log.Warning("{Message}", $"Pipeline watcher dropped events: {e.EventException?.Message ?? "unknown reason"}");
                 return;
             }
 
@@ -163,7 +165,7 @@ namespace FluentTaskScheduler.Services
                     // HRESULT-style codes overflow int, so parse wide.
                     if (!data.TryGetValue("ResultCode", out var rc) || !long.TryParse(rc, out long exitCode))
                     {
-                        LogService.Warn($"Pipeline: event 201 for '{taskPath}' had no readable ResultCode; ignoring.");
+                        Serilog.Log.Warning("{Message}", $"Pipeline: event 201 for '{taskPath}' had no readable ResultCode; ignoring.");
                         return;
                     }
                     succeeded = exitCode == 0;
@@ -178,7 +180,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Error($"Pipeline watcher failed to process event {record.Id}.", ex);
+                Serilog.Log.Error(ex, "{Message}", $"Pipeline watcher failed to process event {record.Id}.");
             }
         }
 
@@ -195,24 +197,24 @@ namespace FluentTaskScheduler.Services
                 foreach (var target in targets)
                     SnoozeService.RecordSuppressedRun(target, "Pipeline");
 
-                LogService.Info($"Pipeline from '{sourcePath}' suppressed: global snooze is active.");
+                Serilog.Log.Information("{Message}", $"Pipeline from '{sourcePath}' suppressed: global snooze is active.");
                 return;
             }
 
-            var service = new TaskServiceWrapper();
+            var service = App.Container.GetRequiredService<ITaskService>();
             foreach (var target in targets)
             {
                 if (string.IsNullOrWhiteSpace(target)) continue;
 
                 if (!TryReserveChainStart())
                 {
-                    LogService.Warn($"Pipeline rate limit reached ({MaxChainStartsPerMinute}/min); skipping '{target}'.");
+                    Serilog.Log.Warning("{Message}", $"Pipeline rate limit reached ({MaxChainStartsPerMinute}/min); skipping '{target}'.");
                     continue;
                 }
 
                 if (WouldLoop(sourcePath, target))
                 {
-                    LogService.Warn(
+                    Serilog.Log.Warning("{Message}", 
                         $"Pipeline loop prevented: '{target}' is already an ancestor of '{sourcePath}' in this chain.");
                     continue;
                 }
@@ -221,7 +223,7 @@ namespace FluentTaskScheduler.Services
                 {
                     RecordAncestry(sourcePath, target);
                     service.RunTask(target, "Pipeline");
-                    LogService.Info(
+                    Serilog.Log.Information("{Message}", 
                         $"Pipeline started '{target}' because '{sourcePath}' {(succeeded ? "succeeded" : "failed")}.");
                     NotificationService.ShowPipelineTriggered(
                         System.IO.Path.GetFileName(sourcePath), System.IO.Path.GetFileName(target), succeeded);
@@ -233,7 +235,7 @@ namespace FluentTaskScheduler.Services
                 }
                 catch (Exception ex)
                 {
-                    LogService.Error($"Pipeline could not start downstream task '{target}' (source '{sourcePath}').", ex);
+                    Serilog.Log.Error(ex, "{Message}", $"Pipeline could not start downstream task '{target}' (source '{sourcePath}').");
                 }
             }
         }
@@ -262,7 +264,7 @@ namespace FluentTaskScheduler.Services
         {
             try
             {
-                var service = new TaskServiceWrapper();
+                var service = App.Container.GetRequiredService<ITaskService>();
                 var pipelines = new Dictionary<string, TaskPipeline>(StringComparer.OrdinalIgnoreCase);
                 var names = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
@@ -282,7 +284,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Error("Failed to refresh the task pipeline cache.", ex);
+                Serilog.Log.Error(ex, "{Message}", "Failed to refresh the task pipeline cache.");
                 lock (_lock)
                 {
                     // Back off for one cache lifetime so a persistent failure doesn't hammer the API.

@@ -7,37 +7,37 @@ using FluentTaskScheduler.Services;
 
 namespace FluentTaskScheduler.Tests
 {
-    // SettingsService is a process-wide static singleton, so these tests must not run concurrently
-    // with each other or with other test classes that touch it (see StaticServicesCollection).
     [Collection("StaticServices")]
     public class SettingsServiceTests : IDisposable
     {
         private readonly string _tempDir;
+        private readonly SettingsService _settings;
 
         public SettingsServiceTests()
         {
             _tempDir = Path.Combine(Path.GetTempPath(), "FTS_Tests_" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_tempDir);
-            SettingsService.UseStorageForTests(_tempDir);
+            _settings = new SettingsService(_tempDir);
         }
 
         public void Dispose()
         {
+            _settings.Dispose();
             try { if (Directory.Exists(_tempDir)) Directory.Delete(_tempDir, recursive: true); } catch { }
         }
 
         [Fact]
         public void SettingChanged_IsReadableImmediately_EvenBeforeDebouncedSaveFlushes()
         {
-            SettingsService.ConfirmDelete = false;
-            Assert.False(SettingsService.ConfirmDelete);
+            _settings.ConfirmDelete = false;
+            Assert.False(_settings.ConfirmDelete);
         }
 
         [Fact]
         public void Flush_WritesPendingChangeToDiskImmediately()
         {
-            SettingsService.IsMicaEnabled = false;
-            SettingsService.Flush();
+            _settings.IsMicaEnabled = false;
+            _settings.Flush();
 
             string settingsFile = Path.Combine(_tempDir, "settings.json");
             Assert.True(File.Exists(settingsFile));
@@ -53,18 +53,18 @@ namespace FluentTaskScheduler.Tests
             // write per tick.
             for (int i = 0; i < 50; i++)
             {
-                SettingsService.SetWindowSize(1000 + i, 700 + i);
+                _settings.SetWindowSize(1000 + i, 700 + i);
             }
 
             // Nothing should have hit disk yet — the debounce window hasn't elapsed.
             string settingsFile = Path.Combine(_tempDir, "settings.json");
             Assert.False(File.Exists(settingsFile));
 
-            SettingsService.Flush();
+            _settings.Flush();
 
             Assert.True(File.Exists(settingsFile));
-            Assert.Equal(1049, SettingsService.WindowWidth);
-            Assert.Equal(749, SettingsService.WindowHeight);
+            Assert.Equal(1049, _settings.WindowWidth);
+            Assert.Equal(749, _settings.WindowHeight);
         }
 
         [Fact]
@@ -80,14 +80,14 @@ namespace FluentTaskScheduler.Tests
                 {
                     for (int i = 0; i < 20; i++)
                     {
-                        SettingsService.ReminderLeadMinutes = captured * 100 + i;
+                        _settings.ReminderLeadMinutes = captured * 100 + i;
                     }
                 });
                 threads[t].Start();
             }
             foreach (var th in threads) th.Join();
 
-            SettingsService.Flush();
+            _settings.Flush();
 
             string settingsFile = Path.Combine(_tempDir, "settings.json");
             string json = File.ReadAllText(settingsFile);
@@ -102,7 +102,7 @@ namespace FluentTaskScheduler.Tests
             // Covers item 1.6c: the disabled-task list must be durable *before* SnoozeService starts
             // disabling tasks, so a crash mid-sweep is recoverable. SaveSnoozeState must therefore
             // bypass the debounce window entirely.
-            SettingsService.SaveSnoozeState(true, DateTime.UtcNow.AddHours(1), false, "", new() { "\\Some\\Task" });
+            _settings.SaveSnoozeState(true, DateTime.UtcNow.AddHours(1), false, "", new() { "\\Some\\Task" });
 
             string settingsFile = Path.Combine(_tempDir, "settings.json");
             Assert.True(File.Exists(settingsFile));
@@ -114,14 +114,14 @@ namespace FluentTaskScheduler.Tests
         [Fact]
         public void Load_AfterSaveImmediate_RoundTripsAllFields()
         {
-            SettingsService.EnableTaskPipelines = false;
-            SettingsService.SavedCategories = new() { "A", "B" };
-            SettingsService.Flush();
+            _settings.EnableTaskPipelines = false;
+            _settings.SavedCategories = new() { "A", "B" };
+            _settings.Flush();
 
-            SettingsService.Load();
+            _settings.Load();
 
-            Assert.False(SettingsService.EnableTaskPipelines);
-            Assert.Equal(new[] { "A", "B" }, SettingsService.SavedCategories);
+            Assert.False(_settings.EnableTaskPipelines);
+            Assert.Equal(new[] { "A", "B" }, _settings.SavedCategories);
         }
 
         // Covers item 4.5: proper add/remove methods instead of "mutate the live list, then
@@ -129,49 +129,49 @@ namespace FluentTaskScheduler.Tests
         [Fact]
         public void AddSavedCategory_PersistsAndIsIdempotent()
         {
-            SettingsService.SavedCategories = new();
-            SettingsService.AddSavedCategory("Work");
-            SettingsService.AddSavedCategory("Work"); // duplicate — must not be added twice
+            _settings.SavedCategories = new();
+            _settings.AddSavedCategory("Work");
+            _settings.AddSavedCategory("Work"); // duplicate — must not be added twice
 
-            Assert.Equal(new[] { "Work" }, SettingsService.SavedCategories);
+            Assert.Equal(new[] { "Work" }, _settings.SavedCategories);
         }
 
         [Fact]
         public void RemoveSavedCategory_RemovesOnlyThatEntry()
         {
-            SettingsService.SavedCategories = new() { "Work", "Personal" };
-            SettingsService.RemoveSavedCategory("Work");
+            _settings.SavedCategories = new() { "Work", "Personal" };
+            _settings.RemoveSavedCategory("Work");
 
-            Assert.Equal(new[] { "Personal" }, SettingsService.SavedCategories);
+            Assert.Equal(new[] { "Personal" }, _settings.SavedCategories);
         }
 
         [Fact]
         public void AddSavedTag_PersistsAndIsIdempotent()
         {
-            SettingsService.SavedTags = new();
-            SettingsService.AddSavedTag("urgent");
-            SettingsService.AddSavedTag("urgent");
+            _settings.SavedTags = new();
+            _settings.AddSavedTag("urgent");
+            _settings.AddSavedTag("urgent");
 
-            Assert.Equal(new[] { "urgent" }, SettingsService.SavedTags);
+            Assert.Equal(new[] { "urgent" }, _settings.SavedTags);
         }
 
         [Fact]
         public void RemoveSavedTag_RemovesOnlyThatEntry()
         {
-            SettingsService.SavedTags = new() { "urgent", "sync" };
-            SettingsService.RemoveSavedTag("urgent");
+            _settings.SavedTags = new() { "urgent", "sync" };
+            _settings.RemoveSavedTag("urgent");
 
-            Assert.Equal(new[] { "sync" }, SettingsService.SavedTags);
+            Assert.Equal(new[] { "sync" }, _settings.SavedTags);
         }
 
         [Fact]
         public void AddSavedCategory_IgnoresEmptyOrWhitespace()
         {
-            SettingsService.SavedCategories = new();
-            SettingsService.AddSavedCategory("");
-            SettingsService.AddSavedCategory("   ");
+            _settings.SavedCategories = new();
+            _settings.AddSavedCategory("");
+            _settings.AddSavedCategory("   ");
 
-            Assert.Empty(SettingsService.SavedCategories);
+            Assert.Empty(_settings.SavedCategories);
         }
 
         // Covers item 4.5: exported settings must not carry this machine's live runtime state
@@ -179,12 +179,12 @@ namespace FluentTaskScheduler.Tests
         [Fact]
         public void ExportSettings_ClearsRuntimeState()
         {
-            SettingsService.SetWindowSize(2000, 1500);
-            SettingsService.SaveSnoozeState(true, DateTime.UtcNow.AddHours(1), false, "", new() { "\\Some\\Task" });
-            SettingsService.Flush();
+            _settings.SetWindowSize(2000, 1500);
+            _settings.SaveSnoozeState(true, DateTime.UtcNow.AddHours(1), false, "", new() { "\\Some\\Task" });
+            _settings.Flush();
 
             string exportPath = Path.Combine(_tempDir, "export.json");
-            SettingsService.ExportSettings(exportPath);
+            _settings.ExportSettings(exportPath);
 
             var exported = JsonSerializer.Deserialize<JsonDocument>(File.ReadAllText(exportPath))!.RootElement;
             Assert.False(exported.GetProperty("IsSnoozed").GetBoolean());
@@ -193,8 +193,8 @@ namespace FluentTaskScheduler.Tests
             Assert.Equal(800, exported.GetProperty("WindowHeight").GetInt32());
 
             // The exported file must not have mutated the live in-memory settings.
-            Assert.True(SettingsService.IsSnoozed);
-            Assert.Equal(2000, SettingsService.WindowWidth);
+            Assert.True(_settings.IsSnoozed);
+            Assert.Equal(2000, _settings.WindowWidth);
         }
 
         [Fact]
@@ -213,13 +213,13 @@ namespace FluentTaskScheduler.Tests
                 }
                 """);
 
-            SettingsService.ImportSettings(importPath);
+            _settings.ImportSettings(importPath);
 
-            Assert.False(SettingsService.IsSnoozed);
-            Assert.False(SettingsService.SnoozeUntilReboot);
-            Assert.Empty(SettingsService.SnoozeDisabledTaskPaths);
-            Assert.Equal(1200, SettingsService.WindowWidth);
-            Assert.Equal(800, SettingsService.WindowHeight);
+            Assert.False(_settings.IsSnoozed);
+            Assert.False(_settings.SnoozeUntilReboot);
+            Assert.Empty(_settings.SnoozeDisabledTaskPaths);
+            Assert.Equal(1200, _settings.WindowWidth);
+            Assert.Equal(800, _settings.WindowHeight);
         }
 
         [Fact]
@@ -228,7 +228,7 @@ namespace FluentTaskScheduler.Tests
             string importPath = Path.Combine(_tempDir, "bad.json");
             File.WriteAllText(importPath, "not valid json");
 
-            Assert.ThrowsAny<Exception>(() => SettingsService.ImportSettings(importPath));
+            Assert.ThrowsAny<Exception>(() => _settings.ImportSettings(importPath));
         }
     }
 }

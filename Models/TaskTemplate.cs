@@ -1,3 +1,4 @@
+using FluentTaskScheduler.Models.Enums;
 using System.Collections.Generic;
 
 namespace FluentTaskScheduler.Models
@@ -35,7 +36,7 @@ namespace FluentTaskScheduler.Models
 
         // ── Recommended trigger ─────────────────────────────────────────────────
         /// <summary>Trigger type understood by TaskServiceWrapper: Daily, Weekly, AtLogon, AtStartup, OnIdle, Once.</summary>
-        public string TriggerType { get; set; } = "Daily";
+        public TriggerType TriggerType { get; set; } = TriggerType.Daily;
         public int TriggerHour { get; set; } = 3;
         public int TriggerMinute { get; set; } = 0;
         public short DailyInterval { get; set; } = 1;

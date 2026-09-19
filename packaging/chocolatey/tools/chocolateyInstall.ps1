@@ -1,25 +1,24 @@
-# NOTE TO MAINTAINER:
-# Replace <SHA256_OF_Setup-x64.msi> with the real SHA-256 hash before packing.
-# Compute with: (Get-FileHash "Setup-x64.msi" -Algorithm SHA256).Hash
-
 $ErrorActionPreference = 'Stop'
 
 $packageName   = 'fluenttaskscheduler'
 $toolsDir      = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$version       = '1.8.2'
+$version       = '1.9.0'
 
 # Detect architecture
 $isArm64 = ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') -or ($env:PROCESSOR_ARCHITEW6432 -eq 'ARM64')
 
 # Use correct 'V' prefix for GitHub release tag
 $pkgUrl = "https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/V$version/Setup-x64.msi"
-$pkgHash = 'A093637F54D59D5BCE0804FAD524A22F2093934BE683E2A19060007112459D5B'
+$pkgHash = 'AFAD2A1E61E4B3F87C1EE2B7ED4E55CFAC9B13DBC5AF7CA99745DA4977539362'
 
 if ($isArm64) {
     $pkgUrl = "https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/V$version/Setup-arm64.msi"
-    $pkgHash = 'A3A452A30ACDB5EBCFAFAF0BAAE16569C5F34BC0E8C1E8D7E726B1CC57C2BE86'
+    $pkgHash = '8CDF80B8DAD1D75F5D107CEFB5A3626DBC3FB627911C978641AF51771D2A54D1'
 }
 
+# Chocolatey's helpers only expose url/checksum (32-bit) and url64bit/checksum64 (64-bit) — there is
+# no dedicated ARM64 slot. url64bit is reused here for both x64 and ARM64 after the manual
+# architecture detection above; this is the standard workaround other ARM64 Chocolatey packages use.
 $packageArgs = @{
   packageName    = $packageName
   fileType       = 'msi'

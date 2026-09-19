@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Velopack;
 using Velopack.Sources;
@@ -11,9 +12,28 @@ namespace FluentTaskScheduler.Services
 
         private static UpdateManager? _updateManager;
 
+        /// <summary>
+        /// Returns the VeloPack channel name that matches the current process architecture.
+        /// This must match the -c / --channel value used at <c>vpk pack</c> time so that
+        /// the UpdateManager looks for the correct <c>releases.{channel}.json</c> file on GitHub.
+        /// </summary>
+        private static string GetChannel()
+        {
+            return RuntimeInformation.ProcessArchitecture switch
+            {
+                Architecture.Arm64 => "win-arm64",
+                _                 => "win-x64",
+            };
+        }
+
         private static UpdateManager GetManager()
         {
-            _updateManager ??= new UpdateManager(new GithubSource(GitHubRepoUrl, null, false));
+            if (_updateManager == null)
+            {
+                var source  = new GithubSource(GitHubRepoUrl, null, false);
+                var options = new UpdateOptions { ExplicitChannel = GetChannel() };
+                _updateManager = new UpdateManager(source, options);
+            }
             return _updateManager;
         }
 
@@ -75,17 +95,21 @@ namespace FluentTaskScheduler.Services
 
         /// <summary>
         /// Applies a previously downloaded update and restarts the application.
+        /// Returns false (instead of throwing) if applying the update failed, so the
+        /// caller can inform the user instead of the app silently doing nothing.
         /// </summary>
-        public static void ApplyAndRestart(UpdateInfo updateInfo)
+        public static bool ApplyAndRestart(UpdateInfo updateInfo)
         {
             try
             {
                 var mgr = GetManager();
                 mgr.ApplyUpdatesAndRestart(updateInfo);
+                return true;
             }
             catch (Exception ex)
             {
-                Serilog.Log.Information("{Message}", $"[VeloPackUpdate] Restart failed: {ex.Message}");
+                Serilog.Log.Error("{Message}", $"[VeloPackUpdate] Restart failed: {ex.Message}");
+                return false;
             }
         }
 

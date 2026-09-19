@@ -13,6 +13,38 @@ using AppTriggerType = FluentTaskScheduler.Models.Enums.TriggerType;
 
 namespace FluentTaskScheduler.Services
 {
+    /// <summary>Thrown when a run request is refused because global snooze is active.</summary>
+    public class TaskSnoozedException : Exception
+    {
+        public string TaskPath { get; }
+
+        public TaskSnoozedException(string taskPath)
+            : base(string.Format(
+                LocalizationService.GetString(
+                    "Snooze.Error.RunBlocked",
+                    "'{0}' was not started because Global Snooze is active."),
+                System.IO.Path.GetFileName(taskPath)))
+        {
+            TaskPath = taskPath;
+        }
+    }
+
+    /// <summary>
+    /// The subset of <see cref="TaskServiceWrapper"/> that other services depend on, extracted so
+    /// SnoozeService/TaskPipelineService logic can be unit tested against a fake implementation
+    /// without a real Task Scheduler.
+    /// </summary>
+    public interface ITaskServiceWrapper
+    {
+        List<ScheduledTaskModel> GetAllTasks(string? folderPath = null, bool recursive = true);
+        bool TaskExists(string path);
+        void EnableTask(string path);
+        void DisableTask(string path);
+        void SetTaskEnabled(string path, bool enabled);
+        void RunTask(string path);
+        void RunTask(string path, string origin);
+    }
+
     public class TaskServiceWrapper : ITaskService
     {
         public List<ScheduledTaskModel> GetAllTasks(string? folderPath = null, bool recursive = true)
@@ -105,6 +137,7 @@ namespace FluentTaskScheduler.Services
             ParseMetadata(model);
 
             // Map Actions
+            var unsupported = new List<string>();
             if (def.Actions != null)
             {
                 foreach (var action in def.Actions)
@@ -118,6 +151,13 @@ namespace FluentTaskScheduler.Services
                             WorkingDirectory = execAction.WorkingDirectory
                         });
                     }
+                    else
+                    {
+                        // Email/COM/show-message actions have no model representation. Round-tripping
+                        // this task through the editor would silently drop them, so it's flagged as
+                        // unsupported instead (see HasUnsupportedElements).
+                        unsupported.Add($"{action.ActionType} action");
+                    }
                 }
             }
 
@@ -126,10 +166,21 @@ namespace FluentTaskScheduler.Services
             {
                 foreach (var trigger in def.Triggers)
                 {
-                    model.TriggersList.Add(MapTriggerToModel(trigger));
+                    var mapped = MapTriggerToModel(trigger);
+                    if (mapped.TriggerType == AppTriggerType.Unsupported)
+                    {
+                        unsupported.Add($"{trigger.GetType().Name} trigger");
+                    }
+                    model.TriggersList.Add(mapped);
                 }
                 // Update display string using wrapper descriptors
                 model.Triggers = string.Join(", ", model.TriggersList.Select(t => t.Descriptor));
+            }
+
+            if (unsupported.Count > 0)
+            {
+                model.HasUnsupportedElements = true;
+                model.UnsupportedElementsDescription = string.Join(", ", unsupported);
             }
 
             // Map Settings
@@ -240,6 +291,12 @@ namespace FluentTaskScheduler.Services
             }
         }
 
+        public bool TaskExists(string path)
+        {
+            using var ts = new TaskService();
+            return ts.GetTask(path) != null;
+        }
+
         public void EnableTask(string path) => SetTaskEnabled(path, true);
         public void DisableTask(string path) => SetTaskEnabled(path, false);
 
@@ -262,8 +319,28 @@ namespace FluentTaskScheduler.Services
             }
         }
 
-        public void RunTask(string path)
+        /// <summary>
+        /// Raised when <see cref="RunTask"/> refuses to start a task because global snooze is active.
+        /// </summary>
+        public static event EventHandler<string>? RunSuppressedBySnooze;
+
+        /// <summary>
+        /// Starts a task immediately. Throws <see cref="TaskSnoozedException"/> instead of starting
+        /// anything while global snooze is active.
+        /// </summary>
+        public void RunTask(string path) => RunTask(path, "Manual");
+
+        /// <param name="origin">Where the request came from — recorded on the suppression log.</param>
+        public void RunTask(string path, string origin)
         {
+            if (SnoozeService.IsActive)
+            {
+                SnoozeService.RecordSuppressedRun(path, origin);
+                NotificationService.ShowRunSuppressed(System.IO.Path.GetFileName(path));
+                RunSuppressedBySnooze?.Invoke(this, path);
+                throw new TaskSnoozedException(path);
+            }
+
             try
             {
                 using (var ts = new TaskService())
@@ -301,6 +378,7 @@ namespace FluentTaskScheduler.Services
                 var task = ts.GetTask(path);
                 if (task != null) task.Folder.DeleteTask(task.Name);
             }
+            InvalidateDiscoveredCache();
         }
 
         public void RegisterTask(string folderPath, ScheduledTaskModel model)
@@ -344,7 +422,7 @@ namespace FluentTaskScheduler.Services
                     if (IsAccessDenied(ex))
                     {
                         Serilog.Log.Warning("{Message}", $"Access denied registering task '{model.Name}' with elevated privileges; falling back to current user context.");
-                        RegisterSafeTask(ts, targetFolder, model, td);
+                        RegisterSafeTask(targetFolder, model, td);
                     }
                     else
                     {
@@ -353,68 +431,43 @@ namespace FluentTaskScheduler.Services
                     }
                 }
             }
+            InvalidateDiscoveredCache();
         }
 
-        private void RegisterSafeTask(TaskService ts, TaskFolder targetFolder, ScheduledTaskModel model, TaskDefinition originalTd)
+        private void RegisterSafeTask(TaskFolder targetFolder, ScheduledTaskModel model, TaskDefinition originalTd)
         {
-            // Create a fresh definition to avoid polluted privileges
-            TaskDefinition safeTd = ts.NewTask();
+            // Reuse the already-fully-configured definition instead of rebuilding one from scratch
+            // and manually re-copying a hand-picked subset of its settings — that subset previously
+            // dropped Hidden, WakeToRun, RunOnlyIfIdle, RestartCount/RestartInterval, and
+            // NetworkSettings on every de-elevated fallback registration (see 3.8). Only the
+            // principal/logon context actually needs to change for the de-elevated retry.
+            originalTd.Principal.RunLevel = TaskRunLevel.LUA;
+            originalTd.Principal.LogonType = TaskLogonType.InteractiveToken;
+            originalTd.Principal.UserId = null;
+            originalTd.Principal.GroupId = null;
 
-            // Copy properties safely
-            safeTd.RegistrationInfo.Description = originalTd.RegistrationInfo.Description;
-            safeTd.RegistrationInfo.Author = originalTd.RegistrationInfo.Author;
-            safeTd.Settings.Enabled = originalTd.Settings.Enabled;
-            safeTd.Settings.Compatibility = TaskCompatibility.V2;
-            
-            // Map settings
-            safeTd.Settings.MultipleInstances = originalTd.Settings.MultipleInstances;
-            safeTd.Settings.DisallowStartIfOnBatteries = originalTd.Settings.DisallowStartIfOnBatteries;
-            safeTd.Settings.StopIfGoingOnBatteries = originalTd.Settings.StopIfGoingOnBatteries;
-            safeTd.Settings.AllowHardTerminate = originalTd.Settings.AllowHardTerminate;
-            safeTd.Settings.StartWhenAvailable = originalTd.Settings.StartWhenAvailable;
-            safeTd.Settings.RunOnlyIfNetworkAvailable = originalTd.Settings.RunOnlyIfNetworkAvailable;
-            safeTd.Settings.IdleSettings.IdleDuration = originalTd.Settings.IdleSettings.IdleDuration;
-            safeTd.Settings.IdleSettings.StopOnIdleEnd = originalTd.Settings.IdleSettings.StopOnIdleEnd;
-            safeTd.Settings.ExecutionTimeLimit = originalTd.Settings.ExecutionTimeLimit;
-            safeTd.Settings.Priority = originalTd.Settings.Priority;
-            safeTd.Settings.DeleteExpiredTaskAfter = originalTd.Settings.DeleteExpiredTaskAfter;
-
-            // Copy Triggers (strip specific user context that requires admin)
-            foreach (var oldTrig in originalTd.Triggers)
+            // Strip specific user contexts from triggers that require admin to target another user.
+            foreach (var trig in originalTd.Triggers)
             {
-                var clone = (Trigger)oldTrig.Clone();
-                if (clone is SessionStateChangeTrigger sst) sst.UserId = null;
-                if (clone is LogonTrigger lt) lt.UserId = null;
-                safeTd.Triggers.Add(clone);
+                if (trig is SessionStateChangeTrigger sst) sst.UserId = null;
+                if (trig is LogonTrigger lt) lt.UserId = null;
             }
-
-            // Copy Actions
-            foreach (var oldAct in originalTd.Actions)
-            {
-                safeTd.Actions.Add((Microsoft.Win32.TaskScheduler.Action)oldAct.Clone());
-            }
-
-            // Force safe principal
-            safeTd.Principal.RunLevel = TaskRunLevel.LUA;
-            safeTd.Principal.LogonType = TaskLogonType.InteractiveToken;
-            safeTd.Principal.UserId = null;
-            safeTd.Principal.GroupId = null;
 
             targetFolder.RegisterTaskDefinition(
                 model.Name,
-                safeTd,
+                originalTd,
                 TaskCreation.CreateOrUpdate,
-                null, 
-                null, 
+                null,
+                null,
                 TaskLogonType.InteractiveToken
             );
-            
+
             Serilog.Log.Information("{Message}", $"Registered task '{model.Name}' via fallback (InteractiveToken).");
         }
 
         private void ConfigureTaskDefinition(TaskDefinition td, ScheduledTaskModel model)
         {
-            td.RegistrationInfo.Description = UpdateDescriptionWithMetadata(model.Description, model.Category, model.Tags.ToList());
+            td.RegistrationInfo.Description = UpdateDescriptionWithMetadata(model.Description, model.Category, model.Tags.ToList(), model.Pipeline);
             td.RegistrationInfo.Author = model.Author;
             td.Settings.Enabled = model.IsEnabled;
             td.Settings.Hidden = model.IsHidden;
@@ -425,26 +478,32 @@ namespace FluentTaskScheduler.Services
                 ConfigureTrigger(td, triggerModel, model);
             }
 
-            if (model.Actions.Count > 0)
+            foreach (var act in model.Actions)
             {
-                foreach (var act in model.Actions)
+                if (!string.IsNullOrWhiteSpace(act.Command))
                 {
-                    if (!string.IsNullOrWhiteSpace(act.Command))
-                    {
-                        td.Actions.Add(new ExecAction(act.Command, act.Arguments, act.WorkingDirectory));
-                    }
+                    td.Actions.Add(new ExecAction(act.Command, act.Arguments, act.WorkingDirectory));
                 }
             }
-            else
+
+            if (td.Actions.Count == 0)
             {
-                td.Actions.Add(new ExecAction("notepad.exe"));
+                // A task with no actions does nothing when it runs — refuse to save it instead of
+                // silently substituting a notepad.exe placeholder the user never asked for.
+                throw new InvalidOperationException("This task has no actions. Add at least one action before saving.");
             }
 
             // Apply Settings
             td.Settings.RunOnlyIfIdle = model.OnlyIfIdle;
             if (!string.IsNullOrWhiteSpace(model.IdleDuration))
             {
-                try { td.Settings.IdleSettings.IdleDuration = System.Xml.XmlConvert.ToTimeSpan(model.IdleDuration); } catch { }
+                // Accepts both ISO-8601 ("PT10M") and the shorthand ("10m") the placeholder text
+                // advertises — previously only the strict ISO form parsed, so shorthand input was
+                // silently discarded (item 2.3).
+                if (DurationUtil.TryParseFlexibleDuration(model.IdleDuration, out var idleDuration))
+                    td.Settings.IdleSettings.IdleDuration = idleDuration;
+                else
+                    Serilog.Log.Warning("{Message}", $"Invalid IdleDuration '{model.IdleDuration}' for task '{model.Name}'; leaving the previous idle duration in place.");
             }
             td.Settings.IdleSettings.StopOnIdleEnd = model.StopOnIdleEnd;
             td.Settings.DisallowStartIfOnBatteries = model.DisallowStartOnBatteries || model.OnlyIfAC;
@@ -466,20 +525,32 @@ namespace FluentTaskScheduler.Services
             td.Settings.WakeToRun = model.WakeToRun;
             td.Settings.StartWhenAvailable = model.RunIfMissed;
 
-            if (model.RestartOnFailure && !string.IsNullOrWhiteSpace(model.RestartInterval))
+            if (model.RestartOnFailure)
             {
-                try
+                TimeSpan restartInterval;
+                if (string.IsNullOrWhiteSpace(model.RestartInterval))
                 {
-                    td.Settings.RestartInterval = System.Xml.XmlConvert.ToTimeSpan(model.RestartInterval);
-                    td.Settings.RestartCount = model.RestartCount;
+                    restartInterval = TimeSpan.FromMinutes(1);
                 }
-                catch { }
+                else if (!DurationUtil.TryParseFlexibleDuration(model.RestartInterval, out restartInterval))
+                {
+                    Serilog.Log.Warning("{Message}", $"Invalid RestartInterval '{model.RestartInterval}' for task '{model.Name}'; defaulting to 1 minute instead of dropping the restart-on-failure policy.");
+                    restartInterval = TimeSpan.FromMinutes(1);
+                }
+                td.Settings.RestartInterval = restartInterval;
+                td.Settings.RestartCount = model.RestartCount;
             }
 
             if (!string.IsNullOrWhiteSpace(model.StopIfRunsLongerThan))
             {
                 try { td.Settings.ExecutionTimeLimit = System.Xml.XmlConvert.ToTimeSpan(model.StopIfRunsLongerThan); }
                 catch { td.Settings.ExecutionTimeLimit = TimeSpan.FromHours(72); }
+            }
+            else
+            {
+                // Explicitly unlimited when the user unchecked "Stop task if runs longer than" -
+                // otherwise the task definition's own built-in default (72h) would silently apply.
+                td.Settings.ExecutionTimeLimit = TimeSpan.Zero;
             }
 
             td.Settings.MultipleInstances = model.MultipleInstancesPolicy;
@@ -506,10 +577,26 @@ namespace FluentTaskScheduler.Services
 
         private void ConfigureTrigger(TaskDefinition td, TaskTriggerModel triggerModel, ScheduledTaskModel model)
         {
-            DateTime startTime = DateTime.Today.AddHours(9);
-            if (!string.IsNullOrWhiteSpace(triggerModel.ScheduleInfo) && DateTime.TryParse(triggerModel.ScheduleInfo, out var parsedStart))
+            if (triggerModel.TriggerType == AppTriggerType.Unsupported)
             {
-                startTime = parsedStart;
+                // Should never be reachable — the editor refuses to open tasks containing one of
+                // these (see ScheduledTaskModel.HasUnsupportedElements) — but guard against saving
+                // over one anyway rather than silently turning it into a daily 9 AM trigger.
+                throw new InvalidOperationException("This trigger type is not supported by the editor and cannot be saved.");
+            }
+
+            DateTime startTime = DateTime.Today.AddHours(9);
+            if (!string.IsNullOrWhiteSpace(triggerModel.ScheduleInfo))
+            {
+                var parsedStart = DurationUtil.TryParseScheduleInfo(triggerModel.ScheduleInfo);
+                if (parsedStart.HasValue)
+                {
+                    startTime = parsedStart.Value;
+                }
+                else
+                {
+                    throw new FormatException($"Could not parse trigger start time '{triggerModel.ScheduleInfo}'. Expected format: {DurationUtil.ScheduleInfoFormat}.");
+                }
             }
 
             Trigger t = triggerModel.TriggerType switch
@@ -540,12 +627,15 @@ namespace FluentTaskScheduler.Services
                     {
                         t.Repetition.Duration = System.Xml.XmlConvert.ToTimeSpan(triggerModel.RepetitionDuration);
                     }
-                    if (!string.IsNullOrWhiteSpace(triggerModel.RandomDelay))
-                    {
-                        try { ((dynamic)t).RandomDelay = System.Xml.XmlConvert.ToTimeSpan(triggerModel.RandomDelay); } catch { }
-                    }
                 }
                 catch { }
+            }
+
+            // RandomDelay applies independently of repetition — must not be nested inside the
+            // RepetitionInterval check above, or a delay configured without repetition is dropped.
+            if (!string.IsNullOrWhiteSpace(triggerModel.RandomDelay))
+            {
+                try { ((dynamic)t).RandomDelay = System.Xml.XmlConvert.ToTimeSpan(triggerModel.RandomDelay); } catch { }
             }
 
             td.Triggers.Add(t);
@@ -576,13 +666,17 @@ namespace FluentTaskScheduler.Services
         {
             var et = new EventTrigger();
             string log = string.IsNullOrWhiteSpace(model.EventLog) ? "Application" : model.EventLog;
+            if (log.Any(c => char.IsControl(c)))
+                throw new ArgumentException("Event log name contains invalid control characters.", nameof(model.EventLog));
+            if (!string.IsNullOrWhiteSpace(model.EventSource) && model.EventSource.Any(c => char.IsControl(c)))
+                throw new ArgumentException("Event source contains invalid control characters.", nameof(model.EventSource));
             string query = "*";
 
             if (!string.IsNullOrWhiteSpace(model.EventSource) || model.EventId.HasValue)
             {
                 string conditions = "";
                 if (!string.IsNullOrWhiteSpace(model.EventSource))
-                    conditions += $"Provider[@Name='{model.EventSource}']";
+                    conditions += $"Provider[@Name={ToXPathLiteral(model.EventSource)}]";
 
                 if (model.EventId.HasValue)
                 {
@@ -591,8 +685,37 @@ namespace FluentTaskScheduler.Services
                 }
                 query = $"*[System[{conditions}]]";
             }
-            et.Subscription = $"<QueryList><Query Id=\"0\" Path=\"{log}\"><Select Path=\"{log}\">{query}</Select></Query></QueryList>";
+
+            // `query` is an XPath expression that itself becomes XML element content below, so it
+            // needs XML-escaping on top of the XPath-literal escaping already applied above.
+            string logXml = System.Security.SecurityElement.Escape(log);
+            string queryXml = System.Security.SecurityElement.Escape(query);
+            et.Subscription = $"<QueryList><Query Id=\"0\" Path=\"{logXml}\"><Select Path=\"{logXml}\">{queryXml}</Select></Query></QueryList>";
             return et;
+        }
+
+        /// <summary>
+        /// Encodes a string as a safe XPath 1.0 string literal. XPath 1.0 has no escape sequence for
+        /// quote characters inside a literal, so a value containing both ' and " has to be split
+        /// across a concat() call.
+        /// </summary>
+        internal static string ToXPathLiteral(string value)
+        {
+            value ??= "";
+            if (!value.Contains('\''))
+                return $"'{value}'";
+            if (!value.Contains('"'))
+                return $"\"{value}\"";
+
+            var parts = value.Split('\'');
+            var sb = new System.Text.StringBuilder("concat(");
+            for (int i = 0; i < parts.Length; i++)
+            {
+                if (i > 0) sb.Append(", \"'\", ");
+                sb.Append('\'').Append(parts[i]).Append('\'');
+            }
+            sb.Append(')');
+            return sb.ToString();
         }
 
         private Trigger CreateSessionTrigger(TaskTriggerModel triggerModel, ScheduledTaskModel model)
@@ -664,6 +787,10 @@ namespace FluentTaskScheduler.Services
 
         private List<ScheduledTaskModel>? _discoveredCache;
 
+        /// <summary>Drops the event-log task-discovery cache so the next GetFolderStructure() call
+        /// re-scans instead of reusing a snapshot that predates a task being added/removed.</summary>
+        internal void InvalidateDiscoveredCache() => _discoveredCache = null;
+
         public List<ScheduledTaskModel> DiscoverTasksFromEventLog(bool forceRefresh = false)
         {
             if (_discoveredCache != null && !forceRefresh) return _discoveredCache;
@@ -674,7 +801,7 @@ namespace FluentTaskScheduler.Services
                 // Event IDs for task activity: 100 (started), 102 (completed), 107 (triggered), 110 (registered)
                 string query = "*[System[(EventID=100 or EventID=102 or EventID=107 or EventID=110)]]";
                 EventLogQuery eventsQuery = new EventLogQuery("Microsoft-Windows-TaskScheduler/Operational", PathType.LogName, query);
-                EventLogReader logReader = new EventLogReader(eventsQuery);
+                using EventLogReader logReader = new EventLogReader(eventsQuery);
 
                 EventRecord record;
                 // Limit to last 2000 events to ensure older infrequent tasks are caught
@@ -708,21 +835,21 @@ namespace FluentTaskScheduler.Services
             }
 
             var discoveredTasks = new List<ScheduledTaskModel>();
+            // One TaskService for the whole pass — opening a fresh COM connection per discovered
+            // path here was the single biggest cost of a folder-tree refresh (see 3.5).
+            using var lookupTs = new TaskService();
             foreach (var path in discoveredRaw)
             {
                 bool added = false;
                 try
                 {
-                    using (var ts = new TaskService())
+                    var task = lookupTs.GetTask(path);
+                    if (task != null)
                     {
-                        var task = ts.GetTask(path);
-                        if (task != null)
-                        {
-                            var model = MapTaskToModel(task);
-                            model.IsFromEventLog = true;
-                            discoveredTasks.Add(model);
-                            added = true;
-                        }
+                        var model = MapTaskToModel(task);
+                        model.IsFromEventLog = true;
+                        discoveredTasks.Add(model);
+                        added = true;
                     }
                 }
                 catch (Exception ex) when (IsAccessDenied(ex))
@@ -755,9 +882,9 @@ namespace FluentTaskScheduler.Services
             var history = new List<TaskHistoryEntry>();
             try
             {
-                string query = $"*[System/Provider[@Name='Microsoft-Windows-TaskScheduler'] and EventData[Data[@Name='TaskName']='{taskPath}']]";
+                string query = $"*[System/Provider[@Name='Microsoft-Windows-TaskScheduler'] and EventData[Data[@Name='TaskName']={ToXPathLiteral(taskPath)}]]";
                 EventLogQuery eventsQuery = new EventLogQuery("Microsoft-Windows-TaskScheduler/Operational", PathType.LogName, query);
-                EventLogReader logReader = new EventLogReader(eventsQuery);
+                using EventLogReader logReader = new EventLogReader(eventsQuery);
 
                 EventRecord record;
                 while ((record = logReader.ReadEvent()) != null)
@@ -769,17 +896,17 @@ namespace FluentTaskScheduler.Services
                             Time = record.TimeCreated?.ToString("yyyy-MM-dd HH:mm:ss") ?? "Unknown",
                             Result = GetEventResult(record.Id),
                             ExitCode = GetEventExitCode(record),
-                            Message = record.FormatDescription() ?? record.LevelDisplayName ?? "",
+                            Message = BuildEventMessage(record),
                             EventId = record.Id,
                             ActivityId = record.ActivityId,
                             User = GetUserFromRecord(record),
                             TaskPath = taskPath,
                             TaskName = System.IO.Path.GetFileName(taskPath),
-                            Level = record.LevelDisplayName ?? "Information",
+                            Level = GetLevelName(record),
                             Keywords = record.KeywordsDisplayNames != null ? string.Join(", ", record.KeywordsDisplayNames) : "None",
                             Computer = record.MachineName ?? "Local",
-                            TaskCategory = record.TaskDisplayName ?? "None",
-                            OpCode = record.OpcodeDisplayName ?? "Info"
+                            TaskCategory = GetEventResult(record.Id),
+                            OpCode = GetLevelName(record)
                         });
                     }
                 }
@@ -790,6 +917,243 @@ namespace FluentTaskScheduler.Services
                 Serilog.Log.Error("{Message}", $"Could not read task history: {ex.Message}");
             }
             return history;
+        }
+
+        /// <summary>
+        /// Returns the actual Task Scheduler engine PID for each currently-running task, keyed by
+        /// task path. Used instead of matching processes by image name — a name match (e.g.
+        /// "powershell.exe") can hit any unrelated process on the machine, not the one this task
+        /// actually started (see item 2.10).
+        /// </summary>
+        public Dictionary<string, int> GetRunningTaskEnginePids()
+        {
+            var result = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            try
+            {
+                using var ts = new TaskService();
+                foreach (RunningTask rt in ts.GetRunningTasks(true))
+                {
+                    try { result[rt.Path] = (int)rt.EnginePID; }
+                    catch { /* task may have just finished; PID no longer available */ }
+                }
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Warning("{Message}", $"Could not enumerate running task engine PIDs: {ex.Message}");
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Reads every task start/completion record from the Task Scheduler operational log within
+        /// <paramref name="window"/>, in one pass. Parses the raw event XML instead of calling
+        /// <c>FormatDescription()</c> per record, which keeps a full 7-day read responsive.
+        /// </summary>
+        public List<TaskRunRecord> GetRecentRunRecords(TimeSpan window)
+        {
+            var records = new List<TaskRunRecord>();
+            long ms = (long)Math.Max(window.TotalMilliseconds, 60_000);
+
+            try
+            {
+                // Note: EventLogQuery takes raw XPath here, so "<=" must NOT be XML-escaped —
+                // "&lt;=" makes the Event Log service reject the query as invalid.
+                string query =
+                    "*[System[(EventID=100 or EventID=102 or EventID=103 or EventID=201 or EventID=203) " +
+                    $"and TimeCreated[timediff(@SystemTime) <= {ms}]]]";
+
+                var eventsQuery = new EventLogQuery("Microsoft-Windows-TaskScheduler/Operational", PathType.LogName, query);
+                using EventLogReader logReader = new EventLogReader(eventsQuery);
+
+                EventRecord? record;
+                while ((record = logReader.ReadEvent()) != null)
+                {
+                    using (record)
+                    {
+                        var parsed = ParseRunRecord(record);
+                        if (parsed != null) records.Add(parsed);
+                    }
+                }
+            }
+            catch (EventLogNotFoundException ex)
+            {
+                Serilog.Log.Error(ex, "{Message}", "The Task Scheduler operational log is not available; dashboard analytics will be empty.");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Serilog.Log.Error(ex, "{Message}", "Access denied reading the Task Scheduler operational log for dashboard analytics.");
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Error(ex, "{Message}", "Failed to read recent task run records.");
+            }
+
+            return records;
+        }
+
+        /// <summary>Maps one operational-log event onto a <see cref="TaskRunRecord"/>, or null if it carries no task name.</summary>
+        private TaskRunRecord? ParseRunRecord(EventRecord record)
+        {
+            try
+            {
+                var data = ReadEventData(record);
+                if (!data.TryGetValue("TaskName", out var taskName) || string.IsNullOrWhiteSpace(taskName))
+                    return null;
+
+                long? resultCode = null;
+                if (data.TryGetValue("ResultCode", out var rc) && long.TryParse(rc, out long parsedRc))
+                    resultCode = parsedRc;
+
+                // Events 100/102 name the field "InstanceId"; event 201 names it "TaskInstanceId".
+                string instanceId = data.TryGetValue("InstanceId", out var iid) ? iid
+                                  : data.TryGetValue("TaskInstanceId", out var tiid) ? tiid
+                                  : "";
+
+                return new TaskRunRecord
+                {
+                    TaskPath = taskName,
+                    TaskName = System.IO.Path.GetFileName(taskName),
+                    Time = record.TimeCreated ?? DateTime.Now,
+                    EventId = record.Id,
+                    InstanceId = instanceId,
+                    ResultCode = resultCode
+                };
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Warning("{Message}", $"Skipping unreadable Task Scheduler event record: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Pulls the <c>&lt;EventData&gt;/&lt;Data Name="..."&gt;</c> pairs out of an event.
+        /// Name-based lookup keeps this stable across schema/locale differences, unlike positional
+        /// <c>record.Properties</c> access.
+        /// </summary>
+        internal static Dictionary<string, string> ReadEventData(EventRecord record)
+        {
+            var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            try
+            {
+                var doc = System.Xml.Linq.XDocument.Parse(record.ToXml());
+                foreach (var element in doc.Descendants())
+                {
+                    if (!string.Equals(element.Name.LocalName, "Data", StringComparison.Ordinal)) continue;
+                    var nameAttr = element.Attribute("Name");
+                    if (nameAttr == null) continue;
+                    result[nameAttr.Value] = element.Value;
+                }
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Warning("{Message}", $"Could not parse event XML for record {record.Id}: {ex.Message}");
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Severity name derived from the numeric level rather than <c>LevelDisplayName</c>, which
+        /// Windows renders in the OS display language (e.g. "Informationen" on a German install).
+        /// </summary>
+        private string GetLevelName(EventRecord record)
+        {
+            byte? level = record.Level;
+            return level switch
+            {
+                1 => LocalizationService.GetString("EventLevel.Critical", "Critical"),
+                2 => LocalizationService.GetString("EventLevel.Error", "Error"),
+                3 => LocalizationService.GetString("EventLevel.Warning", "Warning"),
+                4 => LocalizationService.GetString("EventLevel.Information", "Information"),
+                5 => LocalizationService.GetString("EventLevel.Verbose", "Verbose"),
+                _ => LocalizationService.GetString("EventLevel.Information", "Information")
+            };
+        }
+
+        /// <summary>
+        /// Builds a description from the event's own data fields for the events we understand, so
+        /// the history reads in the app's language. Falls back to the Windows-rendered description
+        /// (OS language) only for events we have no template for.
+        /// </summary>
+        private string BuildEventMessage(EventRecord record)
+        {
+            try
+            {
+                var data = ReadEventData(record);
+                data.TryGetValue("TaskName", out var taskName);
+                data.TryGetValue("ActionName", out var actionName);
+                data.TryGetValue("UserContext", out var userContext);
+                data.TryGetValue("ResultCode", out var resultCode);
+
+                string name = taskName ?? "";
+                string L(string key, string fallback) => LocalizationService.GetString(key, fallback);
+
+                switch (record.Id)
+                {
+                    case 100:
+                        return string.Format(L("EventMsg.100", "Task Scheduler started an instance of task \"{0}\" for user \"{1}\"."), name, userContext ?? "");
+                    case 102:
+                        return string.Format(L("EventMsg.102", "Task Scheduler successfully finished task \"{0}\"."), name);
+                    case 103:
+                        return string.Format(L("EventMsg.103", "Task Scheduler failed to start an instance of task \"{0}\" (error {1})."), name, FormatCode(resultCode));
+                    case 106:
+                        return string.Format(L("EventMsg.106", "User \"{0}\" registered task \"{1}\"."), userContext ?? "", name);
+                    case 107:
+                        return string.Format(L("EventMsg.107", "Task Scheduler launched task \"{0}\" from a time trigger."), name);
+                    case 110:
+                        return string.Format(L("EventMsg.110", "Task Scheduler launched task \"{0}\" for user \"{1}\"."), name, userContext ?? "");
+                    case 111:
+                        return string.Format(L("EventMsg.111", "Task Scheduler terminated task \"{0}\" because it exceeded its configured time limit."), name);
+                    case 129:
+                        return string.Format(L("EventMsg.129", "Task Scheduler launched action \"{0}\" of task \"{1}\"."), actionName ?? "", name);
+                    case 200:
+                        return string.Format(L("EventMsg.200", "Task Scheduler launched action \"{0}\" of task \"{1}\"."), actionName ?? "", name);
+                    case 201:
+                        return string.Format(L("EventMsg.201", "Task Scheduler completed action \"{0}\" of task \"{1}\" with return code {2}."), actionName ?? "", name, FormatCode(resultCode));
+                    case 203:
+                        return string.Format(L("EventMsg.203", "Task Scheduler failed to launch action \"{0}\" of task \"{1}\" (error {2})."), actionName ?? "", name, FormatCode(resultCode));
+                    case 322:
+                        return string.Format(L("EventMsg.322", "Task Scheduler did not launch task \"{0}\" because an instance is already running."), name);
+                    case 108:
+                        return string.Format(L("EventMsg.108", "Task Scheduler failed to start task \"{0}\" (error {1})."), name, FormatCode(resultCode));
+                    case 118:
+                        return string.Format(L("EventMsg.118", "Task Scheduler launched task \"{0}\" from a boot trigger."), name);
+                    case 119:
+                        return string.Format(L("EventMsg.119", "Task Scheduler launched task \"{0}\" from a logon trigger."), name);
+                    case 140:
+                        return string.Format(L("EventMsg.140", "User \"{0}\" updated the definition of task \"{1}\"."), userContext ?? "", name);
+                    case 141:
+                        return string.Format(L("EventMsg.141", "User \"{0}\" deleted task \"{1}\"."), userContext ?? "", name);
+                    case 142:
+                        return string.Format(L("EventMsg.142", "User \"{0}\" disabled task \"{1}\"."), userContext ?? "", name);
+                    case 153:
+                        return string.Format(L("EventMsg.153", "Task Scheduler did not start task \"{0}\" because the schedule was missed. Enable \"Run task as soon as possible after a scheduled start is missed\" to catch up."), name);
+                    case 202:
+                        return string.Format(L("EventMsg.202", "Action \"{0}\" of task \"{1}\" failed with return code {2}."), actionName ?? "", name, FormatCode(resultCode));
+                    case 329:
+                        return string.Format(L("EventMsg.329", "Task Scheduler stopped task \"{0}\" because it exceeded its configured time limit."), name);
+                    case 331:
+                        return string.Format(L("EventMsg.331", "Task Scheduler stopped task \"{0}\" because the computer switched to battery power."), name);
+                    case 332:
+                        return string.Format(L("EventMsg.332", "Task Scheduler did not launch task \"{0}\" because the required conditions (idle, network or power) were not met."), name);
+                }
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Warning("{Message}", $"Could not build a localized message for event {record.Id}: {ex.Message}");
+            }
+
+            // Unknown event: Windows renders this in the OS display language.
+            try { return record.FormatDescription() ?? ""; }
+            catch { return ""; }
+        }
+
+        /// <summary>Renders a raw result code the way Task Scheduler does: 0, otherwise hex.</summary>
+        private static string FormatCode(string? raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) return "-";
+            if (!long.TryParse(raw, out long value)) return raw;
+            return value == 0 ? "0" : "0x" + ((uint)value).ToString("X8");
         }
 
         /// <summary>Looks up logon/logoff/shutdown/reboot/sleep events from the Windows "System" log
@@ -867,29 +1231,48 @@ namespace FluentTaskScheduler.Services
             _ => "System event."
         };
 
+
         private string GetEventResult(int eventId) => eventId switch
         {
-            100 => "Task Started",
-            102 => "Task Completed",
-            103 => "Task Failed",
-            107 => "Task Triggered",
-            110 => "Task Registered",
-            129 => "Action Started",
-            201 => "Action Completed",
-            _ => $"Event {eventId}"
+            100 => LocalizationService.GetString("EventResult.100", "Task Started"),
+            102 => LocalizationService.GetString("EventResult.102", "Task Completed"),
+            103 => LocalizationService.GetString("EventResult.103", "Task Failed"),
+            106 => LocalizationService.GetString("EventResult.106", "Task Registered"),
+            108 => LocalizationService.GetString("EventResult.108", "Start Failed"),
+            118 => LocalizationService.GetString("EventResult.118", "Boot Trigger"),
+            119 => LocalizationService.GetString("EventResult.119", "Logon Trigger"),
+            140 => LocalizationService.GetString("EventResult.140", "Task Updated"),
+            141 => LocalizationService.GetString("EventResult.141", "Task Deleted"),
+            142 => LocalizationService.GetString("EventResult.142", "Task Disabled"),
+            153 => LocalizationService.GetString("EventResult.153", "Schedule Missed"),
+            202 => LocalizationService.GetString("EventResult.202", "Action Failed"),
+            329 => LocalizationService.GetString("EventResult.329", "Stopped (time limit)"),
+            331 => LocalizationService.GetString("EventResult.331", "Stopped (on battery)"),
+            332 => LocalizationService.GetString("EventResult.332", "Skipped (conditions not met)"),
+            107 => LocalizationService.GetString("EventResult.107", "Task Triggered"),
+            110 => LocalizationService.GetString("EventResult.110", "Task Launched"),
+            111 => LocalizationService.GetString("EventResult.111", "Task Terminated"),
+            129 => LocalizationService.GetString("EventResult.129", "Action Started"),
+            200 => LocalizationService.GetString("EventResult.200", "Action Started"),
+            201 => LocalizationService.GetString("EventResult.201", "Action Completed"),
+            203 => LocalizationService.GetString("EventResult.203", "Action Launch Failed"),
+            322 => LocalizationService.GetString("EventResult.322", "Launch Skipped (already running)"),
+            _ => string.Format(LocalizationService.GetString("EventResult.Unknown", "Event {0}"), eventId)
         };
 
+        /// <summary>
+        /// Reads the event's own "ResultCode" data field by name rather than walking
+        /// <see cref="EventRecord.Properties"/> and guessing — the old code returned the first
+        /// non-zero int property, which could be any field of the event (PID, instance id, etc.),
+        /// not necessarily the exit code (see item 2.11).
+        /// </summary>
         private string GetEventExitCode(EventRecord record)
         {
             try
             {
-                if (record.Properties != null && record.Properties.Count > 0)
-                {
-                    foreach (var prop in record.Properties)
-                    {
-                        if (prop.Value is int exitCode && exitCode != 0) return exitCode.ToString();
-                    }
-                }
+                var data = ReadEventData(record);
+                if (data.TryGetValue("ResultCode", out var rc) && long.TryParse(rc, out long value))
+                    return value == 0 ? "0" : "0x" + ((uint)value).ToString("X8");
                 return "0";
             }
             catch { return "-"; }
@@ -906,13 +1289,16 @@ namespace FluentTaskScheduler.Services
             catch { return record.UserId?.ToString() ?? ""; }
         }
 
+        /// <summary>Sentinel TriggerType used when a trigger's real type has no model representation
+        /// (e.g. RegistrationTrigger, custom XML triggers) — must never be saved back to Task Scheduler.</summary>
+
         private TaskTriggerModel MapTriggerToModel(Trigger trigger)
         {
             var model = new TaskTriggerModel();
             
             // Basic Start/End
             if (trigger.StartBoundary != DateTime.MinValue)
-                model.ScheduleInfo = trigger.StartBoundary.ToString("yyyy-MM-dd HH:mm:ss");
+                model.ScheduleInfo = DurationUtil.FormatScheduleInfo(trigger.StartBoundary);
             if (trigger.EndBoundary != DateTime.MaxValue)
                 model.ExpirationDate = trigger.EndBoundary;
 
@@ -921,12 +1307,17 @@ namespace FluentTaskScheduler.Services
             {
                 try { model.RepetitionInterval = System.Xml.XmlConvert.ToString(trigger.Repetition.Interval); } catch {}
                 try { model.RepetitionDuration = System.Xml.XmlConvert.ToString(trigger.Repetition.Duration); } catch {}
-                try { 
-                    var dTrigger = (dynamic)trigger;
-                    if (dTrigger.RandomDelay != TimeSpan.Zero)
-                        model.RandomDelay = System.Xml.XmlConvert.ToString(dTrigger.RandomDelay);
-                } catch {}
             }
+
+            // RandomDelay is a property of most trigger types independent of repetition — read it
+            // unconditionally so a delay configured without repetition isn't silently dropped.
+            try
+            {
+                var dTrigger = (dynamic)trigger;
+                if (dTrigger.RandomDelay is TimeSpan rd && rd != TimeSpan.Zero)
+                    model.RandomDelay = System.Xml.XmlConvert.ToString(rd);
+            }
+            catch { }
 
             switch (trigger)
             {
@@ -975,6 +1366,12 @@ namespace FluentTaskScheduler.Services
                     } catch {}
                     break;
                 case TimeTrigger: model.TriggerType = AppTriggerType.Once; break;
+                default:
+                    // RegistrationTrigger, custom/derived triggers, etc: no model representation.
+                    // Leaving TriggerType at its "Daily" default would silently convert this into a
+                    // daily 9 AM trigger on save, so mark it unsupported instead.
+                    model.TriggerType = AppTriggerType.Unsupported;
+                    break;
             }
             return model;
         }
@@ -1024,15 +1421,19 @@ namespace FluentTaskScheduler.Services
                 {
                     model.Category = metadata.Category ?? "";
                     model.Tags = new ObservableCollection<string>(metadata.Tags ?? new List<string>());
-                    
+                    model.Pipeline = metadata.Pipeline ?? new TaskPipeline();
+
                     // Clean description for UI
                     model.Description = model.Description.Remove(startIndex).Trim();
                 }
             }
-            catch { /* Ignore malformed metadata */ }
+            catch (Exception ex)
+            {
+                Serilog.Log.Warning("{Message}", $"Ignoring malformed FTS metadata on task '{model.Path}': {ex.Message}");
+            }
         }
 
-        private string UpdateDescriptionWithMetadata(string description, string category, List<string> tags)
+        private string UpdateDescriptionWithMetadata(string description, string category, List<string> tags, TaskPipeline? pipeline)
         {
             string cleanDescription = description;
             int startIndex = description.IndexOf(MetadataPrefix);
@@ -1041,12 +1442,18 @@ namespace FluentTaskScheduler.Services
                 cleanDescription = description.Remove(startIndex).Trim();
             }
 
-            if (string.IsNullOrEmpty(category) && (tags == null || tags.Count == 0))
+            bool hasPipeline = pipeline != null && (pipeline.IsEnabled || pipeline.HasAnyTargets);
+            if (string.IsNullOrEmpty(category) && (tags == null || tags.Count == 0) && !hasPipeline)
             {
                 return cleanDescription;
             }
 
-            var metadata = new TaskMetadata { Category = category, Tags = tags };
+            var metadata = new TaskMetadata
+            {
+                Category = category,
+                Tags = tags,
+                Pipeline = hasPipeline ? pipeline : null
+            };
             string json = JsonSerializer.Serialize(metadata);
             return $"{cleanDescription}\n\n{MetadataPrefix}{json}{MetadataSuffix}".Trim();
         }
@@ -1055,6 +1462,7 @@ namespace FluentTaskScheduler.Services
         {
             public string? Category { get; set; }
             public List<string>? Tags { get; set; }
+            public TaskPipeline? Pipeline { get; set; }
         }
 
         // Helpers
@@ -1083,11 +1491,23 @@ namespace FluentTaskScheduler.Services
             _ => WhichWeek.FirstWeek
         };
 
-        private bool IsAccessDenied(Exception ex)
+        /// <summary>Win32 E_ACCESSDENIED (0x80070005), which is what Task Scheduler's COM layer
+        /// raises for a protected/system task regardless of the OS display language.</summary>
+        private const int E_ACCESSDENIED = unchecked((int)0x80070005);
+
+        /// <summary>
+        /// Checks the HRESULT (walking inner exceptions too) instead of matching the exception
+        /// message text — the old code only recognized English and German "access denied" strings,
+        /// so the check silently failed on any other OS display language (see 3.9).
+        /// </summary>
+        internal static bool IsAccessDenied(Exception? ex)
         {
-             return ex.HResult == -2147024891 || 
-                    ex.Message.Contains("Access is denied", StringComparison.OrdinalIgnoreCase) || 
-                    ex.Message.Contains("Zugriff verweigert", StringComparison.OrdinalIgnoreCase);
+            for (var e = ex; e != null; e = e.InnerException)
+            {
+                if (e.HResult == E_ACCESSDENIED) return true;
+                if (e is System.Runtime.InteropServices.COMException com && com.ErrorCode == E_ACCESSDENIED) return true;
+            }
+            return false;
         }
 
         public TaskFolderModel GetFolderStructure()
@@ -1097,9 +1517,11 @@ namespace FluentTaskScheduler.Services
                 var root = new TaskFolderModel { Name = "Task Scheduler Library", Path = "\\" };
                 EnumFolders(ts.RootFolder, root);
 
-                // Synthesize folders from discovered tasks
-                // Pass true to force refresh if we're reloading folders
-                var discovered = DiscoverTasksFromEventLog(true); 
+                // Synthesize folders from discovered tasks. This used to force a full event-log
+                // re-scan (up to 2000 events) plus a fresh TaskService per discovered path on every
+                // single folder-tree refresh; it now reuses the cache and is invalidated explicitly
+                // by RegisterTask/DeleteTask instead (see 3.5).
+                var discovered = DiscoverTasksFromEventLog();
                 foreach (var task in discovered)
                 {
                     SynthesizeFoldersInTree(root, task.Path);
@@ -1215,7 +1637,17 @@ namespace FluentTaskScheduler.Services
                 catch (System.IO.FileNotFoundException) { }
 
                 var targetFolder = GetOrCreateFolder(ts, newPath);
-                CopyFolderContents(ts, sourceFolder, targetFolder);
+                try
+                {
+                    CopyFolderContents(ts, sourceFolder, targetFolder);
+                }
+                catch
+                {
+                    // Copying only some tasks left a half-populated folder at the destination —
+                    // clean it up so a failed move doesn't leave orphaned duplicates behind (3.10).
+                    TryDeleteFolderQuietly(ts, newPath);
+                    throw;
+                }
             }
 
             // Perform deletion in a fresh context to ensure no handles are held
@@ -1286,13 +1718,52 @@ namespace FluentTaskScheduler.Services
                 try { if (ts.GetFolder(newPath) != null) throw new Exception($"A folder named '{newName}' already exists."); } catch (System.IO.FileNotFoundException) { }
 
                 var newFolder = GetOrCreateFolder(ts, newPath);
-                CopyFolderContents(ts, oldFolder, newFolder);
+                try
+                {
+                    CopyFolderContents(ts, oldFolder, newFolder);
+                }
+                catch
+                {
+                    // Same partial-copy cleanup as MoveFolder (3.10).
+                    TryDeleteFolderQuietly(ts, newPath);
+                    throw;
+                }
                 DeleteFolderRecursive(oldFolder);
                 oldFolder.Parent?.DeleteFolder(oldFolder.Name);
             }
         }
 
+        /// <summary>Best-effort cleanup of a half-populated target folder after a failed copy (3.10).</summary>
+        private void TryDeleteFolderQuietly(TaskService ts, string path)
+        {
+            try
+            {
+                var folder = ts.GetFolder(path);
+                if (folder != null && folder.Path != "\\")
+                {
+                    DeleteFolderRecursive(folder);
+                    folder.Parent?.DeleteFolder(folder.Name);
+                }
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Warning("{Message}", $"Could not clean up the partially-copied target folder '{path}' after a failed move/rename: {ex.Message}");
+            }
+        }
+
         private void CopyFolderContents(TaskService ts, TaskFolder sourceFolder, TaskFolder targetFolder)
+        {
+            var failedTasks = new List<string>();
+            CopyFolderContents(ts, sourceFolder, targetFolder, failedTasks);
+            if (failedTasks.Count > 0)
+            {
+                throw new Exception(
+                    $"Failed to copy {failedTasks.Count} task(s): {string.Join(", ", failedTasks)}. " +
+                    "The source folder was left untouched so no tasks were lost.");
+            }
+        }
+
+        private void CopyFolderContents(TaskService ts, TaskFolder sourceFolder, TaskFolder targetFolder, List<string> failedTasks)
         {
             foreach (var task in sourceFolder.Tasks)
             {
@@ -1304,13 +1775,22 @@ namespace FluentTaskScheduler.Services
                 {
                     if (IsAccessDenied(ex))
                     {
-                        var td = ts.NewTask();
-                        td.XmlText = task.Xml;
-                        targetFolder.RegisterTaskDefinition(task.Name, td, TaskCreation.CreateOrUpdate, null, null, TaskLogonType.InteractiveToken);
+                        try
+                        {
+                            var td = ts.NewTask();
+                            td.XmlText = task.Xml;
+                            targetFolder.RegisterTaskDefinition(task.Name, td, TaskCreation.CreateOrUpdate, null, null, TaskLogonType.InteractiveToken);
+                        }
+                        catch (Exception fallbackEx)
+                        {
+                            Serilog.Log.Error("{Message}", $"Failed to copy task '{task.Name}': {fallbackEx.Message}");
+                            failedTasks.Add(task.Name);
+                        }
                     }
                     else
                     {
                         Serilog.Log.Error("{Message}", $"Failed to copy task '{task.Name}': {ex.Message}");
+                        failedTasks.Add(task.Name);
                     }
                 }
             }
@@ -1318,7 +1798,7 @@ namespace FluentTaskScheduler.Services
             foreach (var sub in sourceFolder.SubFolders)
             {
                 var newSub = targetFolder.CreateFolder(sub.Name);
-                CopyFolderContents(ts, sub, newSub);
+                CopyFolderContents(ts, sub, newSub, failedTasks);
             }
         }
     }

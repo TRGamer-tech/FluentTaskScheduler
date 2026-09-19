@@ -3,9 +3,9 @@
     <PropertyGroup>
         <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
         <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-        <Version>1.8.2</Version>
-        <AssemblyVersion>1.8.2</AssemblyVersion>
-        <FileVersion>1.8.2</FileVersion>
+        <Version>1.9.0</Version>
+        <AssemblyVersion>1.9.0</AssemblyVersion>
+        <FileVersion>1.9.0</FileVersion>
         <OutputType>WinExe</OutputType>
         <UseWinUI>true</UseWinUI>
         <EnableMsixTooling>true</EnableMsixTooling>
@@ -23,10 +23,23 @@
         <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
         <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
         <PublishReadyToRun>false</PublishReadyToRun>
-        <DebugType>none</DebugType>
-        <DebugSymbols>false</DebugSymbols>
+        <!-- No PDBs at all (even in Debug) meant crash-log stack traces had no line numbers (3.11).
+             Emit portable PDBs for local/Debug builds; still strip them for Release/publish. -->
+        <DebugType Condition="'$(Configuration)' == 'Debug'">portable</DebugType>
+        <DebugType Condition="'$(Configuration)' != 'Debug'">none</DebugType>
+        <DebugSymbols Condition="'$(Configuration)' == 'Debug'">true</DebugSymbols>
+        <DebugSymbols Condition="'$(Configuration)' != 'Debug'">false</DebugSymbols>
         <SelfContained>true</SelfContained>
     </PropertyGroup>
+
+    <!-- FluentTaskScheduler.Tests lives in a subfolder of this project; without this exclude, the
+         default **/*.cs glob below would also pick up its (and its obj/bin) source files. -->
+    <ItemGroup>
+        <Compile Remove="FluentTaskScheduler.Tests\**\*.cs" />
+        <EmbeddedResource Remove="FluentTaskScheduler.Tests\**\*" />
+        <None Remove="FluentTaskScheduler.Tests\**\*" />
+        <Page Remove="FluentTaskScheduler.Tests\**\*" />
+    </ItemGroup>
 
     <ItemGroup>
         <Content Include="Assets\SplashScreen.scale-200.png" />

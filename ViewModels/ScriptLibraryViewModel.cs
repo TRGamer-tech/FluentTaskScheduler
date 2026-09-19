@@ -151,7 +151,7 @@ namespace FluentTaskScheduler.ViewModels
             }
             catch (Exception ex)
             {
-                Services.LogService.Warn($"Could not delete backing script file for template '{model.Name}': {ex.Message}");
+                Serilog.Log.Warning("{Message}", $"Could not delete backing script file for template '{model.Name}': {ex.Message}");
             }
         }
 

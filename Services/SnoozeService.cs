@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,11 +20,12 @@ namespace FluentTaskScheduler.Services
 
     /// <summary>
     /// Global "pause everything" switch. While active, run requests issued through this app are
-    /// refused and recorded, and — when <see cref="SettingsService.SnoozeSuspendsScheduledTasks"/>
+    /// refused and recorded, and — when <see cref="ISettingsService.SnoozeSuspendsScheduledTasks"/>
     /// is on — enabled tasks are disabled through the Task Scheduler API and restored afterwards.
     /// </summary>
     public static class SnoozeService
     {
+        private static ISettingsService Settings => App.Container.GetRequiredService<ISettingsService>();
         private const int MaxSuppressedEntries = 300;
 
         private static readonly object _lock = new();
@@ -39,7 +41,7 @@ namespace FluentTaskScheduler.Services
         public static event EventHandler? SnoozeChanged;
 
         /// <summary>Factory for the task-service boundary, overridable in unit tests.</summary>
-        public static Func<ITaskServiceWrapper> TaskServiceFactory { get; set; } = () => new TaskServiceWrapper();
+        public static Func<ITaskServiceWrapper> TaskServiceFactory { get; set; } = () => App.Container.GetRequiredService<ITaskService>();
 
         /// <summary>
         /// Test-only hook: the most recently started background suspend/restore operation, so tests
@@ -59,15 +61,15 @@ namespace FluentTaskScheduler.Services
         {
             get
             {
-                if (!SettingsService.IsSnoozed) return false;
+                if (!Settings.IsSnoozed) return false;
 
-                if (SettingsService.SnoozeUntilReboot)
+                if (Settings.SnoozeUntilReboot)
                 {
                     // A different boot stamp means the machine restarted, which ends this snooze.
-                    return string.Equals(SettingsService.SnoozeBootStamp, CurrentBootStamp(), StringComparison.Ordinal);
+                    return string.Equals(Settings.SnoozeBootStamp, CurrentBootStamp(), StringComparison.Ordinal);
                 }
 
-                var until = SettingsService.SnoozeUntilUtc;
+                var until = Settings.SnoozeUntilUtc;
                 return until.HasValue && until.Value > DateTime.UtcNow;
             }
         }
@@ -77,12 +79,12 @@ namespace FluentTaskScheduler.Services
         {
             get
             {
-                if (!IsActive || SettingsService.SnoozeUntilReboot) return null;
-                return SettingsService.SnoozeUntilUtc?.ToLocalTime();
+                if (!IsActive || Settings.SnoozeUntilReboot) return null;
+                return Settings.SnoozeUntilUtc?.ToLocalTime();
             }
         }
 
-        public static bool IsUntilReboot => IsActive && SettingsService.SnoozeUntilReboot;
+        public static bool IsUntilReboot => IsActive && Settings.SnoozeUntilReboot;
 
         /// <summary>Human-readable banner/tooltip text, e.g. "Global Snooze Active (Ends at 14:30)".</summary>
         public static string StatusText
@@ -121,21 +123,21 @@ namespace FluentTaskScheduler.Services
         {
             try
             {
-                if (SettingsService.IsSnoozed && !IsActive)
+                if (Settings.IsSnoozed && !IsActive)
                 {
-                    LogService.Info("Stored global snooze had already expired at startup; clearing it.");
+                    Serilog.Log.Information("{Message}", "Stored global snooze had already expired at startup; clearing it.");
                     ClearSnoozeState();
                 }
-                else if (!SettingsService.IsSnoozed && SettingsService.SnoozeDisabledTaskPaths.Count > 0)
+                else if (!Settings.IsSnoozed && Settings.SnoozeDisabledTaskPaths.Count > 0)
                 {
                     // A previous restore was interrupted (crash/kill) before it finished clearing the
                     // disabled-task list — finish restoring whatever is left, on a background thread.
-                    LogService.Warn("Found a leftover snooze-disabled task list from a previous run; resuming restore.");
-                    var leftover = new List<string>(SettingsService.SnoozeDisabledTaskPaths);
+                    Serilog.Log.Warning("{Message}", "Found a leftover snooze-disabled task list from a previous run; resuming restore.");
+                    var leftover = new List<string>(Settings.SnoozeDisabledTaskPaths);
                     LastBackgroundOperation = System.Threading.Tasks.Task.Run(() =>
                     {
                         RestoreSuspendedTasks(leftover);
-                        SettingsService.SnoozeDisabledTaskPaths = new List<string>();
+                        Settings.SnoozeDisabledTaskPaths = new List<string>();
                     });
                 }
 
@@ -143,11 +145,11 @@ namespace FluentTaskScheduler.Services
                 _expiryTimer?.Dispose();
                 _expiryTimer = new Timer(CheckExpiry, null, TimeSpan.FromSeconds(15), TimeSpan.FromSeconds(15));
 
-                if (_lastKnownActive) LogService.Info($"Global snooze restored: {StatusText}");
+                if (_lastKnownActive) Serilog.Log.Information("{Message}", $"Global snooze restored: {StatusText}");
             }
             catch (Exception ex)
             {
-                LogService.Error("Failed to initialize SnoozeService", ex);
+                Serilog.Log.Error(ex, "{Message}", "Failed to initialize SnoozeService");
             }
         }
 
@@ -167,7 +169,7 @@ namespace FluentTaskScheduler.Services
                 _lastKnownActive = active;
                 if (!active)
                 {
-                    LogService.Info("Global snooze window elapsed; resuming normal operation.");
+                    Serilog.Log.Information("{Message}", "Global snooze window elapsed; resuming normal operation.");
                     ClearSnoozeState();
                     NotificationService.ShowSnoozeEnded();
                 }
@@ -175,7 +177,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Error("Snooze expiry check failed", ex);
+                Serilog.Log.Error(ex, "{Message}", "Snooze expiry check failed");
             }
         }
 
@@ -186,7 +188,7 @@ namespace FluentTaskScheduler.Services
         {
             if (duration <= TimeSpan.Zero)
             {
-                LogService.Warn($"Ignoring snooze request with non-positive duration '{duration}'.");
+                Serilog.Log.Warning("{Message}", $"Ignoring snooze request with non-positive duration '{duration}'.");
                 return;
             }
             Apply(DateTime.UtcNow.Add(duration), untilReboot: false);
@@ -207,12 +209,12 @@ namespace FluentTaskScheduler.Services
         {
             try
             {
-                bool suspend = SettingsService.SnoozeSuspendsScheduledTasks;
-                var candidatePaths = suspend ? GetSuspendCandidates() : new List<string>(SettingsService.SnoozeDisabledTaskPaths);
+                bool suspend = Settings.SnoozeSuspendsScheduledTasks;
+                var candidatePaths = suspend ? GetSuspendCandidates() : new List<string>(Settings.SnoozeDisabledTaskPaths);
 
                 // Persist the full candidate list *before* disabling anything, so a crash partway
                 // through the sweep still leaves a record Initialize() can use to finish restoring.
-                SettingsService.SaveSnoozeState(
+                Settings.SaveSnoozeState(
                     isSnoozed: true,
                     untilUtc: untilUtc,
                     untilReboot: untilReboot,
@@ -220,7 +222,7 @@ namespace FluentTaskScheduler.Services
                     disabledPaths: candidatePaths);
 
                 _lastKnownActive = true;
-                LogService.Info($"Global snooze activated: {StatusText}");
+                Serilog.Log.Information("{Message}", $"Global snooze activated: {StatusText}");
                 NotificationService.ShowSnoozeStarted(StatusText);
                 SnoozeChanged?.Invoke(null, EventArgs.Empty);
 
@@ -234,7 +236,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Error("Failed to activate global snooze", ex);
+                Serilog.Log.Error(ex, "{Message}", "Failed to activate global snooze");
                 throw;
             }
         }
@@ -244,34 +246,34 @@ namespace FluentTaskScheduler.Services
         {
             try
             {
-                if (!SettingsService.IsSnoozed) return;
+                if (!Settings.IsSnoozed) return;
                 ClearSnoozeState();
                 _lastKnownActive = false;
-                LogService.Info("Global snooze cancelled by user.");
+                Serilog.Log.Information("{Message}", "Global snooze cancelled by user.");
                 SnoozeChanged?.Invoke(null, EventArgs.Empty);
             }
             catch (Exception ex)
             {
-                LogService.Error("Failed to cancel global snooze", ex);
+                Serilog.Log.Error(ex, "{Message}", "Failed to cancel global snooze");
                 throw;
             }
         }
 
         private static void ClearSnoozeState()
         {
-            var paths = new List<string>(SettingsService.SnoozeDisabledTaskPaths);
+            var paths = new List<string>(Settings.SnoozeDisabledTaskPaths);
 
             // Clear the "snoozed" flag right away so the UI reflects it immediately, but keep the
             // disabled-path list on disk until the restore actually finishes — if the app is killed
             // mid-restore, Initialize() on the next launch will pick up where this left off.
-            SettingsService.SaveSnoozeState(false, null, false, "", paths);
+            Settings.SaveSnoozeState(false, null, false, "", paths);
 
             if (paths.Count > 0)
             {
                 LastBackgroundOperation = System.Threading.Tasks.Task.Run(() =>
                 {
                     RestoreSuspendedTasks(paths);
-                    SettingsService.SnoozeDisabledTaskPaths = new List<string>();
+                    Settings.SnoozeDisabledTaskPaths = new List<string>();
                 });
             }
         }
@@ -287,7 +289,7 @@ namespace FluentTaskScheduler.Services
         /// </summary>
         internal static List<string> GetSuspendCandidates()
         {
-            bool includeMicrosoft = SettingsService.SnoozeIncludeMicrosoftTasks;
+            bool includeMicrosoft = Settings.SnoozeIncludeMicrosoftTasks;
             var service = TaskServiceFactory();
 
             var candidates = new List<string>();
@@ -318,10 +320,10 @@ namespace FluentTaskScheduler.Services
                 catch (Exception ex)
                 {
                     // Protected system tasks cannot be disabled — that is expected, not fatal.
-                    LogService.Warn($"Snooze could not suspend task '{path}': {ex.Message}");
+                    Serilog.Log.Warning("{Message}", $"Snooze could not suspend task '{path}': {ex.Message}");
                 }
             }
-            LogService.Info($"Global snooze suspended {changed}/{paths.Count} scheduled task(s).");
+            Serilog.Log.Information("{Message}", $"Global snooze suspended {changed}/{paths.Count} scheduled task(s).");
         }
 
         internal static void RestoreSuspendedTasks(List<string> paths)
@@ -339,10 +341,10 @@ namespace FluentTaskScheduler.Services
                 }
                 catch (Exception ex)
                 {
-                    LogService.Error($"Snooze could not re-enable task '{path}' after the snooze ended.", ex);
+                    Serilog.Log.Error(ex, "{Message}", $"Snooze could not re-enable task '{path}' after the snooze ended.");
                 }
             }
-            LogService.Info($"Global snooze restored {restored}/{paths.Count} suspended task(s).");
+            Serilog.Log.Information("{Message}", $"Global snooze restored {restored}/{paths.Count} suspended task(s).");
         }
 
         // ── Suppression log ─────────────────────────────────────────────────────
@@ -365,7 +367,7 @@ namespace FluentTaskScheduler.Services
                     _suppressed.RemoveRange(MaxSuppressedEntries, _suppressed.Count - MaxSuppressedEntries);
             }
 
-            LogService.Info($"Run of '{taskPath}' suppressed by global snooze (origin: {origin}).");
+            Serilog.Log.Information("{Message}", $"Run of '{taskPath}' suppressed by global snooze (origin: {origin}).");
             SaveSuppressed();
         }
 
@@ -390,7 +392,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Error($"Could not read the snooze suppression log at '{SuppressedLogPath}'.", ex);
+                Serilog.Log.Error(ex, "{Message}", $"Could not read the snooze suppression log at '{SuppressedLogPath}'.");
             }
         }
 
@@ -405,7 +407,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Error($"Could not write the snooze suppression log at '{SuppressedLogPath}'.", ex);
+                Serilog.Log.Error(ex, "{Message}", $"Could not write the snooze suppression log at '{SuppressedLogPath}'.");
             }
         }
 

@@ -43,7 +43,7 @@ namespace FluentTaskScheduler.Services
 
         public static void ShowSnoozeStarted(string statusText)
         {
-            if (!SettingsService.ShowNotifications) return;
+            if (!Settings.ShowNotifications) return;
 
             new ToastContentBuilder()
                 .AddArgument("action", "show")
@@ -54,7 +54,7 @@ namespace FluentTaskScheduler.Services
 
         public static void ShowSnoozeEnded()
         {
-            if (!SettingsService.ShowNotifications) return;
+            if (!Settings.ShowNotifications) return;
 
             new ToastContentBuilder()
                 .AddArgument("action", "show")
@@ -65,7 +65,7 @@ namespace FluentTaskScheduler.Services
 
         public static void ShowRunSuppressed(string taskName)
         {
-            if (!SettingsService.ShowNotifications) return;
+            if (!Settings.ShowNotifications) return;
 
             new ToastContentBuilder()
                 .AddArgument("action", "show")
@@ -78,7 +78,7 @@ namespace FluentTaskScheduler.Services
 
         public static void ShowPipelineTriggered(string sourceTask, string targetTask, bool onSuccess)
         {
-            if (!SettingsService.ShowNotifications) return;
+            if (!Settings.ShowNotifications) return;
 
             new ToastContentBuilder()
                 .AddArgument("action", "show")

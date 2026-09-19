@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -41,6 +42,7 @@ namespace FluentTaskScheduler.Services
     /// </summary>
     public static class TaskSnoozeService
     {
+        private static ISettingsService Settings => App.Container.GetRequiredService<ISettingsService>();
         private static readonly object _lock = new();
         private static readonly Dictionary<string, TaskSnoozeEntry> _entries =
             new(StringComparer.OrdinalIgnoreCase);
@@ -54,7 +56,7 @@ namespace FluentTaskScheduler.Services
         public static event EventHandler? TaskSnoozeChanged;
 
         /// <summary>Factory for the task-service boundary, overridable in unit tests.</summary>
-        public static Func<ITaskServiceWrapper> TaskServiceFactory { get; set; } = () => new TaskServiceWrapper();
+        public static Func<ITaskServiceWrapper> TaskServiceFactory { get; set; } = () => App.Container.GetRequiredService<ITaskService>();
 
         /// <summary>Test-only hook so tests can await the background restore deterministically.</summary>
         internal static System.Threading.Tasks.Task? LastBackgroundOperation { get; private set; }
@@ -145,7 +147,7 @@ namespace FluentTaskScheduler.Services
 
                 if (elapsed.Count > 0)
                 {
-                    LogService.Info($"{elapsed.Count} task snooze(s) elapsed while the app was closed; restoring them.");
+                    Serilog.Log.Information("{Message}", $"{elapsed.Count} task snooze(s) elapsed while the app was closed; restoring them.");
                     Save();
                     LastBackgroundOperation = System.Threading.Tasks.Task.Run(() => RestoreTasks(elapsed));
                 }
@@ -155,7 +157,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Error("Failed to initialize TaskSnoozeService", ex);
+                Serilog.Log.Error(ex, "{Message}", "Failed to initialize TaskSnoozeService");
             }
         }
 
@@ -183,7 +185,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Error("Task snooze expiry check failed", ex);
+                Serilog.Log.Error(ex, "{Message}", "Task snooze expiry check failed");
             }
         }
 
@@ -194,7 +196,7 @@ namespace FluentTaskScheduler.Services
         {
             if (duration <= TimeSpan.Zero)
             {
-                LogService.Warn($"Ignoring task snooze for '{taskPath}' with non-positive duration '{duration}'.");
+                Serilog.Log.Warning("{Message}", $"Ignoring task snooze for '{taskPath}' with non-positive duration '{duration}'.");
                 return;
             }
             Apply(taskPath, DateTime.UtcNow.Add(duration), untilReboot: false);
@@ -220,7 +222,7 @@ namespace FluentTaskScheduler.Services
                 var service = TaskServiceFactory();
                 if (!service.TaskExists(taskPath))
                 {
-                    LogService.Warn($"Cannot snooze '{taskPath}': the task no longer exists.");
+                    Serilog.Log.Warning("{Message}", $"Cannot snooze '{taskPath}': the task no longer exists.");
                     return;
                 }
 
@@ -235,7 +237,7 @@ namespace FluentTaskScheduler.Services
                 }
                 catch (Exception ex)
                 {
-                    LogService.Warn($"Could not read the current state of '{taskPath}' before snoozing: {ex.Message}");
+                    Serilog.Log.Warning("{Message}", $"Could not read the current state of '{taskPath}' before snoozing: {ex.Message}");
                 }
 
                 var entry = new TaskSnoozeEntry
@@ -253,12 +255,12 @@ namespace FluentTaskScheduler.Services
 
                 service.DisableTask(taskPath);
 
-                LogService.Info($"Task snoozed: {taskPath} ({DescribeForLog(entry)})");
+                Serilog.Log.Information("{Message}", $"Task snoozed: {taskPath} ({DescribeForLog(entry)})");
                 TaskSnoozeChanged?.Invoke(null, EventArgs.Empty);
             }
             catch (Exception ex)
             {
-                LogService.Error($"Failed to snooze task '{taskPath}'", ex);
+                Serilog.Log.Error(ex, "{Message}", $"Failed to snooze task '{taskPath}'");
             }
         }
 
@@ -276,7 +278,7 @@ namespace FluentTaskScheduler.Services
 
             Save();
             RestoreTasks(new List<TaskSnoozeEntry> { entry });
-            LogService.Info($"Task snooze cancelled: {taskPath}");
+            Serilog.Log.Information("{Message}", $"Task snooze cancelled: {taskPath}");
             TaskSnoozeChanged?.Invoke(null, EventArgs.Empty);
         }
 
@@ -295,21 +297,21 @@ namespace FluentTaskScheduler.Services
                         if (!entry.WasEnabled) continue;
                         if (!service.TaskExists(entry.TaskPath))
                         {
-                            LogService.Warn($"Cannot restore '{entry.TaskPath}': the task no longer exists.");
+                            Serilog.Log.Warning("{Message}", $"Cannot restore '{entry.TaskPath}': the task no longer exists.");
                             continue;
                         }
                         service.EnableTask(entry.TaskPath);
-                        LogService.Info($"Task snooze elapsed; re-enabled {entry.TaskPath}");
+                        Serilog.Log.Information("{Message}", $"Task snooze elapsed; re-enabled {entry.TaskPath}");
                     }
                     catch (Exception ex)
                     {
-                        LogService.Error($"Failed to re-enable snoozed task '{entry.TaskPath}'", ex);
+                        Serilog.Log.Error(ex, "{Message}", $"Failed to re-enable snoozed task '{entry.TaskPath}'");
                     }
                 }
             }
             catch (Exception ex)
             {
-                LogService.Error("Failed to restore snoozed tasks", ex);
+                Serilog.Log.Error(ex, "{Message}", "Failed to restore snoozed tasks");
             }
         }
 
@@ -335,7 +337,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Warn($"Could not read stored task snoozes: {ex.Message}");
+                Serilog.Log.Warning("{Message}", $"Could not read stored task snoozes: {ex.Message}");
             }
         }
 
@@ -351,7 +353,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Warn($"Could not persist task snoozes: {ex.Message}");
+                Serilog.Log.Warning("{Message}", $"Could not persist task snoozes: {ex.Message}");
             }
         }
 

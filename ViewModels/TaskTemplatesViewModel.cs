@@ -1,3 +1,4 @@
+using FluentTaskScheduler.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -29,10 +30,10 @@ namespace FluentTaskScheduler.ViewModels
                 string command = System.IO.Path.GetFileName(Template.Command);
                 string trigger = Template.TriggerType switch
                 {
-                    "AtLogon" => LocalizationService.GetString("Trigger.AtLogon", "At Logon"),
-                    "AtStartup" => LocalizationService.GetString("Trigger.AtStartup", "At Startup"),
-                    "OnIdle" => LocalizationService.GetString("Trigger.OnIdle", "On Idle"),
-                    "Weekly" => $"{LocalizationService.GetString("Dialog.Trigger.Weekly", "Weekly")} " +
+                    TriggerType.AtLogon => LocalizationService.GetString("Trigger.AtLogon", "At Logon"),
+                    TriggerType.AtStartup => LocalizationService.GetString("Trigger.AtStartup", "At Startup"),
+                    TriggerType.OnIdle => LocalizationService.GetString("Trigger.OnIdle", "On Idle"),
+                    TriggerType.Weekly => $"{LocalizationService.GetString("Dialog.Trigger.Weekly", "Weekly")} " +
                                 $"{string.Join(", ", Template.WeeklyDays)} {Template.TriggerHour:00}:{Template.TriggerMinute:00}",
                     _ => $"{LocalizationService.GetString("Dialog.Trigger.Daily", "Daily")} " +
                          $"{Template.TriggerHour:00}:{Template.TriggerMinute:00}"

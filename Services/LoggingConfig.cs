@@ -15,10 +15,10 @@ namespace FluentTaskScheduler.Services
     /// Behavior preserved from the old LogService:
     /// - Info/Warning/Error go to App_Log.txt only while Settings.EnableLogging is on
     ///   (checked live on every event); App_Log.txt rolls over at ~1 MB.
-    /// - Error also always (regardless of EnableLogging) goes to Error_Log.txt (unrotated)
+    /// - Error also always (regardless of EnableLogging) goes to Error_Log.txt (rolls over at ~1 MB)
     ///   and the Windows Event Log; it's additionally excluded from App_Log.txt when
     ///   Settings.SeparateLogFiles is on.
-    /// - Fatal (crashes) always goes to Crash_Log.txt (unrotated) and the Windows Event Log,
+    /// - Fatal (crashes) always goes to Crash_Log.txt (rolls over at ~1 MB) and the Windows Event Log,
     ///   and never to App_Log.txt.
     /// </summary>
     public static class LoggingConfig
@@ -31,7 +31,7 @@ namespace FluentTaskScheduler.Services
         public static readonly string ErrorLogPath = Path.Combine(LogFolder, "Error_Log.txt");
         public static readonly string CrashLogPath = Path.Combine(LogFolder, "Crash_Log.txt");
 
-        private const long MaxAppLogSizeBytes = 1 * 1024 * 1024; // 1 MB
+        private const long MaxLogSizeBytes = 1 * 1024 * 1024; // 1 MB
         private const string EventSourceName = "FluentTaskScheduler";
         private const string OutputTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss}] [{Level:u3}] {Message:lj}{NewLine}{Exception}";
 
@@ -43,16 +43,20 @@ namespace FluentTaskScheduler.Services
                     .Filter.ByIncludingOnly(IsAppLogEvent)
                     .WriteTo.File(LogPath,
                         rollOnFileSizeLimit: true,
-                        fileSizeLimitBytes: MaxAppLogSizeBytes,
+                        fileSizeLimitBytes: MaxLogSizeBytes,
                         retainedFileCountLimit: 2,
                         rollingInterval: RollingInterval.Infinite,
                         outputTemplate: OutputTemplate))
                 .WriteTo.Logger(lc => lc
                     .Filter.ByIncludingOnly(e => e.Level == LogEventLevel.Error)
-                    .WriteTo.File(ErrorLogPath, rollingInterval: RollingInterval.Infinite, outputTemplate: OutputTemplate))
+                    .WriteTo.File(ErrorLogPath, outputTemplate: OutputTemplate,
+                        rollOnFileSizeLimit: true, fileSizeLimitBytes: MaxLogSizeBytes,
+                        retainedFileCountLimit: 2, rollingInterval: RollingInterval.Infinite))
                 .WriteTo.Logger(lc => lc
                     .Filter.ByIncludingOnly(e => e.Level == LogEventLevel.Fatal)
-                    .WriteTo.File(CrashLogPath, rollingInterval: RollingInterval.Infinite, outputTemplate: OutputTemplate + "{NewLine}"))
+                    .WriteTo.File(CrashLogPath, outputTemplate: OutputTemplate + "{NewLine}",
+                        rollOnFileSizeLimit: true, fileSizeLimitBytes: MaxLogSizeBytes,
+                        retainedFileCountLimit: 2, rollingInterval: RollingInterval.Infinite))
                 .WriteTo.Logger(lc => lc
                     .Filter.ByIncludingOnly(e => e.Level >= LogEventLevel.Error)
                     .WriteTo.Sink(new FallbackEventLogSink(EventSourceName)))

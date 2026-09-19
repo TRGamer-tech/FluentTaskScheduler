@@ -245,7 +245,7 @@ namespace FluentTaskScheduler.Services
                 }
                 catch (Exception ex)
                 {
-                    LogService.Error("Failed to render the tray icon badge.", ex);
+                    Serilog.Log.Error(ex, "{Message}", "Failed to render the tray icon badge.");
                 }
             }
 
@@ -361,7 +361,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Error($"Tray snooze command {cmd} failed.", ex);
+                Serilog.Log.Error(ex, "{Message}", $"Tray snooze command {cmd} failed.");
             }
         }
 

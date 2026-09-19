@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Navigation;
 using Microsoft.Toolkit.Uwp.Notifications;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
@@ -26,6 +27,10 @@ namespace FluentTaskScheduler
             public string Name { get; }
             public Window Win  { get; }
             public bool IsHidden { get; set; }
+            /// <summary>Set right before Close() to bypass the close-to-tray cancellation for this window.</summary>
+            public bool ForceClose { get; set; }
+            /// <summary>Per-window backdrop instance — a SystemBackdrop can only ever be attached to one window.</summary>
+            public Microsoft.UI.Xaml.Media.SystemBackdrop? Backdrop { get; set; }
             public WindowRecord(string name, Window win) { Name = name; Win = win; }
         }
 
@@ -59,7 +64,7 @@ namespace FluentTaskScheduler
         private const int ATTACH_PARENT_PROCESS = -1;
 
         // ── Composition root ─────────────────────────────────────────────────────
-        public static IServiceProvider Container { get; private set; } = null!;
+        public static IServiceProvider Container { get; internal set; } = null!;
 
         private static void BuildContainer()
         {
@@ -188,24 +193,49 @@ namespace FluentTaskScheduler
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
             var args = Environment.GetCommandLineArgs();
-            
-            // GUI Mode: No arguments or just the executable path
-            if (args.Length > 1)
+
+            // Known verbs enter CLI mode. Update/installer hooks (Velopack, e.g. --squirrel-install)
+            // must fall through to normal GUI launch. Anything else that *looks* like a switch is an
+            // unrecognized command and must report usage with a non-zero exit rather than silently
+            // opening the GUI (1.9).
+            var knownCliVerbs = new[] { "--list", "--run", "--enable", "--disable", "--export-history", "--help", "-h", "/?" };
+            string firstArg = args.Length > 1 ? args[1].ToLowerInvariant() : string.Empty;
+            bool isInstallerHook = firstArg.StartsWith("--squirrel-") || firstArg.StartsWith("--veloapp-");
+            bool looksLikeSwitch = firstArg.StartsWith("-") || firstArg.StartsWith("/");
+            bool isCliInvocation = args.Length > 1 && !isInstallerHook
+                && (knownCliVerbs.Contains(firstArg) || looksLikeSwitch);
+
+            if (isCliInvocation)
             {
                 // Attempt to attach to parent console to output text
                 AttachConsole(ATTACH_PARENT_PROCESS);
 
                 // CLI Mode
                 // usage: FluentTaskScheduler.exe --run "Path"
-                string command = args[1].ToLower();
-                string? param = args.Length > 2 ? args[2] : null; 
-                bool jsonOutput = args.Contains("--json"); // Keep variable for potential future use or just ignore
+                string command = args[1].ToLowerInvariant();
+                string? param = args.Length > 2 ? args[2] : null;
+                int exitCode = 0;
+
+                void PrintUsage()
+                {
+                    Console.WriteLine("FluentTaskScheduler.exe usage:");
+                    Console.WriteLine("  --list                                  List all scheduled tasks (JSON)");
+                    Console.WriteLine("  --run <TaskPath>                        Run a task");
+                    Console.WriteLine("  --enable <TaskPath>                     Enable a task");
+                    Console.WriteLine("  --disable <TaskPath>                    Disable a task");
+                    Console.WriteLine("  --export-history <TaskPath> [--output <file>]   Export task history to CSV");
+                    Console.WriteLine("  --help                                  Show this usage text");
+                }
 
                 var service = Container.GetRequiredService<ITaskService>();
-                
-                try 
+
+                try
                 {
-                    if (command == "--list")
+                    if (command == "--help" || command == "-h" || command == "/?")
+                    {
+                        PrintUsage();
+                    }
+                    else if (command == "--list")
                     {
                         var tasks = service.GetAllTasks();
                         var simpleList = new System.Collections.Generic.List<object>();
@@ -224,53 +254,93 @@ namespace FluentTaskScheduler
                     }
                     else if (command == "--run" && !string.IsNullOrEmpty(param))
                     {
-                        Console.WriteLine($"Running task: {param}");
-                        service.RunTask(param);
-                        Console.WriteLine("Task started.");
-                    }
-                    else if (command == "--enable" && !string.IsNullOrEmpty(param))
-                    {
-                            Console.WriteLine($"Enabling task: {param}");
-                            service.EnableTask(param);
-                            Console.WriteLine("Task enabled.");
-                    }
-                    else if (command == "--disable" && !string.IsNullOrEmpty(param))
-                    {
-                            Console.WriteLine($"Disabling task: {param}");
-                            service.DisableTask(param);
-                            Console.WriteLine("Task disabled.");
-                    }
-                        else if (command == "--export-history" && !string.IsNullOrEmpty(param))
-                    {
-                        string output = args.Length > 4 && args[3] == "--output" ? args[4] : "history.csv";
-                        Console.WriteLine($"Exporting history for {param} to {output}...");
-                        
-                        var history = service.GetTaskHistory(param);
-                        if (history != null && history.Count > 0)
+                        if (!service.TaskExists(param))
                         {
-                            var sb = new System.Text.StringBuilder();
-                            sb.AppendLine("Time,EventId,Result,User,ExitCode,Message");
-                            foreach (var h in history)
-                            {
-                                sb.AppendLine($"\"{h.Time}\",{h.EventId},\"{h.Result}\",\"{h.User}\",{h.ExitCode},\"{h.Message.Replace("\"", "\"\"")}\"");
-                            }
-                            System.IO.File.WriteAllText(output, sb.ToString());
-                            Console.WriteLine("Export complete.");
+                            Console.WriteLine($"Task not found: {param}");
+                            exitCode = 1;
                         }
                         else
                         {
-                            Console.WriteLine("No history found or task does not exist.");
+                            Console.WriteLine($"Running task: {param}");
+                            service.RunTask(param);
+                            Console.WriteLine("Task started.");
                         }
+                    }
+                    else if (command == "--enable" && !string.IsNullOrEmpty(param))
+                    {
+                        if (!service.TaskExists(param))
+                        {
+                            Console.WriteLine($"Task not found: {param}");
+                            exitCode = 1;
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Enabling task: {param}");
+                            service.EnableTask(param);
+                            Console.WriteLine("Task enabled.");
+                        }
+                    }
+                    else if (command == "--disable" && !string.IsNullOrEmpty(param))
+                    {
+                        if (!service.TaskExists(param))
+                        {
+                            Console.WriteLine($"Task not found: {param}");
+                            exitCode = 1;
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Disabling task: {param}");
+                            service.DisableTask(param);
+                            Console.WriteLine("Task disabled.");
+                        }
+                    }
+                    else if (command == "--export-history" && !string.IsNullOrEmpty(param))
+                    {
+                        if (!service.TaskExists(param))
+                        {
+                            Console.WriteLine($"Task not found: {param}");
+                            exitCode = 1;
+                        }
+                        else
+                        {
+                            string output = args.Length > 4 && args[3] == "--output" ? args[4] : "history.csv";
+                            Console.WriteLine($"Exporting history for {param} to {output}...");
+
+                            var history = service.GetTaskHistory(param);
+                            if (history != null && history.Count > 0)
+                            {
+                                var sb = new System.Text.StringBuilder();
+                                sb.AppendLine("Time,EventId,Result,User,ExitCode,Message");
+                                foreach (var h in history)
+                                {
+                                    sb.AppendLine($"\"{h.Time}\",{h.EventId},\"{h.Result}\",\"{h.User}\",{h.ExitCode},\"{h.Message.Replace("\"", "\"\"")}\"");
+                                }
+                                // UTF-8 *with* BOM so Excel and PowerShell don't mangle non-ASCII names.
+                                System.IO.File.WriteAllText(output, sb.ToString(), new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: true));
+                                Console.WriteLine("Export complete.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("No history found for task.");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Unknown or incomplete command: {string.Join(' ', args.Skip(1))}");
+                        PrintUsage();
+                        exitCode = 1;
                     }
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error: {ex.Message}");
+                    exitCode = 1;
                 }
 
                 // Flush and Exit
                 Console.Out.Flush();
-                Environment.Exit(0);
+                Environment.Exit(exitCode);
                 return;
             }
 
@@ -320,7 +390,7 @@ namespace FluentTaskScheduler
                     list.Add((
                         r.Name,
                         () => r.Win.DispatcherQueue.TryEnqueue(() => { r.Win.AppWindow.Show(); r.Win.Activate(); r.IsHidden = false; }),
-                        () => r.Win.DispatcherQueue.TryEnqueue(() => { r.IsHidden = false; r.Win.Close(); })
+                        () => r.Win.DispatcherQueue.TryEnqueue(() => { r.IsHidden = false; r.ForceClose = true; r.Win.Close(); })
                     ));
                 }
                 return list;
@@ -329,12 +399,33 @@ namespace FluentTaskScheduler
             Services.TrayIconService.NewWindowRequested += () =>
                 _windows[0].Win.DispatcherQueue.TryEnqueue(CreateAndRegisterWindow);
 
-            Services.TrayIconService.ExitRequested += () => Environment.Exit(0);
+            Services.TrayIconService.ExitRequested += () =>
+            {
+                // Release the event-log subscription and its handles before tearing the process down.
+                Services.TaskPipelineService.Stop();
+                Services.SnoozeService.Shutdown();
+                Services.TaskSnoozeService.Shutdown();
+                Services.ReminderService.Stop();
+                Services.TrayIconService.Dispose();
+                Settings.Flush();
+                Environment.Exit(0);
+            };
             Services.TrayIconService.UpdateVisibility();
 
             Serilog.Log.Information("Application started");
             Services.ReminderService.Start();
             Services.ExecutionHistoryLogService.Start();
+
+            // v1.9: restore/expire any stored global snooze, then start the pipeline watcher.
+            Services.SnoozeService.Initialize();
+
+            // Per-task snoozes are restored the same way: anything whose window elapsed while the
+            // app was closed gets re-enabled here.
+            Services.TaskSnoozeService.Initialize();
+
+            Services.SnoozeService.SnoozeChanged += (s, args) => Services.TrayIconService.RefreshSnoozeState();
+            Services.TrayIconService.RefreshSnoozeState();
+            Services.TaskPipelineService.Start();
 
             // Check for VeloPack auto-updates in the background
             _ = CheckForVeloPackUpdateAsync();
@@ -387,8 +478,7 @@ namespace FluentTaskScheduler
                 {
                     if (e.DidSizeChange && !rec.IsHidden)
                     {
-                        Settings.WindowWidth  = s.Size.Width;
-                        Settings.WindowHeight = s.Size.Height;
+                        Settings.SetWindowSize(s.Size.Width, s.Size.Height);
                     }
                 };
             }
@@ -407,7 +497,7 @@ namespace FluentTaskScheduler
             // Close-to-tray handler
             win.AppWindow.Closing += (sender, args) =>
             {
-                if (Settings.EnableTrayIcon)
+                if (Settings.EnableTrayIcon && !rec.ForceClose)
                 {
                     args.Cancel = true;
                     rec.IsHidden = true;
@@ -418,6 +508,20 @@ namespace FluentTaskScheduler
                 {
                     // Actually closing — remove from registry
                     _windows.Remove(rec);
+                }
+            };
+
+            // Minimize-to-tray: a separate opt-in from close-to-tray (Settings.EnableTrayIcon above) —
+            // minimizing the window hides it to the tray instead of just minimizing to the taskbar.
+            win.AppWindow.Changed += (sender, args) =>
+            {
+                if (!args.DidPresenterChange || !Settings.MinimizeToTray || !Settings.EnableTrayIcon || rec.IsHidden) return;
+                if (sender.Presenter is Microsoft.UI.Windowing.OverlappedPresenter op &&
+                    op.State == Microsoft.UI.Windowing.OverlappedPresenterState.Minimized)
+                {
+                    rec.IsHidden = true;
+                    sender.Hide();
+                    Services.NotificationService.ShowMinimizedToTray();
                 }
             };
 
@@ -432,13 +536,15 @@ namespace FluentTaskScheduler
                 return appTitle;
             }
 
-            return $"{appTitle} — {windowName}";
+            // windowName is an internal identifier ("Window N"); the visible suffix is localized
+            // separately so a non-English UI doesn't show the literal English word "Window" (3.2).
+            string suffix = windowName.StartsWith("Window ", StringComparison.OrdinalIgnoreCase) && int.TryParse(windowName.AsSpan(7), out int n)
+                ? string.Format(Services.LocalizationService.GetString("App.WindowTitleSuffixFormat", "Window {0}"), n)
+                : windowName;
+
+            return $"{appTitle} — {suffix}";
         }
 
-        private void AppWindow_Closing(Microsoft.UI.Windowing.AppWindow sender, Microsoft.UI.Windowing.AppWindowClosingEventArgs args)
-        {
-            // Handled per-window inside CreateAndRegisterWindow
-        }
 
         private void OnToastActivated(ToastNotificationActivatedEventArgsCompat e)
         {
@@ -475,19 +581,20 @@ namespace FluentTaskScheduler
             }
         }
 
-        Microsoft.UI.Xaml.Media.SystemBackdrop? _backdrop;
-
         private void ApplyThemeToWindow(Window win)
         {
             if (win?.Content is Control root)
             {
+                var rec = _windows.FirstOrDefault(r => r.Win == win);
                 root.RequestedTheme = Settings.Theme;
                 win.SystemBackdrop = null;
 
                 Application.Current.Resources["TaskCardBackground"] = Application.Current.Resources["CardBackgroundFillColorDefaultBrush"];
                 Application.Current.Resources["TaskCardBorder"] = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
 
-                if (Settings.IsOledMode && Settings.Theme == ElementTheme.Dark)
+                // Use the resolved theme, not the stored preference: "System Default" on a dark
+                // OS is still dark, and OLED mode has to apply there too.
+                if (Settings.IsOledMode && root.ActualTheme == ElementTheme.Dark)
                 {
                     var black = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Black);
                     root.Background = black;
@@ -497,13 +604,22 @@ namespace FluentTaskScheduler
                 {
                     var transparent = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
                     root.Background = transparent;
-                    if (_backdrop == null) _backdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop();
-                    win.SystemBackdrop = _backdrop;
+                    // Each window needs its own backdrop instance — a SystemBackdrop can only be
+                    // attached to a single window at a time.
+                    if (rec != null)
+                    {
+                        rec.Backdrop ??= new Microsoft.UI.Xaml.Media.MicaBackdrop();
+                        win.SystemBackdrop = rec.Backdrop;
+                    }
+                    else
+                    {
+                        win.SystemBackdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop();
+                    }
                     SetNavigationViewBackgrounds(transparent);
                 }
                 else
                 {
-                    _backdrop = null;
+                    if (rec != null) rec.Backdrop = null;
                     // Use ActualTheme so the colour matches the requested theme even when the OS theme differs
                     bool isDark = root.ActualTheme == ElementTheme.Dark;
                     var bg = new Microsoft.UI.Xaml.Media.SolidColorBrush(
@@ -595,7 +711,19 @@ namespace FluentTaskScheduler
                         var dialogResult = await dialog.ShowAsync();
                         if (dialogResult == ContentDialogResult.Primary)
                         {
-                            Services.VeloPackUpdateService.ApplyAndRestart(result.Info);
+                            bool applied = Services.VeloPackUpdateService.ApplyAndRestart(result.Info);
+                            if (!applied)
+                            {
+                                var failDialog = new ContentDialog
+                                {
+                                    Title = Services.LocalizationService.GetString("Settings.UpdateError.Title", "Update Error"),
+                                    Content = Services.LocalizationService.GetString("Settings.UpdateApplyFailed.Content", "Failed to apply the update. Check the log for details, or try again later."),
+                                    CloseButtonText = Services.LocalizationService.GetString("Dialog.Common.Close", "Close"),
+                                    XamlRoot = m_window.Content?.XamlRoot,
+                                    RequestedTheme = Settings.Theme
+                                };
+                                await failDialog.ShowAsync();
+                            }
                         }
                     }
                     catch (Exception ex)

@@ -12,24 +12,22 @@ namespace FluentTaskScheduler
         [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
         private static extern void XamlCheckProcessRequirements();
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern IntPtr AddDllDirectory(string lpPathName);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern bool SetDefaultDllDirectories(uint directoryFlags);
+        // NOTE: do not reintroduce SetDefaultDllDirectories/AddDllDirectory here. Narrowing the
+        // process-wide DLL search order breaks the LoadLibraryEx-by-relative-name calls that XAML
+        // uses to pull in its theme resource DLLs, which fails app startup with
+        // "Cannot locate resource from 'ms-appx:///Microsoft.UI.Xaml/Themes/themeresources.xaml'".
+        // The application directory is already first in the default search order, so for a
+        // self-contained build (runtime DLLs sit next to the exe) these calls bought us nothing.
+        //
+        // Likewise, do not call Bootstrap.Initialize: that is for framework-dependent unpackaged
+        // apps and adds the MSIX-installed runtime to the process package graph. This app is built
+        // WindowsAppSDKSelfContained, so the runtime next to the exe is the one to use.
 
         [STAThread]
         static void Main(string[] args)
         {
-            // Set the DLL search path to include the application directory.
-            // This is critical for ARM64 and self-contained builds where native DLLs
-            // might not be found by the default search logic.
-            string appDir = AppDomain.CurrentDomain.BaseDirectory;
-            AddDllDirectory(appDir);
-            SetDefaultDllDirectories(0x00001000); // LOAD_LIBRARY_SEARCH_DEFAULT_DIRS
-
             // Initialize ComWrappers as early as possible for WinRT support.
-            // This MUST be done before any WinRT types are accessed or the bootstrapper runs.
+            // This MUST be done before any WinRT types are accessed.
             WinRT.ComWrappersSupport.InitializeComWrappers();
 
             // VeloPack: Handle install/uninstall/update hooks before anything else.
@@ -47,15 +45,6 @@ namespace FluentTaskScheduler
                     // Catch-all for any other Velopack initialization issues
                 }
             }
-
-            // NOTE: The Windows App SDK Bootstrapper API (Bootstrap.Initialize/Shutdown) is only for
-            // framework-dependent unpackaged apps that need to dynamically bind to an installed
-            // WinAppSDK framework package at runtime. This project uses WindowsAppSDKSelfContained=true,
-            // meaning the WinAppSDK runtime is deployed locally next to the EXE and never needs the
-            // bootstrapper. Calling Bootstrap.Initialize here always fails on machines without the
-            // WinAppSDK 1.5 framework package installed (writing an Event ID 22 "Windows App Runtime"
-            // error to the Event Log on every launch), and can leave WinRT activation in a bad state
-            // that later surfaces as COMExceptions from WinRT API calls (e.g. FileSavePicker).
 
             try
             {

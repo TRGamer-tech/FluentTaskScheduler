@@ -15,6 +15,7 @@ namespace FluentTaskScheduler.Models.Enums
         Once,
         Event,
         OnIdle,
-        SessionStateChange
+        SessionStateChange,
+        Unsupported
     }
 }

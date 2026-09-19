@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using FluentTaskScheduler.Models;
+using FluentTaskScheduler.Models.Enums;
 
 namespace FluentTaskScheduler.Tests
 {
@@ -12,12 +13,12 @@ namespace FluentTaskScheduler.Tests
         [Fact]
         public void UpdateFrom_CopiesStateAndIsEnabled()
         {
-            var existing = new ScheduledTaskModel { Path = @"\A", Name = "A", State = "Disabled", IsEnabled = false };
-            var fresh = new ScheduledTaskModel { Path = @"\A", Name = "A", State = "Ready", IsEnabled = true };
+            var existing = new ScheduledTaskModel { Path = @"\A", Name = "A", State = TaskState.Disabled, IsEnabled = false };
+            var fresh = new ScheduledTaskModel { Path = @"\A", Name = "A", State = TaskState.Ready, IsEnabled = true };
 
             existing.UpdateFrom(fresh);
 
-            Assert.Equal("Ready", existing.State);
+            Assert.Equal(TaskState.Ready, existing.State);
             Assert.True(existing.IsEnabled);
         }
 

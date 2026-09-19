@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -32,6 +33,7 @@ namespace FluentTaskScheduler.Dialogs
     /// </summary>
     public sealed partial class TaskPipelineDialog : ContentDialog
     {
+        private ISettingsService Settings => App.Container.GetRequiredService<ISettingsService>();
         private readonly string _ownTaskPath;
         private readonly ObservableCollection<PipelineTargetRow> _successTargets = new();
         private readonly ObservableCollection<PipelineTargetRow> _failureTargets = new();
@@ -49,7 +51,7 @@ namespace FluentTaskScheduler.Dialogs
         {
             this.InitializeComponent();
             _ownTaskPath = ownTaskPath ?? "";
-            this.RequestedTheme = SettingsService.Theme;
+            this.RequestedTheme = Settings.Theme;
 
             var choices = (availableTasks ?? Enumerable.Empty<ScheduledTaskModel>())
                 .Where(t => !string.IsNullOrWhiteSpace(t.Path))
@@ -190,7 +192,7 @@ namespace FluentTaskScheduler.Dialogs
                 return;
             }
 
-            LogService.Info(
+            Serilog.Log.Information("{Message}", 
                 $"Pipeline saved for '{_ownTaskPath}': enabled={Result.IsEnabled}, " +
                 $"{Result.OnSuccessTasks.Count} on success, {Result.OnFailureTasks.Count} on failure.");
         }

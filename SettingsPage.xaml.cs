@@ -26,11 +26,38 @@ namespace FluentTaskScheduler
             this.InitializeComponent();
             Loaded += SettingsPage_Loaded;
             LocalizationService.LanguageChanged += LocalizationService_LanguageChanged;
+
+            // With "System Default" selected, the OS switching to dark must un-grey OLED mode.
+            ActualThemeChanged += SettingsPage_ActualThemeChanged;
+        }
+
+        /// <summary>
+        /// Reads the version off the running assembly so it can never drift from the csproj.
+        /// </summary>
+        internal static string GetAppVersion()
+        {
+            try
+            {
+                var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+                return version == null ? "" : $"{version.Major}.{version.Minor}.{version.Build}";
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Warning("{Message}", $"Could not read the assembly version: {ex.Message}");
+                return "";
+            }
+        }
+
+        private void SettingsPage_ActualThemeChanged(FrameworkElement sender, object args)
+        {
+            if (!_isLoaded) return;
+            UpdateOledToggleState();
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             LocalizationService.LanguageChanged -= LocalizationService_LanguageChanged;
+            ActualThemeChanged -= SettingsPage_ActualThemeChanged;
             base.OnNavigatedFrom(e);
         }
 
@@ -78,8 +105,11 @@ namespace FluentTaskScheduler
             // System
             RunOnStartupToggle.IsOn = Settings.RunOnStartup;
             TrayIconToggle.IsOn = Settings.EnableTrayIcon;
+            MinimizeToTrayToggle.IsOn = Settings.MinimizeToTray;
+            MinimizeToTrayToggle.IsEnabled = Settings.EnableTrayIcon;
             SmoothScrollingToggle.IsOn = Settings.SmoothScrolling;
             ShowHiddenTasksToggle.IsOn = Settings.ShowHiddenTasks;
+            TaskPipelinesToggle.IsOn = Settings.EnableTaskPipelines;
 
             // Advanced
             ConfirmDeleteToggle.IsOn = Settings.ConfirmDelete;
@@ -90,7 +120,7 @@ namespace FluentTaskScheduler
             ExecHistoryFolderCard.Visibility = Settings.EnableExecutionHistoryLog ? Visibility.Visible : Visibility.Collapsed;
 
             // Init sidebar panels — sync visibility with current selection
-            _panels = new[] { PanelAppearance, PanelNotifications, PanelSystem, PanelAdvanced, PanelData, PanelCategories, PanelAbout };
+            _panels = new[] { PanelAppearance, PanelNotifications, PanelSystem, PanelAdvanced, PanelCategories, PanelAbout };
             SyncPanelVisibility();
 
             // Categories & Tags initial load
@@ -130,7 +160,6 @@ namespace FluentTaskScheduler
             PanelNotifications.Visibility = panel == SettingsPanel.Notifications ? Visibility.Visible : Visibility.Collapsed;
             PanelSystem.Visibility = panel == SettingsPanel.System ? Visibility.Visible : Visibility.Collapsed;
             PanelAdvanced.Visibility = panel == SettingsPanel.Advanced ? Visibility.Visible : Visibility.Collapsed;
-            PanelData.Visibility = panel == SettingsPanel.Data ? Visibility.Visible : Visibility.Collapsed;
             PanelCategories.Visibility = panel == SettingsPanel.Categories ? Visibility.Visible : Visibility.Collapsed;
             PanelAbout.Visibility = panel == SettingsPanel.About ? Visibility.Visible : Visibility.Collapsed;
         }
@@ -172,11 +201,27 @@ namespace FluentTaskScheduler
             Serilog.Log.Information("{Message}", $"OLED Mode: {(OledModeToggle.IsOn ? "enabled" : "disabled")}");
         }
 
+        /// <summary>
+        /// OLED mode only makes sense on a dark surface. "System Default" resolves to whatever the
+        /// OS is currently using, so the toggle must follow the *effective* theme rather than the
+        /// stored preference - otherwise it stayed greyed out on a dark-themed system.
+        /// </summary>
         private void UpdateOledToggleState()
         {
-            bool isDark = Settings.Theme == ElementTheme.Dark;
+            bool isDark = IsEffectivelyDark();
             OledModeToggle.IsEnabled = isDark;
             MicaModeToggle.IsEnabled = !isDark || !Settings.IsOledMode;
+        }
+
+        private bool IsEffectivelyDark()
+        {
+            return Settings.Theme switch
+            {
+                ElementTheme.Dark => true,
+                ElementTheme.Light => false,
+                // Default: ask the framework what it actually resolved to for this page.
+                _ => ActualTheme == ElementTheme.Dark
+            };
         }
 
         private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -200,7 +245,6 @@ namespace FluentTaskScheduler
             NavNotificationsItem.Content = L("Settings.Nav.Notifications", "Notifications");
             NavSystemItem.Content = L("Settings.Nav.System", "System");
             NavAdvancedItem.Content = L("Settings.Nav.Advanced", "Advanced");
-            NavDataItem.Content = L("Settings.Nav.Data", "Data");
             NavCategoriesItem.Content = L("Settings.Nav.Categories", "Categories & Tags");
             NavAboutItem.Content = L("Settings.Nav.About", "About");
 
@@ -211,6 +255,7 @@ namespace FluentTaskScheduler
             DataHeaderText.Text = L("Settings.Section.Data", "Data");
             CategoriesHeaderText.Text = L("Settings.Section.Categories", "Categories & Tags");
             AboutHeaderText.Text = L("Settings.Section.About", "About");
+            AboutVersionText.Text = string.Format(L("Settings.About.VersionFormat", "Version {0}"), GetAppVersion());
             LanguageTitleText.Text = L("Settings.Appearance.Language.Title", "Language");
             LanguageDescriptionText.Text = L("Settings.Appearance.Language.Description", "Choose the display language for the app.");
             AppThemeTitleText.Text = L("Settings.Appearance.Theme.Title", "App Theme");
@@ -235,6 +280,9 @@ namespace FluentTaskScheduler
             SysTrayDesc.Text = L("Settings.Sys.Tray.Desc", "Hide the window to the system tray instead of closing.");
             SysSmoothTitle.Text = L("Settings.Sys.Smooth.Title", "Smooth Scrolling");
             SysSmoothDesc.Text = L("Settings.Sys.Smooth.Desc", "Enable inertia-based scrolling throughout the app.");
+            SysPipelineTitle.Text = L("Settings.Sys.Pipelines.Title", "Task Pipelines");
+            SysPipelineDesc.Text = L("Settings.Sys.Pipelines.Desc",
+                "Watch the Task Scheduler event log and start the downstream tasks configured under a task's Completion Actions.");
             SysHiddenTitle.Text = L("Settings.Sys.Hidden.Title", "Show Hidden Tasks");
             SysHiddenDesc.Text = L("Settings.Sys.Hidden.Desc", "Display tasks that are marked as hidden in the Windows Task Scheduler.");
 
@@ -342,9 +390,16 @@ namespace FluentTaskScheduler
         {
             if (!_isLoaded) return;
             Settings.EnableTrayIcon = TrayIconToggle.IsOn;
-            Settings.MinimizeToTray = TrayIconToggle.IsOn;
             TrayIconService.UpdateVisibility();
-            Serilog.Log.Information("{Message}", $"Minimize to Tray: {(TrayIconToggle.IsOn ? "enabled" : "disabled")}");
+            MinimizeToTrayToggle.IsEnabled = TrayIconToggle.IsOn;
+            Serilog.Log.Information("{Message}", $"Tray icon: {(TrayIconToggle.IsOn ? "enabled" : "disabled")}");
+        }
+
+        private void MinimizeToTrayToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!_isLoaded) return;
+            Settings.MinimizeToTray = MinimizeToTrayToggle.IsOn;
+            Serilog.Log.Information("{Message}", $"Minimize to Tray: {(MinimizeToTrayToggle.IsOn ? "enabled" : "disabled")}");
         }
 
         private void SmoothScrollingToggle_Toggled(object sender, RoutedEventArgs e)
@@ -365,6 +420,15 @@ namespace FluentTaskScheduler
             Serilog.Log.Information("{Message}", $"Show Hidden Tasks: {(ShowHiddenTasksToggle.IsOn ? "enabled" : "disabled")}");
             // Trigger refresh in main view if it exists
             MainPage.Current?.ViewModel.ApplyFilters();
+        }
+
+        private void TaskPipelinesToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!_isLoaded) return;
+            Settings.EnableTaskPipelines = TaskPipelinesToggle.IsOn;
+            // Start/stop the event-log watcher immediately so no restart is needed.
+            TaskPipelineService.ApplyEnabledSetting();
+            Serilog.Log.Information("{Message}", $"Task Pipelines: {(TaskPipelinesToggle.IsOn ? "enabled" : "disabled")}");
         }
 
         // ── Advanced ───────────────────────────────────────────────────────────
@@ -435,21 +499,16 @@ namespace FluentTaskScheduler
         {
             try
             {
-                var picker = new FileSavePicker();
-                picker.SuggestedStartLocation = PickerLocationId.Desktop;
-                picker.FileTypeChoices.Add("JSON", new[] { ".json" });
-                picker.SuggestedFileName = "FluentTaskScheduler_Settings";
-
-                var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.m_window);
-                WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-
-                var file = await picker.PickSaveFileAsync();
-                if (file != null)
+                // Uses the shared Win32/WinRT picker helper — the plain WinRT FileSavePicker used
+                // here previously throws when the app is running elevated (4.4).
+                string? filePath = await Helpers.FilePickerHelper.PickSaveFileAsync(
+                    App.m_window!, "Export Settings", "JSON", "json", "FluentTaskScheduler_Settings");
+                if (!string.IsNullOrEmpty(filePath))
                 {
-                    Settings.ExportSettings(file.Path);
+                    Settings.ExportSettings(filePath);
                     await ShowDialog(
                         LocalizationService.GetString("Settings.Export.Success.Title", "Export Successful"),
-                        string.Format(LocalizationService.GetString("Settings.Export.Success.ContentFormat", "Settings exported to:\n{0}"), file.Path));
+                        string.Format(LocalizationService.GetString("Settings.Export.Success.ContentFormat", "Settings exported to:\n{0}"), filePath));
                 }
             }
             catch (Exception ex)
@@ -462,17 +521,13 @@ namespace FluentTaskScheduler
         {
             try
             {
-                var picker = new FileOpenPicker();
-                picker.SuggestedStartLocation = PickerLocationId.Desktop;
-                picker.FileTypeFilter.Add(".json");
-
-                var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.m_window);
-                WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-
-                var file = await picker.PickSingleFileAsync();
-                if (file != null)
+                // Uses the shared Win32/WinRT picker helper — the plain WinRT FileOpenPicker used
+                // here previously throws when the app is running elevated (4.4).
+                string? filePath = await Helpers.FilePickerHelper.PickOpenFileAsync(
+                    App.m_window!, "Import Settings", "JSON", "json");
+                if (!string.IsNullOrEmpty(filePath))
                 {
-                    Settings.ImportSettings(file.Path);
+                    Settings.ImportSettings(filePath);
 
                     _isLoaded = false;
                     SettingsPage_Loaded(this, new RoutedEventArgs());
@@ -480,6 +535,7 @@ namespace FluentTaskScheduler
                     (Application.Current as App)?.ApplyTheme(Settings.Theme);
                     TrayIconService.UpdateVisibility();
                     StartupService.UpdateFromSettings();
+                    LocalizationService.ChangeLanguage(Settings.Language);
 
                     await ShowDialog(
                         LocalizationService.GetString("Settings.Import.Success.Title", "Import Successful"),
@@ -550,7 +606,15 @@ namespace FluentTaskScheduler
 
             var dialogResult = await dialog.ShowAsync();
             if (dialogResult == ContentDialogResult.Primary)
-                Services.VeloPackUpdateService.ApplyAndRestart(result.Info);
+            {
+                bool applied = Services.VeloPackUpdateService.ApplyAndRestart(result.Info);
+                if (!applied)
+                {
+                    await ShowDialog(
+                        LocalizationService.GetString("Settings.UpdateError.Title", "Update Error"),
+                        LocalizationService.GetString("Settings.UpdateApplyFailed.Content", "Failed to apply the update. Check the log for details, or try again later."));
+                }
+            }
         }
 
         private async void ReplayOnboardingButton_Click(object sender, RoutedEventArgs e)
@@ -562,18 +626,8 @@ namespace FluentTaskScheduler
 
         // ── Helpers ────────────────────────────────────────────────────────────
 
-        private async System.Threading.Tasks.Task ShowDialog(string title, string message)
-        {
-            var dialog = new ContentDialog
-            {
-                Title = title,
-                Content = message,
-                CloseButtonText = LocalizationService.GetString("Dialog.Common.OK", "OK"),
-                XamlRoot = this.XamlRoot,
-                RequestedTheme = Settings.Theme
-            };
-            await dialog.ShowAsync();
-        }
+        private System.Threading.Tasks.Task ShowDialog(string title, string message) =>
+            Helpers.DialogHelper.ShowMessageAsync(this.XamlRoot, title, message);
 
         // ── Categories & Tags ──────────────────────────────────────────────────
 
@@ -600,8 +654,7 @@ namespace FluentTaskScheduler
             string cat = NewCategoryBox.Text.Trim();
             if (!string.IsNullOrEmpty(cat) && !Settings.SavedCategories.Contains(cat))
             {
-                Settings.SavedCategories.Add(cat);
-                Settings.SavedCategories = Settings.SavedCategories; // Trigger save
+                Settings.AddSavedCategory(cat);
                 NewCategoryBox.Text = "";
                 RefreshCategoriesList();
             }
@@ -611,8 +664,7 @@ namespace FluentTaskScheduler
         {
             if (sender is Button btn && btn.Tag is string cat)
             {
-                Settings.SavedCategories.Remove(cat);
-                Settings.SavedCategories = Settings.SavedCategories; // Trigger save
+                Settings.RemoveSavedCategory(cat);
                 RefreshCategoriesList();
             }
         }
@@ -628,8 +680,7 @@ namespace FluentTaskScheduler
             string tag = NewTagBox.Text.Trim();
             if (!string.IsNullOrEmpty(tag) && !Settings.SavedTags.Contains(tag))
             {
-                Settings.SavedTags.Add(tag);
-                Settings.SavedTags = Settings.SavedTags; // Trigger save
+                Settings.AddSavedTag(tag);
                 NewTagBox.Text = "";
                 RefreshTagsList();
             }
@@ -639,8 +690,7 @@ namespace FluentTaskScheduler
         {
             if (sender is Button btn && btn.Tag is string tag)
             {
-                Settings.SavedTags.Remove(tag);
-                Settings.SavedTags = Settings.SavedTags; // Trigger save
+                Settings.RemoveSavedTag(tag);
                 RefreshTagsList();
             }
         }

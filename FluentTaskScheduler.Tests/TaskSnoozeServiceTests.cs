@@ -14,6 +14,7 @@ namespace FluentTaskScheduler.Tests
     {
         private readonly Func<ITaskServiceWrapper> _originalFactory;
         private readonly FakeTaskServiceWrapper _fake = new();
+        private readonly TestSettingsScope _scope = new();
         private readonly string _statePath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "FluentTaskScheduler", "task_snoozes.json");
@@ -45,6 +46,7 @@ namespace FluentTaskScheduler.Tests
 
             TaskSnoozeService.TaskServiceFactory = _originalFactory;
             TaskSnoozeService.ResetForTests();
+            _scope.Dispose();
             try
             {
                 if (_backup != null) File.WriteAllText(_statePath, _backup);

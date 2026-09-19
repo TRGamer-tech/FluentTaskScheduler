@@ -50,11 +50,6 @@
                         <FontIcon Glyph="&#xE90F;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem x:Name="NavDataItem" Tag="Data" Content="Data">
-                    <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE8B5;"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
                 <NavigationViewItem x:Name="NavCategoriesItem" Tag="Categories" Content="Categories &amp; Tags">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE8EC;"/>
@@ -71,10 +66,10 @@
                 <!-- Content area -->
                 <ScrollViewer x:Name="PageScrollViewer" Padding="28,24,28,24"
                               IsScrollInertiaEnabled="False" VerticalScrollBarVisibility="Auto">
-                    <Grid MaxWidth="800" HorizontalAlignment="Left">
+                    <Grid HorizontalAlignment="Stretch">
 
                     <!-- Appearance -->
-                    <StackPanel x:Name="PanelAppearance" Spacing="4">
+                    <StackPanel x:Name="PanelAppearance" Spacing="4" MaxWidth="800" HorizontalAlignment="Left">
                         <TextBlock x:Name="AppearanceHeaderText" Text="Appearance" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
 
                         <Border Style="{StaticResource SettingsCardStyle}">
@@ -135,7 +130,7 @@
                     </StackPanel>
 
                     <!-- Notifications -->
-                    <StackPanel x:Name="PanelNotifications" Spacing="4" Visibility="Collapsed">
+                    <StackPanel x:Name="PanelNotifications" Spacing="4" Visibility="Collapsed" MaxWidth="800" HorizontalAlignment="Left">
                         <TextBlock x:Name="NotificationsHeaderText" Text="Notifications" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
 
                         <Border Style="{StaticResource SettingsCardStyle}">
@@ -182,7 +177,7 @@
                     </StackPanel>
 
                     <!-- System -->
-                    <StackPanel x:Name="PanelSystem" Spacing="4" Visibility="Collapsed">
+                    <StackPanel x:Name="PanelSystem" Spacing="4" Visibility="Collapsed" MaxWidth="800" HorizontalAlignment="Left">
                         <TextBlock x:Name="SystemHeaderText" Text="System" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
 
                         <Border Style="{StaticResource SettingsCardStyle}">
@@ -213,11 +208,35 @@
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock x:Name="MinimizeToTrayTitle" Text="Minimize Button Hides to Tray" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="MinimizeToTrayDesc" Text="Also hide the window to the tray when you press the minimize button, not just when closing." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <ToggleSwitch x:Name="MinimizeToTrayToggle" Grid.Column="1" VerticalAlignment="Center"
+                                             OffContent="" OnContent="" IsOn="False" Toggled="MinimizeToTrayToggle_Toggled"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
                                     <TextBlock x:Name="SysSmoothTitle" Text="Smooth Scrolling" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                                     <TextBlock x:Name="SysSmoothDesc" Text="Enable inertia-based scrolling throughout the app." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 <ToggleSwitch x:Name="SmoothScrollingToggle" Grid.Column="1" VerticalAlignment="Center"
                                              OffContent="" OnContent="" IsOn="False" Toggled="SmoothScrollingToggle_Toggled"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <TextBlock x:Name="SysPipelineTitle" Text="Task Pipelines" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock x:Name="SysPipelineDesc" Text="Watch the Task Scheduler event log and start the downstream tasks configured under a task's Completion Actions." Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <ToggleSwitch x:Name="TaskPipelinesToggle" Grid.Column="1" VerticalAlignment="Center"
+                                             OffContent="" OnContent="" IsOn="True" Toggled="TaskPipelinesToggle_Toggled"/>
                             </Grid>
                         </Border>
 
@@ -235,7 +254,7 @@
                     </StackPanel>
 
                     <!-- Advanced -->
-                    <StackPanel x:Name="PanelAdvanced" Spacing="4" Visibility="Collapsed">
+                    <StackPanel x:Name="PanelAdvanced" Spacing="4" Visibility="Collapsed" MaxWidth="800" HorizontalAlignment="Left">
                         <TextBlock x:Name="AdvancedHeaderText" Text="Advanced" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
 
                         <Border Style="{StaticResource SettingsCardStyle}">
@@ -317,11 +336,9 @@
                                 <Button x:Name="OpenExecHistoryFolderButton" Grid.Column="1" Content="Open Folder" Click="OpenExecHistoryFolderButton_Click"/>
                             </Grid>
                         </Border>
-                    </StackPanel>
 
-                    <!-- Data -->
-                    <StackPanel x:Name="PanelData" Spacing="4" Visibility="Collapsed">
-                        <TextBlock x:Name="DataHeaderText" Text="Data" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
+                        <!-- Data (folded into Advanced) -->
+                        <TextBlock x:Name="DataHeaderText" Text="Data" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,20,0,8"/>
 
                         <Border Style="{StaticResource SettingsCardStyle}">
                             <Grid>
@@ -347,7 +364,7 @@
                     </StackPanel>
 
                     <!-- Categories & Tags -->
-                    <StackPanel x:Name="PanelCategories" Spacing="16" Visibility="Collapsed">
+                    <StackPanel x:Name="PanelCategories" Spacing="16" Visibility="Collapsed" MaxWidth="1200" HorizontalAlignment="Stretch">
                         <TextBlock x:Name="CategoriesHeaderText" Text="Categories &amp; Tags" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
 
                         <!-- Categories Section -->
@@ -363,22 +380,29 @@
                                     <TextBox x:Name="NewCategoryBox" PlaceholderText="New category name..." KeyDown="NewCategoryBox_KeyDown"/>
                                     <Button x:Name="AddCategoryBtn" Grid.Column="1" Content="Add" Click="AddCategory_Click"/>
                                 </Grid>
-                                <ItemsControl x:Name="CategoriesItemsControl">
+                                <!-- One row per entry so long names stay readable -->
+                                <ItemsControl x:Name="CategoriesItemsControl" HorizontalAlignment="Stretch">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <VariableSizedWrapGrid Orientation="Horizontal"/>
+                                            <StackPanel Orientation="Vertical" Spacing="4"/>
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" CornerRadius="4" Padding="8,4" Margin="0,0,8,8" MaxWidth="500">
+                                            <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                                                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                                                    CornerRadius="4" Padding="12,8" HorizontalAlignment="Stretch">
                                                 <Grid ColumnSpacing="8">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*"/>
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
                                                     <TextBlock Text="{Binding}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                                    <Button Grid.Column="1" Content="&#xE711;" FontFamily="Segoe MDL2 Assets" FontSize="10" Background="Transparent" BorderThickness="0" Padding="4" Click="RemoveCategory_Click" Tag="{Binding}" VerticalAlignment="Center"/>
+                                                    <Button Grid.Column="1" Background="Transparent" BorderThickness="0" Padding="6,2"
+                                                            Click="RemoveCategory_Click" Tag="{Binding}" VerticalAlignment="Center"
+                                                            ToolTipService.ToolTip="Remove">
+                                                        <FontIcon Glyph="&#xE74D;" FontSize="12" Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
+                                                    </Button>
                                                 </Grid>
                                             </Border>
                                         </DataTemplate>
@@ -400,22 +424,29 @@
                                     <TextBox x:Name="NewTagBox" PlaceholderText="New tag name..." KeyDown="NewTagBox_KeyDown"/>
                                     <Button x:Name="AddTagBtn" Grid.Column="1" Content="Add" Click="AddTag_Click"/>
                                 </Grid>
-                                <ItemsControl x:Name="TagsItemsControl">
+                                <!-- One row per entry so long names stay readable -->
+                                <ItemsControl x:Name="TagsItemsControl" HorizontalAlignment="Stretch">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <VariableSizedWrapGrid Orientation="Horizontal"/>
+                                            <StackPanel Orientation="Vertical" Spacing="4"/>
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" CornerRadius="4" Padding="8,4" Margin="0,0,8,8" MaxWidth="500">
+                                            <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                                                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                                                    CornerRadius="4" Padding="12,8" HorizontalAlignment="Stretch">
                                                 <Grid ColumnSpacing="8">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*"/>
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
                                                     <TextBlock Text="{Binding}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                                    <Button Grid.Column="1" Content="&#xE711;" FontFamily="Segoe MDL2 Assets" FontSize="10" Background="Transparent" BorderThickness="0" Padding="4" Click="RemoveTag_Click" Tag="{Binding}" VerticalAlignment="Center"/>
+                                                    <Button Grid.Column="1" Background="Transparent" BorderThickness="0" Padding="6,2"
+                                                            Click="RemoveTag_Click" Tag="{Binding}" VerticalAlignment="Center"
+                                                            ToolTipService.ToolTip="Remove">
+                                                        <FontIcon Glyph="&#xE74D;" FontSize="12" Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
+                                                    </Button>
                                                 </Grid>
                                             </Border>
                                         </DataTemplate>
@@ -426,7 +457,7 @@
                     </StackPanel>
 
                     <!-- About -->
-                    <StackPanel x:Name="PanelAbout" Spacing="4" Visibility="Collapsed">
+                    <StackPanel x:Name="PanelAbout" Spacing="4" Visibility="Collapsed" MaxWidth="800" HorizontalAlignment="Left">
                         <TextBlock x:Name="AboutHeaderText" Text="About" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
 
                         <Border Style="{StaticResource SettingsCardStyle}">
@@ -440,7 +471,8 @@
                                         Background="Transparent" BorderThickness="0" Padding="8,6"
                                         VerticalAlignment="Center" ToolTipService.ToolTip="See What's New">
                                     <StackPanel Orientation="Horizontal" Spacing="4">
-                                        <TextBlock x:Uid="AboutVersion" Text="Version 1.8.2"
+                                        <!-- Text is filled from the assembly version at runtime -->
+                                        <TextBlock x:Name="AboutVersionText" Text="Version"
                                                    Style="{StaticResource CaptionTextBlockStyle}"
                                                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
                                                    FontWeight="SemiBold" VerticalAlignment="Center"/>

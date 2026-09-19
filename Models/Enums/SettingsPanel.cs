@@ -7,7 +7,6 @@ namespace FluentTaskScheduler.Models.Enums
         Notifications,
         System,
         Advanced,
-        Data,
         Categories,
         About
     }

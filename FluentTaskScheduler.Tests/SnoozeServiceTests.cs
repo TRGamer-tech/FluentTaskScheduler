@@ -14,21 +14,20 @@ namespace FluentTaskScheduler.Tests
     [Collection("StaticServices")]
     public class SnoozeServiceTests : IDisposable
     {
-        private readonly string _tempDir;
+        private readonly TestSettingsScope _scope = new();
+        private SettingsService Settings => _scope.Settings;
         private readonly Func<ITaskServiceWrapper> _originalFactory;
 
         public SnoozeServiceTests()
         {
-            _tempDir = Path.Combine(Path.GetTempPath(), "FTS_Tests_" + Guid.NewGuid().ToString("N"));
-            SettingsService.UseStorageForTests(_tempDir);
-            SettingsService.ShowNotifications = false; // avoid real toast activation during tests
+            Settings.ShowNotifications = false; // avoid real toast activation during tests
             _originalFactory = SnoozeService.TaskServiceFactory;
         }
 
         public void Dispose()
         {
             SnoozeService.TaskServiceFactory = _originalFactory;
-            try { if (Directory.Exists(_tempDir)) Directory.Delete(_tempDir, recursive: true); } catch { }
+            _scope.Dispose();
         }
 
         private static ScheduledTaskModel Task(string path, bool enabled = true, bool readOnly = false) =>
@@ -41,7 +40,7 @@ namespace FluentTaskScheduler.Tests
             fake.Tasks.Add(Task(@"\Microsoft\Windows\Defender\Scan"));
             fake.Tasks.Add(Task(@"\MyApp\Backup"));
             SnoozeService.TaskServiceFactory = () => fake;
-            SettingsService.SnoozeIncludeMicrosoftTasks = false;
+            Settings.SnoozeIncludeMicrosoftTasks = false;
 
             var candidates = SnoozeService.GetSuspendCandidates();
 
@@ -55,7 +54,7 @@ namespace FluentTaskScheduler.Tests
             var fake = new FakeTaskServiceWrapper();
             fake.Tasks.Add(Task(@"\Microsoft\Windows\Defender\Scan"));
             SnoozeService.TaskServiceFactory = () => fake;
-            SettingsService.SnoozeIncludeMicrosoftTasks = true;
+            Settings.SnoozeIncludeMicrosoftTasks = true;
 
             var candidates = SnoozeService.GetSuspendCandidates();
 
@@ -122,14 +121,14 @@ namespace FluentTaskScheduler.Tests
             SnoozeService.TaskServiceFactory = () => fake;
 
             var candidates = SnoozeService.GetSuspendCandidates();
-            SettingsService.SaveSnoozeState(true, DateTime.UtcNow.AddMinutes(30), false, "", candidates);
+            Settings.SaveSnoozeState(true, DateTime.UtcNow.AddMinutes(30), false, "", candidates);
             var sweepTask = System.Threading.Tasks.Task.Run(() => SnoozeService.DisableCandidates(candidates));
 
             // The candidate list must already be durable on disk while the sweep is still gated.
-            var persisted = SettingsService.SnoozeDisabledTaskPaths;
+            var persisted = Settings.SnoozeDisabledTaskPaths;
             Assert.Contains(@"\MyApp\A", persisted);
             Assert.Contains(@"\MyApp\B", persisted);
-            Assert.True(SettingsService.IsSnoozed);
+            Assert.True(Settings.IsSnoozed);
             Assert.Empty(fake.EnableCalls); // nothing disabled yet — still gated
 
             fake.Gate.Set();
@@ -147,7 +146,7 @@ namespace FluentTaskScheduler.Tests
             fake.Tasks.Add(Task(@"\MyApp\A", enabled: false));
             SnoozeService.TaskServiceFactory = () => fake;
 
-            SettingsService.SaveSnoozeState(false, null, false, "", new List<string> { @"\MyApp\A" });
+            Settings.SaveSnoozeState(false, null, false, "", new List<string> { @"\MyApp\A" });
 
             SnoozeService.Initialize();
             SnoozeService.LastBackgroundOperation?.Wait(TimeSpan.FromSeconds(5));

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 
@@ -30,7 +31,29 @@ namespace FluentTaskScheduler.Services
         List<string> SavedTags { get; set; }
         bool ShowHiddenTasks { get; set; }
 
+        // Global snooze
+        bool IsSnoozed { get; set; }
+        DateTime? SnoozeUntilUtc { get; set; }
+        bool SnoozeUntilReboot { get; set; }
+        string SnoozeBootStamp { get; set; }
+        bool SnoozeSuspendsScheduledTasks { get; set; }
+        bool SnoozeIncludeMicrosoftTasks { get; set; }
+        List<string> SnoozeDisabledTaskPaths { get; set; }
+
+        // Task chaining
+        bool EnableTaskPipelines { get; set; }
+
         void Load();
+        /// <summary>Forces any pending debounced save to disk immediately (e.g. before app exit).</summary>
+        void Flush();
+        /// <summary>Sets width and height together as a single (debounced) settings write.</summary>
+        void SetWindowSize(int width, int height);
+        void AddSavedCategory(string category);
+        void RemoveSavedCategory(string category);
+        void AddSavedTag(string tag);
+        void RemoveSavedTag(string tag);
+        /// <summary>Writes the snooze fields together and flushes immediately (not debounced).</summary>
+        void SaveSnoozeState(bool isSnoozed, DateTime? untilUtc, bool untilReboot, string bootStamp, List<string> disabledPaths);
         void ExportSettings(string targetPath);
         void ImportSettings(string sourcePath);
     }

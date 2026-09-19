@@ -4,21 +4,23 @@ using FluentTaskScheduler.Models;
 
 namespace FluentTaskScheduler.Services
 {
-    /// <summary>Windows Task Scheduler operations (create/read/update/delete tasks and folders, history, import/export).</summary>
-    public interface ITaskService
+    /// <summary>
+    /// Windows Task Scheduler operations (create/read/update/delete tasks and folders, history,
+    /// analytics, import/export). Extends the narrow <see cref="ITaskServiceWrapper"/> subset
+    /// (task listing, enable/disable, run) that the snooze/pipeline services depend on and that
+    /// unit tests fake.
+    /// </summary>
+    public interface ITaskService : ITaskServiceWrapper
     {
-        List<ScheduledTaskModel> GetAllTasks(string? folderPath = null, bool recursive = true);
         ScheduledTaskModel? GetTaskDetails(string path);
-        void EnableTask(string path);
-        void DisableTask(string path);
-        void SetTaskEnabled(string path, bool enabled);
-        void RunTask(string path);
         void StopTask(string path);
         void DeleteTask(string path);
         void RegisterTask(string folderPath, ScheduledTaskModel model);
         void ExportTask(string taskPath, string outputPath);
         List<ScheduledTaskModel> DiscoverTasksFromEventLog(bool forceRefresh = false);
         List<TaskHistoryEntry> GetTaskHistory(string taskPath);
+        Dictionary<string, int> GetRunningTaskEnginePids();
+        List<TaskRunRecord> GetRecentRunRecords(TimeSpan window);
         List<SystemEventEntry> GetSystemEventsNear(DateTime centerTime, TimeSpan window);
         TaskFolderModel GetFolderStructure();
         void MoveTask(string sourcePath, string targetFolderPath);

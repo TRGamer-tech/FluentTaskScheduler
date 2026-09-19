@@ -22,7 +22,7 @@ namespace FluentTaskScheduler.ViewModels
         private bool _isLoading;
         private string _searchText = "";
         private string _currentFolderPath = "\\";
-        private FilterMode _filterMode = FilterMode.All;
+        private bool _showAllFolders = true;
         private ScheduledTaskModel? _selectedTask;
 
         public string ActionRunPrefix => Services.LocalizationService.GetString("Trigger.Run", "Run:");
@@ -74,13 +74,36 @@ namespace FluentTaskScheduler.ViewModels
 
         public MainViewModel()
         {
-            Services.LocalizationService.LanguageChanged += (s, e) => {
-                OnPropertyChanged(nameof(ActionRunPrefix));
-            };
+            Services.LocalizationService.LanguageChanged += LocalizationService_LanguageChanged;
+        }
+
+        private void LocalizationService_LanguageChanged(object? sender, EventArgs e)
+        {
+            OnPropertyChanged(nameof(ActionRunPrefix));
+        }
+
+        /// <summary>
+        /// Unsubscribes from the static LocalizationService event. Without this, every MainPage
+        /// (a new one is created per window) keeps its MainViewModel — and everything it
+        /// transitively references — alive forever, even after the window closes (see 3.3).
+        /// </summary>
+        public void Cleanup()
+        {
+            Services.LocalizationService.LanguageChanged -= LocalizationService_LanguageChanged;
         }
 
         public bool IsTrayIconVisible => Settings.EnableTrayIcon;
         public void RefreshTrayIconVisibility() => OnPropertyChanged(nameof(IsTrayIconVisible));
+
+        private string? _loadErrorMessage;
+        /// <summary>Set when the last <see cref="LoadTasksAsync"/> failed, so the page can surface
+        /// an InfoBar instead of the failure only going to Debug output (see 3.11).</summary>
+        public string? LoadErrorMessage
+        {
+            get => _loadErrorMessage;
+            private set { _loadErrorMessage = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasLoadError)); }
+        }
+        public bool HasLoadError => !string.IsNullOrEmpty(_loadErrorMessage);
 
         public async Task LoadTasksAsync()
         {
@@ -93,11 +116,14 @@ namespace FluentTaskScheduler.ViewModels
                 _allTasks = tasks ?? new List<ScheduledTaskModel>();
                 ApplyFilters();
                 Services.TrayIconService.UpdateBadge(_allTasks.Count(t => t.State == TaskState.Running));
+                LoadErrorMessage = null;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error loading tasks: {ex.Message}");
+                Serilog.Log.Error(ex, "Failed to load scheduled tasks");
+                LoadErrorMessage = ex.Message;
                 _allTasks = new List<ScheduledTaskModel>();
+                ApplyFilters();
             }
             finally
             {
@@ -107,17 +133,11 @@ namespace FluentTaskScheduler.ViewModels
 
         public void SetFilter(string filterTag)
         {
-            _filterMode = filterTag switch
-            {
-                "all" => FilterMode.All,
-                "running" => FilterMode.Running,
-                "enabled" => FilterMode.Enabled,
-                "disabled" => FilterMode.Disabled,
-                _ => FilterMode.Folder
-            };
+            // "all" is the sidebar's All Tasks entry; anything else pins the list to one folder.
+            _showAllFolders = filterTag == "all";
 
-            // If it's a global filter (footer items), reset folder path
-            if (_filterMode != FilterMode.Folder)
+            // If it's the global filter, reset folder path
+            if (_showAllFolders)
             {
                 _currentFolderPath = "\\";
             }
@@ -126,6 +146,49 @@ namespace FluentTaskScheduler.ViewModels
                 _currentFolderPath = filterTag;
             }
             ApplyFilters();
+        }
+
+        private StatusFilter _statusFilter = StatusFilter.All;
+
+        /// <summary>
+        /// Status shown in the toolbar dropdown. This is independent of the folder selection,
+        /// so a folder can be narrowed by status.
+        /// </summary>
+        public StatusFilter StatusFilter
+        {
+            get => _statusFilter;
+            set
+            {
+                if (_statusFilter == value) return;
+                _statusFilter = value;
+                OnPropertyChanged();
+                ApplyFilters();
+            }
+        }
+
+        /// <summary>Applies the toolbar status dropdown on top of the folder/search filters.</summary>
+        private IEnumerable<ScheduledTaskModel> ApplyStatusFilter(IEnumerable<ScheduledTaskModel> query)
+        {
+            switch (_statusFilter)
+            {
+                case StatusFilter.Running:
+                    return query.Where(t => t.State == TaskState.Running);
+                case StatusFilter.Enabled:
+                    return query.Where(t => t.IsEnabled);
+                case StatusFilter.Disabled:
+                    return query.Where(t => !t.IsEnabled);
+                case StatusFilter.Snoozed:
+                    // Only tasks this app suspended for the active global snooze — an empty result
+                    // simply means nothing is currently suspended.
+                    var suspended = new HashSet<string>(
+                        Settings.SnoozeDisabledTaskPaths ?? new List<string>(),
+                        StringComparer.OrdinalIgnoreCase);
+                    return suspended.Count == 0
+                        ? Enumerable.Empty<ScheduledTaskModel>()
+                        : query.Where(t => suspended.Contains(t.Path));
+                default:
+                    return query;
+            }
         }
 
         /// <summary>Cycles sort: same column toggles Asc/Desc, new column defaults to Asc.</summary>
@@ -166,10 +229,9 @@ namespace FluentTaskScheduler.ViewModels
                 );
             }
 
-            // Tag/Folder Filter
-            if (_filterMode == FilterMode.Folder)
+            // Folder filter — "all" spans every folder, anything else pins to one folder
+            if (!_showAllFolders)
             {
-                // Folder logic
                 query = query.Where(t =>
                 {
                     var taskDir = System.IO.Path.GetDirectoryName(t.Path);
@@ -177,13 +239,9 @@ namespace FluentTaskScheduler.ViewModels
                     return taskDir.Equals(_currentFolderPath, StringComparison.OrdinalIgnoreCase);
                 });
             }
-            else
-            {
-                // Status Logic
-                if (_filterMode == FilterMode.Running) query = query.Where(t => t.State == TaskState.Running);
-                else if (_filterMode == FilterMode.Enabled) query = query.Where(t => t.IsEnabled);
-                else if (_filterMode == FilterMode.Disabled) query = query.Where(t => !t.IsEnabled);
-            }
+
+            // Toolbar status dropdown
+            query = ApplyStatusFilter(query);
 
             var results = SortColumn switch
             {
@@ -205,10 +263,35 @@ namespace FluentTaskScheduler.ViewModels
                 return;
             }
 
-            var resultsSet = new HashSet<ScheduledTaskModel>(results);
+            // LoadTasksAsync always builds brand-new ScheduledTaskModel instances, so a
+            // reference-based diff below would never find a match and this "preserve scroll
+            // position" logic degenerated into remove-everything/insert-everything on every single
+            // refresh. Reusing the existing instance (keyed by Path) and updating its fields in
+            // place is what actually keeps scroll position, selection, and toggle state stable
+            // across a refresh (see 3.4).
+            var existingByPath = new Dictionary<string, ScheduledTaskModel>(StringComparer.OrdinalIgnoreCase);
+            foreach (var t in FilteredTasks)
+            {
+                if (!string.IsNullOrEmpty(t.Path)) existingByPath.TryAdd(t.Path, t);
+            }
+
+            var reconciled = new List<ScheduledTaskModel>(results.Count);
+            foreach (var fresh in results)
+            {
+                if (!string.IsNullOrEmpty(fresh.Path) && existingByPath.TryGetValue(fresh.Path, out var existing))
+                {
+                    existing.UpdateFrom(fresh);
+                    reconciled.Add(existing);
+                }
+                else
+                {
+                    reconciled.Add(fresh);
+                }
+            }
+
+            var resultsSet = new HashSet<ScheduledTaskModel>(reconciled);
             var currentSet = new HashSet<ScheduledTaskModel>(FilteredTasks);
 
-            // Synchronize FilteredTasks with results to preserve scroll position
             // Removing items that are no longer in the filtered results
             for (int i = FilteredTasks.Count - 1; i >= 0; i--)
             {
@@ -220,9 +303,9 @@ namespace FluentTaskScheduler.ViewModels
             }
 
             // Inserting or moving items to match the results list
-            for (int i = 0; i < results.Count; i++)
+            for (int i = 0; i < reconciled.Count; i++)
             {
-                var taskModel = results[i];
+                var taskModel = reconciled[i];
                 if (!currentSet.Contains(taskModel))
                 {
                     FilteredTasks.Insert(i, taskModel);

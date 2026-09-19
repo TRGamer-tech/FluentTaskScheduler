@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using FluentTaskScheduler.Services;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -16,7 +18,7 @@ namespace FluentTaskScheduler.Helpers
                 Content = message,
                 CloseButtonText = Services.LocalizationService.GetString("Dialog.Common.OK", "OK"),
                 XamlRoot = xamlRoot,
-                RequestedTheme = Services.SettingsService.Theme
+                RequestedTheme = App.Container.GetRequiredService<ISettingsService>().Theme
             };
             return await dialog.ShowAsync();
         }

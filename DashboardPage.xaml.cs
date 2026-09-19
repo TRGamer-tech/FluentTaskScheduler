@@ -1,8 +1,13 @@
+using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Shapes;
 using FluentTaskScheduler.ViewModels;
 using FluentTaskScheduler.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Windows.Foundation;
 
 namespace FluentTaskScheduler
 {
@@ -17,8 +22,92 @@ namespace FluentTaskScheduler
             this.InitializeComponent();
             ViewModel = new DashboardViewModel();
             this.NavigationCacheMode = Microsoft.UI.Xaml.Navigation.NavigationCacheMode.Required;
+
+            // Subscriptions are armed in Loaded and torn down in Unloaded, never in this
+            // constructor. NavigationCacheMode.Required means this instance is reused for the life
+            // of its Frame, so the constructor runs exactly once: setting them up here left the
+            // page permanently deaf after the first navigate-away unsubscribed it, freezing the
+            // labels in whatever language was active at first construction and stranding the view
+            // model's filter labels in the old locale (which then matched nothing and zeroed out
+            // every statistic). Tearing down on Unloaded still avoids the leak in 3.3 — the page,
+            // its Frame and its window stay collectable once the window closes.
+            this.Loaded += DashboardPage_Loaded;
+            this.Unloaded += DashboardPage_Unloaded;
+        }
+
+        private void DashboardPage_Loaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+        {
+            // Loaded fires again every time a cached page is navigated back to, so re-arm
+            // idempotently (-= before += is a no-op when not currently subscribed).
+            LocalizationService.LanguageChanged -= LocalizationService_LanguageChanged;
             LocalizationService.LanguageChanged += LocalizationService_LanguageChanged;
+            ViewModel.HealthScoreChanged -= DashboardViewModel_HealthScoreChanged;
+            ViewModel.HealthScoreChanged += DashboardViewModel_HealthScoreChanged;
+            ViewModel.Resume();
+
+            // Picks up any language change that happened while this page was off-screen.
             ApplyLocalizedUi();
+        }
+
+        private void DashboardPage_Unloaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+        {
+            LocalizationService.LanguageChanged -= LocalizationService_LanguageChanged;
+            ViewModel.HealthScoreChanged -= DashboardViewModel_HealthScoreChanged;
+            ViewModel.Cleanup();
+        }
+
+        private void DashboardViewModel_HealthScoreChanged(object? sender, EventArgs e) => DrawHealthRing();
+
+        // ── Health ring ─────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Rebuilds the health arc. WinUI has no built-in ring gauge, so the arc is a Path whose
+        /// geometry is recomputed whenever the score changes.
+        /// </summary>
+        private void DrawHealthRing()
+        {
+            if (HealthRingArc == null) return;
+
+            const double size = 76;
+            const double stroke = 8;
+            double radius = (size - stroke) / 2;
+            var centre = new Point(size / 2, size / 2);
+
+            double fraction = Math.Clamp(ViewModel.HealthScore / 100.0, 0, 1);
+
+            // A full circle cannot be expressed as a single arc segment (start == end).
+            if (fraction <= 0)
+            {
+                HealthRingArc.Data = null;
+                return;
+            }
+            if (fraction >= 1) fraction = 0.9999;
+
+            double angle = fraction * 2 * Math.PI;
+            var start = new Point(centre.X, centre.Y - radius);            // 12 o'clock
+            var end = new Point(
+                centre.X + radius * Math.Sin(angle),
+                centre.Y - radius * Math.Cos(angle));
+
+            var figure = new PathFigure { StartPoint = start, IsClosed = false };
+            figure.Segments.Add(new ArcSegment
+            {
+                Point = end,
+                Size = new Size(radius, radius),
+                IsLargeArc = fraction > 0.5,
+                SweepDirection = SweepDirection.Clockwise
+            });
+
+            var geometry = new PathGeometry();
+            geometry.Figures.Add(figure);
+            HealthRingArc.Data = geometry;
+
+            HealthRingArc.Stroke = ViewModel.HealthScore switch
+            {
+                >= 90 => (Brush)Application.Current.Resources["SystemFillColorSuccessBrush"],
+                >= 70 => (Brush)Application.Current.Resources["SystemFillColorCautionBrush"],
+                _ => (Brush)Application.Current.Resources["SystemFillColorCriticalBrush"]
+            };
         }
 
         private void LocalizationService_LanguageChanged(object? sender, System.EventArgs e)
@@ -53,6 +142,44 @@ namespace FluentTaskScheduler
             DashboardRunHistory.Text = L("DashboardRunHistory.Text", "Run History - Last 7 Days");
             DashboardSuccess.Text = L("DashboardSuccess.Text", "Success");
             DashboardFailure.Text = L("DashboardFailure.Text", "Failure");
+
+            // v1.9 analytics
+            DashboardHealthCaption.Text = L("Dashboard.HealthCaption", "Share of runs that finished with exit code 0 in the last 7 days.");
+            DashboardThroughput.Text = L("Dashboard.Throughput", "Executions");
+            DashboardRuns24hLabel.Text = L("Dashboard.Runs24h", "in the last 24h");
+            DashboardRuns7dLabel.Text = L("Dashboard.Runs7d", "in the last 7 days");
+            DashboardAvgDuration.Text = L("Dashboard.AvgDuration", "Average Duration");
+            DashboardAvgDurationHint.Text = L("Dashboard.AvgDurationHint", "Across all completed runs (7 days)");
+            DashboardLongestTask.Text = L("Dashboard.LongestTask", "Longest Run");
+            DashboardHeatmapTitle.Text = L("Dashboard.HeatmapTitle", "Execution Heatmap - by hour of day");
+            DashboardPeakHourLabel.Text = L("Dashboard.PeakHour", "Busiest hour:");
+            DashboardExecutionStream.Text = L("Dashboard.ExecutionStream", "Execution Log Stream");
+            DashboardNoExecutionEntries.Text = L("Dashboard.NoExecutionEntries", "No runs recorded for this filter.");
+
+            ExecFilterAll.Content = L("Dashboard.Filter.All", "All");
+            ExecFilterSuccess.Content = L("Dashboard.Status.Success", "Success");
+            ExecFilterFailed.Content = L("Dashboard.Status.Failed", "Failed");
+            ExecFilterSnoozed.Content = L("Dashboard.Status.Snoozed", "Snoozed");
+        }
+
+        private void ExecutionFilter_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not ToggleButton clicked) return;
+
+            string filter = clicked.Tag?.ToString() ?? "All";
+            ViewModel.ExecutionFilter = filter;
+
+            // Behave like a radio group: exactly one filter stays checked.
+            foreach (var button in new[] { ExecFilterAll, ExecFilterSuccess, ExecFilterFailed, ExecFilterSnoozed })
+                button.IsChecked = ReferenceEquals(button, clicked);
+        }
+
+        private void ExecutionEntry_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            if (e.ClickedItem is ExecutionLogEntry entry && !string.IsNullOrEmpty(entry.TaskPath))
+            {
+                ViewModel.NavigateToTask(entry.TaskPath);
+            }
         }
 
         protected override async void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
@@ -85,6 +212,7 @@ namespace FluentTaskScheduler
         private void Page_Loaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             PageScrollViewer.IsScrollInertiaEnabled = Settings.SmoothScrolling;
+            DrawHealthRing();
         }
         private async void DashboardReload_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {

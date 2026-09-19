@@ -12,11 +12,11 @@
 
     <Grid>
         <ScrollViewer x:Name="PageScrollViewer" Padding="24" IsScrollInertiaEnabled="False">
-            <StackPanel Spacing="24" MaxWidth="1400" HorizontalAlignment="Center">
+            <StackPanel Spacing="24" Visibility="{x:Bind ViewModel.ContentVisible, Mode=OneWay}">
                 <Button x:Name="DashboardReloadBtn" Click="DashboardReload_Click" HorizontalAlignment="Right" Margin="0,0,0,-12">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <SymbolIcon Symbol="Refresh" />
-                        <TextBlock x:Name="DashboardRefreshBtn" x:Uid="DashboardRefreshBtn" />
+                        <TextBlock x:Name="DashboardRefreshBtn" />
                     </StackPanel>
                 </Button>
 
@@ -29,7 +29,7 @@
                     
                     <!-- Category Filter -->
                     <StackPanel Spacing="8">
-                        <TextBlock x:Name="DashboardFilterCategory" x:Uid="DashboardFilterCategory" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="4,0,0,0"/>
+                        <TextBlock x:Name="DashboardFilterCategory" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="4,0,0,0"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -68,7 +68,7 @@
 
                     <!-- Tag Filter -->
                     <StackPanel Grid.Column="1" Spacing="8">
-                        <TextBlock x:Name="DashboardFilterTag" x:Uid="DashboardFilterTag" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="4,0,0,0"/>
+                        <TextBlock x:Name="DashboardFilterTag" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" Margin="4,0,0,0"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -118,15 +118,15 @@
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE8F1;" FontSize="16" Opacity="0.7"/>
-                                <TextBlock x:Name="DashboardTotalTasks" x:Uid="DashboardTotalTasks" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBlock x:Name="DashboardTotalTasks" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                             </StackPanel>
                             <TextBlock Text="{x:Bind ViewModel.TotalTasks, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
                             <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0" Opacity="0.7">
                                 <TextBlock Text="{x:Bind ViewModel.EnabledTasks, Mode=OneWay}" Foreground="{ThemeResource SystemFillColorSuccessBrush}"/>
-                                <TextBlock x:Name="DashboardEnabled" x:Uid="DashboardEnabled"/>
+                                <TextBlock x:Name="DashboardEnabled"/>
                                 <TextBlock Text="|" Opacity="0.3"/>
                                 <TextBlock Text="{x:Bind ViewModel.DisabledTasks, Mode=OneWay}" Foreground="LightGray"/>
-                                <TextBlock x:Name="DashboardDisabled" x:Uid="DashboardDisabled"/>
+                                <TextBlock x:Name="DashboardDisabled"/>
                             </StackPanel>
                         </StackPanel>
                     </Grid>
@@ -136,25 +136,184 @@
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE76F;" FontSize="16" Opacity="0.7" Foreground="MediumSeaGreen"/>
-                                <TextBlock x:Name="DashboardRunning" x:Uid="DashboardRunning" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBlock x:Name="DashboardRunning" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                             </StackPanel>
                             <TextBlock Text="{x:Bind ViewModel.RunningTasks, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0" Foreground="MediumSeaGreen"/>
-                            <TextBlock x:Name="DashboardActiveProcesses" x:Uid="DashboardActiveProcesses" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Margin="0,4,0,0"/>
+                            <TextBlock x:Name="DashboardActiveProcesses" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Grid>
 
-                    <!-- Health Score -->
+                    <!-- Health Score ring -->
+                    <Grid Grid.Column="2" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE9D9;" FontSize="16" Opacity="0.7"/>
+                                <TextBlock x:Name="DashboardHealthScore" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            </StackPanel>
+                            <TextBlock x:Name="DashboardHealthCaption" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.55"
+                                       TextWrapping="Wrap" Margin="0,6,8,0"/>
+                        </StackPanel>
+
+                        <!-- Ring: track + arc drawn in code-behind from the health score -->
+                        <Grid Grid.Column="1" Width="76" Height="76">
+                            <Ellipse Width="76" Height="76" StrokeThickness="8"
+                                     Stroke="{ThemeResource ControlStrongStrokeColorDisabledBrush}" Opacity="0.35"/>
+                            <Path x:Name="HealthRingArc" StrokeThickness="8" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                  Stroke="{ThemeResource SystemFillColorSuccessBrush}"/>
+                            <TextBlock Text="{x:Bind ViewModel.HealthScoreText, Mode=OneWay}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                        </Grid>
+                    </Grid>
+                </Grid>
+
+                <!-- Row 1b: Performance metrics -->
+                <Grid ColumnSpacing="16" Margin="0,-8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Throughput -->
+                    <Grid Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE9D2;" FontSize="16" Opacity="0.7"/>
+                                <TextBlock x:Name="DashboardThroughput" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,8,0,0" VerticalAlignment="Bottom">
+                                <TextBlock Text="{x:Bind ViewModel.Runs24h, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                                <TextBlock x:Name="DashboardRuns24hLabel" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" VerticalAlignment="Bottom" Margin="0,0,0,4"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
+                                <TextBlock Text="{x:Bind ViewModel.Runs7d, Mode=OneWay}" Opacity="0.75"/>
+                                <TextBlock x:Name="DashboardRuns7dLabel" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Average duration -->
+                    <Grid Grid.Column="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE916;" FontSize="16" Opacity="0.7"/>
+                                <TextBlock x:Name="DashboardAvgDuration" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            </StackPanel>
+                            <TextBlock Text="{x:Bind ViewModel.AverageDurationText, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
+                            <TextBlock x:Name="DashboardAvgDurationHint" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Longest running task -->
                     <Grid Grid.Column="2" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="&#xE9D9;" FontSize="16" Opacity="0.7"/>
-                                <TextBlock x:Name="DashboardHealthScore" x:Uid="DashboardHealthScore" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <FontIcon Glyph="&#xEC4A;" FontSize="16" Opacity="0.7"/>
+                                <TextBlock x:Name="DashboardLongestTask" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                             </StackPanel>
-                            <TextBlock Text="{x:Bind ViewModel.HealthScore, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0" Foreground="{ThemeResource SystemFillColorSuccessBrush}"/>
-                            <ProgressBar Value="{x:Bind ViewModel.HealthScore, Mode=OneWay}" Maximum="100" Margin="0,12,0,0" Height="4"/>
+                            <TextBlock Text="{x:Bind ViewModel.LongestTaskDuration, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
+                            <TextBlock Text="{x:Bind ViewModel.LongestTaskName, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}"
+                                       Opacity="0.6" Margin="0,4,0,0" TextTrimming="CharacterEllipsis" MaxLines="1"/>
                         </StackPanel>
                     </Grid>
                 </Grid>
+
+                <!-- 24-hour execution heatmap -->
+                <StackPanel Spacing="10">
+                    <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                        <TextBlock x:Name="DashboardHeatmapTitle" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <TextBlock x:Name="DashboardPeakHourLabel" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Bind ViewModel.PeakHourLabel, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource SystemAccentColor}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Grid Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8"
+                          Padding="20,16" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollMode="Disabled" VerticalScrollBarVisibility="Disabled" IsScrollInertiaEnabled="False">
+                            <ItemsControl ItemsSource="{x:Bind ViewModel.Heatmap, Mode=OneWay}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="4"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="viewmodels:HeatmapCell">
+                                        <StackPanel Spacing="4" ToolTipService.ToolTip="{x:Bind Tooltip}">
+                                            <Border Width="34" Height="46" CornerRadius="4"
+                                                    Background="{ThemeResource SystemAccentColor}"
+                                                    Opacity="{x:Bind FillOpacity}"/>
+                                            <TextBlock Text="{x:Bind Runs}" FontSize="10" HorizontalAlignment="Center"
+                                                       Opacity="{x:Bind CountOpacity}"/>
+                                            <TextBlock Text="{x:Bind HourLabel}" FontSize="10" HorizontalAlignment="Center" Opacity="0.5"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </StackPanel>
+
+                <!-- Execution log stream -->
+                <StackPanel Spacing="10">
+                    <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                        <TextBlock x:Name="DashboardExecutionStream" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <ToggleButton x:Name="ExecFilterAll" Tag="All" IsChecked="True" CornerRadius="4" Click="ExecutionFilter_Click"/>
+                            <ToggleButton x:Name="ExecFilterSuccess" Tag="Success" CornerRadius="4" Click="ExecutionFilter_Click"/>
+                            <ToggleButton x:Name="ExecFilterFailed" Tag="Failed" CornerRadius="4" Click="ExecutionFilter_Click"/>
+                            <ToggleButton x:Name="ExecFilterSnoozed" Tag="Snoozed" CornerRadius="4" Click="ExecutionFilter_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <ListView x:Name="ExecutionLogListView" ItemsSource="{x:Bind ViewModel.ExecutionLog, Mode=OneWay}"
+                              SelectionMode="None" IsItemClickEnabled="True" ItemClick="ExecutionEntry_ItemClick"
+                              MaxHeight="360" Padding="0">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Margin" Value="0"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="MinHeight" Value="0"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="viewmodels:ExecutionLogEntry">
+                                <Grid Padding="12,10" CornerRadius="4" Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                      Margin="0,0,0,6" BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <FontIcon Glyph="{x:Bind Glyph}" FontSize="14" Foreground="{x:Bind StatusBrush}"
+                                              VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                    <TextBlock Grid.Column="1" Text="{x:Bind TimeText}" Width="130"
+                                               Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6" VerticalAlignment="Center"/>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="{x:Bind TaskName}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxLines="1"/>
+                                        <TextBlock Text="{x:Bind Detail}" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.6"
+                                                   TextTrimming="CharacterEllipsis" MaxLines="1"/>
+                                    </StackPanel>
+                                    <Border Grid.Column="3" CornerRadius="4" Padding="8,3" VerticalAlignment="Center"
+                                            Background="{ThemeResource LayerOnAcrylicFillColorDefaultBrush}">
+                                        <TextBlock Text="{x:Bind StatusText}" Style="{StaticResource CaptionTextBlockStyle}"
+                                                   Foreground="{x:Bind StatusBrush}"/>
+                                    </Border>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <TextBlock x:Name="DashboardNoExecutionEntries" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5"
+                               Visibility="{x:Bind ViewModel.NoExecutionEntriesVisible, Mode=OneWay}"/>
+                </StackPanel>
 
                 <!-- Row 2: Run results -->
                 <Grid ColumnSpacing="16" Margin="0,-8,0,0">
@@ -169,10 +328,10 @@
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE73E;" FontSize="16" Opacity="0.7" Foreground="{ThemeResource SystemFillColorSuccessBrush}"/>
-                                <TextBlock x:Name="DashboardRecentSuccess" x:Uid="DashboardRecentSuccess" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBlock x:Name="DashboardRecentSuccess" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                             </StackPanel>
                             <TextBlock Text="{x:Bind ViewModel.LastRunSuccess, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
-                            <TextBlock x:Name="DashboardRecentChecked" x:Uid="DashboardRecentChecked" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Margin="0,4,0,0"/>
+                            <TextBlock x:Name="DashboardRecentChecked" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Grid>
 
@@ -181,10 +340,10 @@
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE711;" FontSize="16" Opacity="0.7" Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
-                                <TextBlock x:Name="DashboardRecentFailure" x:Uid="DashboardRecentFailure" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBlock x:Name="DashboardRecentFailure" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                             </StackPanel>
                             <TextBlock Text="{x:Bind ViewModel.LastRunFailed, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0" Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
-                            <TextBlock x:Name="DashboardNeedsAttention" x:Uid="DashboardNeedsAttention" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Margin="0,4,0,0"/>
+                            <TextBlock x:Name="DashboardNeedsAttention" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Grid>
 
@@ -195,7 +354,7 @@
                 <!-- Currently Running Tasks -->
                 <StackPanel Spacing="6">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock x:Name="DashboardCurrentlyRunning" x:Uid="DashboardCurrentlyRunning" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                        <TextBlock x:Name="DashboardCurrentlyRunning" Style="{StaticResource SubtitleTextBlockStyle}"/>
                         <ProgressRing IsActive="{x:Bind ViewModel.HasRunningTasks, Mode=OneWay}" Width="16" Height="16" VerticalAlignment="Center"/>
                     </StackPanel>
                     <ListView x:Name="RunningTasksListView" ItemsSource="{x:Bind ViewModel.RunningTasksList, Mode=OneWay}" SelectionMode="None" IsItemClickEnabled="True" ItemClick="RunningTask_ItemClick" Padding="0">
@@ -235,13 +394,13 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
-                    <TextBlock x:Name="DashboardNoRunningTasks" x:Uid="DashboardNoRunningTasks" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5"
+                    <TextBlock x:Name="DashboardNoRunningTasks" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5"
                                Visibility="{x:Bind ViewModel.NoRunningTasksVisible, Mode=OneWay}"/>
                 </StackPanel>
 
                 <!-- Recently Failed Tasks -->
                 <StackPanel Spacing="6">
-                    <TextBlock x:Name="DashboardRecentlyFailed" x:Uid="DashboardRecentlyFailed" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                    <TextBlock x:Name="DashboardRecentlyFailed" Style="{StaticResource SubtitleTextBlockStyle}"/>
                     <ListView x:Name="FailedTasksListView" ItemsSource="{x:Bind ViewModel.FailedTasksList, Mode=OneWay}" SelectionMode="None" IsItemClickEnabled="True" ItemClick="FailedTask_ItemClick" Padding="0">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
@@ -274,7 +433,7 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
-                    <TextBlock x:Name="DashboardNoRecentFailures" x:Uid="DashboardNoRecentFailures" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Foreground="{ThemeResource SystemFillColorSuccessBrush}"
+                    <TextBlock x:Name="DashboardNoRecentFailures" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Foreground="{ThemeResource SystemFillColorSuccessBrush}"
                                Visibility="{x:Bind ViewModel.NoFailedTasksVisible, Mode=OneWay}"/>
                 </StackPanel>
 
@@ -286,7 +445,7 @@
 
                     <!-- Upcoming Schedule -->
                     <StackPanel Grid.Column="0" Spacing="6">
-                        <TextBlock x:Name="DashboardUpcomingSchedule" x:Uid="DashboardUpcomingSchedule" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                        <TextBlock x:Name="DashboardUpcomingSchedule" Style="{StaticResource SubtitleTextBlockStyle}"/>
                         <ListView ItemsSource="{x:Bind ViewModel.UpcomingTasks, Mode=OneWay}" SelectionMode="None" Padding="0">
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="ListViewItem">
@@ -320,7 +479,7 @@
 
                     <!-- Recent Activity Stream -->
                     <StackPanel Grid.Column="1" Spacing="6">
-                        <TextBlock x:Name="DashboardActivityStream" x:Uid="DashboardActivityStream" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                        <TextBlock x:Name="DashboardActivityStream" Style="{StaticResource SubtitleTextBlockStyle}"/>
                         <ListView ItemsSource="{x:Bind ViewModel.RecentHistory, Mode=OneWay}" SelectionMode="None" Padding="0" IsItemClickEnabled="True" ItemClick="ActivityList_ItemClick">
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="ListViewItem">
@@ -350,12 +509,12 @@
                 <StackPanel Spacing="10">
                     <!-- Header + Legend -->
                     <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
-                        <TextBlock x:Name="DashboardRunHistory" x:Uid="DashboardRunHistory" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                        <TextBlock x:Name="DashboardRunHistory" Style="{StaticResource SubtitleTextBlockStyle}"/>
                         <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                             <Rectangle Width="12" Height="12" Fill="{ThemeResource SystemFillColorSuccessBrush}" RadiusX="2" RadiusY="2"/>
-                            <TextBlock x:Name="DashboardSuccess" x:Uid="DashboardSuccess" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="DashboardSuccess" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" VerticalAlignment="Center"/>
                             <Rectangle Width="12" Height="12" Fill="{ThemeResource SystemFillColorCriticalBrush}" RadiusX="2" RadiusY="2" Margin="8,0,0,0"/>
-                            <TextBlock x:Name="DashboardFailure" x:Uid="DashboardFailure" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="DashboardFailure" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" VerticalAlignment="Center"/>
                         </StackPanel>
                     </StackPanel>
 

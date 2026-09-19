@@ -23,11 +23,15 @@ namespace FluentTaskScheduler.Dialogs
             public bool ShowAdminWarn { get; init; } // admin-rights warning
         }
 
-        private static readonly Step[] Steps = new[]
+        // Built per-instance (not static) so replaying onboarding after a language switch shows the
+        // current language instead of whatever was active the first time this type was loaded (2.5).
+        private readonly Step[] _steps;
+
+        private static Step[] BuildSteps() => new[]
         {
             new Step
             {
-                Icon          = "\uE8A1",   // Calendar / Scheduler
+                Icon          = "\uE787",   // Calendar / Scheduler
                 Title         = L("Onboarding.Step1.Title", "Welcome to FluentTaskScheduler"),
                 Body          = L("Onboarding.Step1.Body", "Manage Windows Task Scheduler with a modern, fluent interface — no XML, no fuss."),
                 ShowHint      = false,
@@ -51,7 +55,7 @@ namespace FluentTaskScheduler.Dialogs
             },
             new Step
             {
-                Icon          = "\uE9F9",   // Chart / History
+                Icon          = "\uE9D2",   // Chart / History
                 Title         = L("Onboarding.Step4.Title", "Track history & status"),
                 Body          = L("Onboarding.Step4.Body", "Click any task to see its run history, success and failure counts, and live running status — all in one place."),
                 ShowHint      = false,
@@ -75,6 +79,22 @@ namespace FluentTaskScheduler.Dialogs
             },
             new Step
             {
+                Icon          = "\uEF90",   // Chain / flow
+                Title         = L("Onboarding.StepPipelines.Title", "Chain tasks and pause everything"),
+                Body          = L("Onboarding.StepPipelines.Body", "Set Completion Actions on a task to start other tasks when it succeeds or fails. Need a break? Snooze All Tasks pauses runs \u2014 for a fixed time, until reboot, or until you resume it."),
+                ShowHint      = false,
+                ShowAdminWarn = false
+            },
+            new Step
+            {
+                Icon          = "\uE9F9",   // Analytics
+                Title         = L("Onboarding.StepDashboard.Title", "Analyse and deploy faster"),
+                Body          = L("Onboarding.StepDashboard.Body", "The Dashboard shows an execution heatmap, health score, and live run log. The Library has ready-made task templates and reusable scripts you can deploy in one click."),
+                ShowHint      = false,
+                ShowAdminWarn = false
+            },
+            new Step
+            {
                 Icon          = "\uE713",   // Settings
                 Title         = L("Onboarding.Step7.Title", "Tune it to your liking"),
                 Body          = L("Onboarding.Step7.Body", "Head to Settings to enable Mica backdrop, minimise to tray, configure logging, run on startup, and more."),
@@ -91,15 +111,21 @@ namespace FluentTaskScheduler.Dialogs
         public OnboardingDialog()
         {
             this.InitializeComponent();
+            _steps = BuildSteps();
             BuildDots();
             UpdateStep();
+
+            // Mark onboarding as seen on ANY close path (Next-through-to-"Get Started", ESC, light
+            // dismiss) — previously only reaching the final step and clicking through set the flag,
+            // so dismissing any other way reopened the dialog on every launch (2.5).
+            this.Closed += (s, e) => Settings.HasCompletedOnboarding = true;
         }
 
         // ── Dot indicators ───────────────────────────────────────────────────────
         private void BuildDots()
         {
-            _dots = new Ellipse[Steps.Length];
-            for (int i = 0; i < Steps.Length; i++)
+            _dots = new Ellipse[_steps.Length];
+            for (int i = 0; i < _steps.Length; i++)
             {
                 var dot = new Ellipse
                 {
@@ -114,7 +140,7 @@ namespace FluentTaskScheduler.Dialogs
         // ── Step renderer ────────────────────────────────────────────────────────
         private void UpdateStep()
         {
-            var step = Steps[_currentStep];
+            var step = _steps[_currentStep];
 
             // Icon & title & body
             StepIcon.Glyph  = step.Icon;
@@ -129,7 +155,7 @@ namespace FluentTaskScheduler.Dialogs
             BackButton.Visibility = _currentStep == 0 ? Visibility.Collapsed : Visibility.Visible;
 
             // Next / Get Started button
-            bool isLast = _currentStep == Steps.Length - 1;
+            bool isLast = _currentStep == _steps.Length - 1;
             NextButton.Content = isLast ? L("Dialog.GetStarted", "Get Started") : L("Dialog.Next", "Next");
 
             // Highlight active dot
@@ -152,15 +178,14 @@ namespace FluentTaskScheduler.Dialogs
         // ── Navigation ───────────────────────────────────────────────────────────
         private void NextButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentStep < Steps.Length - 1)
+            if (_currentStep < _steps.Length - 1)
             {
                 _currentStep++;
                 UpdateStep();
             }
             else
             {
-                // Final step — mark onboarding complete and close
-                Settings.HasCompletedOnboarding = true;
+                // Final step — the Closed handler marks onboarding complete.
                 this.Hide();
             }
         }
