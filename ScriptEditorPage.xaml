@@ -18,21 +18,20 @@
 
         <!-- Toolbar -->
         <CommandBar Background="Transparent" DefaultLabelPosition="Right" HorizontalAlignment="Left">
-            <AppBarButton x:Name="RunButton" x:Uid="ScriptEditor_RunBtn" Icon="Play" Click="RunButton_Click">
+            <AppBarButton x:Name="RunButton" Icon="Play" Click="RunButton_Click">
                 <ToolTipService.ToolTip>
                     <ToolTip Content="Run Script (Ctrl+R)"/>
                 </ToolTipService.ToolTip>
             </AppBarButton>
-            <AppBarButton x:Name="StopButton" x:Uid="ScriptEditor_StopBtn" Icon="Stop" Click="StopButton_Click" IsEnabled="False"/>
+            <AppBarButton x:Name="StopButton" Icon="Stop" Click="StopButton_Click" IsEnabled="False"/>
             <AppBarSeparator/>
-            <AppBarButton x:Name="SaveButton" x:Uid="ScriptEditor_SaveBtn" Icon="Save" Click="SaveButton_Click"/>
+            <AppBarButton x:Name="SaveButton" Icon="Save" Click="SaveButton_Click"/>
             <AppBarSeparator/>
-            <AppBarButton x:Name="ClearButton" x:Uid="ScriptEditor_ClearBtn" Icon="Clear" Click="ClearButton_Click"/>
+            <AppBarButton x:Name="ClearButton" Icon="Clear" Click="ClearButton_Click"/>
         </CommandBar>
 
         <!-- Editor Area -->
         <RichEditBox x:Name="CodeEditor"
-                     x:Uid="ScriptEditor_CodeEditor"
                      Grid.Row="1"
                      Margin="0,12,0,0"
                      FontFamily="Consolas, 'Courier New', monospace"
@@ -53,14 +52,16 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock x:Uid="ScriptEditor_OutputHeader" Text="Output Console" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" Margin="0,0,0,4"/>
-            <ScrollViewer Grid.Row="1" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}" CornerRadius="4">
-                <TextBlock x:Name="OutputConsole"
+            <TextBlock x:Name="OutputHeaderText" Text="Output Console" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7" Margin="0,0,0,4"/>
+            <ScrollViewer x:Name="OutputScrollViewer" Grid.Row="1" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}" CornerRadius="4">
+                <RichTextBlock x:Name="OutputConsole"
                            Margin="12"
                            FontFamily="Consolas, 'Courier New', monospace"
                            FontSize="12"
                            TextWrapping="Wrap"
-                           IsTextSelectionEnabled="True"/>
+                           IsTextSelectionEnabled="True">
+                    <Paragraph x:Name="OutputParagraph"/>
+                </RichTextBlock>
             </ScrollViewer>
         </Grid>
     </Grid>

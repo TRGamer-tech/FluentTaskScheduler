@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using FluentTaskScheduler.Helpers;
 using FluentTaskScheduler.Services;
 using Microsoft.UI;
 using Microsoft.UI.Dispatching;
@@ -33,6 +34,10 @@ namespace FluentTaskScheduler.ViewModels
         public string Arguments { get; set; } = "";
         public bool AdminRequired { get; set; }
         public string RunText { get; set; } = LocalizationService.GetString("QuickActions.RunBtn", "Run");
+
+        // Incremented on every ExecuteAction call so a stale reset-to-Idle timer from a
+        // previous run can't clobber the status of a newer run started within the reset delay.
+        internal int RunToken { get; set; }
 
         public QuickActionStatus Status
         {
@@ -105,8 +110,10 @@ namespace FluentTaskScheduler.ViewModels
                 Title = LocalizationService.GetString("QuickActions.ClearTemp.Title", "Clear Temp Files"),
                 Description = LocalizationService.GetString("QuickActions.ClearTemp.Desc", "Deletes files from the temporary folders."),
                 Icon = "\uE74D", // Delete
-                Command = "cmd.exe",
-                Arguments = "/c del /q /s %temp%\\*"
+                // "del /q /s" has an unreliable exit code (e.g. it still returns 0 on partial
+                // failures and vice versa); Remove-Item gives a real success/failure signal.
+                Command = "powershell.exe",
+                Arguments = "-ExecutionPolicy Bypass -Command \"Remove-Item -Path $env:TEMP\\* -Recurse -Force -ErrorAction SilentlyContinue\""
             });
 
             Actions.Add(new QuickActionItemViewModel
@@ -126,7 +133,8 @@ namespace FluentTaskScheduler.ViewModels
                 Description = LocalizationService.GetString("QuickActions.IPReleaseRenew.Desc", "Releases and renews the current IP address."),
                 Icon = "\uE839", // Ethernet
                 Command = "ipconfig",
-                Arguments = "/renew"
+                Arguments = "/renew",
+                AdminRequired = true
             });
 
             Actions.Add(new QuickActionItemViewModel
@@ -156,6 +164,7 @@ namespace FluentTaskScheduler.ViewModels
         {
             if (action.Status == QuickActionStatus.Running) return;
 
+            int runToken = ++action.RunToken;
             action.Status = QuickActionStatus.Running;
             action.StatusMessage = "";
 
@@ -176,7 +185,7 @@ namespace FluentTaskScheduler.ViewModels
                     if (action.AdminRequired)
                     {
                         // Check if we are already elevated
-                        if (!IsRunningAsAdmin())
+                        if (!ElevationHelper.IsElevated())
                         {
                             throw new UnauthorizedAccessException("This action requires Administrator privileges. Please restart the app as Administrator.");
                         }
@@ -185,12 +194,21 @@ namespace FluentTaskScheduler.ViewModels
                     using (var process = Process.Start(startInfo))
                     {
                         if (process == null) throw new Exception("Failed to start process.");
+
+                        // Read stdout/stderr asynchronously while waiting - reading only one stream
+                        // (or reading after WaitForExit) can deadlock if the child fills the OS pipe
+                        // buffer on the other stream before exiting (classic Process redirect deadlock).
+                        var errorBuilder = new System.Text.StringBuilder();
+                        process.OutputDataReceived += (_, args) => { };
+                        process.ErrorDataReceived += (_, args) => { if (args.Data != null) errorBuilder.AppendLine(args.Data); };
+                        process.BeginOutputReadLine();
+                        process.BeginErrorReadLine();
+
                         process.WaitForExit();
 
                         if (process.ExitCode != 0)
                         {
-                            var error = process.StandardError.ReadToEnd();
-                            throw new Exception($"Process exited with code {process.ExitCode}. {error}");
+                            throw new Exception($"Process exited with code {process.ExitCode}. {errorBuilder}");
                         }
                     }
                 });
@@ -204,20 +222,12 @@ namespace FluentTaskScheduler.ViewModels
                 Serilog.Log.Error("{Message}", $"Quick Action '{action.Title}' failed: {ex.Message}");
             }
 
-            // Reset to idle after a few seconds
+            // Reset to idle after a few seconds - only if a newer run hasn't started in the meantime.
             _ = Task.Delay(5000).ContinueWith(_ =>
             {
-                action.Status = QuickActionStatus.Idle;
+                if (action.RunToken == runToken)
+                    action.Status = QuickActionStatus.Idle;
             }, TaskScheduler.FromCurrentSynchronizationContext());
-        }
-
-        private bool IsRunningAsAdmin()
-        {
-            using (var identity = System.Security.Principal.WindowsIdentity.GetCurrent())
-            {
-                var principal = new System.Security.Principal.WindowsPrincipal(identity);
-                return principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
-            }
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)

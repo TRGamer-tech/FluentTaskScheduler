@@ -21,7 +21,11 @@ namespace FluentTaskScheduler.Helpers
             public string lpstrCustomFilter;
             public int nMaxCustFilter;
             public int nFilterIndex;
-            public string lpstrFile;
+            // Marshaled manually as a pinned native buffer (not a managed string) — GetOpenFileName/
+            // GetSaveFileName write the chosen path back into this buffer, and writing into a
+            // managed System.String from native code is undefined behavior (strings are immutable
+            // and may be interned; see 3.7).
+            public IntPtr lpstrFile;
             public int nMaxFile;
             public string lpstrFileTitle;
             public int nMaxFileTitle;
@@ -39,47 +43,62 @@ namespace FluentTaskScheduler.Helpers
             public int FlagsEx;
         }
 
+        private const int FileBufferChars = 2048;
+
+        /// <summary>Allocates an unmanaged, zero-initialized UTF-16 buffer seeded with <paramref name="seed"/>.</summary>
+        private static IntPtr AllocFileBuffer(string seed)
+        {
+            IntPtr buffer = Marshal.AllocHGlobal(FileBufferChars * sizeof(char));
+            var chars = new char[FileBufferChars];
+            seed ??= "";
+            seed.CopyTo(0, chars, 0, Math.Min(seed.Length, FileBufferChars - 1));
+            Marshal.Copy(chars, 0, buffer, FileBufferChars);
+            return buffer;
+        }
+
         public static string? PickSaveFile(IntPtr hwnd, string title, string filter, string defExt, string fileName = "")
         {
-            var ofn = new OpenFileName();
-            ofn.lStructSize = Marshal.SizeOf(ofn);
-            ofn.hwndOwner = hwnd;
-            ofn.lpstrTitle = title;
-            ofn.lpstrFilter = filter.Replace('|', '\0') + '\0';
-            
-            // Initialize file buffer
-            var fileBuffer = fileName.PadRight(2048, '\0');
-            ofn.lpstrFile = fileBuffer;
-            ofn.nMaxFile = ofn.lpstrFile.Length;
-            
-            ofn.lpstrDefExt = defExt;
-            ofn.nFlags = 0x00000002 | 0x00000008 | 0x00000004; // OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR | OFN_HIDEREADONLY
-
-            if (GetSaveFileName(ref ofn))
+            IntPtr fileBuffer = AllocFileBuffer(fileName);
+            try
             {
-                return ofn.lpstrFile.Split('\0')[0];
+                var ofn = new OpenFileName();
+                ofn.lStructSize = Marshal.SizeOf(ofn);
+                ofn.hwndOwner = hwnd;
+                ofn.lpstrTitle = title;
+                ofn.lpstrFilter = filter.Replace('|', '\0') + '\0';
+                ofn.lpstrFile = fileBuffer;
+                ofn.nMaxFile = FileBufferChars;
+                ofn.lpstrDefExt = defExt;
+                ofn.nFlags = 0x00000002 | 0x00000008 | 0x00000004; // OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR | OFN_HIDEREADONLY
+
+                return GetSaveFileName(ref ofn) ? Marshal.PtrToStringUni(fileBuffer) : null;
             }
-            return null;
+            finally
+            {
+                Marshal.FreeHGlobal(fileBuffer);
+            }
         }
 
         public static string? PickOpenFile(IntPtr hwnd, string title, string filter)
         {
-            var ofn = new OpenFileName();
-            ofn.lStructSize = Marshal.SizeOf(ofn);
-            ofn.hwndOwner = hwnd;
-            ofn.lpstrTitle = title;
-            ofn.lpstrFilter = filter.Replace('|', '\0') + '\0';
-            
-            ofn.lpstrFile = new string('\0', 2048);
-            ofn.nMaxFile = ofn.lpstrFile.Length;
-            
-            ofn.nFlags = 0x00000800 | 0x00000008 | 0x00001000; // OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST
-
-            if (GetOpenFileName(ref ofn))
+            IntPtr fileBuffer = AllocFileBuffer("");
+            try
             {
-                return ofn.lpstrFile.Split('\0')[0];
+                var ofn = new OpenFileName();
+                ofn.lStructSize = Marshal.SizeOf(ofn);
+                ofn.hwndOwner = hwnd;
+                ofn.lpstrTitle = title;
+                ofn.lpstrFilter = filter.Replace('|', '\0') + '\0';
+                ofn.lpstrFile = fileBuffer;
+                ofn.nMaxFile = FileBufferChars;
+                ofn.nFlags = 0x00000800 | 0x00000008 | 0x00001000; // OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST
+
+                return GetOpenFileName(ref ofn) ? Marshal.PtrToStringUni(fileBuffer) : null;
             }
-            return null;
+            finally
+            {
+                Marshal.FreeHGlobal(fileBuffer);
+            }
         }
     }
 }

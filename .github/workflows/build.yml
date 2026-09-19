@@ -2,13 +2,39 @@ name: Build
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'feature/**', 'fix/**', 'bugfix/**']
   pull_request:
     branches: [main]
   workflow_dispatch:
 
 jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Run tests
+        run: >
+          dotnet test FluentTaskScheduler.Tests/FluentTaskScheduler.Tests.csproj
+          -c Release
+          -p:Platform=x64
+          --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: test-results
+          path: FluentTaskScheduler.Tests/TestResults/test-results.trx
+
   build:
+    needs: test
     strategy:
       matrix:
         include:

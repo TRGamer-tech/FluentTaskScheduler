@@ -19,11 +19,40 @@ namespace FluentTaskScheduler
         private readonly DispatcherTimer _highlightTimer;
         private bool _isHighlighting = false;
 
+        private static string L(string key, string fallback) => LocalizationService.GetString(key, fallback);
+
         public ScriptEditorPage()
         {
             this.InitializeComponent();
             _highlightTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
             _highlightTimer.Tick += (s, e) => { _highlightTimer.Stop(); HighlightCode(); };
+
+            LocalizationService.LanguageChanged += LocalizationService_LanguageChanged;
+            this.Unloaded += (s, e) => LocalizationService.LanguageChanged -= LocalizationService_LanguageChanged;
+            this.ActualThemeChanged += (s, e) => HighlightCode();
+            ApplyLocalizedUi();
+        }
+
+        private void LocalizationService_LanguageChanged(object? sender, EventArgs e)
+        {
+            if (DispatcherQueue == null) return;
+            DispatcherQueue.TryEnqueue(ApplyLocalizedUi);
+        }
+
+        /// <summary>
+        /// Fills every label from LocalizationService. These used to rely on x:Uid, which resolves
+        /// against the Windows display language rather than the app's language setting.
+        /// </summary>
+        private void ApplyLocalizedUi()
+        {
+            RunButton.Label = L("ScriptEditor_RunBtn.Label", "Run");
+            StopButton.Label = L("ScriptEditor_StopBtn.Label", "Stop");
+            SaveButton.Label = L("ScriptEditor_SaveBtn.Label", "Save to Library");
+            ClearButton.Label = L("ScriptEditor_ClearBtn.Label", "Clear Console");
+
+            CodeEditor.Header = L("ScriptEditor_CodeEditor.Header", "PowerShell Script");
+            CodeEditor.PlaceholderText = L("ScriptEditor_CodeEditor.PlaceholderText", "Write your PowerShell script here...");
+            OutputHeaderText.Text = L("ScriptEditor_OutputHeader.Text", "Output Console");
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -55,7 +84,7 @@ namespace FluentTaskScheduler
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
-            OutputConsole.Text = "";
+            OutputParagraph.Inlines.Clear();
         }
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -90,6 +119,7 @@ namespace FluentTaskScheduler
                 File.WriteAllText(fullPath, code);
 
                 var viewModel = new ScriptLibraryViewModel();
+                await viewModel.LoadScriptsAsync();
                 viewModel.AddUserTemplate(new ScriptTemplateModel
                 {
                     Name = nameBox.Text,
@@ -107,7 +137,8 @@ namespace FluentTaskScheduler
         {
             RunButton.IsEnabled = false;
             StopButton.IsEnabled = true;
-            OutputConsole.Text = LocalizationService.GetString("ScriptEditor.Status.Starting", "[Starting PowerShell...]") + "\n";
+            OutputParagraph.Inlines.Clear();
+            AppendOutput(LocalizationService.GetString("ScriptEditor.Status.Starting", "[Starting PowerShell...]") + "\n", Colors.Gray);
 
             string tempFile = Path.Combine(Path.GetTempPath(), $"ft_temp_{Guid.NewGuid()}.ps1");
             File.WriteAllText(tempFile, code);
@@ -155,9 +186,12 @@ namespace FluentTaskScheduler
         {
             DispatcherQueue.TryEnqueue(() =>
             {
-                // In a real app we'd use a RichTextBlock or colored spans
-                // For now, just plain text to keep it simple but functional
-                OutputConsole.Text += text;
+                OutputParagraph.Inlines.Add(new Microsoft.UI.Xaml.Documents.Run
+                {
+                    Text = text,
+                    Foreground = new SolidColorBrush(color)
+                });
+                OutputScrollViewer.ChangeView(null, OutputScrollViewer.ScrollableHeight, null, disableAnimation: true);
             });
         }
 
@@ -180,14 +214,15 @@ namespace FluentTaskScheduler
             int start = selection.StartPosition;
             int end = selection.EndPosition;
 
-            // Clear formatting first
+            // Clear formatting first — theme-aware, not hardcoded white (which is invisible on the
+            // light theme's editor background; see 2.9).
+            var defaultColor = ActualTheme == ElementTheme.Dark ? Colors.White : Colors.Black;
             var allRange = CodeEditor.Document.GetRange(0, Microsoft.UI.Text.TextConstants.MaxUnitCount);
-            allRange.CharacterFormat.ForegroundColor = Colors.White;
-            
+            allRange.CharacterFormat.ForegroundColor = defaultColor;
+
             string text;
             allRange.GetText(Microsoft.UI.Text.TextGetOptions.None, out text);
 
-            // This is a VERY naive highlighter for demonstration
             foreach (var word in keywords)
             {
                 HighlightWord(word, Colors.CornflowerBlue);
@@ -204,9 +239,11 @@ namespace FluentTaskScheduler
             while (true)
             {
                 var range = CodeEditor.Document.GetRange(start, Microsoft.UI.Text.TextConstants.MaxUnitCount);
-                int found = range.FindText(word, Microsoft.UI.Text.TextConstants.MaxUnitCount, Microsoft.UI.Text.FindOptions.None);
+                // FindOptions.Word restricts matches to whole words, so e.g. the keyword "in" no
+                // longer lights up the "in" inside "string" (see 2.9).
+                int found = range.FindText(word, Microsoft.UI.Text.TextConstants.MaxUnitCount, Microsoft.UI.Text.FindOptions.Word);
                 if (found <= 0) break;
-                
+
                 range.CharacterFormat.ForegroundColor = color;
                 start = range.EndPosition;
             }

@@ -24,31 +24,35 @@
                 <Grid.RowDefinitions>
                     <RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/>
                     <RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/>
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0" Text="Event ID:" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                 <TextBlock Grid.Row="0" Grid.Column="1" Text="{x:Bind Entry.EventId}"/>
 
-                <TextBlock Grid.Row="1" Text="Level:" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                <TextBlock Grid.Row="1" Grid.Column="1" Text="{x:Bind Entry.Level}"/>
+                <TextBlock Grid.Row="1" Text="Exit Code:" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{x:Bind Entry.ExitCode}" IsTextSelectionEnabled="True"/>
 
-                <TextBlock Grid.Row="2" Text="User:" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                <TextBlock Grid.Row="2" Grid.Column="1" Text="{x:Bind Entry.User}" IsTextSelectionEnabled="True"/>
+                <TextBlock Grid.Row="2" Text="Level:" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="{x:Bind Entry.Level}"/>
 
-                <TextBlock Grid.Row="3" Text="OpCode:" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                <TextBlock Grid.Row="3" Grid.Column="1" Text="{x:Bind Entry.OpCode}"/>
+                <TextBlock Grid.Row="3" Text="User:" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="{x:Bind Entry.User}" IsTextSelectionEnabled="True"/>
 
-                <TextBlock Grid.Row="4" Text="Task Category:" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                <TextBlock Grid.Row="4" Grid.Column="1" Text="{x:Bind Entry.TaskCategory}"/>
+                <TextBlock Grid.Row="4" Text="OpCode:" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                <TextBlock Grid.Row="4" Grid.Column="1" Text="{x:Bind Entry.OpCode}"/>
 
-                <TextBlock Grid.Row="5" Text="Keywords:" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                <TextBlock Grid.Row="5" Grid.Column="1" Text="{x:Bind Entry.Keywords}"/>
+                <TextBlock Grid.Row="5" Text="Task Category:" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                <TextBlock Grid.Row="5" Grid.Column="1" Text="{x:Bind Entry.TaskCategory}"/>
 
-                <TextBlock Grid.Row="6" Text="Computer:" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                <TextBlock Grid.Row="6" Grid.Column="1" Text="{x:Bind Entry.Computer}"/>
+                <TextBlock Grid.Row="6" Text="Keywords:" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                <TextBlock Grid.Row="6" Grid.Column="1" Text="{x:Bind Entry.Keywords}"/>
 
-                <TextBlock Grid.Row="7" Text="Correlation ID:" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                <TextBlock Grid.Row="7" Grid.Column="1" Text="{x:Bind Entry.ActivityId}" FontSize="11" Opacity="0.8" IsTextSelectionEnabled="True"/>
+                <TextBlock Grid.Row="7" Text="Computer:" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                <TextBlock Grid.Row="7" Grid.Column="1" Text="{x:Bind Entry.Computer}"/>
+
+                <TextBlock Grid.Row="8" Text="Correlation ID:" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                <TextBlock Grid.Row="8" Grid.Column="1" Text="{x:Bind Entry.ActivityId}" FontSize="11" Opacity="0.8" IsTextSelectionEnabled="True"/>
             </Grid>
 
             <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,8"/>

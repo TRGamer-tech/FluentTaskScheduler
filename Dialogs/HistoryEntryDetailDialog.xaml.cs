@@ -47,6 +47,7 @@ namespace FluentTaskScheduler.Dialogs
             var details = $"Time: {Entry.Time}\n" +
                           $"Result: {Entry.Result}\n" +
                           $"Event ID: {Entry.EventId}\n" +
+                          $"Exit Code: {Entry.ExitCode}\n" +
                           $"Level: {Entry.Level}\n" +
                           $"User: {Entry.User}\n" +
                           $"Computer: {Entry.Computer}\n" +

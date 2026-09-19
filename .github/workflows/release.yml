@@ -1,0 +1,115 @@
+name: Release
+
+# Automates the "Publishing a Release with VeloPack" steps from CONTRIBUTING.md: publish +
+# `vpk pack` per architecture, assemble Dist/, and attach everything to a GitHub Release.
+# Triggered by pushing a tag like V1.9.1 (matching the tag format vpk/CONTRIBUTING.md already use).
+on:
+  push:
+    tags: ['V*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g. 1.9.1) — required for manual runs'
+        required: true
+
+jobs:
+  package:
+    strategy:
+      matrix:
+        include:
+          - platform: x64
+            rid: win-x64
+            channel: win-x64
+            runner: windows-latest
+          - platform: ARM64
+            rid: win-arm64
+            channel: win-arm64
+            runner: windows-11-arm
+
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Determine version
+        id: version
+        shell: pwsh
+        run: |
+          $version = "${{ inputs.version }}"
+          if (-not $version) { $version = "${{ github.ref_name }}".TrimStart('V') }
+          "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Install VeloPack CLI
+        run: dotnet tool install -g vpk
+
+      - name: Publish
+        run: >
+          dotnet publish
+          -c Release
+          -r ${{ matrix.rid }}
+          --self-contained
+          -p:Platform=${{ matrix.platform }}
+
+      - name: vpk pack
+        run: >
+          vpk pack
+          -u FluentTaskScheduler
+          -v ${{ steps.version.outputs.version }}
+          -c ${{ matrix.channel }}
+          -o Releases/${{ matrix.platform }}
+          -p bin/${{ matrix.platform }}/Release/net8.0-windows10.0.19041.0/${{ matrix.rid }}/publish
+          -e FluentTaskScheduler.exe
+          --msi --instLocation Either
+          --msiBanner Assets/MSI-Banner.bmp
+          --msiLogo Assets/MSI-Logo.bmp
+
+      - name: Fix zero-dated Portable ZIP entries
+        shell: pwsh
+        run: |
+          Add-Type -Assembly System.IO.Compression.FileSystem
+          $now = Get-Date
+          $zip = "Releases/${{ matrix.platform }}/FluentTaskScheduler-${{ matrix.rid }}-Portable.zip"
+          $archive = [System.IO.Compression.ZipFile]::Open($zip, 'Update')
+          foreach ($entry in $archive.Entries) { $entry.LastWriteTime = $now }
+          $archive.Dispose()
+
+      - name: Assemble Dist
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path Dist | Out-Null
+          $v = "${{ steps.version.outputs.version }}"
+          Copy-Item "Releases/${{ matrix.platform }}/FluentTaskScheduler-${{ matrix.rid }}-Portable.zip" "Dist/Portable-${{ matrix.platform }}.zip" -Force
+          Copy-Item "Releases/${{ matrix.platform }}/FluentTaskScheduler-${{ matrix.rid }}.msi" "Dist/Setup-${{ matrix.platform }}.msi" -Force
+          Copy-Item "Releases/${{ matrix.platform }}/releases.${{ matrix.channel }}.json" "Dist/" -Force
+          Copy-Item "Releases/${{ matrix.platform }}/FluentTaskScheduler-$v-full.nupkg" "Dist/" -Force
+          Get-Item "Releases/${{ matrix.platform }}/FluentTaskScheduler-$v-delta.nupkg" -ErrorAction SilentlyContinue | Copy-Item -Destination "Dist/" -Force
+
+      - name: Upload Dist artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: Dist-${{ matrix.platform }}
+          path: Dist/
+
+  publish-release:
+    needs: package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all Dist artifacts
+        uses: actions/download-artifact@v6
+        with:
+          pattern: Dist-*
+          path: Dist
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Dist/*
+          draft: true
+          generate_release_notes: true

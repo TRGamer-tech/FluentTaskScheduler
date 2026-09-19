@@ -123,14 +123,46 @@ namespace FluentTaskScheduler.Services
                 Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = language;
                 ResourceContext.SetGlobalQualifierValue("Language", language);
             }
-            catch
+            catch (Exception ex)
             {
-                // Ignore override failures and keep app running.
+                LogService.Warn($"Could not apply the WinRT language override for '{language}': {ex.Message}");
             }
+
+            ApplyCulture(language);
 
             if (raiseEvent)
             {
                 LanguageChanged?.Invoke(null, EventArgs.Empty);
+            }
+        }
+
+        /// <summary>
+        /// Aligns the .NET culture with the chosen app language.
+        ///
+        /// Without this, only .resw lookups follow the language picker while everything that goes
+        /// through <see cref="System.Globalization.CultureInfo"/> keeps using the Windows locale —
+        /// day names and dates on the dashboard, number formats, framework exception messages, and
+        /// the trigger descriptions produced by the TaskScheduler library. That is what made an
+        /// English app show German strings on a German Windows install.
+        ///
+        /// Note this cannot reach text produced by Windows itself (COM/Win32 error messages and the
+        /// Task Scheduler event log's own rendered descriptions) — those always follow the OS
+        /// display language.
+        /// </summary>
+        private static void ApplyCulture(string language)
+        {
+            try
+            {
+                var culture = new System.Globalization.CultureInfo(language);
+
+                System.Globalization.CultureInfo.DefaultThreadCurrentCulture = culture;
+                System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = culture;
+                System.Globalization.CultureInfo.CurrentCulture = culture;
+                System.Globalization.CultureInfo.CurrentUICulture = culture;
+            }
+            catch (Exception ex)
+            {
+                LogService.Warn($"Could not switch the .NET culture to '{language}': {ex.Message}");
             }
         }
 

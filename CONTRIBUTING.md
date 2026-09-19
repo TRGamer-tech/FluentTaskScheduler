@@ -47,35 +47,46 @@ This project uses [VeloPack](https://velopack.io/) for auto-updates. If you are 
    ```bash
    # x64
    dotnet publish -c Release -r win-x64 --self-contained -p:Platform=x64
-   vpk pack -u FluentTaskScheduler -v 1.X.X -o Releases/x64 -p bin/x64/Release/net8.0-windows10.0.19041.0/win-x64/publish -e FluentTaskScheduler.exe --msi --instLocation Either --msiBanner Assets/MSI-Banner.bmp --msiLogo Assets/MSI-Logo.bmp
+   vpk pack -u FluentTaskScheduler -v 1.X.X -c win-x64 -o Releases/x64 -p bin/x64/Release/net8.0-windows10.0.19041.0/win-x64/publish -e FluentTaskScheduler.exe --msi --instLocation Either --msiBanner Assets/MSI-Banner.bmp --msiLogo Assets/MSI-Logo.bmp
 
    # ARM64
    dotnet publish -c Release -r win-arm64 --self-contained -p:Platform=ARM64
-   vpk pack -u FluentTaskScheduler -v 1.X.X -o Releases/arm64 -p bin/arm64/Release/net8.0-windows10.0.19041.0/win-arm64/publish -e FluentTaskScheduler.exe --msi --instLocation Either --msiBanner Assets/MSI-Banner.bmp --msiLogo Assets/MSI-Logo.bmp
+   vpk pack -u FluentTaskScheduler -v 1.X.X -c win-arm64 -o Releases/arm64 -p bin/arm64/Release/net8.0-windows10.0.19041.0/win-arm64/publish -e FluentTaskScheduler.exe --msi --instLocation Either --msiBanner Assets/MSI-Banner.bmp --msiLogo Assets/MSI-Logo.bmp
 
    # Fix zero-dated entries in Portable ZIPs (vpk sets all timestamps to 1980-01-01)
    Add-Type -Assembly System.IO.Compression.FileSystem
    $now = Get-Date
-   foreach ($zip in @("Releases/x64/FluentTaskScheduler-win-Portable.zip", "Releases/arm64/FluentTaskScheduler-win-Portable.zip")) {
+   foreach ($zip in @("Releases/x64/FluentTaskScheduler-win-x64-Portable.zip", "Releases/arm64/FluentTaskScheduler-win-arm64-Portable.zip")) {
        $archive = [System.IO.Compression.ZipFile]::Open($zip, 'Update')
        foreach ($entry in $archive.Entries) { $entry.LastWriteTime = $now }
        $archive.Dispose()
    }
 
-   # Copy to dist folder -> Making it ready for release
-   Copy-Item -Path "Releases/x64/FluentTaskScheduler-win-Portable.zip" -Destination "Dist/Portable-x64.zip" -Force;
-   Copy-Item -Path "Releases/x64/FluentTaskScheduler-win.msi" -Destination "Dist/Setup-x64.msi" -Force;
-   Copy-Item -Path "Releases/arm64/FluentTaskScheduler-win-Portable.zip" -Destination "Dist/Portable-arm64.zip" -Force;
-   Copy-Item -Path "Releases/arm64/FluentTaskScheduler-win.msi" -Destination "Dist/Setup-arm64.msi" -Force;
+   # Copy installers & portables to Dist
+   Copy-Item -Path "Releases/x64/FluentTaskScheduler-win-x64-Portable.zip" -Destination "Dist/Portable-x64.zip" -Force;
+   Copy-Item -Path "Releases/x64/FluentTaskScheduler-win-x64.msi" -Destination "Dist/Setup-x64.msi" -Force;
+   Copy-Item -Path "Releases/arm64/FluentTaskScheduler-win-arm64-Portable.zip" -Destination "Dist/Portable-arm64.zip" -Force;
+   Copy-Item -Path "Releases/arm64/FluentTaskScheduler-win-arm64.msi" -Destination "Dist/Setup-arm64.msi" -Force;
+
+   # Copy VeloPack update metadata to Dist (channel-specific — no filename collision)
+   Copy-Item -Path "Releases/x64/releases.win-x64.json" -Destination "Dist/" -Force;
+   Copy-Item -Path "Releases/arm64/releases.win-arm64.json" -Destination "Dist/" -Force;
+
+   # Copy .nupkg files for auto-update (full + delta for the current version)
+   Copy-Item -Path "Releases/x64/FluentTaskScheduler-1.X.X-full.nupkg" -Destination "Dist/" -Force;
+   Get-Item "Releases/x64/FluentTaskScheduler-1.X.X-delta.nupkg" -ErrorAction SilentlyContinue | Copy-Item -Destination "Dist/" -Force;
+   Copy-Item -Path "Releases/arm64/FluentTaskScheduler-1.X.X-full.nupkg" -Destination "Dist/" -Force;
+   Get-Item "Releases/arm64/FluentTaskScheduler-1.X.X-delta.nupkg" -ErrorAction SilentlyContinue | Copy-Item -Destination "Dist/" -Force;
    ```
 
    The resulting `Setup-x64.msi` and `Setup-arm64.msi` presents a standard MSI UI where the user selects _Per User_ or _Machine-Wide_ installation.
 
-3. Upload the installers and the mandatory Velopack metadata to your GitHub Release:
-   * From the `Dist` folder: `Setup-x64.msi`, `Setup-arm64.msi`, `Portable-x64.zip`, `Portable-arm64.zip`.
-   * From the `Releases` subfolders: All `releases.win.json` files and all `.nupkg` files (Full and Delta).
+3. Upload **all files from the `Dist` folder** to your GitHub Release:
+   * Installers & Portables: `Setup-x64.msi`, `Setup-arm64.msi`, `Portable-x64.zip`, `Portable-arm64.zip`.
+   * VeloPack update metadata: `releases.win-x64.json`, `releases.win-arm64.json`.
+   * VeloPack update packages: All `.nupkg` files (Full and Delta).
 
-   Without `releases.win.json`, the app has no idea that an update exists. Without the `.nupkg` files, the app cannot actually perform the update. Just uploading the MSI is not enough for the auto updater to work.
+   The `releases.win-*.json` files tell the app that an update exists. The `.nupkg` files are what it actually downloads to apply the update. Without both, auto-update silently does nothing.
 
 
 ---

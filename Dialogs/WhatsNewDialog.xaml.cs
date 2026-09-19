@@ -15,19 +15,31 @@ namespace FluentTaskScheduler.Dialogs
         {
             this.InitializeComponent();
 
+            // GitHub can legitimately return null for these fields (e.g. a no-notes release),
+            // so null-coalesce everything rather than let the dialog crash on construction.
+            string tagName = release.TagName ?? "";
+            string name = release.Name ?? "";
+
             // ── Version badge ────────────────────────────────────────────────────
-            ReleaseTagText.Text = release.TagName;
+            ReleaseTagText.Text = tagName;
 
             // ── Title (strip leading tag prefix if present) ──────────────────────
-            string title = release.Name;
-            if (title.StartsWith(release.TagName, StringComparison.OrdinalIgnoreCase))
-                title = title[release.TagName.Length..].TrimStart(' ', '-', '–');
+            string title = name;
+            if (!string.IsNullOrEmpty(tagName) && title.StartsWith(tagName, StringComparison.OrdinalIgnoreCase))
+                title = title[tagName.Length..].TrimStart(' ', '-', '–');
             ReleaseTitleText.Text = title;
 
             // ── Markdown body ────────────────────────────────────────────────────
-            RenderMarkdown(release.Body);
+            RenderMarkdown(release.Body ?? "");
 
-            ViewOnGitHubButton.NavigateUri = new Uri(release.HtmlUrl);
+            if (Uri.TryCreate(release.HtmlUrl, UriKind.Absolute, out var releaseUri))
+            {
+                ViewOnGitHubButton.NavigateUri = releaseUri;
+            }
+            else
+            {
+                ViewOnGitHubButton.IsEnabled = false;
+            }
         }
 
         // ─────────────────────────────────────────────────────────────────────────

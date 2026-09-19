@@ -319,6 +319,7 @@
   <data name="Settings.About.Onboard.Title" xml:space="preserve"><value>新手引导</value></data>
   <data name="Settings.About.Onboard.Desc" xml:space="preserve"><value>重新播放首次启动时的欢迎引导。</value></data>
   <data name="Settings.About.ViewAgain" xml:space="preserve"><value>再次查看</value></data>
+  <data name="Settings.About.VersionFormat" xml:space="preserve"><value>版本 {0}</value></data>
   <data name="Dashboard.AllTags" xml:space="preserve"><value>全部标签</value></data>
   <data name="Dashboard.AllCategories" xml:space="preserve"><value>全部分类</value></data>
   <data name="Dashboard.Today" xml:space="preserve"><value>今天</value></data>
@@ -522,6 +523,325 @@
   <data name="ScriptEditor.SaveDialog.DescHeader" xml:space="preserve"><value>描述</value></data>
   <data name="Dialog.Crash.Title" xml:space="preserve"><value>未处理的异常</value></data>
   <data name="Dialog.Crash.Copy" xml:space="preserve"><value>复制到剪贴板</value></data>
+  <data name="Main.Header.QuickActions" xml:space="preserve"><value>快速操作</value></data>
+  <data name="Main.Nav.Templates" xml:space="preserve"><value>任务模板</value></data>
+  <data name="Main.Nav.Snooze" xml:space="preserve"><value>暂停所有任务</value></data>
+  <data name="Main.Header.Templates" xml:space="preserve"><value>任务模板</value></data>
+  <data name="Snooze.Status.EndsAt" xml:space="preserve"><value>全局暂停已启用（将于 {0} 结束）</value></data>
+  <data name="Snooze.Status.UntilReboot" xml:space="preserve"><value>全局暂停已启用（直到下次重启）</value></data>
+  <data name="Snooze.Status.Generic" xml:space="preserve"><value>全局暂停已启用</value></data>
+  <data name="Snooze.Menu.SnoozeAll" xml:space="preserve"><value>暂停所有任务...</value></data>
+  <data name="Snooze.Menu.Resume" xml:space="preserve"><value>恢复所有任务</value></data>
+  <data name="Snooze.Duration.30m" xml:space="preserve"><value>30 分钟</value></data>
+  <data name="Snooze.Duration.1h" xml:space="preserve"><value>1 小时</value></data>
+  <data name="Snooze.Duration.3h" xml:space="preserve"><value>3 小时</value></data>
+  <data name="Snooze.Duration.Reboot" xml:space="preserve"><value>直到下次重启</value></data>
+  <data name="Snooze.Duration.Custom" xml:space="preserve"><value>自定义时间...</value></data>
+  <data name="Snooze.Dialog.Title" xml:space="preserve"><value>暂停所有任务</value></data>
+  <data name="Snooze.Dialog.Confirm" xml:space="preserve"><value>暂停</value></data>
+  <data name="Snooze.Dialog.ActiveTitle" xml:space="preserve"><value>全局暂停已启用</value></data>
+  <data name="Snooze.Dialog.Intro" xml:space="preserve"><value>暂停期间，FluentTaskScheduler 不会启动任何任务，包括已链式配置的流水线任务。</value></data>
+  <data name="Snooze.SuspendTriggers" xml:space="preserve"><value>同时暂停计划触发器</value></data>
+  <data name="Snooze.SuspendTriggersHint" xml:space="preserve"><value>通过任务计划程序 API 禁用所有已启用的任务，并在暂停结束时仅重新启用这些任务。受保护的系统任务将被跳过。</value></data>
+  <data name="Snooze.Banner.Suspended" xml:space="preserve"><value>计划触发器已暂停，手动运行也会被阻止。暂停结束后任务将重新启用。</value></data>
+  <data name="Snooze.Banner.ManualOnly" xml:space="preserve"><value>从此应用启动的运行将被阻止。Windows 仍会触发计划触发器 —— 若要同时阻止它们，请在暂停时启用“同时暂停计划触发器”。</value></data>
+  <data name="Snooze.Error.RunBlocked" xml:space="preserve"><value>由于全局暂停已启用，未能启动“{0}”。</value></data>
+  <data name="Snooze.Error.BatchBlocked" xml:space="preserve"><value>由于全局暂停已启用，{0} 个任务未能启动。</value></data>
+  <data name="Snooze.Error.PastTime" xml:space="preserve"><value>请选择一个未来的时间。</value></data>
+  <data name="Snooze.Error.Resume" xml:space="preserve"><value>无法恢复所有任务：</value></data>
+  <data name="Snooze.Toast.Started.Title" xml:space="preserve"><value>全局暂停已启用</value></data>
+  <data name="Snooze.Toast.Ended.Title" xml:space="preserve"><value>全局暂停已结束</value></data>
+  <data name="Snooze.Toast.Ended.Body" xml:space="preserve"><value>计划任务已恢复正常运行。</value></data>
+  <data name="Snooze.Toast.Suppressed.Title" xml:space="preserve"><value>运行已被抑制：{0}</value></data>
+  <data name="Snooze.Toast.Suppressed.Body" xml:space="preserve"><value>全局暂停已启用，因此未启动此任务。</value></data>
+  <data name="Pipeline.SectionTitle" xml:space="preserve"><value>完成后操作</value></data>
+  <data name="Pipeline.Configure" xml:space="preserve"><value>配置...</value></data>
+  <data name="Pipeline.Dialog.Title" xml:space="preserve"><value>完成后操作（任务流水线）</value></data>
+  <data name="Pipeline.Info.Title" xml:space="preserve"><value>链式任务的工作原理</value></data>
+  <data name="Pipeline.Info.Message" xml:space="preserve"><value>此任务完成后，FluentTaskScheduler 会从 Windows 任务计划程序事件日志中读取操作的退出代码。退出代码为 0 时启动成功任务，其他任何代码都会启动失败任务。应用必须处于运行状态才能启动链式任务，且在全局暂停期间会跳过链式任务。</value></data>
+  <data name="Pipeline.EnableSwitch" xml:space="preserve"><value>此任务完成后启动后续任务</value></data>
+  <data name="Pipeline.OnSuccess" xml:space="preserve"><value>成功时（退出代码 0）</value></data>
+  <data name="Pipeline.OnFailure" xml:space="preserve"><value>失败时（任何其他退出代码）</value></data>
+  <data name="Pipeline.Add" xml:space="preserve"><value>添加</value></data>
+  <data name="Pipeline.Remove" xml:space="preserve"><value>移除所选项</value></data>
+  <data name="Pipeline.PickTask" xml:space="preserve"><value>选择一个任务...</value></data>
+  <data name="Pipeline.Summary.None" xml:space="preserve"><value>未配置后续任务。</value></data>
+  <data name="Pipeline.Summary.Enabled" xml:space="preserve"><value>已启用</value></data>
+  <data name="Pipeline.Summary.Disabled" xml:space="preserve"><value>已禁用</value></data>
+  <data name="Pipeline.Summary.Format" xml:space="preserve"><value>{0} —— 成功时 {1} 个，失败时 {2} 个</value></data>
+  <data name="Pipeline.Warning.NoTasks" xml:space="preserve"><value>没有其他可供链接的任务。请先创建另一个任务。</value></data>
+  <data name="Pipeline.Warning.Duplicate" xml:space="preserve"><value>“{0}”已在此列表中。</value></data>
+  <data name="Pipeline.Warning.BothLists" xml:space="preserve"><value>“{0}”现在会在成功和失败时都运行 —— 每次完成后都会启动。</value></data>
+  <data name="Pipeline.Warning.NoTargets" xml:space="preserve"><value>请至少添加一个后续任务，或关闭此开关。</value></data>
+  <data name="Pipeline.Error.Open" xml:space="preserve"><value>无法打开完成后操作：</value></data>
+  <data name="Pipeline.Toast.Title" xml:space="preserve"><value>流水线：已启动 {0}</value></data>
+  <data name="Pipeline.Toast.OnSuccess" xml:space="preserve"><value>因“{0}”成功完成而被触发。</value></data>
+  <data name="Pipeline.Toast.OnFailure" xml:space="preserve"><value>因“{0}”失败而被触发。</value></data>
+  <data name="Dashboard.HealthCaption" xml:space="preserve"><value>过去 7 天内以退出代码 0 完成的运行占比。</value></data>
+  <data name="Dashboard.Throughput" xml:space="preserve"><value>执行次数</value></data>
+  <data name="Dashboard.Runs24h" xml:space="preserve"><value>最近 24 小时</value></data>
+  <data name="Dashboard.Runs7d" xml:space="preserve"><value>最近 7 天</value></data>
+  <data name="Dashboard.AvgDuration" xml:space="preserve"><value>平均耗时</value></data>
+  <data name="Dashboard.AvgDurationHint" xml:space="preserve"><value>基于全部已完成的运行（7 天）</value></data>
+  <data name="Dashboard.LongestTask" xml:space="preserve"><value>最长运行</value></data>
+  <data name="Dashboard.HeatmapTitle" xml:space="preserve"><value>执行热力图 —— 按小时分布</value></data>
+  <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>{0}:00 —— 过去 7 天内运行 {1} 次</value></data>
+  <data name="Dashboard.PeakHour" xml:space="preserve"><value>最繁忙时段：</value></data>
+  <data name="Dashboard.ExecutionStream" xml:space="preserve"><value>执行日志流</value></data>
+  <data name="Dashboard.NoExecutionEntries" xml:space="preserve"><value>此筛选条件下没有记录的运行。</value></data>
+  <data name="Dashboard.Filter.All" xml:space="preserve"><value>全部</value></data>
+  <data name="Dashboard.Status.Success" xml:space="preserve"><value>成功</value></data>
+  <data name="Dashboard.Status.Failed" xml:space="preserve"><value>失败</value></data>
+  <data name="Dashboard.Status.Snoozed" xml:space="preserve"><value>已暂停</value></data>
+  <data name="Dashboard.Status.ExitCode" xml:space="preserve"><value>退出代码 {0}</value></data>
+  <data name="Dashboard.Status.LaunchFailed" xml:space="preserve"><value>任务计划程序未能启动该操作</value></data>
+  <data name="Dashboard.Status.SuppressedOrigin" xml:space="preserve"><value>已抑制（{0}）</value></data>
+  <data name="Dashboard.Event.Started" xml:space="preserve"><value>已启动</value></data>
+  <data name="Dashboard.Event.Finished" xml:space="preserve"><value>已完成</value></data>
+  <data name="Dashboard.Event.StartFailed" xml:space="preserve"><value>启动失败</value></data>
+  <data name="Dashboard.Event.LaunchFailed" xml:space="preserve"><value>操作启动失败</value></data>
+  <data name="Templates.Title" xml:space="preserve"><value>任务模板库</value></data>
+  <data name="Templates.Subtitle" xml:space="preserve"><value>适用于常见自动化工作的现成预设。部署模板会打开任务编辑器，并预先填入命令、参数和推荐的计划。</value></data>
+  <data name="Templates.Info.Title" xml:space="preserve"><value>保存前不会创建任何内容</value></data>
+  <data name="Templates.Info.Message" xml:space="preserve"><value>保存前请在编辑器中检查命令、参数和触发器 —— 部分模板会删除文件或更改系统状态，某些还需要管理员权限。</value></data>
+  <data name="Templates.Deploy" xml:space="preserve"><value>部署模板</value></data>
+  <data name="Templates.Error.Deploy" xml:space="preserve"><value>无法打开此模板：</value></data>
+  <data name="Templates.Group.Maintenance" xml:space="preserve"><value>系统维护</value></data>
+  <data name="Templates.Group.Developer" xml:space="preserve"><value>开发者工具</value></data>
+  <data name="Templates.Group.Power" xml:space="preserve"><value>电源与实用工具</value></data>
+  <data name="Templates.TempCleanup.Name" xml:space="preserve"><value>夜间临时文件清理</value></data>
+  <data name="Templates.TempCleanup.Desc" xml:space="preserve"><value>删除用户和 Windows 临时文件夹中超过 7 天的文件。仍在使用中的文件将被跳过。</value></data>
+  <data name="Templates.TempCleanup.Note" xml:space="preserve"><value>将永久删除文件 —— 部署前请检查年限阈值。</value></data>
+  <data name="Templates.UpdateHealth.Name" xml:space="preserve"><value>Windows 更新健康检查</value></data>
+  <data name="Templates.UpdateHealth.Desc" xml:space="preserve"><value>将待处理的 Windows 更新和上次成功安装的日期记录到“文档”文件夹中的日志文件。</value></data>
+  <data name="Templates.UpdateHealth.Note" xml:space="preserve"><value>查询更新代理需要管理员权限。</value></data>
+  <data name="Templates.Defrag.Name" xml:space="preserve"><value>磁盘优化（碎片整理 / TRIM）</value></data>
+  <data name="Templates.Defrag.Desc" xml:space="preserve"><value>在系统驱动器上运行 Windows 内置优化程序。SSD 将执行 TRIM/重新 TRIM，HDD 将进行碎片整理。</value></data>
+  <data name="Templates.Defrag.Note" xml:space="preserve"><value>需要管理员权限。仅在电脑空闲且接通交流电源时运行。</value></data>
+  <data name="Templates.GitFetch.Name" xml:space="preserve"><value>Git 仓库拉取 / 备份</value></data>
+  <data name="Templates.GitFetch.Desc" xml:space="preserve"><value>对指定文件夹下找到的每个 Git 仓库执行带清理的全部远程拉取。保存前请编辑路径。</value></data>
+  <data name="Templates.GitFetch.Note" xml:space="preserve"><value>请将“C:\Repos”改为你自己的仓库根目录，并确保 git 已加入 PATH。</value></data>
+  <data name="Templates.DockerPrune.Name" xml:space="preserve"><value>Docker 系统清理</value></data>
+  <data name="Templates.DockerPrune.Desc" xml:space="preserve"><value>删除已停止的容器、未使用的网络、悬空镜像和构建缓存，以回收磁盘空间。</value></data>
+  <data name="Templates.DockerPrune.Note" xml:space="preserve"><value>需要 Docker Desktop 正在运行。将永久删除未使用的 Docker 数据。</value></data>
+  <data name="Templates.LogRotation.Name" xml:space="preserve"><value>每日日志轮转</value></data>
+  <data name="Templates.LogRotation.Desc" xml:space="preserve"><value>将前一天的 *.log 文件压缩为带日期的 ZIP 归档，并删除超过 30 天的归档。</value></data>
+  <data name="Templates.LogRotation.Note" xml:space="preserve"><value>部署前请将“C:\Logs”改为你自己的日志目录。</value></data>
+  <data name="Templates.IdleShutdown.Name" xml:space="preserve"><value>夜间空闲自动关机</value></data>
+  <data name="Templates.IdleShutdown.Desc" xml:space="preserve"><value>在夜间且电脑已空闲后才关机 —— 关机前会有 60 秒警告，可随时取消。</value></data>
+  <data name="Templates.IdleShutdown.Note" xml:space="preserve"><value>将关闭计算机。打开的应用中未保存的工作可能会丢失。</value></data>
+  <data name="Templates.BatterySaver.Name" xml:space="preserve"><value>省电模式下暂停任务</value></data>
+  <data name="Templates.BatterySaver.Desc" xml:space="preserve"><value>登录时将 Windows 切换为节能计划，以便在使用电池时限制后台工作。</value></data>
+  <data name="Templates.BatterySaver.Note" xml:space="preserve"><value>可与全局暂停开关配合使用，在使用电池时同时暂停你自己的任务。</value></data>
+  <data name="Templates.RecycleBin.Name" xml:space="preserve"><value>每周清空回收站</value></data>
+  <data name="Templates.RecycleBin.Desc" xml:space="preserve"><value>每周为当前用户清空一次回收站，且不显示确认提示。</value></data>
+  <data name="Templates.RecycleBin.Note" xml:space="preserve"><value>回收站清空后，已删除的项目将无法恢复。</value></data>
+  <data name="Dialog.Common.On" xml:space="preserve"><value>开</value></data>
+  <data name="Dialog.Common.Off" xml:space="preserve"><value>关</value></data>
+  <data name="Settings.Sys.Pipelines.Title" xml:space="preserve"><value>任务流水线</value></data>
+  <data name="Settings.Sys.Pipelines.Desc" xml:space="preserve"><value>监视任务计划程序事件日志，并启动在任务的完成后操作中配置的后续任务。</value></data>
+  <data name="Main.Nav.Library" xml:space="preserve"><value>库</value></data>
+  <data name="Main.Header.Library" xml:space="preserve"><value>库</value></data>
+  <data name="Main.Status.All" xml:space="preserve"><value>全部状态</value></data>
+  <data name="Main.Status.Running" xml:space="preserve"><value>正在运行</value></data>
+  <data name="Main.Status.Enabled" xml:space="preserve"><value>已启用</value></data>
+  <data name="Main.Status.Disabled" xml:space="preserve"><value>已禁用</value></data>
+  <data name="Main.Status.Snoozed" xml:space="preserve"><value>已暂停</value></data>
+  <data name="Snooze.Toolbar.Idle" xml:space="preserve"><value>暂停全部</value></data>
+  <data name="Snooze.Toolbar.Active" xml:space="preserve"><value>已暂停</value></data>
+  <data name="Library.Subtitle" xml:space="preserve"><value>部署一个现成的计划任务，或将已保存的命令复用为新任务的操作。在任务编辑器中保存前不会创建任何内容。</value></data>
+  <data name="Library.Section.Templates" xml:space="preserve"><value>任务模板</value></data>
+  <data name="Library.Section.Scripts" xml:space="preserve"><value>脚本</value></data>
+  <data name="Pipeline.EnableSubtitle" xml:space="preserve"><value>关闭后将保留配置但不会执行。</value></data>
+  <data name="Pipeline.SuccessHeader" xml:space="preserve"><value>成功时</value></data>
+  <data name="Pipeline.SuccessHint" xml:space="preserve"><value>当操作以退出代码 0 结束时启动。</value></data>
+  <data name="Pipeline.FailureHeader" xml:space="preserve"><value>失败时</value></data>
+  <data name="Pipeline.FailureHint" xml:space="preserve"><value>当退出代码非 0，或操作无法启动时执行。</value></data>
+  <data name="EventLevel.Critical" xml:space="preserve"><value>严重</value></data>
+  <data name="EventLevel.Error" xml:space="preserve"><value>错误</value></data>
+  <data name="EventLevel.Warning" xml:space="preserve"><value>警告</value></data>
+  <data name="EventLevel.Information" xml:space="preserve"><value>信息</value></data>
+  <data name="EventLevel.Verbose" xml:space="preserve"><value>详细</value></data>
+  <data name="EventResult.100" xml:space="preserve"><value>任务已启动</value></data>
+  <data name="EventResult.102" xml:space="preserve"><value>任务已完成</value></data>
+  <data name="EventResult.103" xml:space="preserve"><value>任务失败</value></data>
+  <data name="EventResult.106" xml:space="preserve"><value>任务已注册</value></data>
+  <data name="EventResult.107" xml:space="preserve"><value>任务已触发</value></data>
+  <data name="EventResult.110" xml:space="preserve"><value>任务已启动</value></data>
+  <data name="EventResult.111" xml:space="preserve"><value>任务已终止</value></data>
+  <data name="EventResult.129" xml:space="preserve"><value>操作已启动</value></data>
+  <data name="EventResult.200" xml:space="preserve"><value>操作已启动</value></data>
+  <data name="EventResult.201" xml:space="preserve"><value>操作已完成</value></data>
+  <data name="EventResult.203" xml:space="preserve"><value>操作启动失败</value></data>
+  <data name="EventResult.322" xml:space="preserve"><value>已跳过启动（已在运行）</value></data>
+  <data name="EventResult.Unknown" xml:space="preserve"><value>事件 {0}</value></data>
+  <data name="EventMsg.100" xml:space="preserve"><value>任务计划程序已为用户“{1}”启动任务“{0}”的一个实例。</value></data>
+  <data name="EventMsg.102" xml:space="preserve"><value>任务计划程序已成功完成任务“{0}”。</value></data>
+  <data name="EventMsg.103" xml:space="preserve"><value>任务计划程序未能启动任务“{0}”的实例（错误 {1}）。</value></data>
+  <data name="EventMsg.106" xml:space="preserve"><value>用户“{0}”已注册任务“{1}”。</value></data>
+  <data name="EventMsg.107" xml:space="preserve"><value>任务计划程序已通过时间触发器启动任务“{0}”。</value></data>
+  <data name="EventMsg.110" xml:space="preserve"><value>任务计划程序已为用户“{1}”启动任务“{0}”。</value></data>
+  <data name="EventMsg.111" xml:space="preserve"><value>由于超出配置的时间限制，任务计划程序已终止任务“{0}”。</value></data>
+  <data name="EventMsg.129" xml:space="preserve"><value>任务计划程序已启动任务“{1}”的操作“{0}”。</value></data>
+  <data name="EventMsg.200" xml:space="preserve"><value>任务计划程序已启动任务“{1}”的操作“{0}”。</value></data>
+  <data name="EventMsg.201" xml:space="preserve"><value>任务计划程序已完成任务“{1}”的操作“{0}”，返回代码为 {2}。</value></data>
+  <data name="EventMsg.203" xml:space="preserve"><value>任务计划程序未能启动任务“{1}”的操作“{0}”（错误 {2}）。</value></data>
+  <data name="EventMsg.322" xml:space="preserve"><value>由于已有实例在运行，任务计划程序未启动任务“{0}”。</value></data>
+  <data name="Templates.RestorePoint.Name" xml:space="preserve"><value>每周系统还原点</value></data>
+  <data name="Templates.RestorePoint.Desc" xml:space="preserve"><value>每周创建一个命名的系统还原点，让你始终拥有一个近期的回滚目标。</value></data>
+  <data name="Templates.RestorePoint.Note" xml:space="preserve"><value>需要管理员权限，并需启用系统保护。</value></data>
+  <data name="Templates.SystemScan.Name" xml:space="preserve"><value>系统文件完整性扫描</value></data>
+  <data name="Templates.SystemScan.Desc" xml:space="preserve"><value>先运行 DISM 组件存储修复，再运行系统文件检查器，并将结果写入“文档”文件夹中的日志。</value></data>
+  <data name="Templates.SystemScan.Note" xml:space="preserve"><value>需要管理员权限，运行时间可能超过 15 分钟。</value></data>
+  <data name="Templates.DnsFlush.Name" xml:space="preserve"><value>登录时清空 DNS 缓存</value></data>
+  <data name="Templates.DnsFlush.Desc" xml:space="preserve"><value>登录时清空 DNS 解析缓存 —— 适合经常切换网络或 VPN 的情况。</value></data>
+  <data name="Templates.DnsFlush.Note" xml:space="preserve"><value>需要管理员权限。</value></data>
+  <data name="Templates.NodePrune.Name" xml:space="preserve"><value>npm / pnpm 缓存清理</value></data>
+  <data name="Templates.NodePrune.Desc" xml:space="preserve"><value>校验并清理 npm 缓存，并移除过期的 pnpm 存储条目，以回收数 GB 空间。</value></data>
+  <data name="Templates.NodePrune.Note" xml:space="preserve"><value>需要 PATH 中包含 Node.js。</value></data>
+  <data name="Templates.ProjectBackup.Name" xml:space="preserve"><value>夜间项目文件夹备份</value></data>
+  <data name="Templates.ProjectBackup.Desc" xml:space="preserve"><value>使用 robocopy 将项目文件夹镜像到备份位置，跳过构建输出和依赖文件夹。</value></data>
+  <data name="Templates.ProjectBackup.Note" xml:space="preserve"><value>/MIR 会删除目标中源已不存在的文件。请先检查两侧路径。</value></data>
+  <data name="Templates.DevServerRestart.Name" xml:space="preserve"><value>每晚重启一个 Windows 服务</value></data>
+  <data name="Templates.DevServerRestart.Desc" xml:space="preserve"><value>重启长时间运行的服务（构建代理、数据库、本地服务器等）以清除内存泄漏。保存前请更改服务名称。</value></data>
+  <data name="Templates.DevServerRestart.Note" xml:space="preserve"><value>需要管理员权限。请将“MSSQLSERVER”替换为你自己的服务名称。</value></data>
+  <data name="Templates.DisplayOff.Name" xml:space="preserve"><value>锁屏时关闭显示器</value></data>
+  <data name="Templates.DisplayOff.Desc" xml:space="preserve"><value>在锁定工作站的瞬间关闭显示器，而不是等待电源超时。</value></data>
+  <data name="Templates.DisplayOff.Note" xml:space="preserve"><value>如尚未设置，请在编辑器中将触发器的会话状态设为“锁定”。</value></data>
+  <data name="Templates.WeeklyReboot.Name" xml:space="preserve"><value>空闲时每周重启</value></data>
+  <data name="Templates.WeeklyReboot.Desc" xml:space="preserve"><value>每周在夜间且仅在空闲时重启一次计算机，以应用待处理的更新。</value></data>
+  <data name="Templates.WeeklyReboot.Note" xml:space="preserve"><value>将重启计算机。打开的应用中未保存的工作可能会丢失。</value></data>
+  <data name="EventResult.108" xml:space="preserve"><value>启动失败</value></data>
+  <data name="EventResult.118" xml:space="preserve"><value>启动触发器</value></data>
+  <data name="EventResult.119" xml:space="preserve"><value>登录触发器</value></data>
+  <data name="EventResult.140" xml:space="preserve"><value>任务已更新</value></data>
+  <data name="EventResult.141" xml:space="preserve"><value>任务已删除</value></data>
+  <data name="EventResult.142" xml:space="preserve"><value>任务已禁用</value></data>
+  <data name="EventResult.153" xml:space="preserve"><value>已错过计划</value></data>
+  <data name="EventResult.202" xml:space="preserve"><value>操作失败</value></data>
+  <data name="EventResult.329" xml:space="preserve"><value>已停止（时间限制）</value></data>
+  <data name="EventResult.331" xml:space="preserve"><value>已停止（使用电池）</value></data>
+  <data name="EventResult.332" xml:space="preserve"><value>已跳过（条件不满足）</value></data>
+  <data name="EventMsg.108" xml:space="preserve"><value>任务计划程序未能启动任务“{0}”（错误 {1}）。</value></data>
+  <data name="EventMsg.118" xml:space="preserve"><value>任务计划程序已通过启动触发器启动任务“{0}”。</value></data>
+  <data name="EventMsg.119" xml:space="preserve"><value>任务计划程序已通过登录触发器启动任务“{0}”。</value></data>
+  <data name="EventMsg.140" xml:space="preserve"><value>用户“{0}”已更新任务“{1}”的定义。</value></data>
+  <data name="EventMsg.141" xml:space="preserve"><value>用户“{0}”已删除任务“{1}”。</value></data>
+  <data name="EventMsg.142" xml:space="preserve"><value>用户“{0}”已禁用任务“{1}”。</value></data>
+  <data name="EventMsg.153" xml:space="preserve"><value>由于错过了计划时间，任务计划程序未启动任务“{0}”。启用“错过计划启动时间后尽快运行任务”即可补跑。</value></data>
+  <data name="EventMsg.202" xml:space="preserve"><value>任务“{1}”的操作“{0}”失败，返回代码为 {2}。</value></data>
+  <data name="EventMsg.329" xml:space="preserve"><value>由于超出配置的时间限制，任务计划程序已停止任务“{0}”。</value></data>
+  <data name="EventMsg.331" xml:space="preserve"><value>由于计算机切换为使用电池，任务计划程序已停止任务“{0}”。</value></data>
+  <data name="EventMsg.332" xml:space="preserve"><value>由于未满足所需条件（空闲、网络或电源），任务计划程序未启动任务“{0}”。</value></data>
+  <data name="Onboarding.StepPipelines.Title" xml:space="preserve"><value>链接任务并暂停一切</value></data>
+  <data name="Onboarding.StepPipelines.Body" xml:space="preserve"><value>为任务设置完成后操作，可在其成功或失败时启动其他任务。需要休息一下？“暂停所有任务”可暂停运行 —— 可设为固定时长、直到重启，或直到你手动恢复。</value></data>
+  <data name="Onboarding.StepDashboard.Title" xml:space="preserve"><value>更快地分析与部署</value></data>
+  <data name="Onboarding.StepDashboard.Body" xml:space="preserve"><value>仪表盘展示执行热力图、健康评分和实时运行日志。库中提供了现成的任务模板和可复用脚本，一键即可部署。</value></data>
+  <data name="Library.Search.Placeholder" xml:space="preserve"><value>搜索...</value></data>
+  <data name="Library.Search.NoTemplates" xml:space="preserve"><value>没有与搜索匹配的模板。</value></data>
+  <data name="Library.Search.NoScripts" xml:space="preserve"><value>没有与搜索匹配的脚本。</value></data>
+
+  <!-- Added while closing localization gaps found during the S3 audit pass (3.2) -->
+  <data name="App.WindowTitleSuffixFormat" xml:space="preserve"><value>窗口 {0}</value></data>
+  <data name="Dashboard.ProcessActive" xml:space="preserve"><value>进程运行中 (PID {0})</value></data>
+  <data name="Dashboard.ProcessNotFound" xml:space="preserve"><value>未找到进程</value></data>
+  <data name="Dashboard.ProcessUnableToCheck" xml:space="preserve"><value>无法检查</value></data>
+  <data name="Dialog.Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="Dialog.Delete" xml:space="preserve"><value>删除</value></data>
+  <data name="Dialog.Error.EmptyName" xml:space="preserve"><value>任务名称不能为空。</value></data>
+  <data name="Dialog.Error.InvalidIdleDuration" xml:space="preserve"><value>"{0}" 不是有效的空闲时长。请使用类似 10m、1h 的值,或 PT10M 这样的 ISO 8601 时长格式。</value></data>
+  <data name="Dialog.Error.InvalidRandomDelay" xml:space="preserve"><value>"{0}" 不是有效的随机延迟值。请使用 PT30M 或 PT1H 这样的 ISO 8601 时长格式。</value></data>
+  <data name="Dialog.Error.InvalidRestartInterval" xml:space="preserve"><value>"{0}" 不是有效的重试间隔。请使用类似 1m、30s 的值,或 PT1M 这样的 ISO 8601 时长格式。</value></data>
+  <data name="Dialog.Error.InvalidStopAfter" xml:space="preserve"><value>"{0}" 不是"运行超过以下时长后停止任务"的有效值。请使用 PT90M 或 P1D 这样的 ISO 8601 时长格式。</value></data>
+  <data name="Dialog.Error.RenameDuplicated" xml:space="preserve"><value>重命名失败:"{0}" 和 "{1}" 现在都已存在。请在任务计划程序中手动删除其中一个。</value></data>
+  <data name="Dialog.Error.RenameFailed" xml:space="preserve"><value>无法将 "{0}" 重命名为 "{1}":无法删除旧任务 ({2})。</value></data>
+  <data name="Dialog.Error.SaveTaskFailedPrefix" xml:space="preserve"><value>保存任务失败: </value></data>
+  <data name="Dialog.GetStarted" xml:space="preserve"><value>开始使用</value></data>
+  <data name="Dialog.Next" xml:space="preserve"><value>下一步</value></data>
+  <data name="Dialog.UnsupportedElements" xml:space="preserve"><value>此任务包含 FluentTaskScheduler 无法安全编辑的元素 ({0})。在此处编辑并保存会移除或损坏这些元素。请使用 Windows 任务计划程序修改此任务。</value></data>
+  <data name="FolderMenu.Delete" xml:space="preserve"><value>删除</value></data>
+  <data name="FolderMenu.NewSubfolder" xml:space="preserve"><value>新建子文件夹</value></data>
+  <data name="FolderMenu.Rename" xml:space="preserve"><value>重命名</value></data>
+  <data name="Main.Batch.ClearSelectionTooltip" xml:space="preserve"><value>清除选择</value></data>
+  <data name="Main.Batch.Delete" xml:space="preserve"><value>删除</value></data>
+  <data name="Main.Batch.DeleteTooltip" xml:space="preserve"><value>删除所选项</value></data>
+  <data name="Main.Batch.Disable" xml:space="preserve"><value>禁用</value></data>
+  <data name="Main.Batch.DisableTooltip" xml:space="preserve"><value>禁用所选项</value></data>
+  <data name="Main.Batch.Enable" xml:space="preserve"><value>启用</value></data>
+  <data name="Main.Batch.EnableTooltip" xml:space="preserve"><value>启用所选项</value></data>
+  <data name="Main.Batch.Run" xml:space="preserve"><value>运行</value></data>
+  <data name="Main.Batch.RunTooltip" xml:space="preserve"><value>运行所选项</value></data>
+  <data name="Main.Batch.SelectedCountFormat" xml:space="preserve"><value>已选择 {0} 项</value></data>
+  <data name="Main.Batch.Stop" xml:space="preserve"><value>停止</value></data>
+  <data name="Main.Batch.StopTooltip" xml:space="preserve"><value>停止所选项</value></data>
+  <data name="Main.Badge.Chained" xml:space="preserve"><value>已链接</value></data>
+  <data name="Main.Badge.FilterByCategory" xml:space="preserve"><value>按此类别筛选</value></data>
+  <data name="Main.Badge.FromHistory" xml:space="preserve"><value>来自历史记录</value></data>
+  <data name="Main.Badge.Hidden" xml:space="preserve"><value>已隐藏</value></data>
+  <data name="Main.Badge.ReadOnly" xml:space="preserve"><value>只读</value></data>
+  <data name="Onboarding.Step1.Body" xml:space="preserve"><value>使用现代化的 Fluent 界面管理 Windows 任务计划程序 —— 无需 XML,不再繁琐。</value></data>
+  <data name="Onboarding.Step1.Title" xml:space="preserve"><value>欢迎使用 FluentTaskScheduler</value></data>
+  <data name="Onboarding.Step2.Body" xml:space="preserve"><value>点击"+ 新建任务"即可安排任意程序、脚本或命令自动运行 —— 每天、登录时、事件触发时等等。</value></data>
+  <data name="Onboarding.Step2.Title" xml:space="preserve"><value>创建您的第一个任务</value></data>
+  <data name="Onboarding.Step3.Body" xml:space="preserve"><value>使用侧边栏将相关任务归入文件夹,就像 Windows 资源管理器一样。系统会记住您上次使用的文件夹,重启后依然有效。</value></data>
+  <data name="Onboarding.Step3.Title" xml:space="preserve"><value>使用文件夹整理任务</value></data>
+  <data name="Onboarding.Step4.Body" xml:space="preserve"><value>点击任意任务即可在同一处查看其运行历史、成功与失败次数以及实时运行状态。</value></data>
+  <data name="Onboarding.Step4.Title" xml:space="preserve"><value>跟踪历史记录与状态</value></data>
+  <data name="Onboarding.Step5.Body" xml:space="preserve"><value>FluentTaskScheduler 每次启动时都会自动检查更新。您也可以随时在"设置 → 关于 → 检查更新"中手动检查。</value></data>
+  <data name="Onboarding.Step5.Title" xml:space="preserve"><value>始终保持最新</value></data>
+  <data name="Onboarding.Step6.Body" xml:space="preserve"><value>使用任务发现功能扫描 Windows 事件日志,自动导入由其他应用程序创建的任务 —— 无需手动重建。</value></data>
+  <data name="Onboarding.Step6.Title" xml:space="preserve"><value>发现现有任务</value></data>
+  <data name="Onboarding.Step7.Body" xml:space="preserve"><value>前往设置以启用 Mica 背景效果、最小化到系统托盘、配置日志记录、设置开机启动等。</value></data>
+  <data name="Onboarding.Step7.Title" xml:space="preserve"><value>按您的喜好进行调整</value></data>
+  <data name="ScriptLibrary.DeleteTemplate.Content" xml:space="preserve"><value>删除"{0}"?</value></data>
+  <data name="ScriptLibrary.DeleteTemplate.Title" xml:space="preserve"><value>删除脚本</value></data>
+  <data name="Settings.UpdateApplyFailed.Content" xml:space="preserve"><value>应用更新失败。请查看日志了解详细信息,或稍后重试。</value></data>
+  <data name="Snooze.IncludeMicrosoftTasks" xml:space="preserve"><value>同时暂停 Microsoft 自身的计划任务(Defender、Windows 更新、维护等)</value></data>
+  <data name="Snooze.IncludeMicrosoftTasksWarning" xml:space="preserve"><value>不建议这样做:禁用这些任务可能会在暂停结束前影响 Windows 安全扫描、更新和维护。</value></data>
+  <data name="Tray.CloseWindowFormat" xml:space="preserve"><value>✕  关闭 {0}</value></data>
+  <data name="Tray.ExitAll" xml:space="preserve"><value>全部退出</value></data>
+  <data name="Tray.NewWindow" xml:space="preserve"><value>新建窗口</value></data>
+  <data name="Tray.NoHiddenWindows" xml:space="preserve"><value>(没有隐藏的窗口)</value></data>
+  <data name="Trigger.Run" xml:space="preserve"><value>运行:</value></data>
+  <data name="Dialog.Sess.ConsoleConnect" xml:space="preserve"><value>控制台连接</value></data>
+  <data name="Dialog.Sess.ConsoleDisconnect" xml:space="preserve"><value>控制台断开连接</value></data>
+  <data name="Dialog.Sess.RemoteConnect" xml:space="preserve"><value>远程连接</value></data>
+  <data name="Dialog.Sess.RemoteDisconnect" xml:space="preserve"><value>远程断开连接</value></data>
+  <data name="Dialog.Trigger.Event" xml:space="preserve"><value>发生事件时</value></data>
+  <data name="Dialog.Trigger.Once" xml:space="preserve"><value>一次</value></data>
+  <data name="Dialog.Trigger.__Unsupported" xml:space="preserve"><value>不支持的触发器</value></data>
+  <data name="Main.FoldersHeader" xml:space="preserve"><value>文件夹</value></data>
+  <data name="Main.Nav.ScriptEditor" xml:space="preserve"><value>脚本编辑器</value></data>
+  <data name="Scripts.BatteryReport.Description" xml:space="preserve"><value>在您的用户文件夹中生成电池运行状况报告。</value></data>
+  <data name="Scripts.BatteryReport.Name" xml:space="preserve"><value>电池报告</value></data>
+  <data name="Scripts.CheckDisk.Description" xml:space="preserve"><value>扫描 C: 驱动器的错误但不修复（使用中运行也安全）。</value></data>
+  <data name="Scripts.CheckDisk.Name" xml:space="preserve"><value>检查磁盘（仅扫描）</value></data>
+  <data name="Scripts.ClearTempFolder.Description" xml:space="preserve"><value>删除当前用户 Temp 文件夹中的所有文件以释放空间。</value></data>
+  <data name="Scripts.ClearTempFolder.Name" xml:space="preserve"><value>清空临时文件夹</value></data>
+  <data name="Scripts.DiskCleanup.Description" xml:space="preserve"><value>在系统驱动器上运行磁盘清理。</value></data>
+  <data name="Scripts.DiskCleanup.Name" xml:space="preserve"><value>磁盘清理（系统）</value></data>
+  <data name="Scripts.EmptyRecycleBin.Description" xml:space="preserve"><value>永久删除回收站中的所有项目。</value></data>
+  <data name="Scripts.EmptyRecycleBin.Name" xml:space="preserve"><value>清空回收站</value></data>
+  <data name="Scripts.ExportIpConfig.Description" xml:space="preserve"><value>将完整的 IP 配置详细信息保存到您的用户文件夹。</value></data>
+  <data name="Scripts.ExportIpConfig.Name" xml:space="preserve"><value>导出 IP 配置</value></data>
+  <data name="Scripts.FlushDns.Description" xml:space="preserve"><value>清除 DNS 解析器缓存。</value></data>
+  <data name="Scripts.FlushDns.Name" xml:space="preserve"><value>刷新 DNS 缓存</value></data>
+  <data name="Scripts.NetworkCheck.Description" xml:space="preserve"><value>Ping Google DNS 以检查 Internet 连接。</value></data>
+  <data name="Scripts.NetworkCheck.Name" xml:space="preserve"><value>网络连接检查</value></data>
+  <data name="Scripts.Reboot.Description" xml:space="preserve"><value>一小时后重启计算机。</value></data>
+  <data name="Scripts.Reboot.Name" xml:space="preserve"><value>重启计算机</value></data>
+  <data name="Scripts.RestartPrintSpooler.Description" xml:space="preserve"><value>重启打印后台处理程序服务以修复卡住的打印作业。</value></data>
+  <data name="Scripts.RestartPrintSpooler.Name" xml:space="preserve"><value>重启打印后台处理程序</value></data>
+  <data name="Scripts.Shutdown.Description" xml:space="preserve"><value>一小时后关闭计算机。</value></data>
+  <data name="Scripts.Shutdown.Name" xml:space="preserve"><value>关闭计算机</value></data>
+  <data name="Scripts.SystemFileChecker.Description" xml:space="preserve"><value>扫描并修复损坏的系统文件。</value></data>
+  <data name="Scripts.SystemFileChecker.Name" xml:space="preserve"><value>系统文件检查器</value></data>
+  <data name="Scripts.SystemInfoReport.Description" xml:space="preserve"><value>生成详细的系统报告并保存到文件。</value></data>
+  <data name="Scripts.SystemInfoReport.Name" xml:space="preserve"><value>系统信息报告</value></data>
+  <data name="Task.Snooze.Label" xml:space="preserve"><value>暂停</value></data>
+  <data name="Task.Snooze.CustomIntro" xml:space="preserve"><value>将此任务禁用至：</value></data>
+  <data name="Task.Snooze.Status" xml:space="preserve"><value>已暂停至 {0}</value></data>
+  <data name="Task.Snooze.Resume" xml:space="preserve"><value>立即恢复</value></data>
 </root>
 
 

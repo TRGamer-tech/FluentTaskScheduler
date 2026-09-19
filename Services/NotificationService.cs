@@ -13,6 +13,7 @@ namespace FluentTaskScheduler.Services
             if (!Settings.ShowNotifications) return;
 
             new ToastContentBuilder()
+                .AddArgument("action", "show")
                 .AddText($"Task Started: {taskName}")
                 .AddText("The task has been triggered manually.")
                 .Show();
@@ -23,6 +24,7 @@ namespace FluentTaskScheduler.Services
             if (!Settings.ShowNotifications) return;
 
             new ToastContentBuilder()
+                .AddArgument("action", "show")
                 .AddText($"Task Failed: {taskName}")
                 .AddText(error)
                 .Show();
@@ -36,6 +38,57 @@ namespace FluentTaskScheduler.Services
                 .AddArgument("action", "show")
                 .AddText($"Upcoming Task: {taskName}")
                 .AddText($"Scheduled to run in {timeLabel}.")
+                .Show();
+        }
+
+        public static void ShowSnoozeStarted(string statusText)
+        {
+            if (!SettingsService.ShowNotifications) return;
+
+            new ToastContentBuilder()
+                .AddArgument("action", "show")
+                .AddText(LocalizationService.GetString("Snooze.Toast.Started.Title", "Global Snooze Enabled"))
+                .AddText(statusText)
+                .Show();
+        }
+
+        public static void ShowSnoozeEnded()
+        {
+            if (!SettingsService.ShowNotifications) return;
+
+            new ToastContentBuilder()
+                .AddArgument("action", "show")
+                .AddText(LocalizationService.GetString("Snooze.Toast.Ended.Title", "Global Snooze Ended"))
+                .AddText(LocalizationService.GetString("Snooze.Toast.Ended.Body", "Scheduled tasks are running normally again."))
+                .Show();
+        }
+
+        public static void ShowRunSuppressed(string taskName)
+        {
+            if (!SettingsService.ShowNotifications) return;
+
+            new ToastContentBuilder()
+                .AddArgument("action", "show")
+                .AddText(string.Format(
+                    LocalizationService.GetString("Snooze.Toast.Suppressed.Title", "Run Suppressed: {0}"), taskName))
+                .AddText(LocalizationService.GetString(
+                    "Snooze.Toast.Suppressed.Body", "Global snooze is active, so this task was not started."))
+                .Show();
+        }
+
+        public static void ShowPipelineTriggered(string sourceTask, string targetTask, bool onSuccess)
+        {
+            if (!SettingsService.ShowNotifications) return;
+
+            new ToastContentBuilder()
+                .AddArgument("action", "show")
+                .AddText(string.Format(
+                    LocalizationService.GetString("Pipeline.Toast.Title", "Pipeline: {0} started"), targetTask))
+                .AddText(string.Format(
+                    onSuccess
+                        ? LocalizationService.GetString("Pipeline.Toast.OnSuccess", "Triggered because '{0}' completed successfully.")
+                        : LocalizationService.GetString("Pipeline.Toast.OnFailure", "Triggered because '{0}' failed."),
+                    sourceTask))
                 .Show();
         }
 

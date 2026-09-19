@@ -9,74 +9,197 @@
     Background="Transparent"
     Loaded="Page_Loaded">
 
-    <Grid>
-        <ScrollViewer x:Name="PageScrollViewer" Padding="24" IsScrollInertiaEnabled="False">
-            <StackPanel Spacing="16">
+    <Grid Padding="24,16,24,0" RowSpacing="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-                <!-- Header row -->
-                <StackPanel Orientation="Horizontal" Spacing="12">
-                    <TextBlock x:Name="ScriptLibraryTitle" x:Uid="ScriptLibraryTitle" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
-                    <Button x:Name="CreateTemplateButton" x:Uid="ScriptLibraryCreateBtn" Click="CreateTemplateButton_Click"/>
+        <!-- Section switcher: task templates vs. reusable scripts -->
+        <StackPanel Grid.Row="0" Spacing="12">
+            <TextBlock x:Name="LibrarySubtitle" Style="{StaticResource CaptionTextBlockStyle}"
+                       Opacity="0.65" TextWrapping="Wrap" MaxWidth="900" HorizontalAlignment="Left"/>
+
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <ToggleButton x:Name="SectionTemplatesButton" IsChecked="True" CornerRadius="4" MinWidth="160"
+                                  Click="SectionButton_Click" Tag="templates">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE8A5;" FontSize="14"/>
+                            <TextBlock x:Name="SectionTemplatesText" Text="Task Templates"/>
+                        </StackPanel>
+                    </ToggleButton>
+                    <ToggleButton x:Name="SectionScriptsButton" CornerRadius="4" MinWidth="160"
+                                  Click="SectionButton_Click" Tag="scripts">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE943;" FontSize="14"/>
+                            <TextBlock x:Name="SectionScriptsText" Text="Scripts"/>
+                        </StackPanel>
+                    </ToggleButton>
                 </StackPanel>
 
-                <!-- Template cards grid -->
-                <GridView ItemsSource="{x:Bind ViewModel.Scripts}" SelectionMode="None">
-                    <GridView.ItemTemplate>
-                        <DataTemplate x:DataType="viewmodels:ScriptTemplateModel">
-                            <Grid Width="300" Height="180" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" Margin="0,0,12,12">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel>
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <FontIcon Glyph="&#xE943;" FontSize="16" Opacity="0.7"/>
-                                            <TextBlock Text="{x:Bind Name}" Style="{StaticResource BodyStrongTextBlockStyle}" TextTrimming="CharacterEllipsis"/>
-                                        </StackPanel>
-                                        <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,8"/>
-                                    </StackPanel>
-                                    <!-- Delete button — only visible for user templates -->
-                                    <Button Grid.Column="1"
-                                            Visibility="{x:Bind DeleteVisibility}"
-                                            Click="DeleteTemplateButton_Click"
-                                            Tag="{x:Bind}"
-                                            Background="Transparent"
-                                            BorderThickness="0"
-                                            Padding="4"
-                                            VerticalAlignment="Top"
-                                            x:Uid="ScriptLibraryDeleteBtn">
-                                        <FontIcon Glyph="&#xE74D;" FontSize="12" Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
-                                    </Button>
+                <AutoSuggestBox x:Name="LibrarySearchBox" Grid.Column="1" QueryIcon="Find" Width="280"
+                                HorizontalAlignment="Right" TextChanged="LibrarySearchBox_TextChanged"/>
+            </Grid>
+        </StackPanel>
+
+        <ScrollViewer x:Name="PageScrollViewer" Grid.Row="1" IsScrollInertiaEnabled="False" Padding="0,0,0,24">
+            <StackPanel Spacing="20">
+
+                <!-- ── Task templates ─────────────────────────────────────────── -->
+                <StackPanel x:Name="TemplatesSection" Spacing="20">
+                    <InfoBar x:Name="TemplatesInfoBar" IsOpen="True" IsClosable="True" Severity="Informational"
+                             MaxWidth="900" HorizontalAlignment="Left"/>
+
+                    <ItemsControl ItemsSource="{x:Bind TemplatesViewModel.Groups}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="viewmodels:TaskTemplateGroup">
+                                <StackPanel Spacing="10" Margin="0,0,0,20">
+                                    <TextBlock Text="{x:Bind DisplayName}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+
+                                    <GridView ItemsSource="{x:Bind Templates}" SelectionMode="None" Padding="0">
+                                        <GridView.ItemContainerStyle>
+                                            <Style TargetType="GridViewItem">
+                                                <Setter Property="Padding" Value="0"/>
+                                                <Setter Property="Margin" Value="0"/>
+                                            </Style>
+                                        </GridView.ItemContainerStyle>
+                                        <GridView.ItemTemplate>
+                                            <DataTemplate x:DataType="viewmodels:TaskTemplateCard">
+                                                <Grid Width="340" MinHeight="224" Margin="0,0,12,12" Padding="16"
+                                                      Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                                      CornerRadius="8" BorderThickness="1"
+                                                      BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="*"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+
+                                                    <Grid ColumnSpacing="8">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <FontIcon Glyph="{x:Bind Glyph}" FontSize="16" Opacity="0.75" VerticalAlignment="Top"/>
+                                                        <TextBlock Grid.Column="1" Text="{x:Bind Name}"
+                                                                   Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap"/>
+                                                        <FontIcon Grid.Column="2" Glyph="&#xE7EF;" FontSize="12" Opacity="0.7" VerticalAlignment="Top"
+                                                                  Visibility="{x:Bind AdminVisibility}"
+                                                                  ToolTipService.ToolTip="Requires administrator privileges"/>
+                                                    </Grid>
+
+                                                    <TextBlock Grid.Row="1" Text="{x:Bind Description}" TextWrapping="Wrap"
+                                                               Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.75" Margin="0,10,0,0"/>
+
+                                                    <StackPanel Grid.Row="2" Spacing="6" Margin="0,10,0,10">
+                                                        <TextBlock Text="{x:Bind Summary}" Style="{StaticResource CaptionTextBlockStyle}"
+                                                                   Opacity="0.55" TextTrimming="CharacterEllipsis" MaxLines="1"/>
+                                                        <Grid ColumnSpacing="6" Visibility="{x:Bind NoteVisibility}">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <FontIcon Glyph="&#xE7BA;" FontSize="11"
+                                                                      Foreground="{ThemeResource SystemFillColorCautionBrush}" VerticalAlignment="Top"/>
+                                                            <TextBlock Grid.Column="1" Text="{x:Bind Note}" Style="{StaticResource CaptionTextBlockStyle}"
+                                                                       Foreground="{ThemeResource SystemFillColorCautionBrush}" TextWrapping="Wrap"/>
+                                                        </Grid>
+                                                    </StackPanel>
+
+                                                    <Button Grid.Row="3" HorizontalAlignment="Stretch" Click="DeployTemplate_Click"
+                                                            Tag="{x:Bind Template}" Style="{StaticResource AccentButtonStyle}"
+                                                            Content="{x:Bind DeployLabel}"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </GridView.ItemTemplate>
+                                    </GridView>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock x:Name="TemplatesNoResultsText" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Visibility="Collapsed"/>
+                </StackPanel>
+
+                <!-- ── Reusable scripts ───────────────────────────────────────── -->
+                <StackPanel x:Name="ScriptsSection" Spacing="16" Visibility="Collapsed">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock x:Name="ScriptLibraryTitle" Style="{StaticResource BodyStrongTextBlockStyle}" VerticalAlignment="Center"/>
+                        <Button x:Name="CreateTemplateButton" Click="CreateTemplateButton_Click"/>
+                    </StackPanel>
+
+                    <GridView ItemsSource="{x:Bind ViewModel.Scripts}" SelectionMode="None" Padding="0">
+                        <GridView.ItemContainerStyle>
+                            <Style TargetType="GridViewItem">
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Margin" Value="0"/>
+                            </Style>
+                        </GridView.ItemContainerStyle>
+                        <GridView.ItemTemplate>
+                            <DataTemplate x:DataType="viewmodels:ScriptTemplateModel">
+                                <Grid Width="340" Height="200" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                      CornerRadius="8" Padding="16" BorderThickness="1"
+                                      BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" Margin="0,0,12,12">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <Grid ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <FontIcon Glyph="&#xE943;" FontSize="16" Opacity="0.7" VerticalAlignment="Top"/>
+                                        <TextBlock Grid.Column="1" Text="{x:Bind Name}"
+                                                   Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap"/>
+                                        <Button Grid.Column="2"
+                                                Visibility="{x:Bind DeleteVisibility}"
+                                                Click="DeleteTemplateButton_Click"
+                                                Tag="{x:Bind}"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Padding="4"
+                                                VerticalAlignment="Top">
+                                            <FontIcon Glyph="&#xE74D;" FontSize="12" Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
+                                        </Button>
+                                    </Grid>
+
+                                    <TextBlock Grid.Row="1" Text="{x:Bind Description}" TextWrapping="Wrap"
+                                               Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.75" Margin="0,10,0,10"/>
+
+                                    <Button Grid.Row="2" HorizontalAlignment="Stretch" Click="ScheduleButton_Click" Tag="{x:Bind}"
+                                            Content="{x:Bind UseLabel}"/>
                                 </Grid>
-                                
-                                <TextBlock Grid.Row="1" Text="{x:Bind Description}" TextWrapping="Wrap" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
-                                
-                                <Button Grid.Row="2" x:Uid="ScriptLibraryUseTemplateBtn" HorizontalAlignment="Stretch" Click="ScheduleButton_Click" Tag="{x:Bind}"/>
-                            </Grid>
-                        </DataTemplate>
-                    </GridView.ItemTemplate>
-                </GridView>
+                            </DataTemplate>
+                        </GridView.ItemTemplate>
+                    </GridView>
+
+                    <TextBlock x:Name="ScriptsNoResultsText" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.5" Visibility="Collapsed"/>
+                </StackPanel>
             </StackPanel>
         </ScrollViewer>
 
-        <!-- Create Template Dialog -->
+        <!-- Create Script Dialog -->
         <ContentDialog x:Name="CreateTemplateDialog"
-                       x:Uid="ScriptLibraryNewTemplateDialog"
                        DefaultButton="Primary"
                        PrimaryButtonClick="CreateTemplateDialog_PrimaryButtonClick">
             <StackPanel Spacing="12" MinWidth="400">
-                <TextBox x:Name="TemplateName"     x:Uid="ScriptLibraryNameHeader"/>
-                <TextBox x:Name="TemplateDesc"     x:Uid="ScriptLibraryDescHeader" TextWrapping="Wrap" AcceptsReturn="True" Height="72"/>
-                <TextBox x:Name="TemplateCommand"  x:Uid="ScriptLibraryCommandHeader"/>
-                <TextBox x:Name="TemplateArgs"     x:Uid="ScriptLibraryArgsHeader"/>
-                <CheckBox x:Name="TemplateAdmin"   x:Uid="ScriptLibraryAdminContent"/>
+                <TextBox x:Name="TemplateName"/>
+                <TextBox x:Name="TemplateDesc" TextWrapping="Wrap" AcceptsReturn="True" Height="72"/>
+                <TextBox x:Name="TemplateCommand"/>
+                <TextBox x:Name="TemplateArgs"/>
+                <CheckBox x:Name="TemplateAdmin"/>
             </StackPanel>
         </ContentDialog>
     </Grid>

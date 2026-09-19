@@ -23,8 +23,8 @@
 
                 <!-- Header row -->
                 <StackPanel Spacing="4">
-                    <TextBlock x:Name="QuickActionsTitle" x:Uid="QuickActions.Title" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                    <TextBlock x:Name="QuickActionsDesc" x:Uid="QuickActions.Description" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
+                    <TextBlock x:Name="QuickActionsTitle" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                    <TextBlock x:Name="QuickActionsDesc" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.7"/>
                 </StackPanel>
 
                 <!-- Action cards grid -->
