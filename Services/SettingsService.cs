@@ -33,49 +33,52 @@ namespace FluentTaskScheduler.Services
         public List<string> SavedTags { get; set; } = new() { "urgent", "sync", "database", "cleanup" };
     }
 
-    public static class SettingsService
+    /// <summary>Instance-based, injectable settings store (registered as a DI singleton). No static state.</summary>
+    public sealed class SettingsService : ISettingsService
     {
-        private static AppSettings _settings = new();
-        private static string SettingsFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FluentTaskScheduler");
-        private static string SettingsPath = Path.Combine(SettingsFolder, "settings.json");
+        private AppSettings _settings = new();
+        private readonly string _settingsFolder;
+        private readonly string _settingsPath;
 
-        static SettingsService()
+        public SettingsService()
         {
+            _settingsFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FluentTaskScheduler");
+            _settingsPath = Path.Combine(_settingsFolder, "settings.json");
             Load();
         }
 
-        public static void Load()
+        public void Load()
         {
             try
             {
-                if (File.Exists(SettingsPath))
+                if (File.Exists(_settingsPath))
                 {
-                    string json = File.ReadAllText(SettingsPath);
+                    string json = File.ReadAllText(_settingsPath);
                     _settings = JsonSerializer.Deserialize<AppSettings>(json) ?? new AppSettings();
                 }
             }
-            catch 
+            catch
             {
                 // Fallback to defaults on error
                 _settings = new AppSettings();
             }
         }
 
-        private static void Save()
+        private void Save()
         {
             try
             {
-                if (!Directory.Exists(SettingsFolder))
+                if (!Directory.Exists(_settingsFolder))
                 {
-                    Directory.CreateDirectory(SettingsFolder);
+                    Directory.CreateDirectory(_settingsFolder);
                 }
                 string json = JsonSerializer.Serialize(_settings);
-                File.WriteAllText(SettingsPath, json);
+                File.WriteAllText(_settingsPath, json);
             }
             catch { }
         }
 
-        public static ElementTheme Theme
+        public ElementTheme Theme
         {
             get => Enum.TryParse<ElementTheme>(_settings.Theme, out var t) ? t : ElementTheme.Default;
             set
@@ -85,7 +88,7 @@ namespace FluentTaskScheduler.Services
             }
         }
 
-        public static bool IsOledMode
+        public bool IsOledMode
         {
             get => _settings.IsOledMode;
             set
@@ -95,7 +98,7 @@ namespace FluentTaskScheduler.Services
             }
         }
 
-        public static bool IsMicaEnabled
+        public bool IsMicaEnabled
         {
             get => _settings.IsMicaEnabled;
             set
@@ -105,7 +108,7 @@ namespace FluentTaskScheduler.Services
             }
         }
 
-        public static string Language
+        public string Language
         {
             get => _settings.Language;
             set
@@ -115,7 +118,7 @@ namespace FluentTaskScheduler.Services
             }
         }
 
-        public static bool ConfirmDelete
+        public bool ConfirmDelete
         {
             get => _settings.ConfirmDelete;
             set
@@ -125,7 +128,7 @@ namespace FluentTaskScheduler.Services
             }
         }
 
-        public static bool ShowNotifications
+        public bool ShowNotifications
         {
             get => _settings.ShowNotifications;
             set
@@ -135,7 +138,7 @@ namespace FluentTaskScheduler.Services
             }
         }
 
-        public static bool EnableTrayIcon
+        public bool EnableTrayIcon
         {
             get => _settings.EnableTrayIcon;
             set
@@ -145,7 +148,7 @@ namespace FluentTaskScheduler.Services
             }
         }
 
-        public static bool MinimizeToTray
+        public bool MinimizeToTray
         {
             get => _settings.MinimizeToTray;
             set
@@ -155,7 +158,7 @@ namespace FluentTaskScheduler.Services
             }
         }
 
-        public static bool EnableLogging
+        public bool EnableLogging
         {
             get => _settings.EnableLogging;
             set
@@ -164,8 +167,8 @@ namespace FluentTaskScheduler.Services
                 Save();
             }
         }
-        
-        public static bool SeparateLogFiles
+
+        public bool SeparateLogFiles
         {
             get => _settings.SeparateLogFiles;
             set
@@ -175,7 +178,7 @@ namespace FluentTaskScheduler.Services
             }
         }
 
-        public static bool EnableExecutionHistoryLog
+        public bool EnableExecutionHistoryLog
         {
             get => _settings.EnableExecutionHistoryLog;
             set
@@ -185,7 +188,7 @@ namespace FluentTaskScheduler.Services
             }
         }
 
-        public static bool RunOnStartup
+        public bool RunOnStartup
         {
             get => _settings.RunOnStartup;
             set
@@ -195,7 +198,7 @@ namespace FluentTaskScheduler.Services
             }
         }
 
-        public static bool SmoothScrolling
+        public bool SmoothScrolling
         {
             get => _settings.SmoothScrolling;
             set
@@ -205,83 +208,83 @@ namespace FluentTaskScheduler.Services
             }
         }
 
-        public static int WindowWidth
+        public int WindowWidth
         {
             get => _settings.WindowWidth;
             set { _settings.WindowWidth = value; Save(); }
         }
 
-        public static int WindowHeight
+        public int WindowHeight
         {
             get => _settings.WindowHeight;
             set { _settings.WindowHeight = value; Save(); }
         }
 
-        public static string LastFolderPath
+        public string LastFolderPath
         {
             get => _settings.LastFolderPath;
             set { _settings.LastFolderPath = value; Save(); }
         }
 
-        public static string LastSeenVersion
+        public string LastSeenVersion
         {
             get => _settings.LastSeenVersion;
             set { _settings.LastSeenVersion = value; Save(); }
         }
 
-        public static bool HasCompletedOnboarding
+        public bool HasCompletedOnboarding
         {
             get => _settings.HasCompletedOnboarding;
             set { _settings.HasCompletedOnboarding = value; Save(); }
         }
 
-        public static bool EnableUpcomingReminders
+        public bool EnableUpcomingReminders
         {
             get => _settings.EnableUpcomingReminders;
             set { _settings.EnableUpcomingReminders = value; Save(); }
         }
 
-        public static int ReminderLeadMinutes
+        public int ReminderLeadMinutes
         {
             get => _settings.ReminderLeadMinutes;
             set { _settings.ReminderLeadMinutes = value; Save(); }
         }
 
-        public static List<string> SavedCategories
+        public List<string> SavedCategories
         {
             get => _settings.SavedCategories;
             set { _settings.SavedCategories = value; Save(); }
         }
 
-        public static List<string> SavedTags
+        public List<string> SavedTags
         {
             get => _settings.SavedTags;
             set { _settings.SavedTags = value; Save(); }
         }
 
-        public static bool ShowHiddenTasks
+        public bool ShowHiddenTasks
         {
             get => _settings.ShowHiddenTasks;
             set { _settings.ShowHiddenTasks = value; Save(); }
         }
 
-        public static void ExportSettings(string targetPath)
+        public void ExportSettings(string targetPath)
         {
             try
             {
                 var options = new JsonSerializerOptions { WriteIndented = true };
                 string json = JsonSerializer.Serialize(_settings, options);
                 File.WriteAllText(targetPath, json);
-                LogService.Info($"Settings exported to {targetPath}");
+                Serilog.Log.Information("{Message}", $"Settings exported to {targetPath}");
             }
             catch (Exception ex)
             {
-                LogService.Error("Failed to export settings", ex);
+                Serilog.Log.Error(ex, "Failed to export settings");
                 throw;
             }
         }
 
-        public static void ImportSettings(string sourcePath)
+        public void ImportSettings(string sourcePath)
         {
             try
             {
@@ -291,12 +294,12 @@ namespace FluentTaskScheduler.Services
                 {
                     _settings = imported;
                     Save();
-                    LogService.Info($"Settings imported from {sourcePath}");
+                    Serilog.Log.Information("{Message}", $"Settings imported from {sourcePath}");
                 }
             }
             catch (Exception ex)
             {
-                LogService.Error("Failed to import settings", ex);
+                Serilog.Log.Error(ex, "Failed to import settings");
                 throw;
             }
         }

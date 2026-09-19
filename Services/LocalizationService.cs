@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Windows.ApplicationModel.Resources;
 using Windows.ApplicationModel.Resources.Core;
 
@@ -17,13 +18,15 @@ namespace FluentTaskScheduler.Services
 
         private static string _currentLanguage = "en-US";
 
+        private static ISettingsService Settings => App.Container.GetRequiredService<ISettingsService>();
+
         public static event EventHandler? LanguageChanged;
 
         public static string CurrentLanguage => _currentLanguage;
 
         public static void Initialize()
         {
-            ApplyLanguage(NormalizeLanguage(SettingsService.Language), raiseEvent: false);
+            ApplyLanguage(NormalizeLanguage(Settings.Language), raiseEvent: false);
         }
 
         public static bool ChangeLanguage(string language)
@@ -113,7 +116,7 @@ namespace FluentTaskScheduler.Services
         private static void ApplyLanguage(string language, bool raiseEvent)
         {
             _currentLanguage = language;
-            SettingsService.Language = language;
+            Settings.Language = language;
 
             try
             {

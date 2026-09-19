@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI;
+using FluentTaskScheduler.Models.Enums;
 using FluentTaskScheduler.ViewModels;
 
 namespace FluentTaskScheduler.Converters
@@ -11,12 +12,12 @@ namespace FluentTaskScheduler.Converters
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            string state = value?.ToString() ?? "";
+            var state = value is TaskState s ? s : TaskState.Unknown;
             return state switch
             {
-                "Running" => "\uE768", // Play
-                "Ready" => "\uE73E",   // Accept
-                "Disabled" => "\uE711", // X (Cancel)
+                TaskState.Running => "\uE768", // Play
+                TaskState.Ready => "\uE73E",   // Accept
+                TaskState.Disabled => "\uE711", // X (Cancel)
                 _ => "\uE9CE"          // Help
             };
         }
@@ -28,12 +29,12 @@ namespace FluentTaskScheduler.Converters
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            string state = value?.ToString() ?? "";
+            var state = value is TaskState s ? s : TaskState.Unknown;
             var color = state switch
             {
-                "Running" => Colors.Green,
-                "Ready" => Colors.RoyalBlue,
-                "Disabled" => Colors.Gray,
+                TaskState.Running => Colors.Green,
+                TaskState.Ready => Colors.RoyalBlue,
+                TaskState.Disabled => Colors.Gray,
                 _ => Colors.Orange
             };
             return new SolidColorBrush(color);

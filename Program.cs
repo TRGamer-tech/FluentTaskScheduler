@@ -2,7 +2,6 @@ using System;
 using System.Runtime.InteropServices;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
-using Microsoft.Windows.ApplicationModel.DynamicDependency;
 using Velopack;
 
 namespace FluentTaskScheduler
@@ -49,25 +48,14 @@ namespace FluentTaskScheduler
                 }
             }
 
-            // Initialize the Windows App SDK bootstrapper for unpackaged apps
-            try
-            {
-                // In a self-contained environment, we check if we should even call the bootstrapper.
-                // If WindowsAppSDKSelfContained is true, the runtime is next to the EXE.
-                // However, for custom Main methods, calling Bootstrap.Initialize with the right version
-                // helps the WinRT subsystem find the metadata even if the manifest merging is tricky.
-                
-                // We use Windows App SDK 1.5 (0x00010005). We use an empty tag to avoid issues with 
-                // specific servicing versions that might not be present on the target machine.
-                Bootstrap.Initialize(0x00010005, "");
-            }
-            catch (Exception ex)
-            {
-                // If this fails, it's often because the Framework Package isn't installed.
-                // In self-contained scenarios, this is expected to fail on machines without the SDK,
-                // but we carry on and hope the local DLLs and manifest are enough.
-                System.Diagnostics.Debug.WriteLine($"Bootstrap initialization failed: {ex.Message}");
-            }
+            // NOTE: The Windows App SDK Bootstrapper API (Bootstrap.Initialize/Shutdown) is only for
+            // framework-dependent unpackaged apps that need to dynamically bind to an installed
+            // WinAppSDK framework package at runtime. This project uses WindowsAppSDKSelfContained=true,
+            // meaning the WinAppSDK runtime is deployed locally next to the EXE and never needs the
+            // bootstrapper. Calling Bootstrap.Initialize here always fails on machines without the
+            // WinAppSDK 1.5 framework package installed (writing an Event ID 22 "Windows App Runtime"
+            // error to the Event Log on every launch), and can leave WinRT activation in a bad state
+            // that later surfaces as COMExceptions from WinRT API calls (e.g. FileSavePicker).
 
             try
             {
@@ -78,19 +66,12 @@ namespace FluentTaskScheduler
                 System.Diagnostics.Debug.WriteLine($"XamlCheckProcessRequirements failed: {ex.Message}");
             }
 
-            try
+            Application.Start((p) =>
             {
-                Application.Start((p) =>
-                {
-                    var context = new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread());
-                    System.Threading.SynchronizationContext.SetSynchronizationContext(context);
-                    new App();
-                });
-            }
-            finally
-            {
-                Bootstrap.Shutdown();
-            }
+                var context = new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread());
+                System.Threading.SynchronizationContext.SetSynchronizationContext(context);
+                new App();
+            });
         }
 
         private static bool HasWriteAccessToAppDir()

@@ -10,10 +10,17 @@
         <CornerRadius x:Key="OverlayCornerRadius">16</CornerRadius>
     </ContentDialog.Resources>
 
-    <StackPanel Spacing="0" MaxWidth="560">
+    <Grid Width="520" Height="520">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
         <!-- Illustration area -->
         <Border x:Name="IllustrationBorder"
+                Grid.Row="0"
                 Height="140"
                 CornerRadius="12"
                 Margin="0,0,0,24"
@@ -26,6 +33,7 @@
                       VerticalAlignment="Center"/>
         </Border>
 
+        <StackPanel Grid.Row="1" Spacing="0">
         <!-- Step title -->
         <TextBlock x:Name="StepTitle"
                    FontSize="20"
@@ -81,9 +89,11 @@
                             VerticalAlignment="Center"/>
             </StackPanel>
         </Border>
+        </StackPanel>
 
         <!-- Step dots -->
         <StackPanel x:Name="DotsPanel"
+                    Grid.Row="2"
                     Orientation="Horizontal"
                     HorizontalAlignment="Center"
                     Spacing="8"
@@ -92,7 +102,7 @@
         </StackPanel>
 
         <!-- Navigation buttons -->
-        <Grid>
+        <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -114,5 +124,5 @@
                     MinWidth="110"/>
         </Grid>
 
-    </StackPanel>
+    </Grid>
 </ContentDialog>

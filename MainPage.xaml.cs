@@ -6,7 +6,9 @@ using Microsoft.UI.Xaml.Media;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using FluentTaskScheduler.Models;
+using FluentTaskScheduler.Models.Enums;
 using FluentTaskScheduler.Services;
+using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.UI.Dispatching;
@@ -19,6 +21,8 @@ namespace FluentTaskScheduler
     public sealed partial class MainPage : Page
     {
         public MainViewModel ViewModel { get; } = new();
+
+        private ISettingsService Settings => App.Container.GetRequiredService<ISettingsService>();
 
         // Forwarding property for x:Bind compatibility
         public ObservableCollection<ScheduledTaskModel> FilteredTasks => ViewModel.FilteredTasks;
@@ -351,7 +355,7 @@ namespace FluentTaskScheduler
                 _tempActions.Add(new TaskActionModel { Command = "notepad.exe" });
             }
 
-            _tempTriggers = new ObservableCollection<TaskTriggerModel> { new TaskTriggerModel { TriggerType = "Daily", ScheduleInfo = DateTime.Now.ToString("g"), DailyInterval = 1 } };
+            _tempTriggers = new ObservableCollection<TaskTriggerModel> { new TaskTriggerModel { TriggerType = TriggerType.Daily, ScheduleInfo = DateTime.Now.ToString("g"), DailyInterval = 1 } };
             
             ActionList.ItemsSource = _tempActions;
             TriggerList.ItemsSource = _tempTriggers;
@@ -375,7 +379,7 @@ namespace FluentTaskScheduler
 
             // Feature 3: restore last-used folder
             /*
-            string saved = Services.SettingsService.LastFolderPath;
+            string saved = Settings.LastFolderPath;
             if (!string.IsNullOrEmpty(saved) && saved != "\\")
             {
                 _currentFolderPath = saved;
@@ -386,7 +390,7 @@ namespace FluentTaskScheduler
             // Defer one frame so the ListView control template is fully applied before we set its internal ScrollViewer
             DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
             {
-                ApplySmoothScrollingSelf(Services.SettingsService.SmoothScrolling);
+                ApplySmoothScrollingSelf(Settings.SmoothScrolling);
                 
                 // Set custom title bar drag region
                 App.m_window?.SetTitleBar(AppTitleBarDragArea);
@@ -423,14 +427,14 @@ namespace FluentTaskScheduler
 
         private async System.Threading.Tasks.Task CheckAndShowOnboardingAsync()
         {
-            if (Services.SettingsService.HasCompletedOnboarding) return;
+            if (Settings.HasCompletedOnboarding) return;
 
             var tcs = new System.Threading.Tasks.TaskCompletionSource();
             DispatcherQueue.TryEnqueue(async () =>
             {
                 try
                 {
-                    var dialog = new Dialogs.OnboardingDialog { XamlRoot = this.XamlRoot, RequestedTheme = Services.SettingsService.Theme };
+                    var dialog = new Dialogs.OnboardingDialog { XamlRoot = this.XamlRoot, RequestedTheme = Settings.Theme };
                     await dialog.ShowAsync();
                 }
                 catch { /* XamlRoot not ready or dialog already open â€” skip silently */ }
@@ -446,7 +450,7 @@ namespace FluentTaskScheduler
                 var release = await Services.GitHubReleaseService.GetLatestReleaseAsync();
                 if (release == null) return;
 
-                string lastSeen = Services.SettingsService.LastSeenVersion;
+                string lastSeen = Settings.LastSeenVersion;
                 if (string.Equals(release.TagName, lastSeen, StringComparison.OrdinalIgnoreCase)) return;
 
                 // New version â€” marshal back to UI thread via TCS
@@ -458,11 +462,11 @@ namespace FluentTaskScheduler
                         var dialog = new Dialogs.WhatsNewDialog(release)
                         {
                             XamlRoot = this.XamlRoot,
-                            RequestedTheme = Services.SettingsService.Theme
+                            RequestedTheme = Settings.Theme
                         };
                         await dialog.ShowAsync();
                         // Only persist after the user has actually seen the dialog
-                        Services.SettingsService.LastSeenVersion = release.TagName;
+                        Settings.LastSeenVersion = release.TagName;
                     }
                     catch { /* dialog already open or XamlRoot not ready â€” skip silently */ }
                     finally { tcs.TrySetResult(); }
@@ -577,7 +581,7 @@ namespace FluentTaskScheduler
             if (args.InvokedItem is TreeViewNode node && _treeNodeFolderMap.TryGetValue(node, out var folder))
             {
                 _currentFolderPath = folder.Path;
-                // Services.SettingsService.LastFolderPath = folder.Path; // Feature 3: persist
+                // Settings.LastFolderPath = folder.Path; // Feature 3: persist
                 ViewModel.SetFilter(folder.Path);
                 
                 // Restore Task View
@@ -949,7 +953,7 @@ namespace FluentTaskScheduler
             try
             {
                 ViewModel.TaskService.RunTask(ViewModel.SelectedTask.Path);
-                ViewModel.SelectedTask.State = "Running";
+                ViewModel.SelectedTask.State = TaskState.Running;
                 ViewModel.SelectedTask.IsRunning = true;
                 _ = WatchTaskUntilFinished(ViewModel.SelectedTask);
                 _ = RefreshTaskHistoryAsync(ViewModel.SelectedTask); // Refresh to show "Task Started"
@@ -963,7 +967,7 @@ namespace FluentTaskScheduler
             try
             {
                 ViewModel.TaskService.StopTask(ViewModel.SelectedTask.Path);
-                ViewModel.SelectedTask.State = "Ready";
+                ViewModel.SelectedTask.State = TaskState.Ready;
                 ViewModel.SelectedTask.IsRunning = false;
                 _ = RefreshTaskHistoryAsync(ViewModel.SelectedTask);
             }
@@ -983,19 +987,19 @@ namespace FluentTaskScheduler
                 await System.Threading.Tasks.Task.Delay(pollIntervalMs);
                 try
                 {
-                    string? liveState = await System.Threading.Tasks.Task.Run(
+                    TaskState? liveState = await System.Threading.Tasks.Task.Run(
                         () => ViewModel.TaskService.GetTaskDetails(task.Path)?.State);
 
                     if (liveState == null) break; // task was deleted
 
                     DispatcherQueue.TryEnqueue(() =>
                     {
-                        task.State = liveState;
-                        if (liveState != "Running")
+                        task.State = liveState.Value;
+                        if (liveState != TaskState.Running)
                             task.IsRunning = false;  // hide the ring
                     });
 
-                    if (liveState != "Running") break;
+                    if (liveState != TaskState.Running) break;
                 }
                 catch { break; }
             }
@@ -1176,7 +1180,7 @@ namespace FluentTaskScheduler
             }
             EditTaskRunIfMissed.IsChecked = ViewModel.SelectedTask.RunIfMissed;
             foreach (var item in EditTaskMultipleInstances.Items.Cast<Microsoft.UI.Xaml.Controls.ComboBoxItem>())
-                if (item.Tag?.ToString() == ViewModel.SelectedTask.MultipleInstancesPolicy) { EditTaskMultipleInstances.SelectedItem = item; break; }
+                if (item.Tag?.ToString() == ViewModel.SelectedTask.MultipleInstancesPolicy.ToString()) { EditTaskMultipleInstances.SelectedItem = item; break; }
             foreach (var item in EditTaskPriority.Items.Cast<Microsoft.UI.Xaml.Controls.ComboBoxItem>())
                 if (item.Tag?.ToString() == ViewModel.SelectedTask.TaskPriority.ToString()) { EditTaskPriority.SelectedItem = item; break; }
             EditTaskDeleteExpired.IsChecked = ViewModel.SelectedTask.DeleteExpiredTaskAfter;
@@ -1238,7 +1242,9 @@ namespace FluentTaskScheduler
                 RunAsSystem = RunAsSystem.IsChecked == true,
                 RunAsUser = RunAsSpecificUser.IsChecked == true ? EditTaskRunAsUser.Text : "",
                 RunIfMissed = EditTaskRunIfMissed.IsChecked == true,
-                MultipleInstancesPolicy = (EditTaskMultipleInstances.SelectedItem as Microsoft.UI.Xaml.Controls.ComboBoxItem)?.Tag?.ToString() ?? "IgnoreNew",
+                MultipleInstancesPolicy = Enum.TryParse<Microsoft.Win32.TaskScheduler.TaskInstancesPolicy>(
+                    (EditTaskMultipleInstances.SelectedItem as Microsoft.UI.Xaml.Controls.ComboBoxItem)?.Tag?.ToString(), out var mip)
+                    ? mip : Microsoft.Win32.TaskScheduler.TaskInstancesPolicy.IgnoreNew,
                 TaskPriority = int.TryParse((EditTaskPriority.SelectedItem as Microsoft.UI.Xaml.Controls.ComboBoxItem)?.Tag?.ToString(), out int p) ? p : 7,
                 DeleteExpiredTaskAfter = EditTaskDeleteExpired.IsChecked == true,
                 AllowHardTerminate = EditTaskAllowHardTerminate.IsChecked == true,
@@ -1273,7 +1279,7 @@ namespace FluentTaskScheduler
                     !model.Name.Equals(ViewModel.SelectedTask.Name, StringComparison.OrdinalIgnoreCase))
                 {
                     ViewModel.TaskService.DeleteTask(ViewModel.SelectedTask.Path);
-                    LogService.Info($"Renamed task - deleted old task at '{ViewModel.SelectedTask.Path}'");
+                    Serilog.Log.Information("{Message}", $"Renamed task - deleted old task at '{ViewModel.SelectedTask.Path}'");
                 }
 
                 TaskEditDialog.Hide();
@@ -1297,7 +1303,7 @@ namespace FluentTaskScheduler
                 _isPopulatingDetails = true;
                 // Map Trigger Model -> UI
                 foreach(var item in EditTaskTriggerType.Items.Cast<ComboBoxItem>()) {
-                    if (item.Tag?.ToString() == tr.TriggerType) EditTaskTriggerType.SelectedItem = item;
+                    if (item.Tag?.ToString() == tr.TriggerType.ToString()) EditTaskTriggerType.SelectedItem = item;
                 }
                 
                 DateTime.TryParse(tr.ScheduleInfo, out var dt);
@@ -1348,7 +1354,8 @@ namespace FluentTaskScheduler
             UpdateTriggerPanelVisibility();
             if (TriggerList.SelectedItem is TaskTriggerModel tr && EditTaskTriggerType.SelectedItem is ComboBoxItem item)
             {
-                if (item.Tag != null) tr.TriggerType = item.Tag.ToString()!;
+                if (item.Tag != null && Enum.TryParse<TriggerType>(item.Tag.ToString(), out var newTriggerType))
+                    tr.TriggerType = newTriggerType;
             }
         }
 
@@ -1367,17 +1374,17 @@ namespace FluentTaskScheduler
              PanelSessionState.Visibility = Visibility.Collapsed;
              PanelStartTime.Visibility = Visibility.Visible;
 
-             if (EditTaskTriggerType.SelectedItem is ComboBoxItem item)
+             if (EditTaskTriggerType.SelectedItem is ComboBoxItem item &&
+                 Enum.TryParse<TriggerType>(item.Tag?.ToString(), out var type))
              {
-                 string type = item.Tag?.ToString() ?? "";
                  switch (type)
                  {
-                     case "Daily": PanelDaily.Visibility = Visibility.Visible; break;
-                     case "Weekly": PanelWeekly.Visibility = Visibility.Visible; break;
-                     case "Monthly": PanelMonthly.Visibility = Visibility.Visible; break;
-                     case "Event": PanelEvent.Visibility = Visibility.Visible; PanelStartTime.Visibility = Visibility.Collapsed; break;
-                     case "OnIdle": PanelIdle.Visibility = Visibility.Visible; PanelStartTime.Visibility = Visibility.Collapsed; break;
-                     case "SessionStateChange": PanelSessionState.Visibility = Visibility.Visible; PanelStartTime.Visibility = Visibility.Collapsed; break;
+                     case TriggerType.Daily: PanelDaily.Visibility = Visibility.Visible; break;
+                     case TriggerType.Weekly: PanelWeekly.Visibility = Visibility.Visible; break;
+                     case TriggerType.Monthly: PanelMonthly.Visibility = Visibility.Visible; break;
+                     case TriggerType.Event: PanelEvent.Visibility = Visibility.Visible; PanelStartTime.Visibility = Visibility.Collapsed; break;
+                     case TriggerType.OnIdle: PanelIdle.Visibility = Visibility.Visible; PanelStartTime.Visibility = Visibility.Collapsed; break;
+                     case TriggerType.SessionStateChange: PanelSessionState.Visibility = Visibility.Visible; PanelStartTime.Visibility = Visibility.Collapsed; break;
                  }
              }
         }
@@ -1461,11 +1468,11 @@ namespace FluentTaskScheduler
                     }
                 }
             }
-            catch (Exception ex) { LogService.Warn($"Could not populate network list: {ex.Message}"); }
+            catch (Exception ex) { Serilog.Log.Warning("{Message}", $"Could not populate network list: {ex.Message}"); }
         }
 
         // List Buttons
-        private void BtnAddTrigger_Click(object sender, RoutedEventArgs e) { _tempTriggers.Add(new TaskTriggerModel { TriggerType="Daily", ScheduleInfo=DateTime.Now.ToString("g") }); TriggerList.SelectedIndex = _tempTriggers.Count - 1; }
+        private void BtnAddTrigger_Click(object sender, RoutedEventArgs e) { _tempTriggers.Add(new TaskTriggerModel { TriggerType=TriggerType.Daily, ScheduleInfo=DateTime.Now.ToString("g") }); TriggerList.SelectedIndex = _tempTriggers.Count - 1; }
         private void BtnRemoveTrigger_Click(object sender, RoutedEventArgs e) { if (TriggerList.SelectedItem is TaskTriggerModel t) _tempTriggers.Remove(t); }
         private void BtnMoveTriggerUp_Click(object sender, RoutedEventArgs e) 
         { 
@@ -1630,7 +1637,7 @@ namespace FluentTaskScheduler
             var tasks = TaskListView.SelectedItems.Cast<ScheduledTaskModel>().ToList();
             foreach (var t in tasks)
             {
-                t.State = "Running";
+                t.State = TaskState.Running;
                 t.IsRunning = true;           // show the ring immediately
                 try
                 {
@@ -1640,7 +1647,7 @@ namespace FluentTaskScheduler
                 _ = WatchTaskUntilFinished(t);
             }
         }
-        private void BatchStop_Click(object sender, RoutedEventArgs e) => PerformBatchAction(t => { ViewModel.TaskService.StopTask(t.Path); t.State = "Ready"; });
+        private void BatchStop_Click(object sender, RoutedEventArgs e) => PerformBatchAction(t => { ViewModel.TaskService.StopTask(t.Path); t.State = TaskState.Ready; });
         private async void BatchEnable_Click(object sender, RoutedEventArgs e) { var denied = PerformBatchActionWithErrors(t => { if (!t.IsEnabled) { ViewModel.TaskService.SetTaskEnabled(t.Path, true); t.IsEnabled = true; } }); UpdateBatchActionsState(); if (denied.Count > 0) await ShowErrorDialog($"The user account under which you are performing this action does not have permission to enable the following task(s):\n\n{string.Join("\n", denied)}\n\nThese tasks are protected and cannot be modified, even with administrator privileges."); }
         private async void BatchDisable_Click(object sender, RoutedEventArgs e) { var denied = PerformBatchActionWithErrors(t => { if (t.IsEnabled) { ViewModel.TaskService.SetTaskEnabled(t.Path, false); t.IsEnabled = false; } }); UpdateBatchActionsState(); if (denied.Count > 0) await ShowErrorDialog($"The user account under which you are performing this action does not have permission to disable the following task(s):\n\n{string.Join("\n", denied)}\n\nThese tasks are protected and cannot be modified, even with administrator privileges."); }
         private async void BatchDelete_Click(object sender, RoutedEventArgs e)
@@ -1690,20 +1697,20 @@ namespace FluentTaskScheduler
         private void SortButton_Click(object sender, RoutedEventArgs e)
         {
             var flyout = new MenuFlyout();
-            string arrow(string col) =>
+            string arrow(SortColumn col) =>
                 ViewModel.SortColumn == col ? (ViewModel.SortAscending ? " ▲" : " ▼") : "";
 
-            void AddItem(string label, string col)
+            void AddItem(string label, SortColumn col)
             {
                 var item = new MenuFlyoutItem { Text = label + arrow(col) };
                 item.Click += (s, _) => { ViewModel.SortBy(col); UpdateSortButtonText(); };
                 flyout.Items.Add(item);
             }
 
-            AddItem(L("Main.Sort.Name", "Name"), "Name");
-            AddItem(L("Main.Sort.Status", "Status"), "Status");
-            AddItem(L("Main.Sort.NextRun", "Next Run"), "NextRun");
-            AddItem(L("Main.Sort.LastRun", "Last Run"), "LastRun");
+            AddItem(L("Main.Sort.Name", "Name"), SortColumn.Name);
+            AddItem(L("Main.Sort.Status", "Status"), SortColumn.Status);
+            AddItem(L("Main.Sort.NextRun", "Next Run"), SortColumn.NextRun);
+            AddItem(L("Main.Sort.LastRun", "Last Run"), SortColumn.LastRun);
             flyout.Items.Add(new MenuFlyoutSeparator());
             var clear = new MenuFlyoutItem { Text = L("Main.Sort.Clear", "Clear Sort") };
             clear.Click += (s, _) => { ViewModel.ClearSort(); UpdateSortButtonText(); };
@@ -1715,7 +1722,7 @@ namespace FluentTaskScheduler
         private void UpdateSortButtonText()
         {
             string arrow = ViewModel.SortAscending ? "▲" : "▼";
-            SortButton.Content = string.IsNullOrEmpty(ViewModel.SortColumn)
+            SortButton.Content = ViewModel.SortColumn == SortColumn.None
                 ? L("Main.Toolbar.SortButton", "Sort ↕")
                 : string.Format(L("Main.Toolbar.SortActiveFormat", "Sort {0} {1}"), arrow, ViewModel.SortColumn);
         }
@@ -1791,7 +1798,7 @@ namespace FluentTaskScheduler
                 CloseButtonText = L("Dialog.Common.Cancel", "Cancel"),
                 DefaultButton = ContentDialogButton.Primary,
                 XamlRoot = this.XamlRoot,
-                RequestedTheme = Services.SettingsService.Theme
+                RequestedTheme = Settings.Theme
             };
             if (await dialog.ShowAsync() == ContentDialogResult.Primary && dialog.Content is TextBox tb && !string.IsNullOrWhiteSpace(tb.Text)) 
             { 
@@ -1820,7 +1827,7 @@ namespace FluentTaskScheduler
                 CloseButtonText = L("Dialog.Common.Cancel", "Cancel"),
                 DefaultButton = ContentDialogButton.Primary,
                 XamlRoot = this.XamlRoot,
-                RequestedTheme = Services.SettingsService.Theme
+                RequestedTheme = Settings.Theme
             };
             
             if (await dialog.ShowAsync() == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(tb.Text) && tb.Text != oldName) 
@@ -1854,7 +1861,7 @@ namespace FluentTaskScheduler
                 CloseButtonText = L("Dialog.Common.Cancel", "Cancel"),
                 DefaultButton = ContentDialogButton.Close,
                 XamlRoot = this.XamlRoot,
-                RequestedTheme = Services.SettingsService.Theme
+                RequestedTheme = Settings.Theme
             };
             if (await dialog.ShowAsync() == ContentDialogResult.Primary) 
             { 
@@ -2209,7 +2216,7 @@ namespace FluentTaskScheduler
                     Content = message, 
                     CloseButtonText = L("Dialog.Common.OK", "OK"), 
                     XamlRoot = this.XamlRoot, 
-                    RequestedTheme = Services.SettingsService.Theme 
+                    RequestedTheme = Settings.Theme 
                 };
                 await dialog.ShowAsync(); 
             }
@@ -2263,7 +2270,7 @@ namespace FluentTaskScheduler
                 {
                     var cats = new List<string>(ViewModel.SavedCategories);
                     cats.Add(newCat);
-                    Services.SettingsService.SavedCategories = cats;
+                    Settings.SavedCategories = cats;
                     ViewModel.RefreshSavedCategories();
                 }
                 sender.Text = newCat;
@@ -2347,7 +2354,7 @@ namespace FluentTaskScheduler
                 {
                     var tags = new List<string>(ViewModel.SavedTags);
                     tags.Add(finalTag);
-                    Services.SettingsService.SavedTags = tags;
+                    Settings.SavedTags = tags;
                     ViewModel.RefreshSavedCategories();
                 }
             }

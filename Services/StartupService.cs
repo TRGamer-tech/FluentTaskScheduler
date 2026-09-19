@@ -1,10 +1,13 @@
 using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 
 namespace FluentTaskScheduler.Services
 {
     public static class StartupService
     {
+        private static ISettingsService Settings => App.Container.GetRequiredService<ISettingsService>();
+
         private const string RegistryKeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
         private const string AppName = "FluentTaskScheduler";
 
@@ -17,11 +20,11 @@ namespace FluentTaskScheduler.Services
 
                 using var key = Registry.CurrentUser.OpenSubKey(RegistryKeyPath, true);
                 key?.SetValue(AppName, $"\"{exePath}\"");
-                LogService.Info("Run on Startup enabled");
+                Serilog.Log.Information("Run on Startup enabled");
             }
             catch (Exception ex)
             {
-                LogService.Error("Failed to enable Run on Startup", ex);
+                Serilog.Log.Error(ex, "Failed to enable Run on Startup");
             }
         }
 
@@ -34,11 +37,11 @@ namespace FluentTaskScheduler.Services
                 {
                     key.DeleteValue(AppName, false);
                 }
-                LogService.Info("Run on Startup disabled");
+                Serilog.Log.Information("Run on Startup disabled");
             }
             catch (Exception ex)
             {
-                LogService.Error("Failed to disable Run on Startup", ex);
+                Serilog.Log.Error(ex, "Failed to disable Run on Startup");
             }
         }
 
@@ -57,7 +60,7 @@ namespace FluentTaskScheduler.Services
 
         public static void UpdateFromSettings()
         {
-            if (SettingsService.RunOnStartup)
+            if (Settings.RunOnStartup)
                 Enable();
             else
                 Disable();

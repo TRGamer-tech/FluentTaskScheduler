@@ -1,13 +1,16 @@
 using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace FluentTaskScheduler.Services
 {
     public static class NotificationService
     {
+        private static ISettingsService Settings => App.Container.GetRequiredService<ISettingsService>();
+
         public static void ShowTaskStarted(string taskName)
         {
-            if (!SettingsService.ShowNotifications) return;
+            if (!Settings.ShowNotifications) return;
 
             new ToastContentBuilder()
                 .AddText($"Task Started: {taskName}")
@@ -17,7 +20,7 @@ namespace FluentTaskScheduler.Services
 
         public static void ShowTaskError(string taskName, string error)
         {
-            if (!SettingsService.ShowNotifications) return;
+            if (!Settings.ShowNotifications) return;
 
             new ToastContentBuilder()
                 .AddText($"Task Failed: {taskName}")
@@ -26,7 +29,7 @@ namespace FluentTaskScheduler.Services
         }
         public static void ShowUpcomingTask(string taskName, int minutesUntilRun)
         {
-            if (!SettingsService.ShowNotifications || !SettingsService.EnableUpcomingReminders) return;
+            if (!Settings.ShowNotifications || !Settings.EnableUpcomingReminders) return;
 
             string timeLabel = minutesUntilRun <= 1 ? "less than a minute" : $"{minutesUntilRun} minutes";
             new ToastContentBuilder()

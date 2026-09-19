@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentTaskScheduler.Services
 {
     public static class TrayIconService
     {
+        private static ISettingsService Settings => App.Container.GetRequiredService<ISettingsService>();
+
         // Win32 Constants
         private const int NIM_ADD = 0x00000000;
         private const int NIM_DELETE = 0x00000002;
@@ -144,7 +147,7 @@ namespace FluentTaskScheduler.Services
 
         public static void UpdateVisibility()
         {
-            if (SettingsService.EnableTrayIcon) Show();
+            if (Settings.EnableTrayIcon) Show();
             else Hide();
         }
 

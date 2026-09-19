@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using FluentTaskScheduler.Models;
+using FluentTaskScheduler.Services;
 using Windows.ApplicationModel.DataTransfer;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
 
@@ -20,7 +22,7 @@ namespace FluentTaskScheduler.Dialogs
             this.InitializeComponent();
             this.Entry = entry;
             this.NearbySystemEvents = LoadNearbySystemEvents(entry);
-            this.RequestedTheme = Services.SettingsService.Theme;
+            this.RequestedTheme = App.Container.GetRequiredService<ISettingsService>().Theme;
         }
 
         /// <summary>Correlates this run with logon/logoff/shutdown/reboot/sleep events from the
@@ -32,7 +34,7 @@ namespace FluentTaskScheduler.Dialogs
             {
                 if (DateTime.TryParse(entry.Time, out var time))
                 {
-                    return new Services.TaskServiceWrapper().GetSystemEventsNear(time, TimeSpan.FromMinutes(10));
+                    return App.Container.GetRequiredService<ITaskService>().GetSystemEventsNear(time, TimeSpan.FromMinutes(10));
                 }
             }
             catch { }

@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentTaskScheduler.Services
 {
@@ -22,10 +23,12 @@ namespace FluentTaskScheduler.Services
 
         public static bool IsRunning => _watcher != null;
 
+        private static ISettingsService Settings => App.Container.GetRequiredService<ISettingsService>();
+
         public static void Start()
         {
             Stop();
-            if (!SettingsService.EnableExecutionHistoryLog) return;
+            if (!Settings.EnableExecutionHistoryLog) return;
 
             try
             {
@@ -33,11 +36,11 @@ namespace FluentTaskScheduler.Services
                 _watcher = new EventLogWatcher(query);
                 _watcher.EventRecordWritten += OnEventRecordWritten;
                 _watcher.Enabled = true;
-                LogService.Info("ExecutionHistoryLogService started.");
+                Serilog.Log.Information("ExecutionHistoryLogService started.");
             }
             catch (Exception ex)
             {
-                LogService.Warn($"Could not start execution history log watcher: {ex.Message}");
+                Serilog.Log.Warning("{Message}", $"Could not start execution history log watcher: {ex.Message}");
                 _watcher = null;
             }
         }
@@ -57,7 +60,7 @@ namespace FluentTaskScheduler.Services
 
         private static void OnEventRecordWritten(object? sender, EventRecordWrittenEventArgs e)
         {
-            if (!SettingsService.EnableExecutionHistoryLog) return;
+            if (!Settings.EnableExecutionHistoryLog) return;
             var record = e.EventRecord;
             if (record == null) return;
 
@@ -90,7 +93,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Warn($"Failed to record execution history event: {ex.Message}");
+                Serilog.Log.Warning("{Message}", $"Failed to record execution history event: {ex.Message}");
             }
         }
 

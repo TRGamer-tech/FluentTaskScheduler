@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentTaskScheduler.Services
 {
@@ -13,12 +14,13 @@ namespace FluentTaskScheduler.Services
         private static Timer? _timer;
         private static readonly HashSet<string> _notifiedKeys = new();
         private static readonly object _lock = new();
+        private static ISettingsService Settings => App.Container.GetRequiredService<ISettingsService>();
 
         public static void Start()
         {
             Stop();
             _timer = new Timer(CheckUpcomingTasks, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
-            LogService.Info("ReminderService started.");
+            Serilog.Log.Information("ReminderService started.");
         }
 
         public static void Stop()
@@ -29,15 +31,15 @@ namespace FluentTaskScheduler.Services
 
         private static void CheckUpcomingTasks(object? state)
         {
-            if (!SettingsService.ShowNotifications || !SettingsService.EnableUpcomingReminders)
+            if (!Settings.ShowNotifications || !Settings.EnableUpcomingReminders)
                 return;
 
             try
             {
-                var taskService = new TaskServiceWrapper();
+                var taskService = App.Container.GetRequiredService<ITaskService>();
                 var tasks = taskService.GetAllTasks(recursive: true);
                 var now = DateTime.Now;
-                int leadMinutes = SettingsService.ReminderLeadMinutes;
+                int leadMinutes = Settings.ReminderLeadMinutes;
 
                 // Prevent unbounded growth across long sessions
                 lock (_lock)
@@ -70,13 +72,13 @@ namespace FluentTaskScheduler.Services
                     {
                         int minutes = (int)Math.Ceiling(timeUntil.TotalMinutes);
                         NotificationService.ShowUpcomingTask(task.Name, minutes);
-                        LogService.Info($"Reminder sent for task '{task.Name}' (runs in ~{minutes} min).");
+                        Serilog.Log.Information("{Message}", $"Reminder sent for task '{task.Name}' (runs in ~{minutes} min).");
                     }
                 }
             }
             catch (Exception ex)
             {
-                LogService.Error("ReminderService check failed", ex);
+                Serilog.Log.Error(ex, "ReminderService check failed");
             }
         }
     }

@@ -201,7 +201,7 @@ namespace FluentTaskScheduler.ViewModels
             {
                 action.Status = QuickActionStatus.Error;
                 action.StatusMessage = ex.Message;
-                LogService.Error($"Quick Action '{action.Title}' failed: {ex.Message}");
+                Serilog.Log.Error("{Message}", $"Quick Action '{action.Title}' failed: {ex.Message}");
             }
 
             // Reset to idle after a few seconds

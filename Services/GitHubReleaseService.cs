@@ -48,7 +48,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Info($"[GitHubReleaseService] Could not fetch release notes: {ex.Message}");
+                Serilog.Log.Information("{Message}", $"[GitHubReleaseService] Could not fetch release notes: {ex.Message}");
                 return null;
             }
         }

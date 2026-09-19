@@ -2,12 +2,15 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using FluentTaskScheduler.ViewModels;
 using FluentTaskScheduler.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentTaskScheduler
 {
     public sealed partial class DashboardPage : Page
     {
         public DashboardViewModel ViewModel { get; }
+
+        private ISettingsService Settings => App.Container.GetRequiredService<ISettingsService>();
 
         public DashboardPage()
         {
@@ -81,7 +84,7 @@ namespace FluentTaskScheduler
 
         private void Page_Loaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            PageScrollViewer.IsScrollInertiaEnabled = FluentTaskScheduler.Services.SettingsService.SmoothScrolling;
+            PageScrollViewer.IsScrollInertiaEnabled = Settings.SmoothScrolling;
         }
         private async void DashboardReload_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {

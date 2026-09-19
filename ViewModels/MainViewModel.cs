@@ -7,24 +7,28 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using FluentTaskScheduler.Models;
+using FluentTaskScheduler.Models.Enums;
+using FluentTaskScheduler.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
 
 namespace FluentTaskScheduler.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        private readonly Services.TaskServiceWrapper _taskService = new();
+        private readonly ITaskService _taskService = App.Container.GetRequiredService<ITaskService>();
+        private ISettingsService Settings => App.Container.GetRequiredService<ISettingsService>();
         private List<ScheduledTaskModel> _allTasks = new();
         private bool _isLoading;
         private string _searchText = "";
         private string _currentFolderPath = "\\";
-        private string _filterTag = "all";
+        private FilterMode _filterMode = FilterMode.All;
         private ScheduledTaskModel? _selectedTask;
-        
+
         public string ActionRunPrefix => Services.LocalizationService.GetString("Trigger.Run", "Run:");
 
         // Sorting
-        public string SortColumn { get; private set; } = "";
+        public SortColumn SortColumn { get; private set; } = SortColumn.None;
         public bool SortAscending { get; private set; } = true;
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -32,7 +36,7 @@ namespace FluentTaskScheduler.ViewModels
         public ObservableCollection<ScheduledTaskModel> FilteredTasks { get; } = new();
         
         // Expose service for direct calls from UI where Command isn't appropriate yet
-        public Services.TaskServiceWrapper TaskService => _taskService;
+        public ITaskService TaskService => _taskService;
 
         public bool IsLoading
         {
@@ -60,8 +64,8 @@ namespace FluentTaskScheduler.ViewModels
             set { _selectedTask = value; OnPropertyChanged(); }
         }
 
-        public List<string> SavedCategories => Services.SettingsService.SavedCategories;
-        public List<string> SavedTags => Services.SettingsService.SavedTags;
+        public List<string> SavedCategories => Settings.SavedCategories;
+        public List<string> SavedTags => Settings.SavedTags;
         public void RefreshSavedCategories() 
         { 
             OnPropertyChanged(nameof(SavedCategories)); 
@@ -75,7 +79,7 @@ namespace FluentTaskScheduler.ViewModels
             };
         }
 
-        public bool IsTrayIconVisible => Services.SettingsService.EnableTrayIcon;
+        public bool IsTrayIconVisible => Settings.EnableTrayIcon;
         public void RefreshTrayIconVisibility() => OnPropertyChanged(nameof(IsTrayIconVisible));
 
         public async Task LoadTasksAsync()
@@ -88,7 +92,7 @@ namespace FluentTaskScheduler.ViewModels
                 var tasks = await Task.Run(() => _taskService.GetAllTasks());
                 _allTasks = tasks ?? new List<ScheduledTaskModel>();
                 ApplyFilters();
-                Services.TrayIconService.UpdateBadge(_allTasks.Count(t => t.State == "Running"));
+                Services.TrayIconService.UpdateBadge(_allTasks.Count(t => t.State == TaskState.Running));
             }
             catch (Exception ex)
             {
@@ -103,9 +107,17 @@ namespace FluentTaskScheduler.ViewModels
 
         public void SetFilter(string filterTag)
         {
-            _filterTag = filterTag;
+            _filterMode = filterTag switch
+            {
+                "all" => FilterMode.All,
+                "running" => FilterMode.Running,
+                "enabled" => FilterMode.Enabled,
+                "disabled" => FilterMode.Disabled,
+                _ => FilterMode.Folder
+            };
+
             // If it's a global filter (footer items), reset folder path
-            if (IsGlobalFilter(filterTag))
+            if (_filterMode != FilterMode.Folder)
             {
                 _currentFolderPath = "\\";
             }
@@ -116,13 +128,8 @@ namespace FluentTaskScheduler.ViewModels
             ApplyFilters();
         }
 
-        private bool IsGlobalFilter(string tag)
-        {
-            return tag == "all" || tag == "running" || tag == "enabled" || tag == "disabled";
-        }
-
         /// <summary>Cycles sort: same column toggles Asc/Desc, new column defaults to Asc.</summary>
-        public void SortBy(string column)
+        public void SortBy(SortColumn column)
         {
             if (SortColumn == column) SortAscending = !SortAscending;
             else { SortColumn = column; SortAscending = true; }
@@ -132,7 +139,7 @@ namespace FluentTaskScheduler.ViewModels
         /// <summary>Clears any active sort.</summary>
         public void ClearSort()
         {
-            SortColumn = "";
+            SortColumn = SortColumn.None;
             SortAscending = true;
             ApplyFilters();
         }
@@ -144,7 +151,7 @@ namespace FluentTaskScheduler.ViewModels
             var query = _allTasks.AsEnumerable();
 
             // Hidden Visibility Filter
-            if (!Services.SettingsService.ShowHiddenTasks)
+            if (!Settings.ShowHiddenTasks)
             {
                 query = query.Where(t => !t.IsHidden);
             }
@@ -160,7 +167,7 @@ namespace FluentTaskScheduler.ViewModels
             }
 
             // Tag/Folder Filter
-            if (!IsGlobalFilter(_filterTag))
+            if (_filterMode == FilterMode.Folder)
             {
                 // Folder logic
                 query = query.Where(t =>
@@ -173,18 +180,18 @@ namespace FluentTaskScheduler.ViewModels
             else
             {
                 // Status Logic
-                if (_filterTag == "running") query = query.Where(t => t.State == "Running");
-                else if (_filterTag == "enabled") query = query.Where(t => t.IsEnabled);
-                else if (_filterTag == "disabled") query = query.Where(t => !t.IsEnabled);
+                if (_filterMode == FilterMode.Running) query = query.Where(t => t.State == TaskState.Running);
+                else if (_filterMode == FilterMode.Enabled) query = query.Where(t => t.IsEnabled);
+                else if (_filterMode == FilterMode.Disabled) query = query.Where(t => !t.IsEnabled);
             }
 
             var results = SortColumn switch
             {
-                "Name"    => SortAscending ? query.OrderBy(t => t.Name)         : query.OrderByDescending(t => t.Name),
-                "Status"  => SortAscending ? query.OrderBy(t => t.State)        : query.OrderByDescending(t => t.State),
-                "NextRun" => SortAscending ? query.OrderBy(t => t.NextRunTime)  : query.OrderByDescending(t => t.NextRunTime),
-                "LastRun" => SortAscending ? query.OrderBy(t => t.LastRunTime)  : query.OrderByDescending(t => t.LastRunTime),
-                _         => query
+                SortColumn.Name    => SortAscending ? query.OrderBy(t => t.Name)         : query.OrderByDescending(t => t.Name),
+                SortColumn.Status  => SortAscending ? query.OrderBy(t => t.State)        : query.OrderByDescending(t => t.State),
+                SortColumn.NextRun => SortAscending ? query.OrderBy(t => t.NextRunTime)  : query.OrderByDescending(t => t.NextRunTime),
+                SortColumn.LastRun => SortAscending ? query.OrderBy(t => t.LastRunTime)  : query.OrderByDescending(t => t.LastRunTime),
+                _                  => query
             };
             UpdateFilteredTasksCollection(results.ToList());
         }

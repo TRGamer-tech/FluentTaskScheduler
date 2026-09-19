@@ -2,9 +2,11 @@ using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using FluentTaskScheduler.Models.Enums;
 using FluentTaskScheduler.Services;
 using Windows.Storage.Pickers;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -15,6 +17,7 @@ namespace FluentTaskScheduler
         private bool _isLoaded = false;
         private StackPanel[]? _panels;
         private readonly Dictionary<string, string> _sectionTitles = new();
+        private ISettingsService Settings => App.Container.GetRequiredService<ISettingsService>();
 
         private static readonly int[] _leadMinuteOptions = { 1, 5, 10, 15, 30 };
 
@@ -46,15 +49,15 @@ namespace FluentTaskScheduler
             if (_isLoaded) return;
 
             // Appearance
-            ThemeComboBox.SelectedIndex = SettingsService.Theme switch
+            ThemeComboBox.SelectedIndex = Settings.Theme switch
             {
                 ElementTheme.Light => 0,
                 ElementTheme.Dark => 1,
                 _ => 2
             };
-            OledModeToggle.IsOn = SettingsService.IsOledMode;
-            MicaModeToggle.IsOn = SettingsService.IsMicaEnabled;
-            LanguageComboBox.SelectedIndex = SettingsService.Language switch
+            OledModeToggle.IsOn = Settings.IsOledMode;
+            MicaModeToggle.IsOn = Settings.IsMicaEnabled;
+            LanguageComboBox.SelectedIndex = Settings.Language switch
             {
                 "de-DE" => 1,
                 "zh-CN" => 2,
@@ -64,27 +67,27 @@ namespace FluentTaskScheduler
             UpdateOledToggleState();
 
             // Notifications
-            NotificationsToggle.IsOn = SettingsService.ShowNotifications;
-            UpcomingRemindersToggle.IsOn = SettingsService.EnableUpcomingReminders;
-            UpcomingRemindersToggle.IsEnabled = SettingsService.ShowNotifications;
+            NotificationsToggle.IsOn = Settings.ShowNotifications;
+            UpcomingRemindersToggle.IsOn = Settings.EnableUpcomingReminders;
+            UpcomingRemindersToggle.IsEnabled = Settings.ShowNotifications;
 
-            int leadIdx = Array.IndexOf(_leadMinuteOptions, SettingsService.ReminderLeadMinutes);
+            int leadIdx = Array.IndexOf(_leadMinuteOptions, Settings.ReminderLeadMinutes);
             ReminderLeadTimeComboBox.SelectedIndex = leadIdx >= 0 ? leadIdx : 1;
-            ReminderLeadTimeComboBox.IsEnabled = SettingsService.ShowNotifications && SettingsService.EnableUpcomingReminders;
+            ReminderLeadTimeComboBox.IsEnabled = Settings.ShowNotifications && Settings.EnableUpcomingReminders;
 
             // System
-            RunOnStartupToggle.IsOn = SettingsService.RunOnStartup;
-            TrayIconToggle.IsOn = SettingsService.EnableTrayIcon;
-            SmoothScrollingToggle.IsOn = SettingsService.SmoothScrolling;
-            ShowHiddenTasksToggle.IsOn = SettingsService.ShowHiddenTasks;
+            RunOnStartupToggle.IsOn = Settings.RunOnStartup;
+            TrayIconToggle.IsOn = Settings.EnableTrayIcon;
+            SmoothScrollingToggle.IsOn = Settings.SmoothScrolling;
+            ShowHiddenTasksToggle.IsOn = Settings.ShowHiddenTasks;
 
             // Advanced
-            ConfirmDeleteToggle.IsOn = SettingsService.ConfirmDelete;
-            LoggingToggle.IsOn = SettingsService.EnableLogging;
-            SeparateLogsToggle.IsOn = SettingsService.SeparateLogFiles;
-            SpecificLogsCard.Visibility = SettingsService.EnableLogging ? Visibility.Visible : Visibility.Collapsed;
-            ExecHistoryLogToggle.IsOn = SettingsService.EnableExecutionHistoryLog;
-            ExecHistoryFolderCard.Visibility = SettingsService.EnableExecutionHistoryLog ? Visibility.Visible : Visibility.Collapsed;
+            ConfirmDeleteToggle.IsOn = Settings.ConfirmDelete;
+            LoggingToggle.IsOn = Settings.EnableLogging;
+            SeparateLogsToggle.IsOn = Settings.SeparateLogFiles;
+            SpecificLogsCard.Visibility = Settings.EnableLogging ? Visibility.Visible : Visibility.Collapsed;
+            ExecHistoryLogToggle.IsOn = Settings.EnableExecutionHistoryLog;
+            ExecHistoryFolderCard.Visibility = Settings.EnableExecutionHistoryLog ? Visibility.Visible : Visibility.Collapsed;
 
             // Init sidebar panels — sync visibility with current selection
             _panels = new[] { PanelAppearance, PanelNotifications, PanelSystem, PanelAdvanced, PanelData, PanelCategories, PanelAbout };
@@ -95,7 +98,7 @@ namespace FluentTaskScheduler
             RefreshTagsList();
 
             _isLoaded = true;
-            PageScrollViewer.IsScrollInertiaEnabled = SettingsService.SmoothScrolling;
+            PageScrollViewer.IsScrollInertiaEnabled = Settings.SmoothScrolling;
 
             ApplyLocalizedUi();
 
@@ -117,17 +120,19 @@ namespace FluentTaskScheduler
             var selectedItem = SettingsNav.SelectedItem as NavigationViewItem;
             if (selectedItem == null) return;
 
-            string tag = selectedItem.Tag?.ToString() ?? "";
+            SettingsPanel? panel = Enum.TryParse<SettingsPanel>(selectedItem.Tag?.ToString(), out var parsed)
+                ? parsed
+                : null;
 
             // Header assignment removed as AlwaysShowHeader is False
-            
-            PanelAppearance.Visibility = tag == "Appearance" ? Visibility.Visible : Visibility.Collapsed;
-            PanelNotifications.Visibility = tag == "Notifications" ? Visibility.Visible : Visibility.Collapsed;
-            PanelSystem.Visibility = tag == "System" ? Visibility.Visible : Visibility.Collapsed;
-            PanelAdvanced.Visibility = tag == "Advanced" ? Visibility.Visible : Visibility.Collapsed;
-            PanelData.Visibility = tag == "Data" ? Visibility.Visible : Visibility.Collapsed;
-            PanelCategories.Visibility = tag == "Categories" ? Visibility.Visible : Visibility.Collapsed;
-            PanelAbout.Visibility = tag == "About" ? Visibility.Visible : Visibility.Collapsed;
+
+            PanelAppearance.Visibility = panel == SettingsPanel.Appearance ? Visibility.Visible : Visibility.Collapsed;
+            PanelNotifications.Visibility = panel == SettingsPanel.Notifications ? Visibility.Visible : Visibility.Collapsed;
+            PanelSystem.Visibility = panel == SettingsPanel.System ? Visibility.Visible : Visibility.Collapsed;
+            PanelAdvanced.Visibility = panel == SettingsPanel.Advanced ? Visibility.Visible : Visibility.Collapsed;
+            PanelData.Visibility = panel == SettingsPanel.Data ? Visibility.Visible : Visibility.Collapsed;
+            PanelCategories.Visibility = panel == SettingsPanel.Categories ? Visibility.Visible : Visibility.Collapsed;
+            PanelAbout.Visibility = panel == SettingsPanel.About ? Visibility.Visible : Visibility.Collapsed;
         }
 
         // ── Navigation ─────────────────────────────────────────────────────────
@@ -139,39 +144,39 @@ namespace FluentTaskScheduler
         private void ThemeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (!_isLoaded) return;
-            SettingsService.Theme = ThemeComboBox.SelectedIndex switch
+            Settings.Theme = ThemeComboBox.SelectedIndex switch
             {
                 0 => ElementTheme.Light,
                 1 => ElementTheme.Dark,
                 _ => ElementTheme.Default
             };
-            (Application.Current as App)?.ApplyTheme(SettingsService.Theme);
+            (Application.Current as App)?.ApplyTheme(Settings.Theme);
             UpdateOledToggleState();
-            LogService.Info($"App Theme: {SettingsService.Theme}");
+            Serilog.Log.Information("{Message}", $"App Theme: {Settings.Theme}");
         }
 
         private void MicaModeToggle_Toggled(object sender, RoutedEventArgs e)
         {
             if (!_isLoaded) return;
-            SettingsService.IsMicaEnabled = MicaModeToggle.IsOn;
-            (Application.Current as App)?.ApplyTheme(SettingsService.Theme);
-            LogService.Info($"Mica Effect: {(MicaModeToggle.IsOn ? "enabled" : "disabled")}");
+            Settings.IsMicaEnabled = MicaModeToggle.IsOn;
+            (Application.Current as App)?.ApplyTheme(Settings.Theme);
+            Serilog.Log.Information("{Message}", $"Mica Effect: {(MicaModeToggle.IsOn ? "enabled" : "disabled")}");
         }
 
         private void OledModeToggle_Toggled(object sender, RoutedEventArgs e)
         {
             if (!_isLoaded) return;
-            SettingsService.IsOledMode = OledModeToggle.IsOn;
+            Settings.IsOledMode = OledModeToggle.IsOn;
             MicaModeToggle.IsEnabled = !OledModeToggle.IsOn;
-            (Application.Current as App)?.ApplyTheme(SettingsService.Theme);
-            LogService.Info($"OLED Mode: {(OledModeToggle.IsOn ? "enabled" : "disabled")}");
+            (Application.Current as App)?.ApplyTheme(Settings.Theme);
+            Serilog.Log.Information("{Message}", $"OLED Mode: {(OledModeToggle.IsOn ? "enabled" : "disabled")}");
         }
 
         private void UpdateOledToggleState()
         {
-            bool isDark = SettingsService.Theme == ElementTheme.Dark;
+            bool isDark = Settings.Theme == ElementTheme.Dark;
             OledModeToggle.IsEnabled = isDark;
-            MicaModeToggle.IsEnabled = !isDark || !SettingsService.IsOledMode;
+            MicaModeToggle.IsEnabled = !isDark || !Settings.IsOledMode;
         }
 
         private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -183,7 +188,7 @@ namespace FluentTaskScheduler
             bool changed = LocalizationService.ChangeLanguage(language);
             if (changed)
             {
-                LogService.Info($"Language switched to {language}");
+                Serilog.Log.Information("{Message}", $"Language switched to {language}");
             }
         }
 
@@ -299,18 +304,18 @@ namespace FluentTaskScheduler
         private void NotificationsToggle_Toggled(object sender, RoutedEventArgs e)
         {
             if (!_isLoaded) return;
-            SettingsService.ShowNotifications = NotificationsToggle.IsOn;
+            Settings.ShowNotifications = NotificationsToggle.IsOn;
             UpcomingRemindersToggle.IsEnabled = NotificationsToggle.IsOn;
             ReminderLeadTimeComboBox.IsEnabled = NotificationsToggle.IsOn && UpcomingRemindersToggle.IsOn;
-            LogService.Info($"Task Notifications: {(NotificationsToggle.IsOn ? "enabled" : "disabled")}");
+            Serilog.Log.Information("{Message}", $"Task Notifications: {(NotificationsToggle.IsOn ? "enabled" : "disabled")}");
         }
 
         private void UpcomingRemindersToggle_Toggled(object sender, RoutedEventArgs e)
         {
             if (!_isLoaded) return;
-            SettingsService.EnableUpcomingReminders = UpcomingRemindersToggle.IsOn;
+            Settings.EnableUpcomingReminders = UpcomingRemindersToggle.IsOn;
             ReminderLeadTimeComboBox.IsEnabled = UpcomingRemindersToggle.IsOn;
-            LogService.Info($"Upcoming Task Reminders: {(UpcomingRemindersToggle.IsOn ? "enabled" : "disabled")}");
+            Serilog.Log.Information("{Message}", $"Upcoming Task Reminders: {(UpcomingRemindersToggle.IsOn ? "enabled" : "disabled")}");
         }
 
         private void ReminderLeadTimeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -319,8 +324,8 @@ namespace FluentTaskScheduler
             int idx = ReminderLeadTimeComboBox.SelectedIndex;
             if (idx >= 0 && idx < _leadMinuteOptions.Length)
             {
-                SettingsService.ReminderLeadMinutes = _leadMinuteOptions[idx];
-                LogService.Info($"Reminder lead time: {_leadMinuteOptions[idx]} min");
+                Settings.ReminderLeadMinutes = _leadMinuteOptions[idx];
+                Serilog.Log.Information("{Message}", $"Reminder lead time: {_leadMinuteOptions[idx]} min");
             }
         }
 
@@ -329,25 +334,25 @@ namespace FluentTaskScheduler
         private void RunOnStartupToggle_Toggled(object sender, RoutedEventArgs e)
         {
             if (!_isLoaded) return;
-            SettingsService.RunOnStartup = RunOnStartupToggle.IsOn;
+            Settings.RunOnStartup = RunOnStartupToggle.IsOn;
             StartupService.UpdateFromSettings();
         }
 
         private void TrayIconToggle_Toggled(object sender, RoutedEventArgs e)
         {
             if (!_isLoaded) return;
-            SettingsService.EnableTrayIcon = TrayIconToggle.IsOn;
-            SettingsService.MinimizeToTray = TrayIconToggle.IsOn;
+            Settings.EnableTrayIcon = TrayIconToggle.IsOn;
+            Settings.MinimizeToTray = TrayIconToggle.IsOn;
             TrayIconService.UpdateVisibility();
-            LogService.Info($"Minimize to Tray: {(TrayIconToggle.IsOn ? "enabled" : "disabled")}");
+            Serilog.Log.Information("{Message}", $"Minimize to Tray: {(TrayIconToggle.IsOn ? "enabled" : "disabled")}");
         }
 
         private void SmoothScrollingToggle_Toggled(object sender, RoutedEventArgs e)
         {
             if (!_isLoaded) return;
             bool enable = SmoothScrollingToggle.IsOn;
-            SettingsService.SmoothScrolling = enable;
-            LogService.Info($"Smooth Scrolling: {(enable ? "enabled" : "disabled")}");
+            Settings.SmoothScrolling = enable;
+            Serilog.Log.Information("{Message}", $"Smooth Scrolling: {(enable ? "enabled" : "disabled")}");
             PageScrollViewer.IsScrollInertiaEnabled = enable;
             (Application.Current as App)?.ApplySmoothScrolling(enable);
             MainPage.Current?.ApplySmoothScrollingSelf(enable);
@@ -356,8 +361,8 @@ namespace FluentTaskScheduler
         private void ShowHiddenTasksToggle_Toggled(object sender, RoutedEventArgs e)
         {
             if (!_isLoaded) return;
-            SettingsService.ShowHiddenTasks = ShowHiddenTasksToggle.IsOn;
-            LogService.Info($"Show Hidden Tasks: {(ShowHiddenTasksToggle.IsOn ? "enabled" : "disabled")}");
+            Settings.ShowHiddenTasks = ShowHiddenTasksToggle.IsOn;
+            Serilog.Log.Information("{Message}", $"Show Hidden Tasks: {(ShowHiddenTasksToggle.IsOn ? "enabled" : "disabled")}");
             // Trigger refresh in main view if it exists
             MainPage.Current?.ViewModel.ApplyFilters();
         }
@@ -367,45 +372,45 @@ namespace FluentTaskScheduler
         private void ConfirmDeleteToggle_Toggled(object sender, RoutedEventArgs e)
         {
             if (!_isLoaded) return;
-            SettingsService.ConfirmDelete = ConfirmDeleteToggle.IsOn;
-            LogService.Info($"Confirm Task Deletion: {(ConfirmDeleteToggle.IsOn ? "enabled" : "disabled")}");
+            Settings.ConfirmDelete = ConfirmDeleteToggle.IsOn;
+            Serilog.Log.Information("{Message}", $"Confirm Task Deletion: {(ConfirmDeleteToggle.IsOn ? "enabled" : "disabled")}");
         }
 
         private void LoggingToggle_Toggled(object sender, RoutedEventArgs e)
         {
             if (!_isLoaded) return;
-            SettingsService.EnableLogging = LoggingToggle.IsOn;
+            Settings.EnableLogging = LoggingToggle.IsOn;
             SpecificLogsCard.Visibility = LoggingToggle.IsOn ? Visibility.Visible : Visibility.Collapsed;
             if (LoggingToggle.IsOn)
-                LogService.Info("Application Logging: enabled");
+                Serilog.Log.Information("Application Logging: enabled");
         }
 
         private void SeparateLogsToggle_Toggled(object sender, RoutedEventArgs e)
         {
             if (!_isLoaded) return;
-            SettingsService.SeparateLogFiles = SeparateLogsToggle.IsOn;
-            LogService.Info($"Separate Log Files: {(SeparateLogsToggle.IsOn ? "enabled" : "disabled")}");
+            Settings.SeparateLogFiles = SeparateLogsToggle.IsOn;
+            Serilog.Log.Information("{Message}", $"Separate Log Files: {(SeparateLogsToggle.IsOn ? "enabled" : "disabled")}");
         }
 
         private void OpenLogButton_Click(object sender, RoutedEventArgs e)
         {
-            LogService.OpenLogFile();
+            LoggingConfig.OpenLogFile();
         }
 
         private void ExecHistoryLogToggle_Toggled(object sender, RoutedEventArgs e)
         {
             if (!_isLoaded) return;
-            SettingsService.EnableExecutionHistoryLog = ExecHistoryLogToggle.IsOn;
+            Settings.EnableExecutionHistoryLog = ExecHistoryLogToggle.IsOn;
             ExecHistoryFolderCard.Visibility = ExecHistoryLogToggle.IsOn ? Visibility.Visible : Visibility.Collapsed;
             if (ExecHistoryLogToggle.IsOn)
             {
                 ExecutionHistoryLogService.Start();
-                LogService.Info("Execution History Log: enabled");
+                Serilog.Log.Information("Execution History Log: enabled");
             }
             else
             {
                 ExecutionHistoryLogService.Stop();
-                LogService.Info("Execution History Log: disabled");
+                Serilog.Log.Information("Execution History Log: disabled");
             }
         }
 
@@ -416,12 +421,12 @@ namespace FluentTaskScheduler
 
         private void OpenErrorLogButton_Click(object sender, RoutedEventArgs e)
         {
-            LogService.OpenErrorLog();
+            LoggingConfig.OpenErrorLog();
         }
 
         private void OpenCrashLogButton_Click(object sender, RoutedEventArgs e)
         {
-            LogService.OpenCrashLog();
+            LoggingConfig.OpenCrashLog();
         }
 
         // ── Data ───────────────────────────────────────────────────────────────
@@ -441,7 +446,7 @@ namespace FluentTaskScheduler
                 var file = await picker.PickSaveFileAsync();
                 if (file != null)
                 {
-                    SettingsService.ExportSettings(file.Path);
+                    Settings.ExportSettings(file.Path);
                     await ShowDialog(
                         LocalizationService.GetString("Settings.Export.Success.Title", "Export Successful"),
                         string.Format(LocalizationService.GetString("Settings.Export.Success.ContentFormat", "Settings exported to:\n{0}"), file.Path));
@@ -467,12 +472,12 @@ namespace FluentTaskScheduler
                 var file = await picker.PickSingleFileAsync();
                 if (file != null)
                 {
-                    SettingsService.ImportSettings(file.Path);
+                    Settings.ImportSettings(file.Path);
 
                     _isLoaded = false;
                     SettingsPage_Loaded(this, new RoutedEventArgs());
 
-                    (Application.Current as App)?.ApplyTheme(SettingsService.Theme);
+                    (Application.Current as App)?.ApplyTheme(Settings.Theme);
                     TrayIconService.UpdateVisibility();
                     StartupService.UpdateFromSettings();
 
@@ -540,7 +545,7 @@ namespace FluentTaskScheduler
                 PrimaryButtonText = LocalizationService.GetString("Dialog.UpdateAvailable.RestartNow", "Restart Now"),
                 CloseButtonText = LocalizationService.GetString("Dialog.Common.Later", "Later"),
                 XamlRoot = this.XamlRoot,
-                RequestedTheme = SettingsService.Theme
+                RequestedTheme = Settings.Theme
             };
 
             var dialogResult = await dialog.ShowAsync();
@@ -550,8 +555,8 @@ namespace FluentTaskScheduler
 
         private async void ReplayOnboardingButton_Click(object sender, RoutedEventArgs e)
         {
-            Services.SettingsService.HasCompletedOnboarding = false;
-            var dialog = new Dialogs.OnboardingDialog { XamlRoot = this.XamlRoot, RequestedTheme = SettingsService.Theme };
+            Settings.HasCompletedOnboarding = false;
+            var dialog = new Dialogs.OnboardingDialog { XamlRoot = this.XamlRoot, RequestedTheme = Settings.Theme };
             await dialog.ShowAsync();
         }
 
@@ -565,7 +570,7 @@ namespace FluentTaskScheduler
                 Content = message,
                 CloseButtonText = LocalizationService.GetString("Dialog.Common.OK", "OK"),
                 XamlRoot = this.XamlRoot,
-                RequestedTheme = SettingsService.Theme
+                RequestedTheme = Settings.Theme
             };
             await dialog.ShowAsync();
         }
@@ -575,13 +580,13 @@ namespace FluentTaskScheduler
         private void RefreshCategoriesList()
         {
             CategoriesItemsControl.ItemsSource = null;
-            CategoriesItemsControl.ItemsSource = SettingsService.SavedCategories;
+            CategoriesItemsControl.ItemsSource = Settings.SavedCategories;
         }
 
         private void RefreshTagsList()
         {
             TagsItemsControl.ItemsSource = null;
-            TagsItemsControl.ItemsSource = SettingsService.SavedTags;
+            TagsItemsControl.ItemsSource = Settings.SavedTags;
         }
 
         private void AddCategory_Click(object sender, RoutedEventArgs e) => AddCategory();
@@ -593,10 +598,10 @@ namespace FluentTaskScheduler
         private void AddCategory()
         {
             string cat = NewCategoryBox.Text.Trim();
-            if (!string.IsNullOrEmpty(cat) && !SettingsService.SavedCategories.Contains(cat))
+            if (!string.IsNullOrEmpty(cat) && !Settings.SavedCategories.Contains(cat))
             {
-                SettingsService.SavedCategories.Add(cat);
-                SettingsService.SavedCategories = SettingsService.SavedCategories; // Trigger save
+                Settings.SavedCategories.Add(cat);
+                Settings.SavedCategories = Settings.SavedCategories; // Trigger save
                 NewCategoryBox.Text = "";
                 RefreshCategoriesList();
             }
@@ -606,8 +611,8 @@ namespace FluentTaskScheduler
         {
             if (sender is Button btn && btn.Tag is string cat)
             {
-                SettingsService.SavedCategories.Remove(cat);
-                SettingsService.SavedCategories = SettingsService.SavedCategories; // Trigger save
+                Settings.SavedCategories.Remove(cat);
+                Settings.SavedCategories = Settings.SavedCategories; // Trigger save
                 RefreshCategoriesList();
             }
         }
@@ -621,10 +626,10 @@ namespace FluentTaskScheduler
         private void AddTag()
         {
             string tag = NewTagBox.Text.Trim();
-            if (!string.IsNullOrEmpty(tag) && !SettingsService.SavedTags.Contains(tag))
+            if (!string.IsNullOrEmpty(tag) && !Settings.SavedTags.Contains(tag))
             {
-                SettingsService.SavedTags.Add(tag);
-                SettingsService.SavedTags = SettingsService.SavedTags; // Trigger save
+                Settings.SavedTags.Add(tag);
+                Settings.SavedTags = Settings.SavedTags; // Trigger save
                 NewTagBox.Text = "";
                 RefreshTagsList();
             }
@@ -634,8 +639,8 @@ namespace FluentTaskScheduler
         {
             if (sender is Button btn && btn.Tag is string tag)
             {
-                SettingsService.SavedTags.Remove(tag);
-                SettingsService.SavedTags = SettingsService.SavedTags; // Trigger save
+                Settings.SavedTags.Remove(tag);
+                Settings.SavedTags = Settings.SavedTags; // Trigger save
                 RefreshTagsList();
             }
         }

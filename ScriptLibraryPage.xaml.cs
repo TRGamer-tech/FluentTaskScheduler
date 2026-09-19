@@ -1,6 +1,8 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using FluentTaskScheduler.Services;
 using FluentTaskScheduler.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentTaskScheduler
 {
@@ -8,6 +10,7 @@ namespace FluentTaskScheduler
     {
         public ScriptLibraryViewModel ViewModel { get; } = new();
         private static string L(string key, string fallback) => Services.LocalizationService.GetString(key, fallback);
+        private ISettingsService Settings => App.Container.GetRequiredService<ISettingsService>();
 
         private MainPage? _ownerMainPage;
 
@@ -53,7 +56,7 @@ namespace FluentTaskScheduler
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            PageScrollViewer.IsScrollInertiaEnabled = FluentTaskScheduler.Services.SettingsService.SmoothScrolling;
+            PageScrollViewer.IsScrollInertiaEnabled = Settings.SmoothScrolling;
             await ViewModel.LoadScriptsAsync();
         }
 

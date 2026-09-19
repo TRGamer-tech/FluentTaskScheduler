@@ -2,6 +2,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Shapes;
+using FluentTaskScheduler.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Windows.UI;
 
 namespace FluentTaskScheduler.Dialogs
@@ -9,6 +11,7 @@ namespace FluentTaskScheduler.Dialogs
     public sealed partial class OnboardingDialog : ContentDialog
     {
         private static string L(string key, string fallback) => Services.LocalizationService.GetString(key, fallback);
+        private ISettingsService Settings => App.Container.GetRequiredService<ISettingsService>();
 
         // ── Step Definitions ─────────────────────────────────────────────────────
         private readonly struct Step
@@ -157,7 +160,7 @@ namespace FluentTaskScheduler.Dialogs
             else
             {
                 // Final step — mark onboarding complete and close
-                Services.SettingsService.HasCompletedOnboarding = true;
+                Settings.HasCompletedOnboarding = true;
                 this.Hide();
             }
         }

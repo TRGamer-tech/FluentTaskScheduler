@@ -8,10 +8,12 @@ using System.Text.RegularExpressions;
 using FluentTaskScheduler.Models;
 using Microsoft.Win32.TaskScheduler;
 using System.Collections.ObjectModel;
+using AppTaskState = FluentTaskScheduler.Models.Enums.TaskState;
+using AppTriggerType = FluentTaskScheduler.Models.Enums.TriggerType;
 
 namespace FluentTaskScheduler.Services
 {
-    public class TaskServiceWrapper
+    public class TaskServiceWrapper : ITaskService
     {
         public List<ScheduledTaskModel> GetAllTasks(string? folderPath = null, bool recursive = true)
         {
@@ -74,7 +76,7 @@ namespace FluentTaskScheduler.Services
                 }
                 catch (Exception ex)
                 {
-                    LogService.Error($"Could not read task '{task.Name}': {ex.Message}");
+                    Serilog.Log.Error("{Message}", $"Could not read task '{task.Name}': {ex.Message}");
                 }
             }
         }
@@ -86,7 +88,7 @@ namespace FluentTaskScheduler.Services
             {
                 Name = task.Name,
                 Path = task.Path,
-                State = task.State.ToString(),
+                State = MapTaskState(task.State),
                 IsEnabled = task.Enabled,
                 LastRunTime = task.LastRunTime == DateTime.MinValue ? null : (DateTime?)task.LastRunTime,
                 NextRunTime = task.NextRunTime == DateTime.MinValue ? null : (DateTime?)task.NextRunTime,
@@ -152,6 +154,15 @@ namespace FluentTaskScheduler.Services
             return model;
         }
 
+        private static AppTaskState MapTaskState(Microsoft.Win32.TaskScheduler.TaskState state) => state switch
+        {
+            Microsoft.Win32.TaskScheduler.TaskState.Disabled => AppTaskState.Disabled,
+            Microsoft.Win32.TaskScheduler.TaskState.Queued => AppTaskState.Queued,
+            Microsoft.Win32.TaskScheduler.TaskState.Ready => AppTaskState.Ready,
+            Microsoft.Win32.TaskScheduler.TaskState.Running => AppTaskState.Running,
+            _ => AppTaskState.Unknown
+        };
+
         private void MapSettingsToModel(TaskSettings settings, ScheduledTaskModel model)
         {
             if (settings == null) return;
@@ -180,13 +191,7 @@ namespace FluentTaskScheduler.Services
             model.RestartOnFailure = settings.RestartCount > 0;
             model.RestartCount = settings.RestartCount;
 
-            model.MultipleInstancesPolicy = settings.MultipleInstances switch
-            {
-                TaskInstancesPolicy.Parallel => "Parallel",
-                TaskInstancesPolicy.Queue => "Queue",
-                TaskInstancesPolicy.StopExisting => "StopExisting",
-                _ => "IgnoreNew"
-            };
+            model.MultipleInstancesPolicy = settings.MultipleInstances;
 
             model.TaskPriority = (int)settings.Priority;
             model.DeleteExpiredTaskAfter = settings.DeleteExpiredTaskAfter != TimeSpan.Zero;
@@ -205,7 +210,7 @@ namespace FluentTaskScheduler.Services
 
         private void FixSessionStateTriggers(Microsoft.Win32.TaskScheduler.Task task, ScheduledTaskModel model)
         {
-            if (model.TriggersList.Any(t => t.TriggerType == "SessionStateChange"))
+            if (model.TriggersList.Any(t => t.TriggerType == AppTriggerType.SessionStateChange))
             {
                 try
                 {
@@ -216,7 +221,7 @@ namespace FluentTaskScheduler.Services
                     if (match.Success)
                     {
                         string state = match.Groups[1].Value.Trim();
-                        foreach (var t in model.TriggersList.Where(t => t.TriggerType == "SessionStateChange"))
+                        foreach (var t in model.TriggersList.Where(t => t.TriggerType == AppTriggerType.SessionStateChange))
                         {
                             t.SessionStateChangeType = state switch
                             {
@@ -250,7 +255,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex) when (IsAccessDenied(ex))
             {
-                LogService.Error($"Access denied: Cannot {(enabled ? "enable" : "disable")} task '{path}'.");
+                Serilog.Log.Error("{Message}", $"Access denied: Cannot {(enabled ? "enable" : "disable")} task '{path}'.");
                 throw new UnauthorizedAccessException(
                     $"The user account under which you are performing this action does not have permission to {(enabled ? "enable" : "disable")} the task \"{System.IO.Path.GetFileName(path)}\".\n\n" +
                     "This task is protected and cannot be modified, even with administrator privileges.", ex);
@@ -274,7 +279,7 @@ namespace FluentTaskScheduler.Services
             catch (Exception ex)
             {
                 var level = IsAccessDenied(ex) ? "Access denied" : "Error";
-                LogService.Error($"{level}: Cannot run task '{path}': {ex.Message}");
+                Serilog.Log.Error("{Message}", $"{level}: Cannot run task '{path}': {ex.Message}");
                 NotificationService.ShowTaskError(System.IO.Path.GetFileName(path), ex.Message);
                 throw;
             }
@@ -332,18 +337,18 @@ namespace FluentTaskScheduler.Services
                         password,
                         logonType
                     );
-                    LogService.Info($"Registered task '{model.Name}'.");
+                    Serilog.Log.Information("{Message}", $"Registered task '{model.Name}'.");
                 }
                 catch (Exception ex)
                 {
                     if (IsAccessDenied(ex))
                     {
-                        LogService.Warn($"Access denied registering task '{model.Name}' with elevated privileges; falling back to current user context.");
+                        Serilog.Log.Warning("{Message}", $"Access denied registering task '{model.Name}' with elevated privileges; falling back to current user context.");
                         RegisterSafeTask(ts, targetFolder, model, td);
                     }
                     else
                     {
-                        LogService.Error($"Failed to register task '{model.Name}': {ex.Message}");
+                        Serilog.Log.Error("{Message}", $"Failed to register task '{model.Name}': {ex.Message}");
                         throw;
                     }
                 }
@@ -404,7 +409,7 @@ namespace FluentTaskScheduler.Services
                 TaskLogonType.InteractiveToken
             );
             
-            LogService.Info($"Registered task '{model.Name}' via fallback (InteractiveToken).");
+            Serilog.Log.Information("{Message}", $"Registered task '{model.Name}' via fallback (InteractiveToken).");
         }
 
         private void ConfigureTaskDefinition(TaskDefinition td, ScheduledTaskModel model)
@@ -455,7 +460,7 @@ namespace FluentTaskScheduler.Services
                     if (!string.IsNullOrWhiteSpace(model.NetworkName) && model.NetworkName != "Any network")
                         td.Settings.NetworkSettings.Name = model.NetworkName;
                 } 
-                catch (Exception ex) { LogService.Warn($"Could not set NetworkSettings: {ex.Message}"); }
+                catch (Exception ex) { Serilog.Log.Warning("{Message}", $"Could not set NetworkSettings: {ex.Message}"); }
             }
 
             td.Settings.WakeToRun = model.WakeToRun;
@@ -477,13 +482,7 @@ namespace FluentTaskScheduler.Services
                 catch { td.Settings.ExecutionTimeLimit = TimeSpan.FromHours(72); }
             }
 
-            td.Settings.MultipleInstances = model.MultipleInstancesPolicy switch
-            {
-                "Parallel" => TaskInstancesPolicy.Parallel,
-                "Queue" => TaskInstancesPolicy.Queue,
-                "StopExisting" => TaskInstancesPolicy.StopExisting,
-                _ => TaskInstancesPolicy.IgnoreNew
-            };
+            td.Settings.MultipleInstances = model.MultipleInstancesPolicy;
 
             td.Settings.Priority = model.TaskPriority switch
             {
@@ -515,18 +514,15 @@ namespace FluentTaskScheduler.Services
 
             Trigger t = triggerModel.TriggerType switch
             {
-                "Daily" => new DailyTrigger { StartBoundary = startTime, DaysInterval = triggerModel.DailyInterval },
-                "Weekly" => new WeeklyTrigger { StartBoundary = startTime, WeeksInterval = triggerModel.WeeklyInterval, DaysOfWeek = GetDaysOfWeek(triggerModel.WeeklyDays) },
-                "Monthly" => CreateMonthlyTrigger(triggerModel, startTime),
-                "AtLogon" => new LogonTrigger(),
-                "AtStartup" => new BootTrigger(),
-                "Once" => new TimeTrigger { StartBoundary = startTime },
-                "One Time" => new TimeTrigger { StartBoundary = startTime },
-                "Event" => CreateEventTrigger(triggerModel),
-                "OnIdle" => new IdleTrigger(),
-                "SessionStateChange" => CreateSessionTrigger(triggerModel, model),
-                "OnLock" => CreateSessionTrigger(triggerModel, model),
-                "OnUnlock" => CreateSessionTrigger(triggerModel, model),
+                AppTriggerType.Daily => new DailyTrigger { StartBoundary = startTime, DaysInterval = triggerModel.DailyInterval },
+                AppTriggerType.Weekly => new WeeklyTrigger { StartBoundary = startTime, WeeksInterval = triggerModel.WeeklyInterval, DaysOfWeek = GetDaysOfWeek(triggerModel.WeeklyDays) },
+                AppTriggerType.Monthly => CreateMonthlyTrigger(triggerModel, startTime),
+                AppTriggerType.AtLogon => new LogonTrigger(),
+                AppTriggerType.AtStartup => new BootTrigger(),
+                AppTriggerType.Once => new TimeTrigger { StartBoundary = startTime },
+                AppTriggerType.Event => CreateEventTrigger(triggerModel),
+                AppTriggerType.OnIdle => new IdleTrigger(),
+                AppTriggerType.SessionStateChange => CreateSessionTrigger(triggerModel, model),
                 _ => new DailyTrigger { StartBoundary = startTime }
             };
 
@@ -708,7 +704,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Error($"Could not discover tasks via event log: {ex.Message}");
+                Serilog.Log.Error("{Message}", $"Could not discover tasks via event log: {ex.Message}");
             }
 
             var discoveredTasks = new List<ScheduledTaskModel>();
@@ -745,7 +741,7 @@ namespace FluentTaskScheduler.Services
                         Path = path,
                         IsFromEventLog = true,
                         IsReadOnlyFallback = true,
-                        State = "Access Denied",
+                        State = AppTaskState.AccessDenied,
                         Description = "This task was discovered via event logs but is highly protected. Access is restricted for non-administrator users."
                     });
                 }
@@ -791,7 +787,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Error($"Could not read task history: {ex.Message}");
+                Serilog.Log.Error("{Message}", $"Could not read task history: {ex.Message}");
             }
             return history;
         }
@@ -838,7 +834,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Warn($"Could not read nearby system events: {ex.Message}");
+                Serilog.Log.Warning("{Message}", $"Could not read nearby system events: {ex.Message}");
             }
             return events;
         }
@@ -935,50 +931,50 @@ namespace FluentTaskScheduler.Services
             switch (trigger)
             {
                 case DailyTrigger dt:
-                    model.TriggerType = "Daily";
+                    model.TriggerType = AppTriggerType.Daily;
                     model.DailyInterval = dt.DaysInterval;
                     break;
                 case WeeklyTrigger wt:
-                    model.TriggerType = "Weekly";
+                    model.TriggerType = AppTriggerType.Weekly;
                     model.WeeklyInterval = wt.WeeksInterval;
                     MapDaysOfWeek(wt.DaysOfWeek, model.WeeklyDays);
                     break;
                 case MonthlyTrigger mt:
-                    model.TriggerType = "Monthly";
+                    model.TriggerType = AppTriggerType.Monthly;
                     model.MonthlyIsDayOfWeek = false;
                     MapMonths(mt.MonthsOfYear, model.MonthlyMonths);
                     model.MonthlyDays.AddRange(mt.DaysOfMonth);
                     if (mt.RunOnLastDayOfMonth) model.MonthlyDays.Add(32);
                     break;
                 case MonthlyDOWTrigger mdt:
-                    model.TriggerType = "Monthly";
+                    model.TriggerType = AppTriggerType.Monthly;
                     model.MonthlyIsDayOfWeek = true;
                     MapMonths(mdt.MonthsOfYear, model.MonthlyMonths);
                     model.MonthlyWeek = mdt.WeeksOfMonth.ToString().Replace("Week","");
                     model.MonthlyDayOfWeek = mdt.DaysOfWeek.ToString();
                     break;
-                case LogonTrigger: model.TriggerType = "AtLogon"; break;
-                case BootTrigger: model.TriggerType = "AtStartup"; break;
-                case IdleTrigger: model.TriggerType = "OnIdle"; break;
+                case LogonTrigger: model.TriggerType = AppTriggerType.AtLogon; break;
+                case BootTrigger: model.TriggerType = AppTriggerType.AtStartup; break;
+                case IdleTrigger: model.TriggerType = AppTriggerType.OnIdle; break;
                 case SessionStateChangeTrigger ssc:
-                    model.TriggerType = "SessionStateChange";
+                    model.TriggerType = AppTriggerType.SessionStateChange;
                     model.SessionStateChangeType = ssc.StateChange.ToString().Replace("Session","");
                     break;
                 case EventTrigger et:
-                    model.TriggerType = "Event";
+                    model.TriggerType = AppTriggerType.Event;
                     // Simplistic parsing maintained for backward compatibility
                     try {
                          var sub = et.Subscription;
                          if (sub.Contains("Path=")) model.EventLog = Regex.Match(sub, "Path=\"([^\"]+)\"").Groups[1].Value;
                          if (sub.Contains("Provider[@Name=")) model.EventSource = Regex.Match(sub, "Provider\\[@Name='([^']+)'\\]").Groups[1].Value;
-                         if (sub.Contains("EventID=")) 
+                         if (sub.Contains("EventID="))
                          {
                              if (int.TryParse(Regex.Match(sub, "EventID=(\\d+)").Groups[1].Value, out int id))
                                 model.EventId = id;
                          }
                     } catch {}
                     break;
-                case TimeTrigger: model.TriggerType = "Once"; break;
+                case TimeTrigger: model.TriggerType = AppTriggerType.Once; break;
             }
             return model;
         }
@@ -1180,7 +1176,7 @@ namespace FluentTaskScheduler.Services
                 }
 
                 task.Folder.DeleteTask(taskName);
-                LogService.Info($"Moved task '{taskName}' to '{targetFolderPath}'.");
+                Serilog.Log.Information("{Message}", $"Moved task '{taskName}' to '{targetFolderPath}'.");
             }
         }
 
@@ -1224,7 +1220,7 @@ namespace FluentTaskScheduler.Services
 
             // Perform deletion in a fresh context to ensure no handles are held
             DeleteFolder(sourceFolderPath);
-            LogService.Info($"Moved folder '{sourceFolderPath}' to '{newPath}'.");
+            Serilog.Log.Information("{Message}", $"Moved folder '{sourceFolderPath}' to '{newPath}'.");
         }
 
         public void CreateFolder(string path)
@@ -1314,7 +1310,7 @@ namespace FluentTaskScheduler.Services
                     }
                     else
                     {
-                        LogService.Error($"Failed to copy task '{task.Name}': {ex.Message}");
+                        Serilog.Log.Error("{Message}", $"Failed to copy task '{task.Name}': {ex.Message}");
                     }
                 }
             }

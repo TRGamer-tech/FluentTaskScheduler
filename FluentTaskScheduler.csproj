@@ -3,9 +3,9 @@
     <PropertyGroup>
         <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
         <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-        <Version>1.8.1</Version>
-        <AssemblyVersion>1.8.1</AssemblyVersion>
-        <FileVersion>1.8.1</FileVersion>
+        <Version>1.8.2</Version>
+        <AssemblyVersion>1.8.2</AssemblyVersion>
+        <FileVersion>1.8.2</FileVersion>
         <OutputType>WinExe</OutputType>
         <UseWinUI>true</UseWinUI>
         <EnableMsixTooling>true</EnableMsixTooling>
@@ -47,9 +47,15 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
         <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
         <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240627000" />
         <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
+        <PackageReference Include="Serilog" Version="4.4.0" />
+        <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
+        <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
         <PackageReference Include="TaskScheduler" Version="2.12.2" />
         <PackageReference Include="Velopack" Version="0.0.1298" />
     </ItemGroup>

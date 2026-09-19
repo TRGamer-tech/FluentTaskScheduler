@@ -7,7 +7,9 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using FluentTaskScheduler.Models;
+using FluentTaskScheduler.Models.Enums;
 using FluentTaskScheduler.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Dispatching;
 
@@ -66,7 +68,7 @@ namespace FluentTaskScheduler.ViewModels
     }
     public class DashboardViewModel : INotifyPropertyChanged
     {
-        private readonly TaskServiceWrapper _taskService;
+        private readonly ITaskService _taskService;
         private int _totalTasks;
         private int _enabledTasks;
         private int _disabledTasks;
@@ -81,7 +83,7 @@ namespace FluentTaskScheduler.ViewModels
 
         public DashboardViewModel()
         {
-            _taskService = new TaskServiceWrapper();
+            _taskService = App.Container.GetRequiredService<ITaskService>();
             RecentHistory = new ObservableCollection<TaskHistoryEntry>();
             UpcomingTasks = new ObservableCollection<ScheduledTaskModel>();
             DailyHistory = new ObservableCollection<DailyChartPoint>();
@@ -262,7 +264,7 @@ namespace FluentTaskScheduler.ViewModels
                     int disabled = allTasks.Count(t => !t.IsEnabled);
 
                     // 3. Currently Running Tasks with process detection
-                    var runningTasks = allTasks.Where(t => t.State == "Running").ToList();
+                    var runningTasks = allTasks.Where(t => t.State == TaskState.Running).ToList();
                     var runningInfos = new List<RunningTaskInfo>();
                     foreach (var task in runningTasks)
                     {

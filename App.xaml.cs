@@ -9,7 +9,9 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Microsoft.UI.Text;
-using SS = global::FluentTaskScheduler.Services.SettingsService;
+using FluentTaskScheduler.Models.Enums;
+using FluentTaskScheduler.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentTaskScheduler
 {
@@ -56,8 +58,23 @@ namespace FluentTaskScheduler
         private static extern bool AttachConsole(int dwProcessId);
         private const int ATTACH_PARENT_PROCESS = -1;
 
+        // ── Composition root ─────────────────────────────────────────────────────
+        public static IServiceProvider Container { get; private set; } = null!;
+
+        private static void BuildContainer()
+        {
+            var services = new ServiceCollection();
+            services.AddSingleton<ISettingsService, Services.SettingsService>();
+            services.AddSingleton<ITaskService, Services.TaskServiceWrapper>();
+            Container = services.BuildServiceProvider();
+        }
+
+        private ISettingsService Settings => Container.GetRequiredService<ISettingsService>();
+
         public App()
         {
+            BuildContainer();
+            Services.LoggingConfig.Initialize();
             Services.LocalizationService.Initialize();
             Services.LocalizationService.LanguageChanged += LocalizationService_LanguageChanged;
 
@@ -124,7 +141,7 @@ namespace FluentTaskScheduler
         public void LogCrash(Exception? ex, string source)
         {
             string errorMessage = $"[{DateTime.Now}] [{source}] Error: {ex?.Message}\r\nStack Trace: {ex?.StackTrace ?? "No stack"}\r\n\r\n";
-            Services.LogService.WriteCrash(ex, source);
+            Serilog.Log.Fatal(ex, "[{Source}] Unhandled exception", source);
 
             if (m_window != null)
             {
@@ -151,7 +168,7 @@ namespace FluentTaskScheduler
                             PrimaryButtonText = Services.LocalizationService.GetString("Dialog.Crash.Copy", "Copy to Clipboard"),
                             CloseButtonText = Services.LocalizationService.GetString("Dialog.Common.Close", "Close"),
                             XamlRoot = m_window.Content?.XamlRoot,
-                            RequestedTheme = SS.Theme
+                            RequestedTheme = Settings.Theme
                         };
 
                         dialog.PrimaryButtonClick += (s, args) =>
@@ -184,7 +201,7 @@ namespace FluentTaskScheduler
                 string? param = args.Length > 2 ? args[2] : null; 
                 bool jsonOutput = args.Contains("--json"); // Keep variable for potential future use or just ignore
 
-                var service = new global::FluentTaskScheduler.Services.TaskServiceWrapper();
+                var service = Container.GetRequiredService<ITaskService>();
                 
                 try 
                 {
@@ -197,7 +214,7 @@ namespace FluentTaskScheduler
                                 simpleList.Add(new { 
                                 Name = t.Name, 
                                 Path = t.Path, 
-                                State = t.State, 
+                                State = t.State.ToDisplayString(),
                                 LastRun = t.LastRunTime, 
                                 NextRun = t.NextRunTime 
                                 });
@@ -315,7 +332,7 @@ namespace FluentTaskScheduler
             Services.TrayIconService.ExitRequested += () => Environment.Exit(0);
             Services.TrayIconService.UpdateVisibility();
 
-            Services.LogService.Info("Application started");
+            Serilog.Log.Information("Application started");
             Services.ReminderService.Start();
             Services.ExecutionHistoryLogService.Start();
 
@@ -325,7 +342,7 @@ namespace FluentTaskScheduler
             // Defer smooth scrolling until visual tree is built
             _windows[0].Win.DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
             {
-                ApplySmoothScrolling(SS.SmoothScrolling);
+                ApplySmoothScrolling(Settings.SmoothScrolling);
             });
         }
 
@@ -361,7 +378,7 @@ namespace FluentTaskScheduler
 
             // Size — first window restores saved size, subsequent windows use a slight offset
             int offset = (_windowCounter - 1) * 30;
-            win.AppWindow.Resize(new Windows.Graphics.SizeInt32 { Width = SS.WindowWidth + offset, Height = SS.WindowHeight + offset });
+            win.AppWindow.Resize(new Windows.Graphics.SizeInt32 { Width = Settings.WindowWidth + offset, Height = Settings.WindowHeight + offset });
 
             // Save size changes for the first window only
             if (_windowCounter == 1)
@@ -370,8 +387,8 @@ namespace FluentTaskScheduler
                 {
                     if (e.DidSizeChange && !rec.IsHidden)
                     {
-                        SS.WindowWidth  = s.Size.Width;
-                        SS.WindowHeight = s.Size.Height;
+                        Settings.WindowWidth  = s.Size.Width;
+                        Settings.WindowHeight = s.Size.Height;
                     }
                 };
             }
@@ -390,7 +407,7 @@ namespace FluentTaskScheduler
             // Close-to-tray handler
             win.AppWindow.Closing += (sender, args) =>
             {
-                if (SS.EnableTrayIcon)
+                if (Settings.EnableTrayIcon)
                 {
                     args.Cancel = true;
                     rec.IsHidden = true;
@@ -464,19 +481,19 @@ namespace FluentTaskScheduler
         {
             if (win?.Content is Control root)
             {
-                root.RequestedTheme = SS.Theme;
+                root.RequestedTheme = Settings.Theme;
                 win.SystemBackdrop = null;
 
                 Application.Current.Resources["TaskCardBackground"] = Application.Current.Resources["CardBackgroundFillColorDefaultBrush"];
                 Application.Current.Resources["TaskCardBorder"] = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
 
-                if (SS.IsOledMode && SS.Theme == ElementTheme.Dark)
+                if (Settings.IsOledMode && Settings.Theme == ElementTheme.Dark)
                 {
                     var black = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Black);
                     root.Background = black;
                     SetNavigationViewBackgrounds(black);
                 }
-                else if (SS.IsMicaEnabled && Microsoft.UI.Composition.SystemBackdrops.MicaController.IsSupported())
+                else if (Settings.IsMicaEnabled && Microsoft.UI.Composition.SystemBackdrops.MicaController.IsSupported())
                 {
                     var transparent = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
                     root.Background = transparent;
@@ -572,7 +589,7 @@ namespace FluentTaskScheduler
                             PrimaryButtonText = Services.LocalizationService.GetString("Dialog.UpdateAvailable.RestartNow", "Restart Now"),
                             CloseButtonText = Services.LocalizationService.GetString("Dialog.Common.Later", "Later"),
                             XamlRoot = m_window.Content?.XamlRoot,
-                            RequestedTheme = SS.Theme
+                            RequestedTheme = Settings.Theme
                         };
 
                         var dialogResult = await dialog.ShowAsync();
@@ -583,13 +600,13 @@ namespace FluentTaskScheduler
                     }
                     catch (Exception ex)
                     {
-                        Services.LogService.Info($"[AutoUpdate] Could not show update dialog: {ex.Message}");
+                        Serilog.Log.Information("{Message}", $"[AutoUpdate] Could not show update dialog: {ex.Message}");
                     }
                 });
             }
             catch (Exception ex)
             {
-                Services.LogService.Info($"[AutoUpdate] Background update check failed: {ex.Message}");
+                Serilog.Log.Information("{Message}", $"[AutoUpdate] Background update check failed: {ex.Message}");
             }
         }
 

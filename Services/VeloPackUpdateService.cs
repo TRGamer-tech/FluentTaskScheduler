@@ -29,7 +29,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Error("[VeloPackUpdate] Could not get current version", ex);
+                Serilog.Log.Error(ex, "[VeloPackUpdate] Could not get current version");
                 return null;
             }
         }
@@ -43,18 +43,18 @@ namespace FluentTaskScheduler.Services
             var mgr = GetManager();
             if (!mgr.IsInstalled)
             {
-                LogService.Info("[VeloPackUpdate] App is not installed via VeloPack, skipping update check.");
+                Serilog.Log.Information("[VeloPackUpdate] App is not installed via VeloPack, skipping update check.");
                 return null;
             }
 
             var updateInfo = await mgr.CheckForUpdatesAsync();
             if (updateInfo != null)
             {
-                LogService.Info($"[VeloPackUpdate] Update available: {updateInfo.TargetFullRelease.Version}");
+                Serilog.Log.Information("{Message}", $"[VeloPackUpdate] Update available: {updateInfo.TargetFullRelease.Version}");
             }
             else
             {
-                LogService.Info("[VeloPackUpdate] App is up-to-date.");
+                Serilog.Log.Information("[VeloPackUpdate] App is up-to-date.");
             }
 
             return updateInfo;
@@ -69,7 +69,7 @@ namespace FluentTaskScheduler.Services
 
             await mgr.DownloadUpdatesAsync(updateInfo, progress => progressCallback?.Invoke(progress));
 
-            LogService.Info("[VeloPackUpdate] Update downloaded successfully.");
+            Serilog.Log.Information("[VeloPackUpdate] Update downloaded successfully.");
             return true;
         }
 
@@ -85,7 +85,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Info($"[VeloPackUpdate] Restart failed: {ex.Message}");
+                Serilog.Log.Information("{Message}", $"[VeloPackUpdate] Restart failed: {ex.Message}");
             }
         }
 
@@ -120,7 +120,7 @@ namespace FluentTaskScheduler.Services
             }
             catch (Exception ex)
             {
-                LogService.Error("[VeloPackUpdate] Update process failed", ex);
+                Serilog.Log.Error(ex, "[VeloPackUpdate] Update process failed");
                 string message = ex.Message;
                 if (message.Contains("access to the path", StringComparison.OrdinalIgnoreCase))
                 {

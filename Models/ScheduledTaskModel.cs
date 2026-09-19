@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Microsoft.Win32.TaskScheduler;
 
 namespace FluentTaskScheduler.Models
 {
@@ -15,7 +16,7 @@ namespace FluentTaskScheduler.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private string _state = "";
+        private Enums.TaskState _state = Enums.TaskState.Unknown;
         private bool _isEnabled;
         private bool _isSelected;
 
@@ -35,17 +36,17 @@ namespace FluentTaskScheduler.Models
         public string Name { get; set; } = "";
         public string Path { get; set; } = "";
         
-        public string State 
-        { 
-            get => _state; 
-            set 
+        public Enums.TaskState State
+        {
+            get => _state;
+            set
             {
                 if (_state != value)
                 {
                     _state = value;
                     OnPropertyChanged();
                 }
-            } 
+            }
         }
 
         private bool _isRunning;
@@ -93,8 +94,8 @@ namespace FluentTaskScheduler.Models
                 if (_isEnabled != value)
                 {
                     _isEnabled = value;
-                    if (_state != "Running")
-                        State = value ? "Ready" : "Disabled";
+                    if (_state != Enums.TaskState.Running)
+                        State = value ? Enums.TaskState.Ready : Enums.TaskState.Disabled;
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(State));
                 }
@@ -139,9 +140,9 @@ namespace FluentTaskScheduler.Models
             get => TriggersList.Count > 0 ? TriggersList[0].ScheduleInfo : ""; 
             set { if (TriggersList.Count == 0) TriggersList.Add(new TaskTriggerModel()); TriggersList[0].ScheduleInfo = value; OnPropertyChanged(); }
         }
-        public string TriggerType 
-        { 
-            get => TriggersList.Count > 0 ? TriggersList[0].TriggerType : "Daily"; 
+        public Enums.TriggerType TriggerType
+        {
+            get => TriggersList.Count > 0 ? TriggersList[0].TriggerType : Enums.TriggerType.Daily;
             set { if (TriggersList.Count == 0) TriggersList.Add(new TaskTriggerModel()); TriggersList[0].TriggerType = value; OnPropertyChanged(); }
         }
         public bool RunWithHighestPrivileges { get; set; } = false;
@@ -250,7 +251,7 @@ namespace FluentTaskScheduler.Models
         public string RestartInterval { get; set; } = "PT1M"; // Default 1 minute
         public int RestartCount { get; set; } = 3;
         public bool RunIfMissed { get; set; }
-        public string MultipleInstancesPolicy { get; set; } = "IgnoreNew"; // Parallel, Queue, IgnoreNew, StopExisting
+        public TaskInstancesPolicy MultipleInstancesPolicy { get; set; } = TaskInstancesPolicy.IgnoreNew;
         public int TaskPriority { get; set; } = 7; // 0=Realtime to 10=Idle, 7=Normal
         public bool DeleteExpiredTaskAfter { get; set; }
         public bool AllowHardTerminate { get; set; } = true;

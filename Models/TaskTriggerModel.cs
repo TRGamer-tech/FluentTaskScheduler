@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using FluentTaskScheduler.Models.Enums;
 
 namespace FluentTaskScheduler.Models
 {
@@ -14,8 +15,8 @@ namespace FluentTaskScheduler.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private string _triggerType = "Daily";
-        public string TriggerType
+        private TriggerType _triggerType = TriggerType.Daily;
+        public TriggerType TriggerType
         {
             get => _triggerType;
             set { if (_triggerType != value) { _triggerType = value; OnPropertyChanged(); OnPropertyChanged(nameof(Descriptor)); } }
@@ -59,16 +60,16 @@ namespace FluentTaskScheduler.Models
         {
             get
             {
-                if (TriggerType == "SessionStateChange") 
+                if (TriggerType == Enums.TriggerType.SessionStateChange)
                 {
                     string sess = Services.LocalizationService.GetString("Dialog.Sess." + SessionStateChangeType, SessionStateChangeType);
                     return string.Format(Services.LocalizationService.GetString("Trigger.SessionStateChange", "At {0}"), sess);
                 }
-                if (TriggerType == "OnIdle") return Services.LocalizationService.GetString("Trigger.OnIdle", "On Idle");
-                if (TriggerType == "AtLogon") return Services.LocalizationService.GetString("Trigger.AtLogon", "At Logon");
-                if (TriggerType == "AtStartup") return Services.LocalizationService.GetString("Trigger.AtStartup", "At Startup");
-                
-                string typeLoc = Services.LocalizationService.GetString("Dialog.Trigger." + TriggerType, TriggerType);
+                if (TriggerType == Enums.TriggerType.OnIdle) return Services.LocalizationService.GetString("Trigger.OnIdle", "On Idle");
+                if (TriggerType == Enums.TriggerType.AtLogon) return Services.LocalizationService.GetString("Trigger.AtLogon", "At Logon");
+                if (TriggerType == Enums.TriggerType.AtStartup) return Services.LocalizationService.GetString("Trigger.AtStartup", "At Startup");
+
+                string typeLoc = Services.LocalizationService.GetString("Dialog.Trigger." + TriggerType, TriggerType.ToString());
                 if (string.IsNullOrEmpty(ScheduleInfo)) return typeLoc;
                 
                 string at = Services.LocalizationService.GetString("Trigger.At", "at");
