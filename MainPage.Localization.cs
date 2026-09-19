@@ -43,7 +43,6 @@ namespace FluentTaskScheduler
             NavQuickActions.Content = L("Main.Nav.QuickActions", "Quick Actions");
             NavScriptLibrary.Content = L("Main.Nav.Library", "Library");
             NavScriptEditor.Content = L("Main.Nav.ScriptEditor", "Script Editor");
-            FoldersHeader.Text = L("Main.FoldersHeader", "Folders");
 
             // Per-task snooze, in the task detail dialog. These belong here and not in the global
             // snooze dialog's click handler: that handler only runs if the user opens "Snooze All",
@@ -115,7 +114,6 @@ namespace FluentTaskScheduler
             // These used to come from x:Uid, which resolves against the Windows display language
             // instead of the app's language picker - hence German text in an English app.
             DlgTitleText.Text = L("DialogTitle.Text", "Add or edit task");
-            DlgTriggersTitle.Text = L("TriggerTitle.Text", "Triggers");
             DlgActionsTitle.Text = L("ActionTitle.Text", "Actions");
             DlgRepetitionTitle.Text = L("RepetitionSectionTitle.Text", "Repetition");
             DlgRepeatEveryLabel.Text = L("RepetitionIntervalText.Text", "Repeat task every");
@@ -151,18 +149,7 @@ namespace FluentTaskScheduler
             UpdatePipelineSummaryLabel();
 
             // Trigger types
-            DlgTriggerTypeLabel.Text = L("Dialog.TriggerType", "Trigger Type");
-            DlgTriggerDaily.Content = L("Dialog.Trigger.Daily", "Daily");
-            DlgTriggerWeekly.Content = L("Dialog.Trigger.Weekly", "Weekly");
-            DlgTriggerMonthly.Content = L("Dialog.Trigger.Monthly", "Monthly");
-            DlgTriggerLogon.Content = L("Dialog.Trigger.AtLogon", "At Logon");
-            DlgTriggerStartup.Content = L("Dialog.Trigger.AtStartup", "At Startup");
-            DlgTriggerOnce.Content = L("Dialog.Trigger.OneTime", "One Time");
-            DlgTriggerEvent.Content = L("Dialog.Trigger.OnEvent", "On an event");
-            DlgTriggerSession.Content = L("Dialog.Trigger.Session", "On Workstation Lock/Unlock");
 
-            EditTaskRandomDelay.Content = L("Dialog.RandomDelay", "Delay task for up to (random delay):");
-            EditTaskStopAfter.Content = L("Dialog.StopAfter", "Stop task if runs longer than:");
 
             // Actions
             DlgProgramLabel.Text = L("Dialog.ProgramScript", "Program / Script");
@@ -200,83 +187,26 @@ namespace FluentTaskScheduler
             EditTaskActionCommand.PlaceholderText = L("Dialog.Ph.Command", "e.g., notepad.exe or C:\\Scripts\\myscript.ps1");
             EditTaskArguments.PlaceholderText = L("Dialog.Ph.Args", "e.g., /c echo hello or -File script.ps1");
             EditTaskWorkingDirectory.PlaceholderText = L("Dialog.Ph.WorkDir", "e.g., C:\\Scripts");
-            EditTaskRandomDelayVal.PlaceholderText = L("Dialog.Ph.Delay", "e.g. 1 hour");
-            EditTaskIdleDuration.PlaceholderText = L("Dialog.Ph.Idle", "e.g., 10m");
             EditTaskIdleDurationSetting.PlaceholderText = L("Dialog.Ph.Idle", "e.g., 10m");
-            MonthlyDaysInput.PlaceholderText = L("Dialog.Ph.MonthDays", "e.g. 1, 15, Last");
             EditTaskRestartInterval.PlaceholderText = L("Dialog.Ph.RestartInt", "e.g. 1 minute");
             EditTaskRunAsUser.PlaceholderText = L("Dialog.Ph.Username", "DOMAIN\\Username or username@domain.com");
             EditTaskRunAsUser.Header = L("Dialog.UsernameHeader", "Username");
-            EditTaskEventLog.Header = L("Dialog.EventLog", "Log");
-            EditTaskEventLog.PlaceholderText = L("Dialog.Ph.EventLog", "Application, System, Security, etc.");
-            EditTaskEventSource.Header = L("Dialog.EventSource", "Source");
-            EditTaskEventSource.PlaceholderText = L("Dialog.Ph.EventSource", "e.g., VSS, Outlook (Optional)");
-            EditTaskEventId.Header = L("Dialog.EventId", "Event ID");
-            EditTaskEventId.PlaceholderText = L("Dialog.Ph.EventId", "e.g., 1000 (Optional)");
 
             // Hint texts
-            DlgDelayHint.Text = L("Dialog.Hint.Delay", "(e.g. 30s, 1m, 1h)");
-            DlgIdleHint.Text = L("Dialog.Hint.Idle", "(e.g. 5m, 10m, 30m)");
             DlgRestartHint.Text = L("Dialog.Hint.Restart", "(e.g. 30s, 1m, 5m)");
-            DlgMonthlyDaysHint.Text = L("Dialog.Hint.MonthDays", "(comma separated, use 'Last' for last day)");
 
             // Daily/Weekly/Monthly labels
-            EditTaskDailyRecurrence.Content = L("Dialog.RecurEvery", "Recur every");
-            DlgDaysSuffix.Text = L("Dialog.DaysSuffix", "day(s)");
-            DlgWeeklyRecur.Text = L("Dialog.RecurEvery", "Recur every");
-            DlgWeeksOn.Text = L("Dialog.WeeksOn", "weeks on:");
-            DlgMonthsLabel.Text = L("Dialog.Months", "Months:");
-            MonthlyRadioDays.Content = L("Dialog.Days", "Days");
-            MonthlyRadioOn.Content = L("Dialog.On", "On");
-            DlgIdleWait.Text = L("Dialog.IdleWait", "Wait for the computer to be idle for:");
 
             // Weekday checkboxes
-            WeeklyMon.Content = L("Dialog.Day.Mon", "Mon");
-            WeeklyTue.Content = L("Dialog.Day.Tue", "Tue");
-            WeeklyWed.Content = L("Dialog.Day.Wed", "Wed");
-            WeeklyThu.Content = L("Dialog.Day.Thu", "Thu");
-            WeeklyFri.Content = L("Dialog.Day.Fri", "Fri");
-            WeeklySat.Content = L("Dialog.Day.Sat", "Sat");
-            WeeklySun.Content = L("Dialog.Day.Sun", "Sun");
 
             // Month abbreviations
-            MonthJan.Content = L("Dialog.Month.Jan", "Jan");
-            MonthFeb.Content = L("Dialog.Month.Feb", "Feb");
-            MonthMar.Content = L("Dialog.Month.Mar", "Mar");
-            MonthApr.Content = L("Dialog.Month.Apr", "Apr");
-            MonthMay.Content = L("Dialog.Month.May", "May");
-            MonthJun.Content = L("Dialog.Month.Jun", "Jun");
-            MonthJul.Content = L("Dialog.Month.Jul", "Jul");
-            MonthAug.Content = L("Dialog.Month.Aug", "Aug");
-            MonthSep.Content = L("Dialog.Month.Sep", "Sep");
-            MonthOct.Content = L("Dialog.Month.Oct", "Oct");
-            MonthNov.Content = L("Dialog.Month.Nov", "Nov");
-            MonthDec.Content = L("Dialog.Month.Dec", "Dec");
 
             // Monthly week ordinals
-            DlgWeekFirst.Content = L("Dialog.Week.First", "First");
-            DlgWeekSecond.Content = L("Dialog.Week.Second", "Second");
-            DlgWeekThird.Content = L("Dialog.Week.Third", "Third");
-            DlgWeekFourth.Content = L("Dialog.Week.Fourth", "Fourth");
-            DlgWeekLast.Content = L("Dialog.Week.Last", "Last");
 
             // Monthly day names
-            DlgDayMon.Content = L("Dialog.Weekday.Mon", "Monday");
-            DlgDayTue.Content = L("Dialog.Weekday.Tue", "Tuesday");
-            DlgDayWed.Content = L("Dialog.Weekday.Wed", "Wednesday");
-            DlgDayThu.Content = L("Dialog.Weekday.Thu", "Thursday");
-            DlgDayFri.Content = L("Dialog.Weekday.Fri", "Friday");
-            DlgDaySat.Content = L("Dialog.Weekday.Sat", "Saturday");
-            DlgDaySun.Content = L("Dialog.Weekday.Sun", "Sunday");
 
             // Session state items
-            EditTaskSessionStateType.Header = L("Dialog.TriggerOn", "Trigger on");
-            DlgSessLock.Content = L("Dialog.Sess.Lock", "Workstation Lock");
-            DlgSessUnlock.Content = L("Dialog.Sess.Unlock", "Workstation Unlock");
-            DlgSessRdpOn.Content = L("Dialog.Sess.RdpConnect", "Remote Desktop Connect");
-            DlgSessRdpOff.Content = L("Dialog.Sess.RdpDisconnect", "Remote Desktop Disconnect");
 
-            EditTaskExpires.Content = L("Dialog.Expire", "Expire task on:");
 
             // Action menu items
             DlgActionRunProg.Text = L("Dialog.Action.RunProg", "Run Program");
@@ -285,17 +215,6 @@ namespace FluentTaskScheduler
             BrowseActionButton.Content = L("Dialog.Browse", "Browse...");
 
             // Time duration items - Stop After
-            DlgStop15m.Content = L("Dialog.Time.15m", "15 minutes");
-            DlgStop30m.Content = L("Dialog.Time.30m", "30 minutes");
-            DlgStop1h.Content = L("Dialog.Time.1h", "1 hour");
-            DlgStop2h.Content = L("Dialog.Time.2h", "2 hours");
-            DlgStop4h.Content = L("Dialog.Time.4h", "4 hours");
-            DlgStop8h.Content = L("Dialog.Time.8h", "8 hours");
-            DlgStop12h.Content = L("Dialog.Time.12h", "12 hours");
-            DlgStop1d.Content = L("Dialog.Time.1d", "1 day");
-            DlgStop2d.Content = L("Dialog.Time.2d", "2 days");
-            DlgStop3d.Content = L("Dialog.Time.3d", "3 days");
-            DlgStop5d.Content = L("Dialog.Time.5d", "5 days");
 
             // Repetition interval items
             DlgRep5m.Content = L("Dialog.Time.5m", "5 minutes");

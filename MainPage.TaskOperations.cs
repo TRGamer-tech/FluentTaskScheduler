@@ -210,7 +210,7 @@ namespace FluentTaskScheduler
 
             if (!string.IsNullOrEmpty(filePath))
             {
-                var folderList = _treeNodeFolderMap.Values.Select(f => f.Path).Distinct().OrderBy(p => p).ToList();
+                var folderList = FolderTree.FolderPaths.Distinct().OrderBy(p => p).ToList();
                 if (folderList.Count == 0) folderList.Add("\\");
 
                 var comboBox = new ComboBox

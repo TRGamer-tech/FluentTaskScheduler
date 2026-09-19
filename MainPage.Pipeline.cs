@@ -101,9 +101,8 @@ namespace FluentTaskScheduler
                 EditTaskEnabled.IsOn = true;
 
                 _tempActions = new ObservableCollection<TaskActionModel>(model.Actions);
-                _tempTriggers = new ObservableCollection<TaskTriggerModel>(model.TriggersList);
                 ActionList.ItemsSource = _tempActions;
-                TriggerList.ItemsSource = _tempTriggers;
+                TriggerEditor.EditedTriggers = new ObservableCollection<TaskTriggerModel>(model.TriggersList);
 
                 EditTaskRunWithHighestPrivileges.IsChecked = model.RunWithHighestPrivileges;
                 EditTaskRunIfMissed.IsChecked = model.RunIfMissed;
@@ -116,7 +115,7 @@ namespace FluentTaskScheduler
 
                 _isPopulatingDetails = false;
                 ActionList.SelectedIndex = 0;
-                TriggerList.SelectedIndex = 0;
+                TriggerEditor.SelectedIndex = 0;
 
                 EditTaskErrorBar.IsOpen = false;
                 TaskEditDialog.XamlRoot = this.Content.XamlRoot;
@@ -156,12 +155,12 @@ namespace FluentTaskScheduler
                 _tempActions.Add(new TaskActionModel { Command = "notepad.exe" });
             }
 
-            _tempTriggers = new ObservableCollection<TaskTriggerModel> { new TaskTriggerModel { TriggerType = TriggerType.Daily, ScheduleInfo = FormatScheduleInfo(DateTime.Now), DailyInterval = 1 } };
+            var initialTriggers = new ObservableCollection<TaskTriggerModel> { new TaskTriggerModel { TriggerType = TriggerType.Daily, ScheduleInfo = FormatScheduleInfo(DateTime.Now), DailyInterval = 1 } };
             
             ActionList.ItemsSource = _tempActions;
-            TriggerList.ItemsSource = _tempTriggers;
+            TriggerEditor.EditedTriggers = initialTriggers;
             ActionList.SelectedIndex = 0;
-            TriggerList.SelectedIndex = 0;
+            TriggerEditor.SelectedIndex = 0;
             
             // Settings defaults
             EditTaskRunWithHighestPrivileges.IsChecked = template?.RunAsAdmin ?? false;
@@ -173,7 +172,7 @@ namespace FluentTaskScheduler
 
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
-            LoadFolderStructure();
+            FolderTree.Reload();
             _ = ViewModel.LoadTasksAsync();
             TaskListView.Focus(FocusState.Programmatic);
             UpdateFolderTreeMaxHeight();
@@ -184,7 +183,7 @@ namespace FluentTaskScheduler
             {
                 _currentFolderPath = saved;
                 ViewModel.SetFilter(saved);
-                SelectFolderTreeNodeForPath(saved);
+                FolderTree.SelectFolder(saved);
             }
 
             // Defer one frame so the ListView control template is fully applied before we set its internal ScrollViewer
@@ -201,7 +200,7 @@ namespace FluentTaskScheduler
                     AdminDragWarning.Visibility = Visibility.Collapsed; // We handle it via custom drag
                     TaskListView.CanDragItems = false;
                     TaskListView.AllowDrop = false;
-                    FolderTreeView.AllowDrop = false;
+                    FolderTree.AllowFolderDrop = false;
                     
                     // Hook up custom drag events
                     this.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(OnCustomDragPointerPressed), true);
@@ -315,7 +314,7 @@ namespace FluentTaskScheduler
 
         private void UpdateFolderTreeMaxHeight()
         {
-            if (NavView == null || FolderTreeView == null) return;
+            if (NavView == null || FolderTree == null) return;
             // Estimated height of Footer Items (4 items + Settings) + Header ("New Task") + Margins
             // Footer: ~200px
             // Header (PaneCustomContent top part): 
@@ -325,7 +324,7 @@ namespace FluentTaskScheduler
             // Total deduction: ~430px
             double availableHeight = NavView.ActualHeight - 430; 
             if (availableHeight < 100) availableHeight = 100;
-            FolderTreeView.MaxHeight = availableHeight;
+            FolderTree.TreeMaxHeight = availableHeight;
         }
 
     }

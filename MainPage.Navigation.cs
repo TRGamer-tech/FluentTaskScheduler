@@ -25,89 +25,52 @@ namespace FluentTaskScheduler
         // Navigation & Loading
         // ========================================================================================================
 
-        private void LoadFolderStructure()
+        // Folder tree events (see Controls/FolderTreeControl)
+
+        private void FolderTree_FolderInvoked(object? sender, string folderPath)
         {
-            try
+            _currentFolderPath = folderPath;
+            Settings.LastFolderPath = folderPath;
+            ViewModel.SetFilter(folderPath);
+
+            // Restore Task View
+            NavView.Header = L("Main.Header.ScheduledTasks", "Scheduled Tasks");
+            TasksViewGrid.Visibility = Visibility.Visible;
+            ContentFrame.Visibility = Visibility.Collapsed;
+
+            NavView.SelectedItem = null; // Native indicator for Dashboard/ScriptLib disappears
+        }
+
+        private void FolderTree_FolderRenamed(object? sender, string oldPath)
+        {
+            if (_currentFolderPath.StartsWith(oldPath, StringComparison.OrdinalIgnoreCase))
             {
-                var rootFolder = ViewModel.TaskService.GetFolderStructure();
-
-                // Unregister the previous pass's property-changed callbacks before discarding those
-                // nodes — RegisterPropertyChangedCallback tokens are otherwise never released, which
-                // leaks a callback per folder on every reload (3.11).
-                foreach (var kv in _treeNodeCallbackTokens)
-                    kv.Key.UnregisterPropertyChangedCallback(TreeViewNode.IsExpandedProperty, kv.Value);
-                _treeNodeCallbackTokens.Clear();
-
-                _treeNodeFolderMap.Clear();
-                FolderTreeView.RootNodes.Clear();
-                AddFolderToTree(rootFolder, null);
+                _currentFolderPath = "\\";
+                ViewModel.SetFilter("all");
+                NavView.SelectedItem = NavAllTasks;
             }
-            catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex.ToString()); }
         }
 
-        private Dictionary<TreeViewNode, TaskFolderModel> _treeNodeFolderMap = new();
-        private Dictionary<TreeViewNode, long> _treeNodeCallbackTokens = new();
-
-        /// <summary>Expands and selects the tree node for the given folder path, if it still exists
-        /// (used to restore the last-used folder — see 2.2).</summary>
-        private void SelectFolderTreeNodeForPath(string path)
+        private void FolderTree_FolderDeleted(object? sender, string path)
         {
-            var entry = _treeNodeFolderMap.FirstOrDefault(kv => string.Equals(kv.Value.Path, path, StringComparison.OrdinalIgnoreCase));
-            if (entry.Key == null) return;
-
-            for (var ancestor = entry.Key.Parent; ancestor != null; ancestor = ancestor.Parent)
-                ancestor.IsExpanded = true;
-
-            FolderTreeView.SelectedNode = entry.Key;
+            ViewModel.SetFilter("all");
+            NavView.SelectedItem = NavAllTasks;
         }
 
-        private void AddFolderToTree(TaskFolderModel folder, TreeViewNode? parentNode)
+        private void FolderTree_ContentMoved(object? sender, EventArgs e) => _ = ViewModel.LoadTasksAsync();
+
+        private async void FolderTree_ErrorRaised(object? sender, string message) => await ShowErrorDialog(message);
+
+        private void FolderTree_ElevatedDragBlocked(object? sender, EventArgs e) => AdminDragWarning.Visibility = Visibility.Visible;
+
+        private void WireFolderTree()
         {
-            var displayName = folder.Name == "\\" ? "Task Scheduler Library" : folder.Name;
-            var treeNode = new TreeViewNode
-            {
-                Content = displayName,  
-                IsExpanded = _folderExpandedState.ContainsKey(folder.Path) ? _folderExpandedState[folder.Path] : (folder.Path == "\\")
-            };
-
-            // Store folder in our mapping dictionary
-            _treeNodeFolderMap[treeNode] = folder;
-
-            // Track expansion state changes
-            long token = treeNode.RegisterPropertyChangedCallback(TreeViewNode.IsExpandedProperty, (sender, dp) =>
-            {
-                if (sender is TreeViewNode node && _treeNodeFolderMap.TryGetValue(node, out var f))
-                    _folderExpandedState[f.Path] = node.IsExpanded;
-            });
-            _treeNodeCallbackTokens[treeNode] = token;
-            
-            // Add to parent or root
-            if (parentNode != null)
-                parentNode.Children.Add(treeNode);
-            else
-                FolderTreeView.RootNodes.Add(treeNode);
-
-            // Add subfolders
-            foreach (var sub in folder.SubFolders)
-                AddFolderToTree(sub, treeNode);
-        }
-
-        private void FolderTreeView_ItemInvoked(TreeView sender, TreeViewItemInvokedEventArgs args)
-        {
-            if (args.InvokedItem is TreeViewNode node && _treeNodeFolderMap.TryGetValue(node, out var folder))
-            {
-                _currentFolderPath = folder.Path;
-                Settings.LastFolderPath = folder.Path;
-                ViewModel.SetFilter(folder.Path);
-                
-                // Restore Task View
-                NavView.Header = L("Main.Header.ScheduledTasks", "Scheduled Tasks");
-                TasksViewGrid.Visibility = Visibility.Visible;
-                ContentFrame.Visibility = Visibility.Collapsed;
-                
-                NavView.SelectedItem = null; // Native indicator for Dashboard/ScriptLib disappears
-                FolderTreeView.SelectedItem = node; 
-            }
+            FolderTree.FolderInvoked += FolderTree_FolderInvoked;
+            FolderTree.FolderRenamed += FolderTree_FolderRenamed;
+            FolderTree.FolderDeleted += FolderTree_FolderDeleted;
+            FolderTree.ContentMoved += FolderTree_ContentMoved;
+            FolderTree.ErrorRaised += FolderTree_ErrorRaised;
+            FolderTree.ElevatedDragBlocked += FolderTree_ElevatedDragBlocked;
         }
 
         private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
@@ -129,7 +92,7 @@ namespace FluentTaskScheduler
                     TasksViewGrid.Visibility = Visibility.Collapsed;
                     ContentFrame.Visibility = Visibility.Visible;
                     ContentFrame.Navigate(typeof(DashboardPage));
-                    FolderTreeView.SelectedItem = null;
+                    FolderTree.ClearSelection();
                 }
                 else if (tag == "ScriptLibrary")
                 {
@@ -137,7 +100,7 @@ namespace FluentTaskScheduler
                     TasksViewGrid.Visibility = Visibility.Collapsed;
                     ContentFrame.Visibility = Visibility.Visible;
                     ContentFrame.Navigate(typeof(ScriptLibraryPage), this);
-                    FolderTreeView.SelectedItem = null;
+                    FolderTree.ClearSelection();
                 }
                 else if (tag == "ScriptEditor")
                 {
@@ -145,7 +108,7 @@ namespace FluentTaskScheduler
                     TasksViewGrid.Visibility = Visibility.Collapsed;
                     ContentFrame.Visibility = Visibility.Visible;
                     ContentFrame.Navigate(typeof(ScriptEditorPage));
-                    FolderTreeView.SelectedItem = null;
+                    FolderTree.ClearSelection();
                 }
                 else if (tag == "QuickActions")
                 {
@@ -153,7 +116,7 @@ namespace FluentTaskScheduler
                     TasksViewGrid.Visibility = Visibility.Collapsed;
                     ContentFrame.Visibility = Visibility.Visible;
                     ContentFrame.Navigate(typeof(QuickActionsPage));
-                    FolderTreeView.SelectedItem = null;
+                    FolderTree.ClearSelection();
                 }
                 else
                 {
@@ -161,7 +124,7 @@ namespace FluentTaskScheduler
                     NavView.Header = L("Main.Header.ScheduledTasks", "Scheduled Tasks");
                     TasksViewGrid.Visibility = Visibility.Visible;
                     ContentFrame.Visibility = Visibility.Collapsed;
-                    FolderTreeView.SelectedItem = null;
+                    FolderTree.ClearSelection();
 
                     if (tag.StartsWith("\\"))
                         _currentFolderPath = tag;
@@ -195,7 +158,7 @@ namespace FluentTaskScheduler
             NavView.Header = L("Main.Header.ScheduledTasks", "Scheduled Tasks");
             TasksViewGrid.Visibility = Visibility.Visible;
             ContentFrame.Visibility = Visibility.Collapsed;
-            FolderTreeView.SelectedItem = null;
+            FolderTree.ClearSelection();
 
             // Set filter to show this task (or all tasks)
             _currentFolderPath = System.IO.Path.GetDirectoryName(taskPath) ?? "\\";

@@ -1,0 +1,87 @@
+<UserControl
+    x:Class="FluentTaskScheduler.Controls.FolderTreeControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <StackPanel>
+        <Grid Margin="10,5,10,4">
+            <TextBlock x:Name="FoldersHeader" Text="Folders"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
+                <Button x:Name="FolderRefreshBtn" Padding="4" Background="Transparent" BorderThickness="0" Click="ReloadFolders_Click" ToolTipService.ToolTip="Reload Folders">
+                    <Grid Width="14" Height="14">
+                        <Viewbox>
+                            <SymbolIcon x:Name="FolderRefreshIcon" Symbol="Refresh" />
+                        </Viewbox>
+                        <ProgressRing x:Name="FolderRefreshRing" IsActive="False" Visibility="Collapsed" />
+                    </Grid>
+                </Button>
+                <Button x:Name="FolderCreateBtn" Padding="4" Background="Transparent" BorderThickness="0" Click="CreateRootFolder_Click" ToolTipService.ToolTip="New Folder">
+                    <Viewbox Width="14" Height="14">
+                        <SymbolIcon Symbol="Add" />
+                    </Viewbox>
+                </Button>
+            </StackPanel>
+        </Grid>
+        <TreeView x:Name="FolderTreeView"
+                  SelectionMode="Single"
+                  ItemInvoked="FolderTreeView_ItemInvoked"
+                  RightTapped="FolderTreeViewItem_RightTapped"
+                  AllowDrop="True"
+                  CanDragItems="False"
+                  CanReorderItems="False"
+                  DragOver="FolderTreeView_DragOver"
+                  DragLeave="FolderTreeView_DragLeave"
+                  Drop="FolderTreeView_Drop"
+                  Margin="4,0,0,8">
+            <TreeView.ItemContainerTransitions>
+                <TransitionCollection>
+                    <ContentThemeTransition/>
+                    <EntranceThemeTransition IsStaggeringEnabled="True"/>
+                </TransitionCollection>
+            </TreeView.ItemContainerTransitions>
+            <TreeView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Height="27" Padding="0" Background="Transparent"
+                          AllowDrop="True"
+                          CanDrag="False"
+                          DragOver="FolderItem_DragOver"
+                          DragLeave="FolderItem_DragLeave"
+                          Drop="FolderItem_Drop">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Grid.Column="0"
+                                  Glyph="&#xE8B7;"
+                                  FontSize="16"
+                                  Margin="0,0,12,0"
+                                  VerticalAlignment="Center"
+                                  CanDrag="False"/>
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding}"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"
+                                   FontSize="14"
+                                   CanDrag="False"/>
+                        <!-- Drag handle: Moved to the right -->
+                        <FontIcon Grid.Column="2"
+                                  Glyph="&#xE76F;"
+                                  FontFamily="Segoe MDL2 Assets"
+                                  FontSize="12"
+                                  Opacity="0.6"
+                                  Margin="12,0,8,0"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center"
+                                  CanDrag="True"
+                                  DragStarting="FolderItem_DragStarting"
+                                  ToolTipService.ToolTip="Drag to move folder"/>
+                    </Grid>
+                </DataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+    </StackPanel>
+</UserControl>

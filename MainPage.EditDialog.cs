@@ -55,8 +55,7 @@ namespace FluentTaskScheduler
             EditTaskEnabled.IsOn = ViewModel.SelectedTask.IsEnabled;
             
             // Triggers
-            _tempTriggers = new ObservableCollection<TaskTriggerModel>(ViewModel.SelectedTask.TriggersList);
-            TriggerList.ItemsSource = _tempTriggers;
+            TriggerEditor.EditedTriggers = new ObservableCollection<TaskTriggerModel>(ViewModel.SelectedTask.TriggersList);
             
             // Actions
             _tempActions = new ObservableCollection<TaskActionModel>(ViewModel.SelectedTask.Actions);
@@ -100,26 +99,8 @@ namespace FluentTaskScheduler
             EditTaskRestartInterval.Text = ViewModel.SelectedTask.RestartInterval;
             if (EditTaskRestartCount != null) EditTaskRestartCount.Value = ViewModel.SelectedTask.RestartCount;
 
-            // Expiration
-            DateTime? expirationDate = ViewModel.SelectedTask.TriggersList.FirstOrDefault()?.ExpirationDate;
-            bool hasExpiration = expirationDate.HasValue;
-            EditTaskExpires.IsChecked = hasExpiration;
-            EditTaskExpirationDate.Date = hasExpiration ? expirationDate!.Value.Date : DateTime.Today;
-            EditTaskExpirationTime.Time = hasExpiration ? expirationDate!.Value.TimeOfDay : DateTime.Now.TimeOfDay;
-            EditTaskExpirationDate.IsEnabled = hasExpiration;
-            EditTaskExpirationTime.IsEnabled = hasExpiration;
-
             // Stop task if runs longer than
-            bool hasStopAfter = !string.IsNullOrWhiteSpace(ViewModel.SelectedTask.StopIfRunsLongerThan);
-            EditTaskStopAfter.IsChecked = hasStopAfter;
-            EditTaskStopAfterVal.IsEnabled = hasStopAfter;
-            if (hasStopAfter)
-            {
-                bool matchedStopAfter = false;
-                foreach (var item in EditTaskStopAfterVal.Items.Cast<Microsoft.UI.Xaml.Controls.ComboBoxItem>())
-                    if (item.Tag?.ToString() == ViewModel.SelectedTask.StopIfRunsLongerThan) { EditTaskStopAfterVal.SelectedItem = item; matchedStopAfter = true; break; }
-                if (!matchedStopAfter) EditTaskStopAfterVal.Text = ViewModel.SelectedTask.StopIfRunsLongerThan;
-            }
+            TriggerEditor.SetStopAfter(ViewModel.SelectedTask.StopIfRunsLongerThan);
             // All settings mapped
             
             PopulateNetworkList();
@@ -161,10 +142,9 @@ namespace FluentTaskScheduler
             // SelectedItem, so it must be read from .Text — falling back to the preset's Tag only
             // silently replaced any custom duration with 72h (see 1.4).
             string stopAfterValue = "";
-            if (EditTaskStopAfter.IsChecked == true)
+            if (TriggerEditor.IsStopAfterEnabled)
             {
-                stopAfterValue = (EditTaskStopAfterVal.SelectedItem as Microsoft.UI.Xaml.Controls.ComboBoxItem)?.Tag?.ToString()
-                    ?? EditTaskStopAfterVal.Text?.Trim() ?? "";
+                stopAfterValue = TriggerEditor.StopAfterValue;
                 if (string.IsNullOrWhiteSpace(stopAfterValue) || !TryParseIsoDuration(stopAfterValue, out _))
                 {
                     EditTaskErrorBar.Message = string.Format(
@@ -177,7 +157,7 @@ namespace FluentTaskScheduler
 
             // Random delay is validated per-trigger here rather than silently discarded on a parse
             // failure (see 1.3).
-            foreach (var trig in _tempTriggers)
+            foreach (var trig in TriggerEditor.EditedTriggers)
             {
                 if (!string.IsNullOrWhiteSpace(trig.RandomDelay) && !TryParseIsoDuration(trig.RandomDelay, out _))
                 {
@@ -221,7 +201,7 @@ namespace FluentTaskScheduler
                 Category = EditTaskCategory.Text,
                 Tags = new ObservableCollection<string>(EditTaskTags.Text.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)),
                 Actions = new ObservableCollection<TaskActionModel>(_tempActions),
-                TriggersList = new ObservableCollection<TaskTriggerModel>(_tempTriggers),
+                TriggersList = new ObservableCollection<TaskTriggerModel>(TriggerEditor.EditedTriggers),
                 // Map Settings
                 OnlyIfIdle = EditTaskOnlyIfIdle.IsChecked == true,
                 IdleDuration = EditTaskIdleDurationSetting.Text ?? "",

@@ -33,7 +33,6 @@ namespace FluentTaskScheduler
         
         // Dialog State
         private ObservableCollection<TaskActionModel> _tempActions = new();
-        private ObservableCollection<TaskTriggerModel> _tempTriggers = new();
         private bool _isPopulatingDetails = false;
 
         /// <summary>Pipeline being edited in the currently open task dialog.</summary>
@@ -41,7 +40,6 @@ namespace FluentTaskScheduler
         
         // Current folder path for new task creation
         private string _currentFolderPath = "\\";
-        private Dictionary<string, bool> _folderExpandedState = new();
 
         public static MainPage? Current { get; private set; }
 
@@ -49,6 +47,8 @@ namespace FluentTaskScheduler
         {
             Current = this;
             this.InitializeComponent();
+            WireFolderTree();
+            TriggerEditor.SelectedTriggerChanged += TriggerEditor_SelectedTriggerChanged;
             this.Loaded += MainPage_Loaded;
             this.Unloaded += MainPage_Unloaded;
             LocalizationService.LanguageChanged += LocalizationService_LanguageChanged;
