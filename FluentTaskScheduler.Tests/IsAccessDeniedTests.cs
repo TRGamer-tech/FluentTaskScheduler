@@ -16,14 +16,14 @@ namespace FluentTaskScheduler.Tests
             var ex = new UnauthorizedAccessException("some message");
             typeof(Exception).GetProperty(nameof(Exception.HResult))!.SetValue(ex, E_ACCESSDENIED);
 
-            Assert.True(TaskServiceWrapper.IsAccessDenied(ex));
+            Assert.True(TaskSchedulerErrors.IsAccessDenied(ex));
         }
 
         [Fact]
         public void ReturnsTrue_ForComExceptionWithAccessDeniedErrorCode()
         {
             var ex = new COMException("Zugriff verweigert auf Japanisch oder sonst was", E_ACCESSDENIED);
-            Assert.True(TaskServiceWrapper.IsAccessDenied(ex));
+            Assert.True(TaskSchedulerErrors.IsAccessDenied(ex));
         }
 
         [Fact]
@@ -32,20 +32,20 @@ namespace FluentTaskScheduler.Tests
             var inner = new COMException("inner", E_ACCESSDENIED);
             var outer = new InvalidOperationException("outer", inner);
 
-            Assert.True(TaskServiceWrapper.IsAccessDenied(outer));
+            Assert.True(TaskSchedulerErrors.IsAccessDenied(outer));
         }
 
         [Fact]
         public void ReturnsFalse_ForUnrelatedException()
         {
             var ex = new InvalidOperationException("Something else went wrong");
-            Assert.False(TaskServiceWrapper.IsAccessDenied(ex));
+            Assert.False(TaskSchedulerErrors.IsAccessDenied(ex));
         }
 
         [Fact]
         public void ReturnsFalse_ForNull()
         {
-            Assert.False(TaskServiceWrapper.IsAccessDenied(null));
+            Assert.False(TaskSchedulerErrors.IsAccessDenied(null));
         }
 
         [Fact]
@@ -55,7 +55,7 @@ namespace FluentTaskScheduler.Tests
             // the message text. A message that happens to contain similar wording but a completely
             // unrelated HResult must NOT be treated as access-denied.
             var ex = new Exception("Access is denied") { HResult = unchecked((int)0x80004005) }; // E_FAIL
-            Assert.False(TaskServiceWrapper.IsAccessDenied(ex));
+            Assert.False(TaskSchedulerErrors.IsAccessDenied(ex));
         }
     }
 }

@@ -1796,10 +1796,11 @@ namespace FluentTaskScheduler
             if (EditTaskRestartCount != null) EditTaskRestartCount.Value = ViewModel.SelectedTask.RestartCount;
 
             // Expiration
-            bool hasExpiration = ViewModel.SelectedTask.ExpirationDate.HasValue;
+            DateTime? expirationDate = ViewModel.SelectedTask.TriggersList.FirstOrDefault()?.ExpirationDate;
+            bool hasExpiration = expirationDate.HasValue;
             EditTaskExpires.IsChecked = hasExpiration;
-            EditTaskExpirationDate.Date = hasExpiration ? ViewModel.SelectedTask.ExpirationDate!.Value.Date : DateTime.Today;
-            EditTaskExpirationTime.Time = hasExpiration ? ViewModel.SelectedTask.ExpirationDate!.Value.TimeOfDay : DateTime.Now.TimeOfDay;
+            EditTaskExpirationDate.Date = hasExpiration ? expirationDate!.Value.Date : DateTime.Today;
+            EditTaskExpirationTime.Time = hasExpiration ? expirationDate!.Value.TimeOfDay : DateTime.Now.TimeOfDay;
             EditTaskExpirationDate.IsEnabled = hasExpiration;
             EditTaskExpirationTime.IsEnabled = hasExpiration;
 
@@ -1944,7 +1945,14 @@ namespace FluentTaskScheduler
                 StopIfRunsLongerThan = stopAfterValue
             };
 
-            model.ExpirationDate = EditTaskExpires.IsChecked == true
+            // Expiration is edited as a single value and applies to the first trigger.
+            var expirationTarget = model.TriggersList.FirstOrDefault();
+            if (expirationTarget == null)
+            {
+                expirationTarget = new TaskTriggerModel();
+                model.TriggersList.Add(expirationTarget);
+            }
+            expirationTarget.ExpirationDate = EditTaskExpires.IsChecked == true
                 ? EditTaskExpirationDate.Date.Date + EditTaskExpirationTime.Time
                 : (DateTime?)null;
 

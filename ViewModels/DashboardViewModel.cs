@@ -749,7 +749,7 @@ namespace FluentTaskScheduler.ViewModels
 
             foreach (var task in runningTasks)
             {
-                var actionCmd = task.ActionCommand;
+                var actionCmd = task.Actions.FirstOrDefault()?.Command ?? "";
                 var processName = !string.IsNullOrEmpty(actionCmd) ? System.IO.Path.GetFileNameWithoutExtension(actionCmd.Trim('"')) : "";
                 var processAlive = false;
                 var processStatus = LocalizationService.GetString("Dashboard.Unknown", "Unknown");

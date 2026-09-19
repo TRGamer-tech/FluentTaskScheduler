@@ -156,7 +156,7 @@ namespace FluentTaskScheduler.Services
             {
                 if (!TryClaimRecord(record.RecordId)) return;
 
-                var data = TaskServiceWrapper.ReadEventData(record);
+                var data = TaskEventLogService.ReadEventData(record);
                 if (!data.TryGetValue("TaskName", out var taskPath) || string.IsNullOrWhiteSpace(taskPath)) return;
 
                 bool succeeded;

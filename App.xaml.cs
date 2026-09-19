@@ -70,6 +70,11 @@ namespace FluentTaskScheduler
         {
             var services = new ServiceCollection();
             services.AddSingleton<ISettingsService, Services.SettingsService>();
+            services.AddSingleton<TaskSchedulerConnection>();
+            services.AddSingleton<ITaskEventLogService, TaskEventLogService>();
+            services.AddSingleton<ITaskCrudService, TaskCrudService>();
+            services.AddSingleton<IFolderService, FolderService>();
+            services.AddSingleton<ITaskXmlImportExportService, TaskXmlImportExportService>();
             services.AddSingleton<ITaskService, Services.TaskServiceWrapper>();
             Container = services.BuildServiceProvider();
         }
