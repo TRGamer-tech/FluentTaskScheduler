@@ -106,6 +106,12 @@ public sealed class FakeNetworkProfiles(params NetworkProfile[] profiles) : INet
     public IReadOnlyList<NetworkProfile> GetAll() => profiles;
 }
 
+public sealed class FakeClipboard : IClipboard
+{
+    public string? Text { get; private set; }
+    public void SetText(string text) => Text = text;
+}
+
 /// <summary>A snooze that is on or off as the test says, and remembers the runs it refused.</summary>
 public sealed class FakeSnoozeGate : ISnoozeGate
 {
