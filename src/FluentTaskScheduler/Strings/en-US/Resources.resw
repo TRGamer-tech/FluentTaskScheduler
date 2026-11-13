@@ -845,5 +845,10 @@ Restart now to apply the update?</value></data>
   <data name="Main.Toolbar.SortedByFormat" xml:space="preserve"><value>Sorted by {0}, {1}</value></data>
   <data name="Main.Sort.Ascending" xml:space="preserve"><value>ascending</value></data>
   <data name="Main.Sort.Descending" xml:space="preserve"><value>descending</value></data>
+  <data name="Trigger.Kind.Registration" xml:space="preserve"><value>when the task is created or changed</value></data>
+  <data name="Trigger.Kind.Custom" xml:space="preserve"><value>custom</value></data>
+  <data name="Action.Kind.ComHandler" xml:space="preserve"><value>COM handler {0}</value></data>
+  <data name="Action.Kind.SendEmail" xml:space="preserve"><value>send an email</value></data>
+  <data name="Action.Kind.ShowMessage" xml:space="preserve"><value>display a message</value></data>
 </root>
 

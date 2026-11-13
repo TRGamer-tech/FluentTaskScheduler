@@ -36,4 +36,13 @@ public class TaskDraftReaderTests
         Assert.Equal(DateTimeKind.Unspecified, draft.Start?.Kind);
         Assert.Null(draft.End);
     }
+
+    /// <summary>Without resources a text shows its resource name, which is what this test reads.</summary>
+    [Fact]
+    public void KindsTheEditorCannotChange_AreNamedInTheAppsWords_NotByTheLibrarysNames()
+    {
+        Assert.Equal("Trigger.Kind.Registration", TaskDraftReader.Read(new RegistrationTrigger(), 0).UnsupportedSummary);
+        Assert.Equal("Action.Kind.ShowMessage", TaskDraftReader.Read(new ShowMessageAction("Backup done", "Backup"), 0).UnsupportedSummary);
+        Assert.Equal("Action.Kind.ComHandler", TaskDraftReader.Read(new ComHandlerAction(Guid.NewGuid(), ""), 0).UnsupportedSummary);
+    }
 }

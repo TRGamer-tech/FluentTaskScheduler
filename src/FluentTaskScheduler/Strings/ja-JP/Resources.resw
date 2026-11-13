@@ -845,4 +845,9 @@
   <data name="Main.Toolbar.SortedByFormat" xml:space="preserve"><value>{0}で並べ替え ({1})</value></data>
   <data name="Main.Sort.Ascending" xml:space="preserve"><value>昇順</value></data>
   <data name="Main.Sort.Descending" xml:space="preserve"><value>降順</value></data>
+  <data name="Trigger.Kind.Registration" xml:space="preserve"><value>タスクの作成時または変更時</value></data>
+  <data name="Trigger.Kind.Custom" xml:space="preserve"><value>カスタム</value></data>
+  <data name="Action.Kind.ComHandler" xml:space="preserve"><value>COM ハンドラー {0}</value></data>
+  <data name="Action.Kind.SendEmail" xml:space="preserve"><value>電子メールの送信</value></data>
+  <data name="Action.Kind.ShowMessage" xml:space="preserve"><value>メッセージの表示</value></data>
 </root>

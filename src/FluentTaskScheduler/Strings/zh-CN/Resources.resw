@@ -846,6 +846,11 @@
   <data name="Main.Toolbar.SortedByFormat" xml:space="preserve"><value>按{0}排序（{1}）</value></data>
   <data name="Main.Sort.Ascending" xml:space="preserve"><value>升序</value></data>
   <data name="Main.Sort.Descending" xml:space="preserve"><value>降序</value></data>
+  <data name="Trigger.Kind.Registration" xml:space="preserve"><value>创建或修改任务时</value></data>
+  <data name="Trigger.Kind.Custom" xml:space="preserve"><value>自定义</value></data>
+  <data name="Action.Kind.ComHandler" xml:space="preserve"><value>COM 处理程序 {0}</value></data>
+  <data name="Action.Kind.SendEmail" xml:space="preserve"><value>发送电子邮件</value></data>
+  <data name="Action.Kind.ShowMessage" xml:space="preserve"><value>显示消息</value></data>
 </root>
 
 

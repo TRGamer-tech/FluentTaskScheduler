@@ -1,3 +1,4 @@
+using FluentTaskScheduler.Localization;
 using Microsoft.Win32.TaskScheduler;
 using ScheduledTask = Microsoft.Win32.TaskScheduler.Task;
 using TaskAction = Microsoft.Win32.TaskScheduler.Action;
@@ -93,9 +94,17 @@ internal static class TaskDraftReader
             IdleTrigger => draft with { Type = TriggerType.OnIdle },
             EventTrigger t => draft with { Type = TriggerType.Event, EventSubscription = t.Subscription ?? "" },
             SessionStateChangeTrigger t => draft with { Type = TriggerType.SessionStateChange, SessionChange = t.StateChange },
-            _ => draft with { Type = TriggerType.Unsupported, UnsupportedSummary = trigger.TriggerType.ToString() }
+            _ => draft with { Type = TriggerType.Unsupported, UnsupportedSummary = KindText(trigger.TriggerType) }
         };
     }
+
+    // Windows' own tasks use these kinds a lot; one without a text of its own keeps the library's name.
+    private static string KindText(TaskTriggerType type) => type switch
+    {
+        TaskTriggerType.Registration => Loc.Get("Trigger.Kind.Registration"),
+        TaskTriggerType.Custom => Loc.Get("Trigger.Kind.Custom"),
+        _ => type.ToString()
+    };
 
     /// <summary>
     /// A boundary stored in UTC (Task Scheduler's "synchronize across time zones") comes back from
@@ -113,8 +122,15 @@ internal static class TaskDraftReader
             Arguments = exec.Arguments ?? "",
             WorkingDirectory = exec.WorkingDirectory ?? ""
         },
-        ComHandlerAction com => new ActionDraft { SourceIndex = index, UnsupportedSummary = $"{action.ActionType} {com.ClassId:B}" },
-        _ => new ActionDraft { SourceIndex = index, UnsupportedSummary = action.ActionType.ToString() }
+        ComHandlerAction com => new ActionDraft { SourceIndex = index, UnsupportedSummary = Loc.Format("Action.Kind.ComHandler", com.ClassId.ToString("B")) },
+        _ => new ActionDraft { SourceIndex = index, UnsupportedSummary = KindText(action.ActionType) }
+    };
+
+    private static string KindText(TaskActionType type) => type switch
+    {
+        TaskActionType.SendEmail => Loc.Get("Action.Kind.SendEmail"),
+        TaskActionType.ShowMessage => Loc.Get("Action.Kind.ShowMessage"),
+        _ => type.ToString()
     };
 
     /// <summary>Days 1 to 31 as a bit mask: bit 0 is the 1st.</summary>

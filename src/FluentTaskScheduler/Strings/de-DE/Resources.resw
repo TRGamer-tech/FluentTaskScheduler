@@ -845,4 +845,9 @@ Jetzt App neustarten?</value></data>
   <data name="Main.Toolbar.SortedByFormat" xml:space="preserve"><value>Sortierung: {0}, {1}</value></data>
   <data name="Main.Sort.Ascending" xml:space="preserve"><value>aufsteigend</value></data>
   <data name="Main.Sort.Descending" xml:space="preserve"><value>absteigend</value></data>
+  <data name="Trigger.Kind.Registration" xml:space="preserve"><value>bei Erstellung oder Änderung der Aufgabe</value></data>
+  <data name="Trigger.Kind.Custom" xml:space="preserve"><value>benutzerdefiniert</value></data>
+  <data name="Action.Kind.ComHandler" xml:space="preserve"><value>COM-Handler {0}</value></data>
+  <data name="Action.Kind.SendEmail" xml:space="preserve"><value>E-Mail senden</value></data>
+  <data name="Action.Kind.ShowMessage" xml:space="preserve"><value>Meldung anzeigen</value></data>
 </root>
