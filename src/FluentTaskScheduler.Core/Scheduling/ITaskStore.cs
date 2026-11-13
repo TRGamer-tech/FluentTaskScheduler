@@ -36,6 +36,8 @@ public interface ITaskStore
     /// <param name="password">The password of the task's account; only needed when Windows stores one for the task.</param>
     /// <returns>The path of the saved task.</returns>
     /// <exception cref="TaskExistsException">A new task, or a task renamed, would take the place of another task.</exception>
+    /// <exception cref="TaskAccessDeniedException">Windows refused the change; for a rename this includes removing the task under its old name.</exception>
+    /// <exception cref="TaskDuplicatedException">A rename could neither remove the task under its old name nor take back the new copy.</exception>
     string Save(TaskDraft draft, string folderPath, string? originalPath = null, string? password = null);
 
     void SetEnabled(string path, bool enabled);
@@ -95,6 +97,23 @@ public sealed class TaskExistsException : InvalidOperationException
 {
     public string Path { get; }
     public TaskExistsException(string path, Exception? inner = null) : base($"There is already a task '{path}'.", inner) => Path = path;
+}
+
+/// <summary>
+/// A task was registered again at a new path, for a rename or a move, and then neither the
+/// original nor the new copy could be removed: the task now exists, and runs, twice.
+/// </summary>
+public sealed class TaskDuplicatedException : InvalidOperationException
+{
+    public string Path { get; }
+    public string CopyPath { get; }
+
+    public TaskDuplicatedException(string path, string copyPath, Exception inner)
+        : base($"The task '{path}' was copied to '{copyPath}', but neither of the two could be removed. Both exist now.", inner)
+    {
+        Path = path;
+        CopyPath = copyPath;
+    }
 }
 
 /// <summary>Windows refused the operation: the task is protected, or the change needs administrator rights.</summary>

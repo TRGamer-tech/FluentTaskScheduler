@@ -1,5 +1,7 @@
 using System.Security.Principal;
+using FluentTaskScheduler.Scheduling;
 using Microsoft.Win32.TaskScheduler;
+using ScheduledTask = Microsoft.Win32.TaskScheduler.Task;
 
 namespace FluentTaskScheduler.Tests.Integration;
 
@@ -9,6 +11,12 @@ namespace FluentTaskScheduler.Tests.Integration;
 /// </summary>
 public sealed class SchedulerSandbox : IDisposable
 {
+    // Everyone may do anything with the task except delete it, as with some of Windows' own tasks.
+    private const string NoDeleting = "D:(D;;SD;;;WD)(A;;FA;;;WD)";
+    private const string Deletable = "D:(A;;FA;;;WD)";
+
+    private readonly List<ScheduledTask> _undeletable = [];
+
     public TaskService Service { get; } = new();
     public TaskFolder Folder { get; }
     public string FolderPath { get; }
@@ -39,16 +47,39 @@ public sealed class SchedulerSandbox : IDisposable
 
     public string PathOf(string taskName) => FolderPath + "\\" + taskName;
 
+    /// <summary>Registers a simple task in <paramref name="folder"/> that nobody may delete until the sandbox is disposed.</summary>
+    public ScheduledTask RegisterUndeletable(TaskFolder folder, string name)
+    {
+        var task = folder.RegisterTaskDefinition(name, SampleTasks.Simple(Service), TaskCreation.CreateOrUpdate, null, null, TaskLogonType.InteractiveToken, NoDeleting);
+        _undeletable.Add(task);
+        Assert.True(TaskSchedulerErrors.IsAccessDenied(Record.Exception(() => folder.DeleteTask(name))),
+            "Task Scheduler deleted a task whose security descriptor denies that, so the test proves nothing.");
+        return task;
+    }
+
     public void Dispose()
     {
         try
         {
+            foreach (var task in _undeletable) AllowDeleting(task);
             DeleteRecursive(Folder);
             Service.RootFolder.DeleteFolder(FolderPath.TrimStart('\\'), exceptionOnNotExists: false);
         }
         finally
         {
             Service.Dispose();
+        }
+    }
+
+    private static void AllowDeleting(ScheduledTask task)
+    {
+        try
+        {
+            task.SetSecurityDescriptorSddlForm(Deletable);
+        }
+        catch (Exception ex) when (ex is FileNotFoundException or DirectoryNotFoundException)
+        {
+            // The test removed it already.
         }
     }
 

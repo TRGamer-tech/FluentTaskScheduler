@@ -58,6 +58,38 @@ internal static class TaskRegistration
             throw new TaskExistsException(TaskPaths.Combine(folder.Path, name), ex);
         }
     }
+
+    /// <summary>
+    /// The second half of a rename or a move: Task Scheduler can do neither, so the task has been
+    /// registered again as <paramref name="copyName"/> in <paramref name="copyFolder"/>, and the
+    /// original goes now. If it cannot be removed, the copy is taken back instead, so that the task
+    /// stays where it was rather than running twice. An original that is gone already is fine.
+    /// </summary>
+    /// <exception cref="TaskAccessDeniedException">Windows refused to remove the original.</exception>
+    /// <exception cref="TaskDuplicatedException">Neither the original nor the copy could be removed.</exception>
+    public static void RemoveOriginal(TaskFolder folder, string name, TaskFolder copyFolder, string copyName)
+    {
+        try
+        {
+            folder.DeleteTask(name, exceptionOnNotExists: false);
+        }
+        catch (Exception ex)
+        {
+            string path = TaskPaths.Combine(folder.Path, name);
+            try
+            {
+                copyFolder.DeleteTask(copyName, exceptionOnNotExists: false);
+            }
+            catch (Exception rollback)
+            {
+                string copyPath = TaskPaths.Combine(copyFolder.Path, copyName);
+                Serilog.Log.Error(rollback, "Task {Path} could not be removed, and neither could its copy {Copy}", path, copyPath);
+                throw new TaskDuplicatedException(path, copyPath, ex);
+            }
+            if (TaskSchedulerErrors.IsAccessDenied(ex)) throw new TaskAccessDeniedException(path, ex);
+            throw;
+        }
+    }
 }
 
 /// <summary>Paths of tasks and folders in Task Scheduler: backslash-separated, "\" for the root.</summary>

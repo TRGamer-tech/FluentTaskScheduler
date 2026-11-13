@@ -146,39 +146,13 @@ public sealed class TaskStore : ITaskStore
         {
             string interim = $"{draft.Name} ({Guid.NewGuid().ToString("N")[..8]})";
             Register(interim, TaskCreation.Create);
-            DeleteAfterRename(folder, oldName, interim);
+            TaskRegistration.RemoveOriginal(folder, oldName, folder, interim);
             oldName = interim;
         }
 
         ScheduledTask renamed = Register(draft.Name, TaskCreation.Create);
-        DeleteAfterRename(folder, oldName, draft.Name);
+        TaskRegistration.RemoveOriginal(folder, oldName, folder, draft.Name);
         return renamed.Path;
-    }
-
-    /// <summary>
-    /// A rename registers the task under the new name first and removes the old one afterwards.
-    /// If the old one cannot be removed, the new copy is taken back so the task does not end up twice.
-    /// </summary>
-    private static void DeleteAfterRename(TaskFolder folder, string oldName, string newName)
-    {
-        try
-        {
-            folder.DeleteTask(oldName);
-        }
-        catch (Exception ex)
-        {
-            try
-            {
-                folder.DeleteTask(newName);
-            }
-            catch (Exception rollback)
-            {
-                throw new AggregateException(
-                    $"The task was saved as '{newName}', but the old task '{oldName}' could not be removed, and neither could the new copy. Both exist now.",
-                    ex, rollback);
-            }
-            throw new InvalidOperationException($"The task could not be renamed because '{oldName}' could not be removed: {ex.Message}", ex);
-        }
     }
 
     public void SetEnabled(string path, bool enabled)

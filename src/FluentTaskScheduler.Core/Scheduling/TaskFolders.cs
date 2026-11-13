@@ -1,3 +1,4 @@
+using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.TaskScheduler;
 
@@ -18,13 +19,17 @@ public interface ITaskFolders
     /// <summary>Moves a task into another folder.</summary>
     /// <returns>The task's new path.</returns>
     /// <exception cref="TaskExistsException">The folder already has a task of that name.</exception>
+    /// <exception cref="TaskAccessDeniedException">Windows refused a part of the move; the task is where it was.</exception>
+    /// <exception cref="TaskDuplicatedException">The task could be removed neither from its folder nor from the new one.</exception>
     string MoveTask(string taskPath, string folderPath);
 
     /// <summary>
     /// Moves a folder with everything in it to <paramref name="newPath"/>; giving it a new name in
-    /// the same place is a rename.
+    /// the same place is a rename. A task that cannot be removed from the folder stays there, and
+    /// so does the folder; everything else moves, and the first such failure is thrown.
     /// </summary>
     /// <exception cref="InvalidOperationException">There is already a folder at the new path, or the new path lies inside the folder.</exception>
+    /// <exception cref="TaskAccessDeniedException">Windows refused a part of the move.</exception>
     void MoveFolder(string path, string newPath);
 }
 
@@ -77,10 +82,17 @@ public sealed class TaskFolders : ITaskFolders
         var task = service.GetTask(taskPath) ?? throw new TaskNotFoundException(taskPath);
         if (string.Equals(task.Folder.Path, folderPath, StringComparison.OrdinalIgnoreCase)) return task.Path;
 
-        TaskFolder target = TaskPaths.GetOrCreateFolder(service, folderPath);
-        Copy(task, target);
-        task.Folder.DeleteTask(task.Name);
-        return TaskPaths.Combine(target.Path, task.Name);
+        try
+        {
+            TaskFolder target = TaskPaths.GetOrCreateFolder(service, folderPath);
+            Copy(task, target);
+            TaskRegistration.RemoveOriginal(task.Folder, task.Name, target, task.Name);
+            return TaskPaths.Combine(target.Path, task.Name);
+        }
+        catch (Exception ex) when (IsRawAccessDenied(ex))
+        {
+            throw new TaskAccessDeniedException(taskPath, ex);
+        }
     }
 
     public void MoveFolder(string path, string newPath)
@@ -103,23 +115,48 @@ public sealed class TaskFolders : ITaskFolders
         TaskFolder source = Find(service, path);
         if (Exists(service, newPath)) throw new InvalidOperationException($"There is already a folder '{newPath}'.");
 
-        TaskFolder target = TaskPaths.GetOrCreateFolder(service, newPath);
         try
         {
-            CopyContent(source, target);
-        }
-        catch
-        {
-            // Nothing was removed from the source yet. Take back the partial copy, so that the
-            // failed move leaves no duplicates behind.
-            try { DeleteWithContent(target); }
-            catch (Exception cleanup) when (cleanup is COMException or UnauthorizedAccessException or IOException)
+            TaskFolder target = TaskPaths.GetOrCreateFolder(service, newPath);
+            var copied = new List<(TaskFolder Folder, string Name, TaskFolder CopyFolder)>();
+            try
             {
-                Serilog.Log.Warning(cleanup, "The partial copy in {Folder} could not be removed", newPath);
+                CopyContent(source, target, copied);
             }
-            throw;
+            catch
+            {
+                // Nothing was removed from the source yet. Take back the partial copy, so that the
+                // failed move leaves no duplicates behind.
+                try { DeleteWithContent(target); }
+                catch (Exception cleanup) when (cleanup is COMException or UnauthorizedAccessException or IOException)
+                {
+                    Serilog.Log.Warning(cleanup, "The partial copy in {Folder} could not be removed", newPath);
+                }
+                throw;
+            }
+
+            // Every original goes now that its copy is in place. One that cannot be removed keeps
+            // its place and loses its copy instead, and the others still move.
+            Exception? failure = null;
+            foreach (var (folder, name, copyFolder) in copied)
+            {
+                try
+                {
+                    TaskRegistration.RemoveOriginal(folder, name, copyFolder, name);
+                }
+                catch (Exception ex)
+                {
+                    Serilog.Log.Warning(ex, "Task {Name} could not be moved and stays in {Folder}", name, folder.Path);
+                    failure ??= ex;
+                }
+            }
+            RemoveIfEmpty(source);
+            if (failure is not null) ExceptionDispatchInfo.Throw(failure);
         }
-        DeleteWithContent(source);
+        catch (Exception ex) when (IsRawAccessDenied(ex))
+        {
+            throw new TaskAccessDeniedException(path, ex);
+        }
     }
 
     private static void Collect(TaskFolder folder, List<string> paths)
@@ -138,10 +175,15 @@ public sealed class TaskFolders : ITaskFolders
         foreach (TaskFolder subFolder in subFolders) Collect(subFolder, paths);
     }
 
-    private static void CopyContent(TaskFolder source, TaskFolder target)
+    /// <summary>Copies everything in <paramref name="source"/> to <paramref name="target"/> and notes each task copied, with the folder its copy is in.</summary>
+    private static void CopyContent(TaskFolder source, TaskFolder target, List<(TaskFolder Folder, string Name, TaskFolder CopyFolder)> copied)
     {
-        foreach (var task in source.Tasks.ToList()) Copy(task, target);
-        foreach (TaskFolder sub in source.SubFolders.ToList()) CopyContent(sub, target.CreateFolder(sub.Name));
+        foreach (var task in source.Tasks.ToList())
+        {
+            Copy(task, target);
+            copied.Add((source, task.Name, target));
+        }
+        foreach (TaskFolder sub in source.SubFolders.ToList()) CopyContent(sub, target.CreateFolder(sub.Name), copied);
     }
 
     /// <exception cref="TaskExistsException">The target folder already has a task of that name; it is left as it is.</exception>
@@ -158,6 +200,16 @@ public sealed class TaskFolders : ITaskFolders
         foreach (TaskFolder sub in folder.SubFolders.ToList()) DeleteWithContent(sub);
         folder.Parent.DeleteFolder(folder.Name);
     }
+
+    /// <summary>Removes <paramref name="folder"/> and the folders in it that hold nothing any more; one that still holds a task stays.</summary>
+    private static void RemoveIfEmpty(TaskFolder folder)
+    {
+        foreach (TaskFolder sub in folder.SubFolders.ToList()) RemoveIfEmpty(sub);
+        if (folder.Tasks.Count == 0 && folder.SubFolders.Count == 0) folder.Parent.DeleteFolder(folder.Name);
+    }
+
+    /// <summary>Access denied as Windows raises it, not yet turned into a <see cref="TaskAccessDeniedException"/>.</summary>
+    private static bool IsRawAccessDenied(Exception ex) => ex is UnauthorizedAccessException or COMException && TaskSchedulerErrors.IsAccessDenied(ex);
 
     private static TaskFolder Find(TaskService service, string path) =>
         Exists(service, path) ? service.GetFolder(path) : throw new DirectoryNotFoundException($"The folder '{path}' does not exist.");

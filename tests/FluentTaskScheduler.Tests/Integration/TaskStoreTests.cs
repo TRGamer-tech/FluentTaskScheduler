@@ -137,6 +137,19 @@ public class TaskStoreTests
     }
 
     [SkippableFact]
+    public void RenamingATaskThatMayNotBeRemoved_LeavesItAsItWas_WithoutACopy()
+    {
+        Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
+        using var sandbox = new SchedulerSandbox();
+        var task = sandbox.RegisterUndeletable(sandbox.Folder, "Kept");
+
+        Assert.Throws<TaskAccessDeniedException>(() => _store.Save(_store.Load(task.Path) with { Name = "Renamed" }, sandbox.FolderPath, task.Path));
+
+        Assert.True(_store.Exists(task.Path));
+        Assert.False(_store.Exists(sandbox.PathOf("Renamed")));
+    }
+
+    [SkippableFact]
     public void ChangingOnlyTheCaseOfItsName_RenamesTheTask()
     {
         Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");

@@ -58,6 +58,36 @@ public class TaskFoldersTests
     }
 
     [SkippableFact]
+    public void ATaskThatMayNotBeRemovedFromItsFolder_IsNotMoved_AndLeavesNoCopy()
+    {
+        Skip.IfNot(SchedulerSandbox.IsElevated, NeedsElevation);
+        using var sandbox = new SchedulerSandbox();
+        var task = sandbox.RegisterUndeletable(sandbox.Folder, "Kept");
+
+        Assert.Throws<TaskAccessDeniedException>(() => _folders.MoveTask(task.Path, sandbox.FolderPath + @"\Target"));
+
+        Assert.True(_store.Exists(task.Path));
+        Assert.False(_store.Exists(sandbox.FolderPath + @"\Target\Kept"));
+    }
+
+    [SkippableFact]
+    public void MovingAFolder_LeavesATaskThatMayNotBeRemoved_AndMovesTheRest()
+    {
+        Skip.IfNot(SchedulerSandbox.IsElevated, NeedsElevation);
+        using var sandbox = new SchedulerSandbox();
+        var old = sandbox.Folder.CreateFolder("Old");
+        old.RegisterTaskDefinition("Free", SampleTasks.Simple(sandbox.Service));
+        sandbox.RegisterUndeletable(old, "Kept");
+
+        Assert.Throws<TaskAccessDeniedException>(() => _folders.MoveFolder(sandbox.FolderPath + @"\Old", sandbox.FolderPath + @"\New"));
+
+        Assert.True(_store.Exists(sandbox.FolderPath + @"\New\Free"));
+        Assert.False(_store.Exists(sandbox.FolderPath + @"\Old\Free"));
+        Assert.True(_store.Exists(sandbox.FolderPath + @"\Old\Kept"));
+        Assert.False(_store.Exists(sandbox.FolderPath + @"\New\Kept"));
+    }
+
+    [SkippableFact]
     public void RenamingAFolder_TakesItsTasksAndSubFoldersAlong()
     {
         Skip.IfNot(SchedulerSandbox.IsElevated, NeedsElevation);
