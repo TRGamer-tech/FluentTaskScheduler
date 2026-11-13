@@ -94,14 +94,22 @@ public class ImportTaskViewModelTests
     }
 
     [Theory]
-    [InlineData(true, 2, false, false)]
-    [InlineData(false, 2, false, true)]
-    [InlineData(false, 1, true, true)]
-    [InlineData(false, 1, false, false)]
-    public void WhatNeedsAdministratorRights_IsFlaggedWhenTheAppHasNone(bool elevated, int accountIndex, bool highest, bool expected)
+    [InlineData(true, TaskAccountKind.CurrentUser, 2, false, false)]
+    [InlineData(false, TaskAccountKind.CurrentUser, 2, false, true)]
+    [InlineData(false, TaskAccountKind.CurrentUser, 1, true, true)]
+    [InlineData(false, TaskAccountKind.CurrentUser, 1, false, false)]
+    [InlineData(false, TaskAccountKind.CurrentUser, 0, false, false)]
+    [InlineData(false, TaskAccountKind.User, 0, false, false)]
+    [InlineData(false, TaskAccountKind.System, 0, false, true)]
+    [InlineData(false, TaskAccountKind.LocalService, 0, false, true)]
+    [InlineData(false, TaskAccountKind.NetworkService, 0, false, true)]
+    [InlineData(false, TaskAccountKind.Group, 0, false, true)]
+    [InlineData(false, TaskAccountKind.System, 1, false, false)]
+    [InlineData(true, TaskAccountKind.System, 0, false, false)]
+    public void WhatNeedsAdministratorRights_IsFlaggedWhenTheAppHasNone(bool elevated, TaskAccountKind exported, int accountIndex, bool highest, bool expected)
     {
         _app.IsElevated = elevated;
-        var import = Import(Info(TaskAccount.CurrentUser));
+        var import = Import(Info(new TaskAccount(exported, @"PC\Somebody")));
 
         import.AccountIndex = accountIndex;
         import.HighestPrivileges = highest;

@@ -77,7 +77,15 @@ public sealed partial class ImportTaskViewModel : ObservableObject
     [ObservableProperty] private string _password = "";
 
     /// <summary>True when what is chosen can only be registered with administrator rights, which the app does not have right now.</summary>
-    public bool NeedsElevation => !_app.IsElevated && (AccountIndex == AsSystem || HighestPrivileges);
+    public bool NeedsElevation => !_app.IsElevated && (RunsAsAccountOnlyAdministratorsMayChoose || HighestPrivileges);
+
+    // SYSTEM, the service accounts and groups: a task gets one of these from an administrator only.
+    private bool RunsAsAccountOnlyAdministratorsMayChoose => AccountIndex switch
+    {
+        AsSystem => true,
+        AsExported => _info.Account.Kind is TaskAccountKind.System or TaskAccountKind.LocalService or TaskAccountKind.NetworkService or TaskAccountKind.Group,
+        _ => false
+    };
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasProblem))]
