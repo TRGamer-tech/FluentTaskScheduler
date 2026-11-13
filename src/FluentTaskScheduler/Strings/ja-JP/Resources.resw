@@ -1096,4 +1096,22 @@
   <data name="Library.DeleteScriptFormat" xml:space="preserve"><value>スクリプト「{0}」を削除</value></data>
   <data name="Editor.Error.NameTaken" xml:space="preserve"><value>このフォルダーには「{0}」という名前のタスクが既にあります。別の名前を選んでください。</value></data>
   <data name="Editor.Trigger.EveryNWeeks" xml:space="preserve"><value>{0} 週ごと</value></data>
+  <data name="Templates.Category.Maintenance" xml:space="preserve"><value>メンテナンス</value></data>
+  <data name="Templates.Category.Work" xml:space="preserve"><value>仕事</value></data>
+  <data name="Templates.Category.System" xml:space="preserve"><value>システム</value></data>
+  <data name="Templates.Tag.Cleanup" xml:space="preserve"><value>クリーンアップ</value></data>
+  <data name="Templates.Tag.Disk" xml:space="preserve"><value>ディスク</value></data>
+  <data name="Templates.Tag.Updates" xml:space="preserve"><value>更新プログラム</value></data>
+  <data name="Templates.Tag.Health" xml:space="preserve"><value>正常性</value></data>
+  <data name="Templates.Tag.Performance" xml:space="preserve"><value>パフォーマンス</value></data>
+  <data name="Templates.Tag.Backup" xml:space="preserve"><value>バックアップ</value></data>
+  <data name="Templates.Tag.Recovery" xml:space="preserve"><value>回復</value></data>
+  <data name="Templates.Tag.Repair" xml:space="preserve"><value>修復</value></data>
+  <data name="Templates.Tag.Network" xml:space="preserve"><value>ネットワーク</value></data>
+  <data name="Templates.Tag.Sync" xml:space="preserve"><value>同期</value></data>
+  <data name="Templates.Tag.Logs" xml:space="preserve"><value>ログ</value></data>
+  <data name="Templates.Tag.Service" xml:space="preserve"><value>サービス</value></data>
+  <data name="Templates.Tag.Power" xml:space="preserve"><value>電源</value></data>
+  <data name="Templates.Tag.Battery" xml:space="preserve"><value>バッテリー</value></data>
+  <data name="Templates.Tag.Display" xml:space="preserve"><value>ディスプレイ</value></data>
 </root>

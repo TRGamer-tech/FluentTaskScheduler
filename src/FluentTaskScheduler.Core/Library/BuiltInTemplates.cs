@@ -53,8 +53,8 @@ public static class BuiltInTemplates
             Trigger = Daily,
             At = new(3, 0),
             RunIfMissed = true,
-            Category = "Maintenance",
-            Tags = ["cleanup", "disk"]
+            Category = Category("Maintenance"),
+            Tags = [Tag("Cleanup"), Tag("Disk")]
         }),
         Define("UpdateHealth", TemplateGroup.Maintenance, "\uE895", hasNote: false, new()
         {
@@ -66,8 +66,8 @@ public static class BuiltInTemplates
                 "'{0} pending={1} last-install={2:yyyy-MM-dd}' -f (Get-Date -Format s), $pending, $last.InstalledOn | Out-File -FilePath $log -Append -Encoding utf8"),
             Trigger = Weekly(DaysOfTheWeek.Monday),
             At = new(9, 0),
-            Category = "Maintenance",
-            Tags = ["updates", "health"]
+            Category = Category("Maintenance"),
+            Tags = [Tag("Updates"), Tag("Health")]
         }),
         Define("Defrag", TemplateGroup.Maintenance, "\uEDA2", hasNote: true, new()
         {
@@ -78,8 +78,8 @@ public static class BuiltInTemplates
             RunElevated = true,
             OnlyWhenIdle = true,
             OnlyOnAcPower = true,
-            Category = "Maintenance",
-            Tags = ["disk", "performance"]
+            Category = Category("Maintenance"),
+            Tags = [Tag("Disk"), Tag("Performance")]
         }),
         Define("RestorePoint", TemplateGroup.Maintenance, "\uE81C", hasNote: true, new()
         {
@@ -89,8 +89,8 @@ public static class BuiltInTemplates
             At = new(12, 0),
             RunElevated = true,
             OnlyOnAcPower = true,
-            Category = "Maintenance",
-            Tags = ["backup", "recovery"]
+            Category = Category("Maintenance"),
+            Tags = [Tag("Backup"), Tag("Recovery")]
         }),
         Define("SystemScan", TemplateGroup.Maintenance, "\uE90F", hasNote: true, new()
         {
@@ -107,16 +107,16 @@ public static class BuiltInTemplates
             RunElevated = true,
             OnlyWhenIdle = true,
             OnlyOnAcPower = true,
-            Category = "Maintenance",
-            Tags = ["health", "repair"]
+            Category = Category("Maintenance"),
+            Tags = [Tag("Health"), Tag("Repair")]
         }),
         Define("DnsFlush", TemplateGroup.Maintenance, "\uE968", hasNote: false, new()
         {
             Command = "ipconfig.exe",
             Arguments = "/flushdns",
             Trigger = new() { Type = TriggerType.AtLogon },
-            Category = "Maintenance",
-            Tags = ["network"]
+            Category = Category("Maintenance"),
+            Tags = [Tag("Network")]
         }),
         Define("RecycleBin", TemplateGroup.Maintenance, "\uE74D", hasNote: true, new()
         {
@@ -124,8 +124,8 @@ public static class BuiltInTemplates
             Arguments = PowerShellCommand.ForScript("Clear-RecycleBin -Force -ErrorAction SilentlyContinue; exit 0"),
             Trigger = Weekly(DaysOfTheWeek.Saturday),
             At = new(20, 0),
-            Category = "Maintenance",
-            Tags = ["cleanup"]
+            Category = Category("Maintenance"),
+            Tags = [Tag("Cleanup")]
         }),
 
         Define("GitFetch", TemplateGroup.Developer, "\uE895", hasNote: true, new()
@@ -142,8 +142,8 @@ public static class BuiltInTemplates
             Trigger = Daily,
             At = new(8, 0),
             RunIfMissed = true,
-            Category = "Work",
-            Tags = ["git", "sync"]
+            Category = Category("Work"),
+            Tags = ["git", Tag("Sync")]
         }),
         Define("DockerPrune", TemplateGroup.Developer, "\uE7B8", hasNote: true, new()
         {
@@ -151,8 +151,8 @@ public static class BuiltInTemplates
             Arguments = "system prune -f",
             Trigger = Weekly(DaysOfTheWeek.Friday),
             At = new(19, 0),
-            Category = "Work",
-            Tags = ["docker", "cleanup"]
+            Category = Category("Work"),
+            Tags = ["docker", Tag("Cleanup")]
         }),
         Define("LogRotation", TemplateGroup.Developer, "\uE7C3", hasNote: true, new()
         {
@@ -173,8 +173,8 @@ public static class BuiltInTemplates
             Trigger = Daily,
             At = new(1, 0),
             RunIfMissed = true,
-            Category = "Work",
-            Tags = ["logs", "cleanup"]
+            Category = Category("Work"),
+            Tags = [Tag("Logs"), Tag("Cleanup")]
         }),
         Define("NodePrune", TemplateGroup.Developer, "\uE7B8", hasNote: true, new()
         {
@@ -186,8 +186,8 @@ public static class BuiltInTemplates
                 "exit ([int]$failed)"),
             Trigger = Weekly(DaysOfTheWeek.Friday),
             At = new(18, 0),
-            Category = "Work",
-            Tags = ["node", "cleanup"]
+            Category = Category("Work"),
+            Tags = ["node", Tag("Cleanup")]
         }),
         Define("ProjectBackup", TemplateGroup.Developer, "\uE8F7", hasNote: true, new()
         {
@@ -199,8 +199,8 @@ public static class BuiltInTemplates
             Trigger = Daily,
             At = new(2, 30),
             RunIfMissed = true,
-            Category = "Work",
-            Tags = ["backup"]
+            Category = Category("Work"),
+            Tags = [Tag("Backup")]
         }),
         Define("DevServerRestart", TemplateGroup.Developer, "\uE72C", hasNote: true, new()
         {
@@ -209,8 +209,8 @@ public static class BuiltInTemplates
             Trigger = Daily,
             At = new(5, 0),
             RunElevated = true,
-            Category = "Work",
-            Tags = ["service"]
+            Category = Category("Work"),
+            Tags = [Tag("Service")]
         }),
 
         Define("IdleShutdown", TemplateGroup.Power, "\uE7E8", hasNote: true, new()
@@ -220,8 +220,8 @@ public static class BuiltInTemplates
             Trigger = Daily,
             At = new(23, 30),
             OnlyWhenIdle = true,
-            Category = "System",
-            Tags = ["power"]
+            Category = Category("System"),
+            Tags = [Tag("Power")]
         }),
         Define("WeeklyReboot", TemplateGroup.Power, "\uE777", hasNote: true, new()
         {
@@ -230,16 +230,16 @@ public static class BuiltInTemplates
             Trigger = Weekly(DaysOfTheWeek.Sunday),
             At = new(4, 0),
             OnlyWhenIdle = true,
-            Category = "System",
-            Tags = ["power", "updates"]
+            Category = Category("System"),
+            Tags = [Tag("Power"), Tag("Updates")]
         }),
         Define("BatterySaver", TemplateGroup.Power, "\uE83E", hasNote: true, new()
         {
             Command = "powercfg.exe",
             Arguments = "/setactive a1841308-3541-4fab-bc81-f71556f20b4a",
             Trigger = new() { Type = TriggerType.AtLogon },
-            Category = "System",
-            Tags = ["power", "battery"]
+            Category = Category("System"),
+            Tags = [Tag("Power"), Tag("Battery")]
         }),
         Define("DisplayOff", TemplateGroup.Power, "\uE7F4", hasNote: false, new()
         {
@@ -249,8 +249,8 @@ public static class BuiltInTemplates
                 "(Add-Type -MemberDefinition '[DllImport(\"user32.dll\")] public static extern bool PostMessage(IntPtr window, uint message, IntPtr wParam, IntPtr lParam);' " +
                 "-Name Display -Namespace FluentTaskScheduler -PassThru)::PostMessage([IntPtr]0xffff, 0x0112, [IntPtr]0xF170, [IntPtr]2) | Out-Null"),
             Trigger = new() { Type = TriggerType.SessionStateChange, SessionChange = TaskSessionStateChangeType.SessionLock },
-            Category = "System",
-            Tags = ["power", "display"]
+            Category = Category("System"),
+            Tags = [Tag("Power"), Tag("Display")]
         })
     ];
 
@@ -264,6 +264,12 @@ public static class BuiltInTemplates
             Name = Loc.Get($"Templates.{id}.Name"),
             Description = Loc.Get($"Templates.{id}.Desc")
         });
+
+    // A task keeps its category and tags as words, and the task list shows them, so they are
+    // written in the language the app shows now. Names of programs are tags of their own.
+    private static string Category(string id) => Loc.Get($"Templates.Category.{id}");
+
+    private static string Tag(string id) => Loc.Get($"Templates.Tag.{id}");
 
     /// <summary>The text Windows shows while it counts down, quoted for the command line.</summary>
     private static string ShutdownComment(string id) =>

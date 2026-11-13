@@ -1096,5 +1096,23 @@ Restart now to apply the update?</value></data>
   <data name="Library.DeleteScriptFormat" xml:space="preserve"><value>Delete script {0}</value></data>
   <data name="Editor.Error.NameTaken" xml:space="preserve"><value>Another task in this folder is already called '{0}'. Choose a different name.</value></data>
   <data name="Editor.Trigger.EveryNWeeks" xml:space="preserve"><value>every {0} weeks</value></data>
+  <data name="Templates.Category.Maintenance" xml:space="preserve"><value>Maintenance</value></data>
+  <data name="Templates.Category.Work" xml:space="preserve"><value>Work</value></data>
+  <data name="Templates.Category.System" xml:space="preserve"><value>System</value></data>
+  <data name="Templates.Tag.Cleanup" xml:space="preserve"><value>cleanup</value></data>
+  <data name="Templates.Tag.Disk" xml:space="preserve"><value>disk</value></data>
+  <data name="Templates.Tag.Updates" xml:space="preserve"><value>updates</value></data>
+  <data name="Templates.Tag.Health" xml:space="preserve"><value>health</value></data>
+  <data name="Templates.Tag.Performance" xml:space="preserve"><value>performance</value></data>
+  <data name="Templates.Tag.Backup" xml:space="preserve"><value>backup</value></data>
+  <data name="Templates.Tag.Recovery" xml:space="preserve"><value>recovery</value></data>
+  <data name="Templates.Tag.Repair" xml:space="preserve"><value>repair</value></data>
+  <data name="Templates.Tag.Network" xml:space="preserve"><value>network</value></data>
+  <data name="Templates.Tag.Sync" xml:space="preserve"><value>sync</value></data>
+  <data name="Templates.Tag.Logs" xml:space="preserve"><value>logs</value></data>
+  <data name="Templates.Tag.Service" xml:space="preserve"><value>service</value></data>
+  <data name="Templates.Tag.Power" xml:space="preserve"><value>power</value></data>
+  <data name="Templates.Tag.Battery" xml:space="preserve"><value>battery</value></data>
+  <data name="Templates.Tag.Display" xml:space="preserve"><value>display</value></data>
 </root>
 

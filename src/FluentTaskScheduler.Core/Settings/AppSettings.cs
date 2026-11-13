@@ -51,8 +51,11 @@ public sealed record AppSettings
     public int ReminderLeadMinutes { get; init; } = 5;
     public bool ShowHiddenTasks { get; init; } = true;
 
-    public ValueList<string> SavedCategories { get; init; } = ["Work", "Personal", "Maintenance", "System"];
-    public ValueList<string> SavedTags { get; init; } = ["urgent", "sync", "database", "cleanup"];
+    /// <summary>Categories the editor suggests: those of the tasks saved in it, and those added in the settings.</summary>
+    public ValueList<string> SavedCategories { get; init; } = [];
+
+    /// <summary>Tags the editor suggests, gathered the same way as <see cref="SavedCategories"/>.</summary>
+    public ValueList<string> SavedTags { get; init; } = [];
 
     /// <summary>Snoozing all tasks also disables their triggers in Task Scheduler until the snooze ends.</summary>
     public bool SnoozeSuspendsScheduledTasks { get; init; }

@@ -1096,4 +1096,22 @@ Jetzt App neustarten?</value></data>
   <data name="Library.DeleteScriptFormat" xml:space="preserve"><value>Skript {0} löschen</value></data>
   <data name="Editor.Error.NameTaken" xml:space="preserve"><value>Eine andere Aufgabe in diesem Ordner trägt bereits den Namen „{0}“. Wähle einen anderen Namen.</value></data>
   <data name="Editor.Trigger.EveryNWeeks" xml:space="preserve"><value>alle {0} Wochen</value></data>
+  <data name="Templates.Category.Maintenance" xml:space="preserve"><value>Wartung</value></data>
+  <data name="Templates.Category.Work" xml:space="preserve"><value>Arbeit</value></data>
+  <data name="Templates.Category.System" xml:space="preserve"><value>System</value></data>
+  <data name="Templates.Tag.Cleanup" xml:space="preserve"><value>Bereinigung</value></data>
+  <data name="Templates.Tag.Disk" xml:space="preserve"><value>Datenträger</value></data>
+  <data name="Templates.Tag.Updates" xml:space="preserve"><value>Updates</value></data>
+  <data name="Templates.Tag.Health" xml:space="preserve"><value>Zustand</value></data>
+  <data name="Templates.Tag.Performance" xml:space="preserve"><value>Leistung</value></data>
+  <data name="Templates.Tag.Backup" xml:space="preserve"><value>Sicherung</value></data>
+  <data name="Templates.Tag.Recovery" xml:space="preserve"><value>Wiederherstellung</value></data>
+  <data name="Templates.Tag.Repair" xml:space="preserve"><value>Reparatur</value></data>
+  <data name="Templates.Tag.Network" xml:space="preserve"><value>Netzwerk</value></data>
+  <data name="Templates.Tag.Sync" xml:space="preserve"><value>Synchronisierung</value></data>
+  <data name="Templates.Tag.Logs" xml:space="preserve"><value>Protokolle</value></data>
+  <data name="Templates.Tag.Service" xml:space="preserve"><value>Dienst</value></data>
+  <data name="Templates.Tag.Power" xml:space="preserve"><value>Energie</value></data>
+  <data name="Templates.Tag.Battery" xml:space="preserve"><value>Akku</value></data>
+  <data name="Templates.Tag.Display" xml:space="preserve"><value>Bildschirm</value></data>
 </root>

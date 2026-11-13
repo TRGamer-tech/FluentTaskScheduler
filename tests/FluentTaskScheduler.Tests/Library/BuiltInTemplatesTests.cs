@@ -69,6 +69,17 @@ public sealed class BuiltInTemplatesTests
 
     [Theory]
     [MemberData(nameof(Ids))]
+    public void TheCategoryAndTagsOfATemplate_AreTextsOfTheApp_ExceptNamesOfPrograms(string id)
+    {
+        TaskTemplate template = Find(id).Template;
+
+        Assert.StartsWith("Templates.Category.", template.Category);
+        Assert.NotEmpty(template.Tags);
+        Assert.All(template.Tags, tag => Assert.True(tag.StartsWith("Templates.Tag.", StringComparison.Ordinal) || tag is "git" or "docker" or "node", tag));
+    }
+
+    [Theory]
+    [MemberData(nameof(Ids))]
     public void PowerShellInATemplate_ReachesPowerShellAsOneLineInOneArgument(string id)
     {
         TaskTemplate template = Find(id).Template;

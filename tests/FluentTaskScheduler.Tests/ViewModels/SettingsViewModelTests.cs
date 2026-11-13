@@ -274,25 +274,31 @@ public sealed class SettingsViewModelTests : IDisposable
     [Fact]
     public void Categories_AreKeptInTheSettings()
     {
+        Assert.Empty(_page.Categories.Items);
+
+        _page.Categories.NewName = "Personal";
+        _page.Categories.AddCommand.Execute(null);
         _page.Categories.NewName = "  Backups ";
         _page.Categories.AddCommand.Execute(null);
 
-        Assert.Equal(["Work", "Personal", "Maintenance", "System", "Backups"], _settings.Current.SavedCategories);
+        Assert.Equal(["Personal", "Backups"], _settings.Current.SavedCategories);
         Assert.Equal(_settings.Current.SavedCategories, _page.Categories.Items);
 
         _page.Categories.RemoveCommand.Execute("Personal");
 
-        Assert.Equal(["Work", "Maintenance", "System", "Backups"], _settings.Current.SavedCategories);
-        Assert.Equal(["urgent", "sync", "database", "cleanup"], _settings.Current.SavedTags);
+        Assert.Equal(["Backups"], _settings.Current.SavedCategories);
+        Assert.Empty(_settings.Current.SavedTags);
     }
 
     [Fact]
     public void Tags_AreKeptInTheSettings_AndFollowAChangeMadeElsewhere()
     {
+        Assert.Empty(_page.Tags.Items);
+
         _page.Tags.NewName = "nightly";
         _page.Tags.AddCommand.Execute(null);
 
-        Assert.Equal(["urgent", "sync", "database", "cleanup", "nightly"], _settings.Current.SavedTags);
+        Assert.Equal(["nightly"], _settings.Current.SavedTags);
 
         _settings.Update(s => s with { SavedTags = ["one"] });
 
