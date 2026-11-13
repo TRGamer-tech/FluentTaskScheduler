@@ -179,9 +179,13 @@ public sealed class TaskTests : IDisposable
         app.Require("DetailsRunButton").Press();
         Assert.True(AppSession.Eventually(() => app.Find("DetailsRunButton", 500) is null), "Run did not close the details.");
 
-        // The log is written a moment after the fact.
-        Row().Click();
-        app.Require("DetailsReloadButton", 20000);
+        // The log is written a moment after the fact. Meanwhile the list reads the task again and can
+        // rebuild its row just as it is clicked, which the ARM64 build machine has seen.
+        Assert.True(AppSession.Eventually(() =>
+        {
+            Row().Click();
+            return app.Find("DetailsReloadButton", 3000) is not null;
+        }), "The details did not open again after the run.");
         Assert.True(AppSession.Eventually(() =>
         {
             app.Require("DetailsReloadButton").Press();
