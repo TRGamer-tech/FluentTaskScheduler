@@ -15,7 +15,7 @@ public sealed class SchedulerSandbox : IDisposable
     private const string NoDeleting = "D:(D;;SD;;;WD)(A;;FA;;;WD)";
     private const string Deletable = "D:(A;;FA;;;WD)";
 
-    private readonly List<ScheduledTask> _undeletable = [];
+    private bool _hasUndeletable;
 
     public TaskService Service { get; } = new();
     public TaskFolder Folder { get; }
@@ -50,8 +50,8 @@ public sealed class SchedulerSandbox : IDisposable
     /// <summary>Registers a simple task in <paramref name="folder"/> that nobody may delete until the sandbox is disposed.</summary>
     public ScheduledTask RegisterUndeletable(TaskFolder folder, string name)
     {
+        _hasUndeletable = true;
         var task = folder.RegisterTaskDefinition(name, SampleTasks.Simple(Service), TaskCreation.CreateOrUpdate, null, null, TaskLogonType.InteractiveToken, NoDeleting);
-        _undeletable.Add(task);
         Assert.True(TaskSchedulerErrors.IsAccessDenied(Record.Exception(() => folder.DeleteTask(name))),
             "Task Scheduler deleted a task whose security descriptor denies that, so the test proves nothing.");
         return task;
@@ -61,7 +61,8 @@ public sealed class SchedulerSandbox : IDisposable
     {
         try
         {
-            foreach (var task in _undeletable) AllowDeleting(task);
+            // Copies the code under test made of such a task may have taken its security descriptor along.
+            if (_hasUndeletable) AllowDeleting(Folder);
             DeleteRecursive(Folder);
             Service.RootFolder.DeleteFolder(FolderPath.TrimStart('\\'), exceptionOnNotExists: false);
         }
@@ -71,16 +72,10 @@ public sealed class SchedulerSandbox : IDisposable
         }
     }
 
-    private static void AllowDeleting(ScheduledTask task)
+    private static void AllowDeleting(TaskFolder folder)
     {
-        try
-        {
-            task.SetSecurityDescriptorSddlForm(Deletable);
-        }
-        catch (Exception ex) when (ex is FileNotFoundException or DirectoryNotFoundException)
-        {
-            // The test removed it already.
-        }
+        foreach (var task in folder.Tasks.ToList()) task.SetSecurityDescriptorSddlForm(Deletable);
+        foreach (var sub in folder.SubFolders.ToList()) AllowDeleting(sub);
     }
 
     private static void DeleteRecursive(TaskFolder folder)
