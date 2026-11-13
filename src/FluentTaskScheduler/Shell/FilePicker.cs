@@ -1,3 +1,4 @@
+using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.ViewModels;
 using Windows.Storage.Pickers;
 
@@ -14,7 +15,7 @@ public sealed class FilePicker(WindowContext window, IAppLifetime app) : IFilePi
         string ext = extension.TrimStart('.');
         if (app.IsElevated)
         {
-            string filter = ext == "*" ? "All files (*.*)|*.*" : $"{typeName} (*.{ext})|*.{ext}|All files (*.*)|*.*";
+            string filter = ext == "*" ? $"{typeName} (*.*)|*.*" : $"{typeName} (*.{ext})|*.{ext}|{AllFiles}";
             return ClassicFileDialog.PickOpenFile(window.Handle, title, filter);
         }
 
@@ -29,7 +30,7 @@ public sealed class FilePicker(WindowContext window, IAppLifetime app) : IFilePi
         string ext = extension.TrimStart('.');
         if (app.IsElevated)
         {
-            string filter = $"{typeName} (*.{ext})|*.{ext}|All files (*.*)|*.*";
+            string filter = $"{typeName} (*.{ext})|*.{ext}|{AllFiles}";
             return ClassicFileDialog.PickSaveFile(window.Handle, title, filter, ext, suggestedFileName);
         }
 
@@ -38,4 +39,6 @@ public sealed class FilePicker(WindowContext window, IAppLifetime app) : IFilePi
         picker.FileTypeChoices.Add(typeName, ["." + ext]);
         return (await picker.PickSaveFileAsync())?.Path;
     }
+
+    private static string AllFiles => $"{Loc.Get("Editor.AllFiles")} (*.*)|*.*";
 }
