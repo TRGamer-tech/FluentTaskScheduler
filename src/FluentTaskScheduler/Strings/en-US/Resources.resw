@@ -533,15 +533,14 @@ Restart now to apply the update?</value></data>
   <data name="Snooze.SuspendTriggersHint" xml:space="preserve"><value>Disables every enabled task through the Task Scheduler API and re-enables exactly those tasks when the snooze ends. Protected system tasks are skipped.</value></data>
   <data name="Snooze.Banner.Suspended" xml:space="preserve"><value>Scheduled triggers are suspended and manual runs are blocked. Tasks are re-enabled when the snooze ends.</value></data>
   <data name="Snooze.Banner.ManualOnly" xml:space="preserve"><value>Runs started from this app are blocked. Windows will still fire scheduled triggers - enable "Suspend scheduled triggers" when snoozing to stop those too.</value></data>
-  <data name="Snooze.Error.RunBlocked" xml:space="preserve"><value>'{0}' was not started because Global Snooze is active.</value></data>
-  <data name="Snooze.Error.BatchBlocked" xml:space="preserve"><value>{0} task(s) were not started because Global Snooze is active.</value></data>
+  <data name="Snooze.Error.BatchBlocked" xml:space="preserve"><value>{0} task(s) were not started because they are snoozed.</value></data>
   <data name="Snooze.Error.PastTime" xml:space="preserve"><value>Pick a time in the future.</value></data>
   <data name="Snooze.Error.Resume" xml:space="preserve"><value>Could not resume all tasks: </value></data>
   <data name="Snooze.Toast.Started.Title" xml:space="preserve"><value>Global Snooze Enabled</value></data>
   <data name="Snooze.Toast.Ended.Title" xml:space="preserve"><value>Global Snooze Ended</value></data>
   <data name="Snooze.Toast.Ended.Body" xml:space="preserve"><value>Scheduled tasks are running normally again.</value></data>
   <data name="Snooze.Toast.Suppressed.Title" xml:space="preserve"><value>Run Suppressed: {0}</value></data>
-  <data name="Snooze.Toast.Suppressed.Body" xml:space="preserve"><value>Global snooze is active, so this task was not started.</value></data>
+  <data name="Snooze.Toast.Suppressed.Body" xml:space="preserve"><value>This task is snoozed, so it was not started.</value></data>
   <data name="Pipeline.SectionTitle" xml:space="preserve"><value>Completion Actions</value></data>
   <data name="Pipeline.Configure" xml:space="preserve"><value>Configure...</value></data>
   <data name="Pipeline.Dialog.Title" xml:space="preserve"><value>Completion Actions (Task Pipeline)</value></data>

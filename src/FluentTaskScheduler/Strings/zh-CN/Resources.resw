@@ -537,15 +537,14 @@
   <data name="Snooze.SuspendTriggersHint" xml:space="preserve"><value>通过任务计划程序 API 禁用所有已启用的任务，并在暂停结束时仅重新启用这些任务。受保护的系统任务将被跳过。</value></data>
   <data name="Snooze.Banner.Suspended" xml:space="preserve"><value>计划触发器已暂停，手动运行也会被阻止。暂停结束后任务将重新启用。</value></data>
   <data name="Snooze.Banner.ManualOnly" xml:space="preserve"><value>从此应用启动的运行将被阻止。Windows 仍会触发计划触发器；若要同时阻止它们，请在暂停时启用“同时暂停计划触发器”。</value></data>
-  <data name="Snooze.Error.RunBlocked" xml:space="preserve"><value>由于全局暂停已启用，未能启动“{0}”。</value></data>
-  <data name="Snooze.Error.BatchBlocked" xml:space="preserve"><value>由于全局暂停已启用，{0} 个任务未能启动。</value></data>
+  <data name="Snooze.Error.BatchBlocked" xml:space="preserve"><value>{0} 个任务处于暂停状态，因此未能启动。</value></data>
   <data name="Snooze.Error.PastTime" xml:space="preserve"><value>请选择一个未来的时间。</value></data>
   <data name="Snooze.Error.Resume" xml:space="preserve"><value>无法恢复所有任务：</value></data>
   <data name="Snooze.Toast.Started.Title" xml:space="preserve"><value>全局暂停已启用</value></data>
   <data name="Snooze.Toast.Ended.Title" xml:space="preserve"><value>全局暂停已结束</value></data>
   <data name="Snooze.Toast.Ended.Body" xml:space="preserve"><value>计划任务已恢复正常运行。</value></data>
   <data name="Snooze.Toast.Suppressed.Title" xml:space="preserve"><value>运行已被抑制：{0}</value></data>
-  <data name="Snooze.Toast.Suppressed.Body" xml:space="preserve"><value>全局暂停已启用，因此未启动此任务。</value></data>
+  <data name="Snooze.Toast.Suppressed.Body" xml:space="preserve"><value>此任务已暂停，因此未启动。</value></data>
   <data name="Pipeline.SectionTitle" xml:space="preserve"><value>完成后操作</value></data>
   <data name="Pipeline.Configure" xml:space="preserve"><value>配置...</value></data>
   <data name="Pipeline.Dialog.Title" xml:space="preserve"><value>完成后操作（任务流水线）</value></data>

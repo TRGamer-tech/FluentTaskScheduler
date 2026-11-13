@@ -534,15 +534,14 @@
   <data name="Snooze.SuspendTriggersHint" xml:space="preserve"><value>タスクスケジューラの API を通じて有効なすべてのタスクを無効化し、スヌーズが終了すると該当するタスクだけを再度有効化します。保護されたシステムタスクはスキップされます。</value></data>
   <data name="Snooze.Banner.Suspended" xml:space="preserve"><value>スケジュールされたトリガーは一時停止され、手動実行はブロックされます。スヌーズが終了するとタスクは再度有効化されます。</value></data>
   <data name="Snooze.Banner.ManualOnly" xml:space="preserve"><value>このアプリから開始された実行はブロックされます。Windows はスケジュールされたトリガーを引き続き発生させます。これも停止するには、スヌーズ時に「スケジュールされたトリガーも一時停止する」を有効にしてください。</value></data>
-  <data name="Snooze.Error.RunBlocked" xml:space="preserve"><value>グローバルスヌーズが有効なため、「{0}」は開始されませんでした。</value></data>
-  <data name="Snooze.Error.BatchBlocked" xml:space="preserve"><value>グローバルスヌーズが有効なため、{0} 件のタスクが開始されませんでした。</value></data>
+  <data name="Snooze.Error.BatchBlocked" xml:space="preserve"><value>スヌーズ中のため、{0} 件のタスクが開始されませんでした。</value></data>
   <data name="Snooze.Error.PastTime" xml:space="preserve"><value>未来の時刻を選択してください。</value></data>
   <data name="Snooze.Error.Resume" xml:space="preserve"><value>すべてのタスクを再開できませんでした: </value></data>
   <data name="Snooze.Toast.Started.Title" xml:space="preserve"><value>グローバルスヌーズを有効にしました</value></data>
   <data name="Snooze.Toast.Ended.Title" xml:space="preserve"><value>グローバルスヌーズが終了しました</value></data>
   <data name="Snooze.Toast.Ended.Body" xml:space="preserve"><value>スケジュールされたタスクは通常どおり実行されています。</value></data>
   <data name="Snooze.Toast.Suppressed.Title" xml:space="preserve"><value>実行を抑制しました: {0}</value></data>
-  <data name="Snooze.Toast.Suppressed.Body" xml:space="preserve"><value>グローバルスヌーズが有効なため、このタスクは開始されませんでした。</value></data>
+  <data name="Snooze.Toast.Suppressed.Body" xml:space="preserve"><value>このタスクはスヌーズ中のため、開始されませんでした。</value></data>
   <data name="Pipeline.SectionTitle" xml:space="preserve"><value>完了時アクション</value></data>
   <data name="Pipeline.Configure" xml:space="preserve"><value>構成...</value></data>
   <data name="Pipeline.Dialog.Title" xml:space="preserve"><value>完了時アクション（タスクパイプライン）</value></data>
