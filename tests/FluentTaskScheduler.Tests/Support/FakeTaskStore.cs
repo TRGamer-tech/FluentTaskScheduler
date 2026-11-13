@@ -17,7 +17,7 @@ public sealed class FakeTaskStore : ITaskStore
     /// <summary>Tasks Windows would refuse to change or start.</summary>
     public HashSet<string> Protected { get; } = new(StringComparer.OrdinalIgnoreCase);
 
-    /// <summary>Every call that changed or started something, in order, e.g. "Run \Backup" or "SetEnabled \Backup False".</summary>
+    /// <summary>Every call that changed or started something, in order, e.g. "Run \Backup", "Run \Backup unforced" or "SetEnabled \Backup False".</summary>
     public List<string> Calls { get; } = [];
 
     /// <summary>The password the last <see cref="Save"/> was given.</summary>
@@ -68,6 +68,9 @@ public sealed class FakeTaskStore : ITaskStore
 
     public TaskDraft Load(string path) => Get(path);
 
+    public CompletionActions GetCompletionActions(string path) =>
+        _tasks.TryGetValue(path, out var draft) ? draft.CompletionActions : CompletionActions.None;
+
     public string Save(TaskDraft draft, string folderPath, string? originalPath = null, string? password = null)
     {
         string path = folderPath.TrimEnd('\\') + "\\" + draft.Name;
@@ -88,9 +91,9 @@ public sealed class FakeTaskStore : ITaskStore
         _tasks[path] = _tasks[path] with { Enabled = enabled };
     }
 
-    public void Run(string path)
+    public void Run(string path, bool force = true)
     {
-        Change("Run", path);
+        Change("Run", path, detail: force ? null : "unforced");
         _running.Add(path);
     }
 

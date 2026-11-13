@@ -924,4 +924,10 @@
   <data name="Import.Account.Me" xml:space="preserve"><value>自分 ({0})</value></data>
   <data name="Import.Account.Missing" xml:space="preserve"><value>ファイルに記録されたアカウント {0} は、このコンピューターに存在しません。</value></data>
   <data name="Import.Error.NotATask" xml:space="preserve"><value>'{0}' はタスク スケジューラからエクスポートされたタスクではありません。{1}</value></data>
+  <data name="EventResult.101" xml:space="preserve"><value>起動失敗</value></data>
+  <data name="EventResult.323" xml:space="preserve"><value>停止（新しいインスタンス）</value></data>
+  <data name="EventResult.324" xml:space="preserve"><value>起動待機</value></data>
+  <data name="EventResult.327" xml:space="preserve"><value>停止（バッテリー駆動）</value></data>
+  <data name="EventResult.328" xml:space="preserve"><value>停止（アイドル終了）</value></data>
+  <data name="EventResult.330" xml:space="preserve"><value>停止（ユーザー操作）</value></data>
 </root>

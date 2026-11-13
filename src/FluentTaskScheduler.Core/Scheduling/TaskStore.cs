@@ -70,6 +70,28 @@ public sealed class TaskStore : ITaskStore
         return TaskDraftReader.Read(Find(service, path));
     }
 
+    public CompletionActions GetCompletionActions(string path)
+    {
+        using var service = Open();
+        if (service.GetTask(path) is not { } task) return CompletionActions.None;
+
+        // Only the description is wanted, so the task's XML is read as text. Loading the
+        // definition would fail for tasks this user may not read or this library cannot interpret.
+        try
+        {
+            var description = System.Xml.Linq.XElement.Parse(task.Xml)
+                .Elements().FirstOrDefault(element => element.Name.LocalName == "RegistrationInfo")
+                ?.Elements().FirstOrDefault(element => element.Name.LocalName == "Description");
+            return TaskMetadata.Split(description?.Value).CompletionActions;
+        }
+        catch (Exception ex) when (ex is COMException or UnauthorizedAccessException or System.Xml.XmlException)
+        {
+            // Not logged: this is asked for every run that ends on the computer, and a task
+            // whose description cannot be read is simply one without completion actions.
+            return CompletionActions.None;
+        }
+    }
+
     public string Save(TaskDraft draft, string folderPath, string? originalPath = null, string? password = null)
     {
         using var service = Open();
@@ -142,14 +164,17 @@ public sealed class TaskStore : ITaskStore
         }
     }
 
-    public void Run(string path)
+    public void Run(string path, bool force = true)
     {
         using var service = Open();
         var task = Find(service, path);
         try
         {
-            // A run started by hand happens now, whatever the task's conditions (idle, power, network) say.
-            task.RunEx(TaskRunFlags.IgnoreConstraints, 0, null);
+            // Ignoring constraints does more than the name says: besides the conditions it skips
+            // the task's rule for multiple instances, so a second instance starts next to one
+            // that is already running. A plain run leaves both to Task Scheduler.
+            if (force) task.RunEx(TaskRunFlags.IgnoreConstraints, 0, null);
+            else task.Run();
         }
         catch (Exception ex) when (TaskSchedulerErrors.IsAccessDenied(ex))
         {

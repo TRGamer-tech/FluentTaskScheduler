@@ -927,6 +927,12 @@
   <data name="Import.Account.Me" xml:space="preserve"><value>我 ({0})</value></data>
   <data name="Import.Account.Missing" xml:space="preserve"><value>文件中指定的帐户 {0} 在此计算机上不存在。</value></data>
   <data name="Import.Error.NotATask" xml:space="preserve"><value>“{0}”不是从任务计划程序导出的任务。{1}</value></data>
+  <data name="EventResult.101" xml:space="preserve"><value>启动失败</value></data>
+  <data name="EventResult.323" xml:space="preserve"><value>已停止（新实例）</value></data>
+  <data name="EventResult.324" xml:space="preserve"><value>启动已排队</value></data>
+  <data name="EventResult.327" xml:space="preserve"><value>已停止（使用电池）</value></data>
+  <data name="EventResult.328" xml:space="preserve"><value>已停止（不再空闲）</value></data>
+  <data name="EventResult.330" xml:space="preserve"><value>已停止（用户请求）</value></data>
 </root>
 
 

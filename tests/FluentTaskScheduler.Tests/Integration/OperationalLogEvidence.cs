@@ -9,14 +9,23 @@ using ScheduledTask = Microsoft.Win32.TaskScheduler.Task;
 namespace FluentTaskScheduler.Tests.Integration;
 
 /// <summary>
-/// Not a test of the app. It records what the Task Scheduler operational log really contains for
-/// each kind of run (and what subscribing to the log does while it is switched off), so the
-/// history model is built on observed events instead of on what the documentation suggests.
-/// The findings are its output; it only fails when a scenario could not be carried out.
+/// Not a test of the app, and not run unless asked for. It records what the Task Scheduler
+/// operational log really contains for each kind of run (and what subscribing to the log does
+/// while it is switched off), so the history model rests on observed events instead of on what
+/// the documentation suggests. Its output is the finding; the section headed "The whole period
+/// as test data" is the content of History/Evidence.cs, which the unit tests are built on.
+/// <para>
+/// To record again, say after a new Windows version: run it elevated with the environment
+/// variable <see cref="OptIn"/> set to 1. It takes about two minutes, switches the history log
+/// off and on (and back to how it was), registers tasks in a throw-away folder, and creates and
+/// deletes a local user account.
+/// </para>
 /// </summary>
 [Collection(SchedulerSandbox.Collection)]
 public sealed class OperationalLogEvidence
 {
+    public const string OptIn = "FTS_RECORD_EVIDENCE";
+
     private const string Channel = "Microsoft-Windows-TaskScheduler/Operational";
     private const string Provider = "Microsoft-Windows-TaskScheduler";
     private const string LongRunning = "ping -n 30 127.0.0.1 > nul";
@@ -35,8 +44,10 @@ public sealed class OperationalLogEvidence
     public OperationalLogEvidence(ITestOutputHelper output) => _out = output;
 
     [SkippableFact]
-    public void TheOperationalLog_ShowsWhatEachKindOfRunLeavesBehind()
+    public void RecordWhatEachKindOfRunLeavesInTheLog_CreatingALocalUserAndSwitchingTheLogOffAndOn()
     {
+        Skip.IfNot(Environment.GetEnvironmentVariable(OptIn) == "1",
+            $"Opt-in diagnostic: set {OptIn}=1 and run elevated. It takes about two minutes, switches the Task Scheduler history log off and on, and creates and deletes a local user account.");
         Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
 
         _sinceUtc = DateTime.UtcNow.AddSeconds(-1);
@@ -254,6 +265,7 @@ public sealed class OperationalLogEvidence
                 log = ReadLog(withText: true);
                 foreach (var e in log.Where(e => !_reported.Contains(e.RecordId))) Print(e, "");
             });
+            Scenario("The whole period as test data: the Folder constant and the records of History/Evidence.cs", () => PrintAsTestData(log));
             subscribedWhileDisabled?.Dispose();
             subscribedWhileEnabled?.Dispose();
             Scenario("What the two subscriptions received", () =>
@@ -429,6 +441,31 @@ public sealed class OperationalLogEvidence
         Line("      text: " + Flat(e.Message));
         if (_shownAsXml.Add(e.Id)) Line("      xml:  " + Flat(e.Xml));
     }
+
+    /// <summary>Prints every record as the line of C# that History/Evidence.cs holds for it.</summary>
+    private void PrintAsTestData(IEnumerable<LoggedEvent> log)
+    {
+        Line($"    public const string Folder = {Literal(_folderPath)};");
+        foreach (var e in log)
+        {
+            var arguments = new List<string>
+            {
+                e.RecordId.ToString(CultureInfo.InvariantCulture),
+                Literal(e.TimeUtc.ToString("yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'", CultureInfo.InvariantCulture)),
+                e.Id.ToString(CultureInfo.InvariantCulture),
+                e.Level.ToString(CultureInfo.InvariantCulture)
+            };
+            foreach (var field in e.Data)
+            {
+                arguments.Add(Literal(field.Key));
+                arguments.Add(Literal(field.Value));
+            }
+            Line($"        R({string.Join(", ", arguments)}),");
+        }
+    }
+
+    private static string Literal(string value) =>
+        value.Contains('\\') || value.Contains('"') ? "@\"" + value.Replace("\"", "\"\"") + "\"" : "\"" + value + "\"";
 
     private static bool Mentions(LoggedEvent e, string path) =>
         e.Data.Any(d => d.Value.Contains(path, StringComparison.OrdinalIgnoreCase));

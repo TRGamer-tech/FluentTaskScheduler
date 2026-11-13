@@ -16,6 +16,14 @@ public interface ITaskStore
     TaskDraft Load(string path);
 
     /// <summary>
+    /// What the task starts when it finishes. Unlike <see cref="Load"/> this reads no more than
+    /// that and never fails: it is asked for any task on the computer, including ones this user
+    /// may not read. For those, and for a task that does not exist, the answer is
+    /// <see cref="CompletionActions.None"/>.
+    /// </summary>
+    CompletionActions GetCompletionActions(string path);
+
+    /// <summary>
     /// Creates a task in <paramref name="folderPath"/>, or changes the task at
     /// <paramref name="originalPath"/> when one is given. Renaming is saving under a new name.
     /// </summary>
@@ -24,7 +32,16 @@ public interface ITaskStore
     string Save(TaskDraft draft, string folderPath, string? originalPath = null, string? password = null);
 
     void SetEnabled(string path, bool enabled);
-    void Run(string path);
+
+    /// <summary>Asks Task Scheduler to start the task.</summary>
+    /// <param name="force">
+    /// True starts it now whatever the task itself says: its conditions (idle, power, network)
+    /// are skipped, and so is its rule for an instance that is already running, so a second
+    /// instance starts next to the first. False leaves both to Task Scheduler, as with a trigger:
+    /// the request can then be ignored or queued, and that is not an error.
+    /// </param>
+    void Run(string path, bool force = true);
+
     void Stop(string path);
     void Delete(string path);
 

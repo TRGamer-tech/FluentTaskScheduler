@@ -924,5 +924,11 @@ Restart now to apply the update?</value></data>
   <data name="Import.Account.Me" xml:space="preserve"><value>Me ({0})</value></data>
   <data name="Import.Account.Missing" xml:space="preserve"><value>The file names the account {0}, which does not exist on this computer.</value></data>
   <data name="Import.Error.NotATask" xml:space="preserve"><value>'{0}' is not a task exported from Task Scheduler. {1}</value></data>
+  <data name="EventResult.101" xml:space="preserve"><value>Start Failed</value></data>
+  <data name="EventResult.323" xml:space="preserve"><value>Stopped (new instance)</value></data>
+  <data name="EventResult.324" xml:space="preserve"><value>Launch Queued</value></data>
+  <data name="EventResult.327" xml:space="preserve"><value>Stopped (on battery)</value></data>
+  <data name="EventResult.328" xml:space="preserve"><value>Stopped (no longer idle)</value></data>
+  <data name="EventResult.330" xml:space="preserve"><value>Stopped (by user)</value></data>
 </root>
 

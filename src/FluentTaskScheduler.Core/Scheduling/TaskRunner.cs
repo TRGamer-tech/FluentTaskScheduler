@@ -66,7 +66,9 @@ public sealed class TaskRunner : ITaskRunner
 
         try
         {
-            _store.Run(taskPath);
+            // What the user starts by hand runs now. What merely follows from another task is
+            // left to the task's own conditions and to its rule for instances that already run.
+            _store.Run(taskPath, force: origin == RunOrigin.Manual);
         }
         catch (Exception ex)
         {

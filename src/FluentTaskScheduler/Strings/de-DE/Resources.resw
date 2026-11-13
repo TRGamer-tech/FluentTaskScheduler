@@ -924,4 +924,10 @@ Jetzt App neustarten?</value></data>
   <data name="Import.Account.Me" xml:space="preserve"><value>Ich ({0})</value></data>
   <data name="Import.Account.Missing" xml:space="preserve"><value>Die Datei nennt das Konto {0}, das es auf diesem Computer nicht gibt.</value></data>
   <data name="Import.Error.NotATask" xml:space="preserve"><value>'{0}' ist keine aus der Aufgabenplanung exportierte Aufgabe. {1}</value></data>
+  <data name="EventResult.101" xml:space="preserve"><value>Start fehlgeschlagen</value></data>
+  <data name="EventResult.323" xml:space="preserve"><value>Gestoppt (neue Instanz)</value></data>
+  <data name="EventResult.324" xml:space="preserve"><value>Start in Warteschlange</value></data>
+  <data name="EventResult.327" xml:space="preserve"><value>Gestoppt (Akkubetrieb)</value></data>
+  <data name="EventResult.328" xml:space="preserve"><value>Gestoppt (nicht mehr im Leerlauf)</value></data>
+  <data name="EventResult.330" xml:space="preserve"><value>Gestoppt (durch Benutzer)</value></data>
 </root>
