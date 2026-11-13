@@ -1092,5 +1092,8 @@ Restart now to apply the update?</value></data>
   <data name="Import.Error.Exists" xml:space="preserve"><value>There is already a task '{0}' in this folder. Choose another name or folder.</value></data>
   <data name="Action.Unsupported" xml:space="preserve"><value>Unsupported action</value></data>
   <data name="Editor.Action.Unsupported" xml:space="preserve"><value>This kind of action cannot be edited here. It stays as it is.</value></data>
+  <data name="Main.Status.Ready" xml:space="preserve"><value>Ready</value></data>
+  <data name="Main.Status.Queued" xml:space="preserve"><value>Queued</value></data>
+  <data name="Main.Status.Unknown" xml:space="preserve"><value>State unknown</value></data>
 </root>
 

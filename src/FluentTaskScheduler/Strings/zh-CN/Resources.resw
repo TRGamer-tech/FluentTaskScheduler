@@ -1095,6 +1095,9 @@
   <data name="Import.Error.Exists" xml:space="preserve"><value>此文件夹中已有任务“{0}”。请选择其他名称或文件夹。</value></data>
   <data name="Action.Unsupported" xml:space="preserve"><value>不支持的操作</value></data>
   <data name="Editor.Action.Unsupported" xml:space="preserve"><value>无法在此处编辑这种操作。它将保持原样。</value></data>
+  <data name="Main.Status.Ready" xml:space="preserve"><value>就绪</value></data>
+  <data name="Main.Status.Queued" xml:space="preserve"><value>已排队</value></data>
+  <data name="Main.Status.Unknown" xml:space="preserve"><value>状态未知</value></data>
 </root>
 
 

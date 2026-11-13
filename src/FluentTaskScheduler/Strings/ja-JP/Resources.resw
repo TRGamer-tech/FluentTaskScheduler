@@ -1092,4 +1092,7 @@
   <data name="Import.Error.Exists" xml:space="preserve"><value>このフォルダーには既にタスク '{0}' があります。別の名前かフォルダーを選択してください。</value></data>
   <data name="Action.Unsupported" xml:space="preserve"><value>サポートされていない操作</value></data>
   <data name="Editor.Action.Unsupported" xml:space="preserve"><value>この種類の操作はここでは編集できません。現在の設定のまま保持されます。</value></data>
+  <data name="Main.Status.Ready" xml:space="preserve"><value>準備完了</value></data>
+  <data name="Main.Status.Queued" xml:space="preserve"><value>キューに登録済み</value></data>
+  <data name="Main.Status.Unknown" xml:space="preserve"><value>状態不明</value></data>
 </root>
