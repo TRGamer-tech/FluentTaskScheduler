@@ -109,7 +109,16 @@ public sealed class FakeNetworkProfiles(params NetworkProfile[] profiles) : INet
 public sealed class FakeClipboard : IClipboard
 {
     public string? Text { get; private set; }
-    public void SetText(string text) => Text = text;
+
+    /// <summary>True while another program keeps the clipboard to itself: nothing can be copied.</summary>
+    public bool IsBusy { get; set; }
+
+    public bool SetText(string text)
+    {
+        if (IsBusy) return false;
+        Text = text;
+        return true;
+    }
 }
 
 /// <summary>A snooze that is on or off as the test says, and remembers the runs it refused.</summary>

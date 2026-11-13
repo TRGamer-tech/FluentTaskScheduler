@@ -1122,4 +1122,5 @@
   <data name="Tasks.SelectFormat" xml:space="preserve"><value>「{0}」を選択</value></data>
   <data name="Tasks.EnableFormat" xml:space="preserve"><value>「{0}」を有効にする</value></data>
   <data name="Snooze.Error.RecordUnreadable" xml:space="preserve"><value>以前のスヌーズの記録「{0}」を読み取れなかったため、変更せずにそのままにしています。アプリを再起動するか、このファイルを別の場所へ移動するまで、新たに記録することはできません。</value></data>
+  <data name="Clipboard.Busy" xml:space="preserve"><value>コピーできませんでした。別のプログラムがクリップボードを使用しています。しばらくしてから、もう一度お試しください。</value></data>
 </root>

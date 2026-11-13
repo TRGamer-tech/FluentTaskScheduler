@@ -116,7 +116,8 @@ public sealed partial class ShellPage : Page, IShellNavigator
                 }
             }
         };
-        dialog.PrimaryButtonClick += (_, _) => _clipboard.SetText(details);
+        // Should another program hold the clipboard, the report stays open to be copied again.
+        dialog.PrimaryButtonClick += (_, args) => args.Cancel = !_clipboard.SetText(details);
         return _dialogs.ShowAsync(dialog);
     }
 

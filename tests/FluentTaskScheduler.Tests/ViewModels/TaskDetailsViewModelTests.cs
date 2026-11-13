@@ -289,6 +289,20 @@ public sealed class TaskDetailsViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task Copy_WhileAnotherProgramHoldsTheClipboard_SaysThatNothingWasCopied()
+    {
+        _history.Events.AddRange(Succeeded);
+        _details.PeriodIndex = (int)HistoryPeriod.Everything;
+        await _details.LoadHistoryAsync();
+        _clipboard.IsBusy = true;
+
+        _details.CopyCommand.Execute(null);
+
+        Assert.Null(_clipboard.Text);
+        Assert.Equal("Clipboard.Busy", _details.Problem);
+    }
+
+    [Fact]
     public void ATaskSnoozedOnItsOwn_SaysUntilWhen_AndTheSnoozeOfAllTasksIsNotItsOwn()
     {
         Assert.False(_details.IsSnoozed);

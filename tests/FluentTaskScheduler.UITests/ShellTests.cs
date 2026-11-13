@@ -1,9 +1,11 @@
+using System.Runtime.InteropServices;
+using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
 using FlaUI.Core.Tools;
 
 namespace FluentTaskScheduler.UITests;
 
-/// <summary>The window frame: navigation between pages, the pane, the app language, the window's dialogs.</summary>
+/// <summary>The window frame and what it does for every page: navigation, the pane, the app language, dialogs, the clipboard.</summary>
 public class ShellTests
 {
     private static readonly (string Item, string Heading)[] Pages =
@@ -129,6 +131,69 @@ public class ShellTests
         Assert.False(app.HasExited);
     }
 
+    /// <summary>
+    /// What the app copied stays on the clipboard after the app has gone, even when it was ended
+    /// the hard way. What is copied here is the script editor's output, which has a line once a
+    /// script is saved.
+    /// </summary>
+    [Fact]
+    public void TextCopiedInTheApp_IsStillOnTheClipboard_AfterTheAppHasEnded()
+    {
+        string name = "fts clipboard " + Guid.NewGuid().ToString("N")[..8];
+        string savedLine = $"[Saved to Library as '{name}']";
+        using (var app = AppSession.Launch("clipboard"))
+        {
+            app.Require("NavScriptEditor").Press();
+            app.Require("ScriptEditorName").AsTextBox().Text = name;
+            app.Require("ScriptEditorText").AsTextBox().Text = "Get-Date";
+            var save = app.Find(e => e.AutomationId == "ScriptEditorSave" && e.IsEnabled, 10000)
+                       ?? throw new InvalidOperationException("Save did not become available.");
+            save.AsButton().Invoke();
+            Assert.True(app.Find(e => e.Name == savedLine, 10000) != null, "The output does not confirm that the script was saved.");
+
+            app.Require("ScriptEditorCopyOutput").Press();
+            Assert.True(AppSession.Eventually(() => ClipboardText() == savedLine, 10), "The output did not reach the clipboard.");
+        }
+
+        // Ending the session has killed the app.
+        Assert.True(AppSession.Eventually(() => ClipboardText() == savedLine, 5), "The copied text left the clipboard with the app.");
+    }
+
     private static int WidthOf(AppSession app, string automationId) =>
         (int)app.Require(automationId).BoundingRectangle.Width;
+
+    /// <summary>The text on the clipboard; null when there is none, or another program has the clipboard open.</summary>
+    private static string? ClipboardText()
+    {
+        if (!OpenClipboard(0)) return null;
+        try
+        {
+            nint data = GetClipboardData(UnicodeText);
+            if (data == 0) return null;
+            nint text = GlobalLock(data);
+            try { return Marshal.PtrToStringUni(text); }
+            finally { GlobalUnlock(data); }
+        }
+        finally
+        {
+            CloseClipboard();
+        }
+    }
+
+    private const uint UnicodeText = 13; // CF_UNICODETEXT
+
+    [DllImport("user32.dll")]
+    private static extern bool OpenClipboard(nint owner);
+
+    [DllImport("user32.dll")]
+    private static extern bool CloseClipboard();
+
+    [DllImport("user32.dll")]
+    private static extern nint GetClipboardData(uint format);
+
+    [DllImport("kernel32.dll")]
+    private static extern nint GlobalLock(nint memory);
+
+    [DllImport("kernel32.dll")]
+    private static extern bool GlobalUnlock(nint memory);
 }

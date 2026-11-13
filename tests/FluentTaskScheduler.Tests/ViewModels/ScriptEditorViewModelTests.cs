@@ -241,6 +241,21 @@ public sealed class ScriptEditorViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task CopyingTheOutput_WhileAnotherProgramHoldsTheClipboard_SaysThatNothingWasCopied()
+    {
+        _editor.Text = "anything";
+        Task run = _editor.RunCommand.ExecuteAsync(null);
+        _runner.Last.Writes("one").Exits();
+        await run;
+        _clipboard.IsBusy = true;
+
+        await _editor.CopyOutputCommand.ExecuteAsync(null);
+
+        Assert.Null(_clipboard.Text);
+        Assert.Equal(["Error: Clipboard.Busy"], _prompts.Shown);
+    }
+
+    [Fact]
     public async Task Saving_PutsTheScriptIntoTheLibrary_AndSavingAgainChangesThatScript()
     {
         _editor.Name = " Tidy up ";

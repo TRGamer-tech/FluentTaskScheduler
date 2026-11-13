@@ -116,7 +116,7 @@ public sealed partial class TaskDetailsViewModel : ObservableObject, IDisposable
     /// <summary>Windows is not recording history at the moment. What was recorded earlier is still shown.</summary>
     [ObservableProperty] private bool _isLogOff;
 
-    /// <summary>Why the history could not be read or switched on, in the user's language.</summary>
+    /// <summary>Why the history could not be read, switched on, exported or copied, in the user's language.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasProblem))]
     private string? _problem;
@@ -356,8 +356,11 @@ public sealed partial class TaskDetailsViewModel : ObservableObject, IDisposable
 
     /// <summary>Puts the listed events on the clipboard, one line each, columns separated by tabs.</summary>
     [RelayCommand]
-    private void Copy() =>
-        _clipboard.SetText(string.Join(Environment.NewLine, Entries.Select(entry => $"{entry.Time}\t{entry.Label}\t{entry.Details}")));
+    private void Copy()
+    {
+        if (!_clipboard.SetText(string.Join(Environment.NewLine, Entries.Select(entry => $"{entry.Time}\t{entry.Label}\t{entry.Details}"))))
+            Problem = Loc.Get("Clipboard.Busy");
+    }
 
     [RelayCommand]
     private async Task SnoozeAsync(SnoozeChoice choice) => SnoozeProblem = await TrySnoozeAsync(choice.End);

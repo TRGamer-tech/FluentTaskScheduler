@@ -178,7 +178,11 @@ public sealed partial class ScriptEditorViewModel(
     }
 
     [RelayCommand]
-    private void CopyOutput() => clipboard.SetText(string.Join(Environment.NewLine, Output.Select(line => line.Text)));
+    private async Task CopyOutputAsync()
+    {
+        if (!clipboard.SetText(string.Join(Environment.NewLine, Output.Select(line => line.Text))))
+            await prompts.ShowErrorAsync(Loc.Get("Clipboard.Busy"));
+    }
 
     /// <summary>Ends the script if one is running.</summary>
     public void Dispose()

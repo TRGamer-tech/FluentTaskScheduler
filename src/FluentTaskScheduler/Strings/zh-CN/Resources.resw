@@ -1125,6 +1125,7 @@
   <data name="Tasks.SelectFormat" xml:space="preserve"><value>选择“{0}”</value></data>
   <data name="Tasks.EnableFormat" xml:space="preserve"><value>启用“{0}”</value></data>
   <data name="Snooze.Error.RecordUnreadable" xml:space="preserve"><value>无法读取之前暂停的记录“{0}”，因此未对其做任何改动。在重启应用或将该文件移到别处之前，无法记录任何新内容。</value></data>
+  <data name="Clipboard.Busy" xml:space="preserve"><value>未能复制：另一个程序正在使用剪贴板。请稍后重试。</value></data>
 </root>
 
 
