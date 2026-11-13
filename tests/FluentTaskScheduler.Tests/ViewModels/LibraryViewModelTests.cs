@@ -1,4 +1,3 @@
-using System.Globalization;
 using FluentTaskScheduler.Library;
 using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Tests.Processes;
@@ -51,11 +50,10 @@ public sealed class LibraryViewModelTests : IDisposable
     public void ATemplateCard_SaysWhatRunsAndWhen_AndWhetherItNeedsAdministratorRights()
     {
         LibraryViewModel library = NewLibrary();
-        string twoOClock = new TimeOnly(2, 0).ToString("t", CultureInfo.CurrentCulture);
 
         TemplateCard defrag = Template(library, "Defrag");
         Assert.Equal(
-            ("Templates.Defrag.Name", "Templates.Defrag.Desc", "Templates.Defrag.Note", $"defrag.exe · Dialog.Trigger.Weekly (Dialog.Day.Sun) Trigger.At {twoOClock}"),
+            ("Templates.Defrag.Name", "Templates.Defrag.Desc", "Templates.Defrag.Note", "defrag.exe · Trigger.AtTimeFormat"),
             (defrag.Name, defrag.Description, defrag.Note, defrag.Summary));
         Assert.True(defrag.HasNote);
         Assert.True(defrag.RunsElevated);
@@ -65,7 +63,7 @@ public sealed class LibraryViewModelTests : IDisposable
         Assert.False(dnsFlush.HasNote);
         Assert.False(dnsFlush.RunsElevated);
 
-        Assert.StartsWith("powershell.exe · Dialog.Trigger.Daily Trigger.At ", Template(library, "TempCleanup").Summary);
+        Assert.Equal("powershell.exe · Trigger.AtTimeFormat", Template(library, "TempCleanup").Summary);
         Assert.Equal("powershell.exe · Trigger.SessionStateChange", Template(library, "DisplayOff").Summary);
     }
 

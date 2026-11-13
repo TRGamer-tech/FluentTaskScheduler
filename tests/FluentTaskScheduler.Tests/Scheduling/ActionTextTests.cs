@@ -1,10 +1,22 @@
+using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Scheduling;
+using FluentTaskScheduler.Tests.Library;
+using FluentTaskScheduler.Tests.Snoozing;
 
 namespace FluentTaskScheduler.Tests.Scheduling;
 
-/// <summary>Without resources a text shows its resource names, which is what these tests read.</summary>
-public class ActionTextTests
+/// <summary>The descriptions with the app's English texts in place.</summary>
+[Collection(LocalizedTextCollection.Name)]
+public sealed class ActionTextTests : IDisposable
 {
+    public ActionTextTests()
+    {
+        var english = RepoFiles.Texts("en-US");
+        Loc.Use(key => english.GetValueOrDefault(key));
+    }
+
+    public void Dispose() => Loc.Use(static _ => null);
+
     [Theory]
     [InlineData("cmd.exe", "/c exit 0", "cmd.exe /c exit 0")]
     [InlineData("backup.exe", "", "backup.exe")]
@@ -16,6 +28,6 @@ public class ActionTextTests
     [Fact]
     public void AnActionTheEditorCannotChange_IsCalledUnsupported_AndNamesItsKind()
     {
-        Assert.Equal("Action.Unsupported (SendEmail)", ActionText.Describe(new ActionDraft { SourceIndex = 0, UnsupportedSummary = "SendEmail" }));
+        Assert.Equal("Unsupported action (send an email)", ActionText.Describe(new ActionDraft { SourceIndex = 0, UnsupportedSummary = "send an email" }));
     }
 }

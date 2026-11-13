@@ -242,7 +242,6 @@
   <data name="Dialog.RunAsCurrent" xml:space="preserve"><value>以当前用户身份运行</value></data>
   <data name="Dialog.RunAsSpecific" xml:space="preserve"><value>以指定用户身份运行</value></data>
   <data name="Dialog.RunAsSystem" xml:space="preserve"><value>以 SYSTEM 身份运行（需要管理员权限）</value></data>
-  <data name="Trigger.At" xml:space="preserve"><value>在</value></data>
   <data name="Trigger.OnIdle" xml:space="preserve"><value>空闲时</value></data>
   <data name="Trigger.AtLogon" xml:space="preserve"><value>登录时</value></data>
   <data name="Trigger.AtStartup" xml:space="preserve"><value>启动时</value></data>
@@ -854,6 +853,13 @@
   <data name="NewTask.Email.Subject" xml:space="preserve"><value>任务已启动</value></data>
   <data name="NewTask.Email.Body" xml:space="preserve"><value>任务已启动。</value></data>
   <data name="NewTask.Message.Text" xml:space="preserve"><value>来自计划任务的消息</value></data>
+  <data name="Trigger.AtTimeFormat" xml:space="preserve"><value>{0}的 {1}</value></data>
+  <data name="Text.DetailFormat" xml:space="preserve"><value>{0}（{1}）</value></data>
+  <data name="Trigger.PartFormat" xml:space="preserve"><value>{0}：{1}</value></data>
+  <data name="Trigger.InMonthsFormat" xml:space="preserve"><value>{0}；{1}</value></data>
+  <data name="Trigger.DayOfMonthFormat" xml:space="preserve"><value>{0}日</value></data>
+  <data name="Trigger.LastDayOfMonth" xml:space="preserve"><value>最后一天</value></data>
+  <data name="Text.ListSeparator" xml:space="preserve"><value>、</value></data>
 </root>
 
 

@@ -241,7 +241,6 @@
   <data name="Dialog.RunAsCurrent" xml:space="preserve"><value>現在のユーザーとして実行</value></data>
   <data name="Dialog.RunAsSpecific" xml:space="preserve"><value>特定のユーザーとして実行</value></data>
   <data name="Dialog.RunAsSystem" xml:space="preserve"><value>SYSTEM として実行 (管理者権限が必要)</value></data>
-  <data name="Trigger.At" xml:space="preserve"><value>開始時間</value></data>
   <data name="Trigger.OnIdle" xml:space="preserve"><value>アイドル時</value></data>
   <data name="Trigger.AtLogon" xml:space="preserve"><value>ログオン時</value></data>
   <data name="Trigger.AtStartup" xml:space="preserve"><value>スタートアップ時</value></data>
@@ -853,4 +852,11 @@
   <data name="NewTask.Email.Subject" xml:space="preserve"><value>タスクが開始されました</value></data>
   <data name="NewTask.Email.Body" xml:space="preserve"><value>タスクが開始されました。</value></data>
   <data name="NewTask.Message.Text" xml:space="preserve"><value>スケジュールされたタスクからのメッセージ</value></data>
+  <data name="Trigger.AtTimeFormat" xml:space="preserve"><value>{0} {1}</value></data>
+  <data name="Text.DetailFormat" xml:space="preserve"><value>{0} ({1})</value></data>
+  <data name="Trigger.PartFormat" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="Trigger.InMonthsFormat" xml:space="preserve"><value>{1}の{0}</value></data>
+  <data name="Trigger.DayOfMonthFormat" xml:space="preserve"><value>{0}日</value></data>
+  <data name="Trigger.LastDayOfMonth" xml:space="preserve"><value>最終日</value></data>
+  <data name="Text.ListSeparator" xml:space="preserve"><value>、</value></data>
 </root>

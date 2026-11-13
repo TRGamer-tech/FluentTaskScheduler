@@ -37,6 +37,7 @@ public sealed class SnoozeViewModelTests : IDisposable
             "Snooze.Restore.MessageFormat" => "Still disabled: {0}",
             "Snooze.Restore.MoreFormat" => "{0} and {1} more",
             "Snooze.Unreadable.MessageFormat" => "Kept as {0}",
+            "Text.ListSeparator" => ", ",
             _ => null
         });
         _settings = new SettingsStore(_folder.Paths, _time);

@@ -7,6 +7,6 @@ public static class ActionText
 {
     public static string Describe(ActionDraft action) =>
         action.UnsupportedSummary is { } kind
-            ? $"{Loc.Get("Action.Unsupported")} ({kind})"
+            ? Loc.Format("Text.DetailFormat", Loc.Get("Action.Unsupported"), kind)
             : $"{action.Path} {action.Arguments}".Trim();
 }

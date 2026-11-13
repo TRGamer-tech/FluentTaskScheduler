@@ -241,7 +241,6 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.RunAsCurrent" xml:space="preserve"><value>Als aktueller Benutzer ausführen</value></data>
   <data name="Dialog.RunAsSpecific" xml:space="preserve"><value>Als bestimmter Benutzer ausführen</value></data>
   <data name="Dialog.RunAsSystem" xml:space="preserve"><value>Als SYSTEM ausführen (Administratorrechte erforderlich)</value></data>
-  <data name="Trigger.At" xml:space="preserve"><value>um</value></data>
   <data name="Trigger.OnIdle" xml:space="preserve"><value>Bei Leerlauf</value></data>
   <data name="Trigger.AtLogon" xml:space="preserve"><value>Bei Anmeldung</value></data>
   <data name="Trigger.AtStartup" xml:space="preserve"><value>Beim Systemstart</value></data>
@@ -281,11 +280,11 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.Month.Oct" xml:space="preserve"><value>Okt</value></data>
   <data name="Dialog.Month.Nov" xml:space="preserve"><value>Nov</value></data>
   <data name="Dialog.Month.Dec" xml:space="preserve"><value>Dez</value></data>
-  <data name="Dialog.Week.First" xml:space="preserve"><value>Erster</value></data>
-  <data name="Dialog.Week.Second" xml:space="preserve"><value>Zweiter</value></data>
-  <data name="Dialog.Week.Third" xml:space="preserve"><value>Dritter</value></data>
-  <data name="Dialog.Week.Fourth" xml:space="preserve"><value>Vierter</value></data>
-  <data name="Dialog.Week.Last" xml:space="preserve"><value>Letzter</value></data>
+  <data name="Dialog.Week.First" xml:space="preserve"><value>Erste</value></data>
+  <data name="Dialog.Week.Second" xml:space="preserve"><value>Zweite</value></data>
+  <data name="Dialog.Week.Third" xml:space="preserve"><value>Dritte</value></data>
+  <data name="Dialog.Week.Fourth" xml:space="preserve"><value>Vierte</value></data>
+  <data name="Dialog.Week.Last" xml:space="preserve"><value>Letzte</value></data>
   <data name="Dialog.Sess.Lock" xml:space="preserve"><value>Arbeitsstation sperren</value></data>
   <data name="Dialog.Sess.Unlock" xml:space="preserve"><value>Arbeitsstation entsperren</value></data>
   <data name="Dialog.Action.RunProg" xml:space="preserve"><value>Programm starten</value></data>
@@ -853,4 +852,11 @@ Jetzt App neustarten?</value></data>
   <data name="NewTask.Email.Subject" xml:space="preserve"><value>Aufgabe gestartet</value></data>
   <data name="NewTask.Email.Body" xml:space="preserve"><value>Die Aufgabe wurde gestartet.</value></data>
   <data name="NewTask.Message.Text" xml:space="preserve"><value>Nachricht einer geplanten Aufgabe</value></data>
+  <data name="Trigger.AtTimeFormat" xml:space="preserve"><value>{0} um {1}</value></data>
+  <data name="Text.DetailFormat" xml:space="preserve"><value>{0} ({1})</value></data>
+  <data name="Trigger.PartFormat" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="Trigger.InMonthsFormat" xml:space="preserve"><value>{0}; {1}</value></data>
+  <data name="Trigger.DayOfMonthFormat" xml:space="preserve"><value>{0}.</value></data>
+  <data name="Trigger.LastDayOfMonth" xml:space="preserve"><value>letzter Tag</value></data>
+  <data name="Text.ListSeparator" xml:space="preserve"><value>, </value></data>
 </root>

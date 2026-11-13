@@ -24,4 +24,7 @@ public static class Loc
     /// <summary>The text for <paramref name="key"/> with its {0}, {1}, ... placeholders filled in.</summary>
     public static string Format(string key, params object?[] arguments) =>
         string.Format(CultureInfo.CurrentCulture, Get(key), arguments);
+
+    /// <summary>Items in a row, separated the way the language separates them: "a, b" in English, "a、b" in Japanese.</summary>
+    public static string List(IEnumerable<string> items) => string.Join(Get("Text.ListSeparator"), items);
 }

@@ -28,25 +28,26 @@ public static class TriggerText
         (MonthsOfTheYear.October, "Dialog.Month.Oct"), (MonthsOfTheYear.November, "Dialog.Month.Nov"), (MonthsOfTheYear.December, "Dialog.Month.Dec")
     ];
 
+    // Put together with format texts rather than with spaces and punctuation in code: languages
+    // differ in where the time goes, whether a word comes before it, and which brackets and
+    // separators they use.
     public static string Describe(TriggerDraft trigger)
     {
         string type = Loc.Get(TypeKey(trigger.Type));
-        string time = trigger.Start is { } start ? $" {Loc.Get("Trigger.At")} {start.ToString("t", CultureInfo.CurrentCulture)}" : "";
+        string With(string detail) => Loc.Format("Text.DetailFormat", type, detail);
 
         return trigger.Type switch
         {
-            TriggerType.Once => trigger.Start is { } when ? $"{type}: {when.ToString("g", CultureInfo.CurrentCulture)}" : type,
-            TriggerType.Daily => trigger.DaysInterval > 1
-                ? $"{type} ({Loc.Format("Editor.Trigger.EveryNDays", trigger.DaysInterval)}){time}"
-                : $"{type}{time}",
-            TriggerType.Weekly => $"{type} ({EveryNWeeks(trigger)}{Names(Weekdays, d => trigger.DaysOfWeek.HasFlag(d))}){time}",
-            TriggerType.Monthly when trigger.MonthlyByWeekday =>
-                $"{type} ({Names(WeeksOfMonth, w => trigger.Weeks.HasFlag(w))}: {Names(Weekdays, d => trigger.DaysOfWeek.HasFlag(d))}{InMonths(trigger)}){time}",
-            TriggerType.Monthly => $"{type} ({DaysOfMonth(trigger)}{InMonths(trigger)}){time}",
+            TriggerType.Once => trigger.Start is { } when ? Loc.Format("Trigger.PartFormat", type, when.ToString("g", CultureInfo.CurrentCulture)) : type,
+            TriggerType.Daily => AtTime(trigger, trigger.DaysInterval > 1 ? With(Loc.Format("Editor.Trigger.EveryNDays", trigger.DaysInterval)) : type),
+            TriggerType.Weekly => AtTime(trigger, With(EveryNWeeks(trigger, Names(Weekdays, d => trigger.DaysOfWeek.HasFlag(d))))),
+            TriggerType.Monthly when trigger.MonthlyByWeekday => AtTime(trigger, With(InMonths(trigger,
+                Loc.Format("Trigger.PartFormat", Names(WeeksOfMonth, w => trigger.Weeks.HasFlag(w)), Names(Weekdays, d => trigger.DaysOfWeek.HasFlag(d)))))),
+            TriggerType.Monthly => AtTime(trigger, With(InMonths(trigger, DaysOfMonth(trigger)))),
             TriggerType.Event when EventQuery.TryParse(trigger.EventSubscription, out string log, out string source, out int? id) =>
-                $"{type} ({string.Join(", ", new[] { log, source, id?.ToString() }.Where(part => !string.IsNullOrEmpty(part)))})",
+                With(Loc.List(new[] { log, source, id?.ToString() }.OfType<string>().Where(part => part.Length > 0))),
             TriggerType.SessionStateChange => Loc.Format("Trigger.SessionStateChange", Loc.Get(SessionChangeKey(trigger.SessionChange))),
-            TriggerType.Unsupported when trigger.UnsupportedSummary is { Length: > 0 } summary => $"{type} ({summary})",
+            TriggerType.Unsupported when trigger.UnsupportedSummary is { Length: > 0 } summary => With(summary),
             _ => type
         };
     }
@@ -78,20 +79,24 @@ public static class TriggerText
         _ => "Dialog.Trigger.__Unsupported"
     };
 
-    private static string EveryNWeeks(TriggerDraft trigger) =>
-        trigger.WeeksInterval > 1 ? Loc.Format("Editor.Trigger.EveryNWeeks", trigger.WeeksInterval) + ": " : "";
+    /// <summary>A calendar trigger's summary with the time of day it fires.</summary>
+    private static string AtTime(TriggerDraft trigger, string summary) =>
+        trigger.Start is { } start ? Loc.Format("Trigger.AtTimeFormat", summary, start.ToString("t", CultureInfo.CurrentCulture)) : summary;
+
+    private static string EveryNWeeks(TriggerDraft trigger, string days) =>
+        trigger.WeeksInterval > 1 ? Loc.Format("Trigger.PartFormat", Loc.Format("Editor.Trigger.EveryNWeeks", trigger.WeeksInterval), days) : days;
 
     /// <summary>The months a monthly trigger is limited to. Every month goes without saying, and none at all is an error the editor reports.</summary>
-    private static string InMonths(TriggerDraft trigger) =>
-        trigger.Months is MonthsOfTheYear.AllMonths or 0 ? "" : "; " + Names(Months, m => trigger.Months.HasFlag(m));
+    private static string InMonths(TriggerDraft trigger, string days) =>
+        trigger.Months is MonthsOfTheYear.AllMonths or 0 ? days : Loc.Format("Trigger.InMonthsFormat", days, Names(Months, m => trigger.Months.HasFlag(m)));
 
     private static string DaysOfMonth(TriggerDraft trigger)
     {
-        var parts = TaskDraftReader.DaysOfMonthFromMask(trigger.DaysOfMonth).Select(day => day.ToString(CultureInfo.CurrentCulture)).ToList();
-        if (trigger.LastDayOfMonth) parts.Add(Loc.Get("Dialog.Week.Last"));
-        return string.Join(", ", parts);
+        var parts = TaskDraftReader.DaysOfMonthFromMask(trigger.DaysOfMonth).Select(day => Loc.Format("Trigger.DayOfMonthFormat", day)).ToList();
+        if (trigger.LastDayOfMonth) parts.Add(Loc.Get("Trigger.LastDayOfMonth"));
+        return Loc.List(parts);
     }
 
     private static string Names<T>((T Value, string Key)[] all, Func<T, bool> isSet) =>
-        string.Join(", ", all.Where(item => isSet(item.Value)).Select(item => Loc.Get(item.Key)));
+        Loc.List(all.Where(item => isSet(item.Value)).Select(item => Loc.Get(item.Key)));
 }

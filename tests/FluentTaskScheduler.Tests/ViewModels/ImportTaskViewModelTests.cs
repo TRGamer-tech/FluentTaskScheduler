@@ -45,14 +45,16 @@ public class ImportTaskViewModelTests
     public void WhatTheTaskRunsAndWhen_IsShownBeforeItIsImported()
     {
         var daily = new TriggerDraft { Type = TriggerType.Daily, SourceIndex = 0, Start = new DateTime(2031, 5, 6, 7, 8, 0) };
+        var registration = new TriggerDraft { Type = TriggerType.Unsupported, SourceIndex = 1, UnsupportedSummary = "Registration" };
+        var message = new ActionDraft { SourceIndex = 1, UnsupportedSummary = "ShowMessage" };
         var import = Import(Info(TaskAccount.System) with
         {
-            Triggers = [daily, new TriggerDraft { Type = TriggerType.Unsupported, SourceIndex = 1, UnsupportedSummary = "Registration" }],
-            Actions = [new ActionDraft { SourceIndex = 0, Path = "cmd.exe", Arguments = "/c del *" }, new ActionDraft { SourceIndex = 1, UnsupportedSummary = "ShowMessage" }]
+            Triggers = [daily, registration],
+            Actions = [new ActionDraft { SourceIndex = 0, Path = "cmd.exe", Arguments = "/c del *" }, message]
         });
 
-        Assert.Equal(["cmd.exe /c del *", "Action.Unsupported (ShowMessage)"], import.Actions);
-        Assert.Equal([TriggerText.Describe(daily), "Dialog.Trigger.__Unsupported (Registration)"], import.Triggers);
+        Assert.Equal(["cmd.exe /c del *", ActionText.Describe(message)], import.Actions);
+        Assert.Equal([TriggerText.Describe(daily), TriggerText.Describe(registration)], import.Triggers);
         Assert.False(import.HasNoTriggers);
     }
 

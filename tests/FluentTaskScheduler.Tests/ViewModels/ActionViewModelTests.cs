@@ -26,7 +26,7 @@ public class ActionViewModelTests
         var action = new ActionViewModel(stored);
 
         Assert.False(action.IsEditable);
-        Assert.Equal("Action.Unsupported (ShowMessage)", action.Summary);
+        Assert.Equal(ActionText.Describe(stored), action.Summary);
         Assert.Equal(stored, action.Build());
     }
 }

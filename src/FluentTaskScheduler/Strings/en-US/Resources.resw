@@ -240,7 +240,6 @@ Restart now to apply the update?</value></data>
   <data name="Dialog.RunAsCurrent" xml:space="preserve"><value>Run as current user</value></data>
   <data name="Dialog.RunAsSpecific" xml:space="preserve"><value>Run as specific user</value></data>
   <data name="Dialog.RunAsSystem" xml:space="preserve"><value>Run as SYSTEM (needs administrator rights)</value></data>
-  <data name="Trigger.At" xml:space="preserve"><value>at</value></data>
   <data name="Trigger.OnIdle" xml:space="preserve"><value>On idle</value></data>
   <data name="Trigger.AtLogon" xml:space="preserve"><value>At logon</value></data>
   <data name="Trigger.AtStartup" xml:space="preserve"><value>At startup</value></data>
@@ -853,5 +852,12 @@ Restart now to apply the update?</value></data>
   <data name="NewTask.Email.Subject" xml:space="preserve"><value>Task started</value></data>
   <data name="NewTask.Email.Body" xml:space="preserve"><value>The task has started.</value></data>
   <data name="NewTask.Message.Text" xml:space="preserve"><value>Message from a scheduled task</value></data>
+  <data name="Trigger.AtTimeFormat" xml:space="preserve"><value>{0} at {1}</value></data>
+  <data name="Text.DetailFormat" xml:space="preserve"><value>{0} ({1})</value></data>
+  <data name="Trigger.PartFormat" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="Trigger.InMonthsFormat" xml:space="preserve"><value>{0}; {1}</value></data>
+  <data name="Trigger.DayOfMonthFormat" xml:space="preserve"><value>{0}</value></data>
+  <data name="Trigger.LastDayOfMonth" xml:space="preserve"><value>last day</value></data>
+  <data name="Text.ListSeparator" xml:space="preserve"><value>, </value></data>
 </root>
 

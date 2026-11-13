@@ -75,7 +75,7 @@ public sealed partial class SnoozeViewModel : ObservableObject, IDisposable
         get
         {
             ValueList<PendingRestore> restores = _state.PendingRestores;
-            string named = string.Join(", ", restores.Take(NamedRestores).Select(restore => restore.TaskPath));
+            string named = Loc.List(restores.Take(NamedRestores).Select(restore => restore.TaskPath));
             if (restores.Count > NamedRestores) named = Loc.Format("Snooze.Restore.MoreFormat", named, restores.Count - NamedRestores);
 
             string text = Loc.Format("Snooze.Restore.MessageFormat", named);
