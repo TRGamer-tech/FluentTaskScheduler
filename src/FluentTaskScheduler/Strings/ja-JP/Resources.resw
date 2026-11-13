@@ -1121,4 +1121,5 @@
   <data name="Tasks.Error.OnlyWithPassword" xml:space="preserve"><value>'{0}': このタスクは、アカウントのパスワードを入力してエディターでのみ変更できます。</value></data>
   <data name="Tasks.SelectFormat" xml:space="preserve"><value>「{0}」を選択</value></data>
   <data name="Tasks.EnableFormat" xml:space="preserve"><value>「{0}」を有効にする</value></data>
+  <data name="Snooze.Error.RecordUnreadable" xml:space="preserve"><value>以前のスヌーズの記録「{0}」を読み取れなかったため、変更せずにそのままにしています。アプリを再起動するか、このファイルを別の場所へ移動するまで、新たに記録することはできません。</value></data>
 </root>

@@ -409,9 +409,11 @@ public sealed class SnoozeRecoveryTests : SnoozeTestBase
         var snooze = await StartedService();
         Assert.Equal(StateFile, snooze.State.UnreadableStateFile);
 
-        await Assert.ThrowsAsync<IOException>(() => snooze.SnoozeTaskAsync(A, After(60)));
+        IOException refused = await Assert.ThrowsAsync<IOException>(() => snooze.SnoozeTaskAsync(A, After(60)));
         await Assert.ThrowsAsync<IOException>(() => snooze.SnoozeAllAsync(After(60)));
 
+        // The user is told why, so it is one of the app's texts.
+        Assert.Equal("Snooze.Error.RecordUnreadable", refused.Message);
         Assert.True(Store.IsEnabled(A));
         Assert.Empty(Store.Calls);
         Assert.Null(snooze.State.Global);

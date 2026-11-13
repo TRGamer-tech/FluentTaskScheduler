@@ -1121,4 +1121,5 @@ Jetzt App neustarten?</value></data>
   <data name="Tasks.Error.OnlyWithPassword" xml:space="preserve"><value>'{0}': Diese Aufgabe lässt sich nur im Editor ändern, mit dem Kennwort ihres Kontos.</value></data>
   <data name="Tasks.SelectFormat" xml:space="preserve"><value>{0} auswählen</value></data>
   <data name="Tasks.EnableFormat" xml:space="preserve"><value>{0} aktivieren</value></data>
+  <data name="Snooze.Error.RecordUnreadable" xml:space="preserve"><value>Die Aufzeichnung früherer Pausen in „{0}“ konnte nicht gelesen werden und wurde unverändert gelassen. Bis die App neu gestartet oder diese Datei an einen anderen Ort verschoben wurde, kann nichts Neues aufgezeichnet werden.</value></data>
 </root>

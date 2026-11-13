@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using FluentTaskScheduler.Localization;
 using Serilog;
 
 namespace FluentTaskScheduler.Snoozing;
@@ -65,8 +66,8 @@ internal sealed class SnoozeStateFile
     /// <exception cref="UnauthorizedAccessException">The file could not be written.</exception>
     public void Write(SnoozeFileContent content)
     {
-        if (_holdsUnreadableState)
-            throw new IOException($"The snooze state in '{_path}' could not be read and was left untouched. Nothing new can be recorded until the app has been restarted or that file has been moved away.");
+        // The message is shown to the user as the reason a snooze did not start.
+        if (_holdsUnreadableState) throw new IOException(Loc.Format("Snooze.Error.RecordUnreadable", _path));
 
         Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
         string temp = _path + ".tmp";
