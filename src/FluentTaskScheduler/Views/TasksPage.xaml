@@ -12,13 +12,13 @@
     <Page.Resources>
         <!-- One menu for all rows; it finds out which row it was opened for when it opens. -->
         <MenuFlyout x:Key="RowMenu" x:Name="RowMenu" Opening="RowMenu_Opening">
-            <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Main.Task.RunNow')}" Icon="Play" Click="RunRow_Click"/>
-            <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Main.Task.Stop')}" Icon="Stop" Click="StopRow_Click"/>
-            <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Main.Task.Edit')}" Icon="Edit" Click="EditRow_Click"/>
-            <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Main.Task.Export')}" Icon="Save" Click="ExportRow_Click"/>
+            <MenuFlyoutItem x:Name="RowRunItem" Text="{x:Bind l:Loc.Get('Main.Task.RunNow')}" Icon="Play" Click="RunRow_Click"/>
+            <MenuFlyoutItem x:Name="RowStopItem" Text="{x:Bind l:Loc.Get('Main.Task.Stop')}" Icon="Stop" Click="StopRow_Click"/>
+            <MenuFlyoutItem x:Name="RowEditItem" Text="{x:Bind l:Loc.Get('Main.Task.Edit')}" Icon="Edit" Click="EditRow_Click"/>
+            <MenuFlyoutItem x:Name="RowExportItem" Text="{x:Bind l:Loc.Get('Main.Task.Export')}" Icon="Save" Click="ExportRow_Click"/>
             <MenuFlyoutSubItem x:Name="RowMoveMenu" Text="{x:Bind l:Loc.Get('Tasks.MoveTo')}" Icon="MoveToFolder"/>
             <MenuFlyoutSeparator/>
-            <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Main.Task.Delete')}" Icon="Delete" Click="DeleteRow_Click"/>
+            <MenuFlyoutItem x:Name="RowDeleteItem" Text="{x:Bind l:Loc.Get('Main.Task.Delete')}" Icon="Delete" Click="DeleteRow_Click"/>
         </MenuFlyout>
         <Style x:Key="BadgeStyle" TargetType="Border">
             <Setter Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}"/>
@@ -119,12 +119,12 @@
                 <AppBarButton x:Name="SortButton" Icon="Sort" Label="{x:Bind ViewModel.SortText, Mode=OneWay}">
                     <AppBarButton.Flyout>
                         <MenuFlyout>
-                            <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Main.Sort.Name')}" Command="{x:Bind ViewModel.SortByCommand}" CommandParameter="{x:Bind vm:TaskSort.Name}"/>
-                            <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Main.Sort.Status')}" Command="{x:Bind ViewModel.SortByCommand}" CommandParameter="{x:Bind vm:TaskSort.Status}"/>
-                            <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Main.Sort.NextRun')}" Command="{x:Bind ViewModel.SortByCommand}" CommandParameter="{x:Bind vm:TaskSort.NextRun}"/>
-                            <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Main.Sort.LastRun')}" Command="{x:Bind ViewModel.SortByCommand}" CommandParameter="{x:Bind vm:TaskSort.LastRun}"/>
+                            <MenuFlyoutItem x:Name="SortByNameItem" Text="{x:Bind l:Loc.Get('Main.Sort.Name')}" Command="{x:Bind ViewModel.SortByCommand}" CommandParameter="{x:Bind vm:TaskSort.Name}"/>
+                            <MenuFlyoutItem x:Name="SortByStatusItem" Text="{x:Bind l:Loc.Get('Main.Sort.Status')}" Command="{x:Bind ViewModel.SortByCommand}" CommandParameter="{x:Bind vm:TaskSort.Status}"/>
+                            <MenuFlyoutItem x:Name="SortByNextRunItem" Text="{x:Bind l:Loc.Get('Main.Sort.NextRun')}" Command="{x:Bind ViewModel.SortByCommand}" CommandParameter="{x:Bind vm:TaskSort.NextRun}"/>
+                            <MenuFlyoutItem x:Name="SortByLastRunItem" Text="{x:Bind l:Loc.Get('Main.Sort.LastRun')}" Command="{x:Bind ViewModel.SortByCommand}" CommandParameter="{x:Bind vm:TaskSort.LastRun}"/>
                             <MenuFlyoutSeparator/>
-                            <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Main.Sort.Clear')}" Command="{x:Bind ViewModel.SortByCommand}" CommandParameter="{x:Bind vm:TaskSort.None}"/>
+                            <MenuFlyoutItem x:Name="SortClearItem" Text="{x:Bind l:Loc.Get('Main.Sort.Clear')}" Command="{x:Bind ViewModel.SortByCommand}" CommandParameter="{x:Bind vm:TaskSort.None}"/>
                         </MenuFlyout>
                     </AppBarButton.Flyout>
                 </AppBarButton>
@@ -231,8 +231,9 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
+                        <!-- Every row has the same check box and switch; a screen reader tells them apart by the task's name. -->
                         <CheckBox MinWidth="0" VerticalAlignment="Center" IsChecked="{x:Bind IsSelected, Mode=OneWay}" Click="RowCheckBox_Click"
-                                  AutomationProperties.Name="{x:Bind l:Loc.Get('Tasks.Select')}"/>
+                                  AutomationProperties.Name="{x:Bind local:TasksPage.Named('Tasks.SelectFormat', Name)}"/>
                         <controls:TaskStateIcon Grid.Column="1" VerticalAlignment="Center"
                                                 State="{x:Bind State, Mode=OneWay}" IsRunning="{x:Bind IsRunning, Mode=OneWay}"/>
 
@@ -279,7 +280,7 @@
 
                         <ToggleSwitch Grid.Column="3" VerticalAlignment="Center" MinWidth="0"
                                       IsOn="{x:Bind EnabledSwitch, Mode=TwoWay}"
-                                      AutomationProperties.Name="{x:Bind l:Loc.Get('Dialog.Enabled')}"/>
+                                      AutomationProperties.Name="{x:Bind local:TasksPage.Named('Tasks.EnableFormat', Name)}"/>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>

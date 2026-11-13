@@ -905,7 +905,6 @@ Restart now to apply the update?</value></data>
   <data name="Tasks.Error.Gone" xml:space="preserve"><value>'{0}' no longer exists.</value></data>
   <data name="Tasks.Snoozed.Title" xml:space="preserve"><value>Tasks are snoozed</value></data>
   <data name="Tasks.File.TaskXml" xml:space="preserve"><value>Task XML</value></data>
-  <data name="Tasks.Select" xml:space="preserve"><value>Select</value></data>
   <data name="Tasks.Badge.Unreadable" xml:space="preserve"><value>Unreadable</value></data>
   <data name="Tasks.Toolbar.Sort" xml:space="preserve"><value>Sort</value></data>
   <data name="Folders.Library" xml:space="preserve"><value>Task Scheduler Library</value></data>
@@ -1121,5 +1120,7 @@ Restart now to apply the update?</value></data>
   <data name="Folders.Error.PartlyMoved" xml:space="preserve"><value>Some tasks could not be moved and stay in '{0}'. The others were moved.</value></data>
   <data name="Tasks.Error.CompletionActionsKept" xml:space="preserve"><value>The completion actions of these tasks still start tasks by the paths they had before, because these tasks could not be changed:</value></data>
   <data name="Tasks.Error.OnlyWithPassword" xml:space="preserve"><value>'{0}': this task can only be changed in the editor, with the password of its account.</value></data>
+  <data name="Tasks.SelectFormat" xml:space="preserve"><value>Select {0}</value></data>
+  <data name="Tasks.EnableFormat" xml:space="preserve"><value>Enable {0}</value></data>
 </root>
 

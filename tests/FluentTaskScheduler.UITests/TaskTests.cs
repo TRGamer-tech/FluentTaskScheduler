@@ -21,6 +21,10 @@ public sealed class TaskTests : IDisposable
         app.Snapshot("searched");
 
         Assert.True(app.Find(RowNamed("Made elsewhere"), 20000) != null, "The task created with schtasks is not in the list.");
+
+        // Every row has the same check box and switch; a screen reader tells them apart by the task's name.
+        Assert.True(app.FindByName("Select Made elsewhere") != null, "The row's check box does not say which task it selects.");
+        Assert.True(app.FindByName("Enable Made elsewhere") != null, "The row's switch does not say which task it enables.");
     }
 
     [Fact]

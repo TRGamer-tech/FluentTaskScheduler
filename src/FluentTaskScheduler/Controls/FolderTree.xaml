@@ -9,7 +9,7 @@
     <UserControl.Resources>
         <!-- One menu for all folders; it finds out which folder it was opened for when it opens. -->
         <MenuFlyout x:Key="FolderMenu" x:Name="FolderMenu" Opening="FolderMenu_Opening">
-            <MenuFlyoutItem Text="{x:Bind l:Loc.Get('FolderMenu.NewSubfolder')}" Icon="NewFolder" Click="NewFolder_Click"/>
+            <MenuFlyoutItem x:Name="NewSubfolderItem" Text="{x:Bind l:Loc.Get('FolderMenu.NewSubfolder')}" Icon="NewFolder" Click="NewFolder_Click"/>
             <MenuFlyoutItem x:Name="RenameFolderItem" Text="{x:Bind l:Loc.Get('FolderMenu.Rename')}" Icon="Rename" Click="RenameFolder_Click"/>
             <MenuFlyoutItem x:Name="DeleteFolderItem" Text="{x:Bind l:Loc.Get('FolderMenu.Delete')}" Icon="Delete" Click="DeleteFolder_Click"/>
         </MenuFlyout>

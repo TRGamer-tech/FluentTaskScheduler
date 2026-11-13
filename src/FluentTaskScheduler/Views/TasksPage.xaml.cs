@@ -69,6 +69,9 @@ public sealed partial class TasksPage : Page
     public static string NextRunText(DateTime? time) =>
         time is { } next ? Loc.Format("Tasks.NextRunFormat", next.ToString("g", CultureInfo.CurrentCulture)) : "";
 
+    /// <summary>For x:Bind: what a screen reader calls a control of a task's row, with the task's name, e.g. "Select Backup".</summary>
+    public static string Named(string format, string taskName) => Loc.Format(format, taskName);
+
     private async Task<string?> ShowEditorAsync(TaskEditorViewModel editor)
     {
         // A second request (a shortcut pressed while a dialog is open) would only queue up behind it.

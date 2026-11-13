@@ -905,7 +905,6 @@
   <data name="Tasks.Error.Gone" xml:space="preserve"><value>'{0}' は既に存在しません。</value></data>
   <data name="Tasks.Snoozed.Title" xml:space="preserve"><value>タスクはスヌーズ中です</value></data>
   <data name="Tasks.File.TaskXml" xml:space="preserve"><value>タスク XML</value></data>
-  <data name="Tasks.Select" xml:space="preserve"><value>選択</value></data>
   <data name="Tasks.Badge.Unreadable" xml:space="preserve"><value>読み取り不可</value></data>
   <data name="Tasks.Toolbar.Sort" xml:space="preserve"><value>並べ替え</value></data>
   <data name="Folders.Library" xml:space="preserve"><value>タスク スケジューラ ライブラリ</value></data>
@@ -1121,4 +1120,6 @@
   <data name="Folders.Error.PartlyMoved" xml:space="preserve"><value>一部のタスクは移動できず、「{0}」に残っています。ほかのタスクは移動しました。</value></data>
   <data name="Tasks.Error.CompletionActionsKept" xml:space="preserve"><value>次のタスクは変更できなかったため、完了時アクションでは引き続き以前のパスのタスクが開始されます:</value></data>
   <data name="Tasks.Error.OnlyWithPassword" xml:space="preserve"><value>'{0}': このタスクは、アカウントのパスワードを入力してエディターでのみ変更できます。</value></data>
+  <data name="Tasks.SelectFormat" xml:space="preserve"><value>「{0}」を選択</value></data>
+  <data name="Tasks.EnableFormat" xml:space="preserve"><value>「{0}」を有効にする</value></data>
 </root>

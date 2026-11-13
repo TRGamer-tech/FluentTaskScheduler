@@ -908,7 +908,6 @@
   <data name="Tasks.Error.Gone" xml:space="preserve"><value>“{0}”已不存在。</value></data>
   <data name="Tasks.Snoozed.Title" xml:space="preserve"><value>任务已暂停</value></data>
   <data name="Tasks.File.TaskXml" xml:space="preserve"><value>任务 XML</value></data>
-  <data name="Tasks.Select" xml:space="preserve"><value>选择</value></data>
   <data name="Tasks.Badge.Unreadable" xml:space="preserve"><value>无法读取</value></data>
   <data name="Tasks.Toolbar.Sort" xml:space="preserve"><value>排序</value></data>
   <data name="Folders.Library" xml:space="preserve"><value>任务计划程序库</value></data>
@@ -1124,6 +1123,8 @@
   <data name="Folders.Error.PartlyMoved" xml:space="preserve"><value>部分任务无法移动，仍留在“{0}”中。其他任务已移动。</value></data>
   <data name="Tasks.Error.CompletionActionsKept" xml:space="preserve"><value>以下任务无法更改，因此它们的完成后操作仍按原来的路径启动任务：</value></data>
   <data name="Tasks.Error.OnlyWithPassword" xml:space="preserve"><value>“{0}”：只有在编辑器中输入其帐户的密码后才能更改此任务。</value></data>
+  <data name="Tasks.SelectFormat" xml:space="preserve"><value>选择“{0}”</value></data>
+  <data name="Tasks.EnableFormat" xml:space="preserve"><value>启用“{0}”</value></data>
 </root>
 
 

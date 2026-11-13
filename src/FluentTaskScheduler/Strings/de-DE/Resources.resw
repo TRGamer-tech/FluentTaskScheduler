@@ -905,7 +905,6 @@ Jetzt App neustarten?</value></data>
   <data name="Tasks.Error.Gone" xml:space="preserve"><value>'{0}' gibt es nicht mehr.</value></data>
   <data name="Tasks.Snoozed.Title" xml:space="preserve"><value>Aufgaben sind pausiert</value></data>
   <data name="Tasks.File.TaskXml" xml:space="preserve"><value>Aufgaben-XML</value></data>
-  <data name="Tasks.Select" xml:space="preserve"><value>Auswählen</value></data>
   <data name="Tasks.Badge.Unreadable" xml:space="preserve"><value>Nicht lesbar</value></data>
   <data name="Tasks.Toolbar.Sort" xml:space="preserve"><value>Sortieren</value></data>
   <data name="Folders.Library" xml:space="preserve"><value>Aufgabenplanungsbibliothek</value></data>
@@ -1121,4 +1120,6 @@ Jetzt App neustarten?</value></data>
   <data name="Folders.Error.PartlyMoved" xml:space="preserve"><value>Einige Aufgaben konnten nicht verschoben werden und bleiben in „{0}“. Die anderen wurden verschoben.</value></data>
   <data name="Tasks.Error.CompletionActionsKept" xml:space="preserve"><value>Die Abschlussaktionen dieser Aufgaben starten Aufgaben noch unter ihrem früheren Pfad, weil diese Aufgaben nicht geändert werden konnten:</value></data>
   <data name="Tasks.Error.OnlyWithPassword" xml:space="preserve"><value>'{0}': Diese Aufgabe lässt sich nur im Editor ändern, mit dem Kennwort ihres Kontos.</value></data>
+  <data name="Tasks.SelectFormat" xml:space="preserve"><value>{0} auswählen</value></data>
+  <data name="Tasks.EnableFormat" xml:space="preserve"><value>{0} aktivieren</value></data>
 </root>
