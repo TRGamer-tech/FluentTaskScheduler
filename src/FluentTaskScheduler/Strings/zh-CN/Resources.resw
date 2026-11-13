@@ -569,7 +569,7 @@
   <data name="Pipeline.Toast.Title" xml:space="preserve"><value>流水线：已启动 {0}</value></data>
   <data name="Pipeline.Toast.OnSuccess" xml:space="preserve"><value>因“{0}”成功完成而被触发。</value></data>
   <data name="Pipeline.Toast.OnFailure" xml:space="preserve"><value>因“{0}”失败而被触发。</value></data>
-  <data name="Dashboard.HealthCaption" xml:space="preserve"><value>过去 7 天内以退出代码 0 完成的运行占比。</value></data>
+  <data name="Dashboard.HealthCaption" xml:space="preserve"><value>过去 7 天内结束的运行中成功运行的占比。已停止的运行不计入。</value></data>
   <data name="Dashboard.Throughput" xml:space="preserve"><value>执行次数</value></data>
   <data name="Dashboard.Runs24h" xml:space="preserve"><value>最近 24 小时</value></data>
   <data name="Dashboard.Runs7d" xml:space="preserve"><value>最近 7 天</value></data>

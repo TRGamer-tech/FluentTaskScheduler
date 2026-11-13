@@ -566,7 +566,7 @@ Jetzt App neustarten?</value></data>
   <data name="Pipeline.Toast.Title" xml:space="preserve"><value>Pipeline: {0} gestartet</value></data>
   <data name="Pipeline.Toast.OnSuccess" xml:space="preserve"><value>Ausgelöst, weil „{0}“ erfolgreich abgeschlossen wurde.</value></data>
   <data name="Pipeline.Toast.OnFailure" xml:space="preserve"><value>Ausgelöst, weil „{0}“ fehlgeschlagen ist.</value></data>
-  <data name="Dashboard.HealthCaption" xml:space="preserve"><value>Anteil der Läufe, die in den letzten 7 Tagen mit Exitcode 0 abgeschlossen wurden.</value></data>
+  <data name="Dashboard.HealthCaption" xml:space="preserve"><value>Anteil der erfolgreichen unter den Läufen, die in den letzten 7 Tagen geendet haben. Gestoppte Läufe zählen nicht mit.</value></data>
   <data name="Dashboard.Throughput" xml:space="preserve"><value>Ausführungen</value></data>
   <data name="Dashboard.Runs24h" xml:space="preserve"><value>in den letzten 24 Std.</value></data>
   <data name="Dashboard.Runs7d" xml:space="preserve"><value>in den letzten 7 Tagen</value></data>
