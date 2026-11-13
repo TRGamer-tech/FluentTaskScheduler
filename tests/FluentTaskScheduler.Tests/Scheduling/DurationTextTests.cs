@@ -43,6 +43,8 @@ public class DurationTextTests
     [InlineData("1٣m")]
     [InlineData("P99999Y")]
     [InlineData("P10675200D")]
+    [InlineData("P99999999D")]
+    [InlineData("P30000Y")]
     public void TryParse_RejectsEverythingElse(string? text)
     {
         Assert.False(DurationText.TryParse(text, out _));
