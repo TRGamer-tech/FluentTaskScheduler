@@ -342,6 +342,21 @@ public sealed class ReminderServiceTests : SnoozeTestBase
     }
 
     [Fact]
+    public void EveryLook_ReadsTheTimeZoneOfTheComputerAfresh()
+    {
+        // In the app the zone comes from .NET, which reads it once and keeps it until its cache is
+        // cleared; read again, it is a new object. A test cannot change the zone of the computer,
+        // so the new object is what it can see.
+        TimeZoneInfo readBefore = TimeZoneInfo.Local;
+        StartReminders();
+
+        AdvanceSeconds(30);
+
+        Assert.Equal(1, Store.Listings);
+        Assert.NotSame(readBefore, TimeZoneInfo.Local);
+    }
+
+    [Fact]
     public void WhenTheTasksCannotBeListed_TheNextLookTriesAgain()
     {
         Store.Add(Backup);

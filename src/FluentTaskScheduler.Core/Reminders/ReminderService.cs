@@ -119,6 +119,11 @@ public sealed class ReminderService : IDisposable
     /// <returns>How long to wait until the next look.</returns>
     private TimeSpan AnnounceWhatIsDue()
     {
+        // Task Scheduler gives run times in the time zone Windows uses now, but .NET keeps the zone
+        // it read first until its cache is cleared. On a laptop taken to another zone, reminders
+        // would otherwise come hours early or late.
+        TimeZoneInfo.ClearCachedData();
+
         TimeSpan lead = TimeSpan.FromMinutes(_settings.Current.ReminderLeadMinutes);
         DateTimeOffset now = _time.GetUtcNow();
         DateTimeOffset nextLook = now + RefreshInterval;
