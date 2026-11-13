@@ -358,7 +358,7 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.UserContext" xml:space="preserve"><value>Benutzerkontext</value></data>
   <data name="Dialog.RunAsCurrent" xml:space="preserve"><value>Als aktueller Benutzer ausführen</value></data>
   <data name="Dialog.RunAsSpecific" xml:space="preserve"><value>Als bestimmter Benutzer ausführen</value></data>
-  <data name="Dialog.RunAsSystem" xml:space="preserve"><value>Als SYSTEM ausfuehren (Admin erforderlich)</value></data>
+  <data name="Dialog.RunAsSystem" xml:space="preserve"><value>Als SYSTEM ausführen (Admin erforderlich)</value></data>
 
   <data name="Trigger.At" xml:space="preserve"><value>um</value></data>
   <data name="Trigger.OnIdle" xml:space="preserve"><value>Bei Leerlauf</value></data>
@@ -381,7 +381,7 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.EventLog" xml:space="preserve"><value>Protokoll</value></data>
   <data name="Dialog.EventSource" xml:space="preserve"><value>Quelle</value></data>
   <data name="Dialog.EventId" xml:space="preserve"><value>Ereignis-ID</value></data>
-  <data name="Dialog.Ph.EventLog" xml:space="preserve"><value>Anwendung, System, Sicherheit, etc.</value></data>
+  <data name="Dialog.Ph.EventLog" xml:space="preserve"><value>Application, System, Security usw.</value></data>
   <data name="Dialog.Ph.EventSource" xml:space="preserve"><value>z.B. VSS, Outlook (Optional)</value></data>
   <data name="Dialog.Ph.EventId" xml:space="preserve"><value>z.B. 1000 (Optional)</value></data>
 
@@ -445,7 +445,7 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.Action.Email" xml:space="preserve"><value>E-Mail senden</value></data>
   <data name="Dialog.Action.Notif" xml:space="preserve"><value>Benachrichtigung anzeigen</value></data>
   <data name="Dialog.Browse" xml:space="preserve"><value>Durchsuchen...</value></data>
-  <data name="Dialog.RunPrefix" xml:space="preserve"><value>Ausfuehren:</value></data>
+  <data name="Dialog.RunPrefix" xml:space="preserve"><value>Ausführen:</value></data>
 
   <data name="Dialog.Time.5m" xml:space="preserve"><value>5 Minuten</value></data>
   <data name="Dialog.Time.10m" xml:space="preserve"><value>10 Minuten</value></data>
@@ -471,9 +471,9 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.Pri.Idle" xml:space="preserve"><value>Leerlauf</value></data>
 
   <data name="Dialog.NetAdmin.Title" xml:space="preserve"><value>Administrator erforderlich</value></data>
-  <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>Die Auswahl eines spezifischen Netzwerks erfordert, dass die App als Administrator ausgefuehrt wird.</value></data>
+  <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>Die Auswahl eines spezifischen Netzwerks erfordert, dass die App als Administrator ausgeführt wird.</value></data>
   <data name="Dialog.SysWarn.Title" xml:space="preserve"><value>Administratorrechte erforderlich</value></data>
-  <data name="Dialog.SysWarn.Msg" xml:space="preserve"><value>Um Aufgaben zu erstellen, die als SYSTEM ausgefuehrt werden, muss diese Anwendung mit Administratorrechten ausgefuehrt werden. Rechtsklick auf die App und 'Als Administrator ausfuehren' wählen.</value></data>
+  <data name="Dialog.SysWarn.Msg" xml:space="preserve"><value>Um Aufgaben zu erstellen, die als SYSTEM ausgeführt werden, muss diese Anwendung mit Administratorrechten ausgeführt werden. Rechtsklick auf die App und 'Als Administrator ausführen' wählen.</value></data>
 
   <data name="Settings.Theme.Light" xml:space="preserve"><value>Hell</value></data>
   <data name="Settings.Theme.Dark" xml:space="preserve"><value>Dunkel</value></data>
