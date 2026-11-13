@@ -140,12 +140,13 @@ jobs:
             throw "The installer ended with exit code $($install.ExitCode)."
           }
 
-          # Where the installer puts the app depends on whether it installs for one user or for all.
-          $roots = $env:ProgramFiles, ${env:ProgramFiles(x86)}, $env:LOCALAPPDATA, $env:ProgramData
-          $exe = Get-ChildItem $roots -Filter FluentTaskScheduler.exe -Recurse -Depth 3 -ErrorAction SilentlyContinue |
-                 Where-Object { $_.Directory.Name -eq 'current' } | Select-Object -First 1 -ExpandProperty FullName
-          if (-not $exe) {
-            Select-String -Path install.log -Pattern 'INSTALLFOLDER|APPLICATIONFOLDER|TARGETDIR|ALLUSERS|InstallLocation' | Select-Object -First 30 -ExpandProperty Line
+          # Where the app goes depends on what the installer decides, so its own log is asked.
+          $folder = Select-String -Path install.log -Pattern 'Property\(S\): INSTALLFOLDER = (.+)$' |
+                    Select-Object -Last 1 | ForEach-Object { $_.Matches[0].Groups[1].Value.Trim() }
+          $exe = if ($folder) { Join-Path $folder 'current\FluentTaskScheduler.exe' }
+          if (-not $exe -or -not (Test-Path $exe)) {
+            Select-String -Path install.log -Pattern 'INSTALLFOLDER|TARGETDIR|ALLUSERS' | Select-Object -First 30 -ExpandProperty Line
+            if ($folder) { Get-ChildItem $folder -Recurse -Depth 1 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName }
             throw 'The installed app was not found.'
           }
           "Installed: $exe, version $((Get-Item $exe).VersionInfo.FileVersion)"
