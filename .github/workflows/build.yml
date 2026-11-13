@@ -7,10 +7,14 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   # Unit tests plus the tests that register real tasks in the runner's Task Scheduler.
   test:
     runs-on: windows-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -50,6 +54,7 @@ jobs:
             runner: windows-11-arm
 
     runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
 
     steps:
       - name: Checkout
@@ -90,10 +95,14 @@ jobs:
           FTS_UI_ARTIFACTS: ${{ github.workspace }}\ui-artifacts
           # A fresh runner can show Windows' first sign-in screens on top of everything.
           FTS_UI_CLOSE_COVERING_WINDOWS: 1
+        # A test held up by a dialog or by an app that stopped answering is ended after ten
+        # minutes instead of holding the runner for hours. No dump: nothing would upload it.
         run: >
           dotnet test tests/FluentTaskScheduler.UITests
           -c Release
           --logger "console;verbosity=detailed"
+          --blame-hang-timeout 10m
+          --blame-hang-dump-type none
 
       - name: Upload UI screenshots
         if: always()
