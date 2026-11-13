@@ -74,8 +74,7 @@ public sealed partial class ShellPage : Page, IShellNavigator
     public void Open(string tag)
     {
         _folders.ShowLastChoice();
-        // The task list of one folder is no entry of the pane.
-        if (tag == "Tasks" && _tasks.FolderPath is not null) Show(tag);
+        if (tag == "Tasks") ShowTaskList();
         else Navigate(tag);
     }
 
@@ -159,18 +158,27 @@ public sealed partial class ShellPage : Page, IShellNavigator
         Show(tag);
     }
 
-    private void Folders_FolderChosen(object? sender, EventArgs e)
-    {
-        // The task list of one folder is no entry of the pane; none of them is selected then.
-        SelectInPane(null);
-        Show("Tasks");
-    }
+    private void Folders_FolderChosen(object? sender, EventArgs e) => ShowTaskList();
 
     // The list also falls back to all tasks by itself: when the folder it shows is gone, or to show
     // a task of another folder. The pane's entry for all tasks is then selected as well.
     private void Tasks_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(TasksViewModel.FolderPath) && _tasks.FolderPath is null && CurrentPage == "Tasks") SelectInPane(NavAllTasks);
+    }
+
+    /// <summary>Shows the task list as it is, with the tasks of one folder or of all, and the pane in step with it.</summary>
+    private void ShowTaskList()
+    {
+        if (_tasks.FolderPath is null)
+        {
+            Navigate("Tasks");
+            return;
+        }
+
+        // The task list of one folder is no entry of the pane; none of them is selected then.
+        SelectInPane(null);
+        Show("Tasks");
     }
 
     /// <summary>Selects an entry of the pane, or none, as the shell's doing rather than the user's.</summary>
@@ -222,7 +230,8 @@ public sealed partial class ShellPage : Page, IShellNavigator
         }
         else if (ReferenceEquals(args.InvokedItemContainer, NavAdd))
         {
-            Navigate("Tasks");
+            // The new task goes into the folder the list shows.
+            ShowTaskList();
             await _windowServices.GetRequiredService<TasksPage>().CreateTaskAsync();
         }
     }

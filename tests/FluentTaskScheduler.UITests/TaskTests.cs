@@ -359,7 +359,7 @@ public sealed class TaskTests : IDisposable
 
         Assert.True(app.Find(RowNamed("Chosen last time"), 20000) != null, "The list does not show the task of the folder chosen last.");
         app.Snapshot("opened");
-        int rows = AppSession.Walk(app.Require("TaskList")).Count(element => element.ControlType == ControlType.ListItem);
+        int rows = RowsIn(app);
         Assert.True(rows == 1, $"The list shows {rows} tasks instead of the one in the folder.");
 
         app.Require("NavAllTasks").Press();
@@ -378,6 +378,26 @@ public sealed class TaskTests : IDisposable
         bool highlighted = AppSession.Eventually(() => folder.Patterns.SelectionItem.Pattern.IsSelected.Value);
         app.Snapshot("tree");
         Assert.True(highlighted, "The tree does not highlight the folder the list opened on.");
+    }
+
+    [Fact]
+    public void NewTaskInThePane_IsForTheFolderShown_WhichStaysTheOneRemembered()
+    {
+        _windows.CreateDaily("Chosen last time");
+        using var app = AppSession.Launch("last-folder-new-task", AppSession.FirstRunDone(("LastFolderPath", _windows.Folder)));
+        Assert.True(app.Find(RowNamed("Chosen last time"), 20000) != null, "The list does not show the task of the folder chosen last.");
+
+        app.Require("NavAdd").Press();
+        app.Require("EditorName", 20000);
+        app.Snapshot("editor");
+        app.Require("CloseButton").Press();
+        Assert.True(AppSession.Eventually(() => app.Find("EditorName", 500) == null), "The editor did not close.");
+
+        // Had New task switched the list to all tasks, the task would have gone into the root folder.
+        int rows = RowsIn(app);
+        Assert.True(rows == 1, $"After the editor, the list shows {rows} tasks instead of the one in the folder.");
+        Wait(); // settings are written half a second after a change
+        Assert.Equal(_windows.Folder, app.SavedSetting("LastFolderPath"));
     }
 
     [Fact]
@@ -456,6 +476,8 @@ public sealed class TaskTests : IDisposable
         element => element.ControlType == ControlType.ListItem && element.Name == name;
 
     private static void OpenFolderlessList(AppSession app) => app.Require("NavAllTasks").Press();
+
+    private static int RowsIn(AppSession app) => AppSession.Walk(app.Require("TaskList")).Count(element => element.ControlType == ControlType.ListItem);
 
     /// <summary>A click on a row shows the task's details; the editor is one button further.</summary>
     private static void OpenEditor(AppSession app, AutomationElement row)
