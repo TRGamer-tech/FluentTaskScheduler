@@ -9,8 +9,9 @@ public sealed class FakeTaskEventStream : ITaskEventStream
     public event EventHandler<TaskRun>? RunCompleted;
     public event EventHandler<TaskChange>? TaskChanged;
 
-    /// <summary>How many handlers are subscribed to the two run events together.</summary>
-    public int RunSubscribers => (RunStarted?.GetInvocationList().Length ?? 0) + (RunCompleted?.GetInvocationList().Length ?? 0);
+    /// <summary>How many handlers are subscribed to the three events together.</summary>
+    public int Subscribers =>
+        (RunStarted?.GetInvocationList().Length ?? 0) + (RunCompleted?.GetInvocationList().Length ?? 0) + (TaskChanged?.GetInvocationList().Length ?? 0);
 
     public void Start(TaskRun run) => RunStarted?.Invoke(this, run);
     public void Complete(TaskRun run) => RunCompleted?.Invoke(this, run);

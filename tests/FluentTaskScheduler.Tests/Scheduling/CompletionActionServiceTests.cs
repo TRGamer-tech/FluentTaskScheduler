@@ -278,7 +278,7 @@ public sealed class CompletionActionServiceTests : IDisposable
 
         _stream.Complete(Finished(A));
 
-        Assert.Equal(0, _stream.RunSubscribers);
+        Assert.Equal(0, _stream.Subscribers);
         Assert.Empty(_store.Calls);
     }
 

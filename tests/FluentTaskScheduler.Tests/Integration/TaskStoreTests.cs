@@ -54,6 +54,29 @@ public class TaskStoreTests
     }
 
     [SkippableFact]
+    public void OneTask_IsReadTheWayTheListShowsIt_AndATaskThatDoesNotExistIsNull()
+    {
+        Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
+        using var sandbox = new SchedulerSandbox();
+        string path = _store.Save(NewDraft("One") with { Category = "Work", Tags = new[] { "one" } }, sandbox.FolderPath);
+
+        var listed = Assert.Single(_store.GetTasks(), r => r.Path == path);
+        var row = _store.GetTask(path);
+
+        Assert.NotNull(row);
+        Assert.Equal(path, row.Path);
+        Assert.Equal(listed.State, row.State);
+        Assert.Equal(listed.IsEnabled, row.IsEnabled);
+        Assert.Equal(listed.LastRunTime, row.LastRunTime);
+        Assert.Equal(listed.NextRunTime, row.NextRunTime);
+        Assert.Equal("Work", row.Category);
+        Assert.Equal(new[] { "one" }, row.Tags);
+        Assert.Null(row.LoadError);
+
+        Assert.Null(_store.GetTask(sandbox.PathOf("Missing")));
+    }
+
+    [SkippableFact]
     public void TasksCreatedByWindowsTools_AreListedAndCanBeLoaded()
     {
         // Issue #29: tasks made outside the app must show up.

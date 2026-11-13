@@ -46,19 +46,37 @@ public sealed class FakeTaskStore : ITaskStore
     public bool IsRunning(string path) => _running.Contains(path);
     public IEnumerable<string> Paths => _tasks.Keys;
 
-    public IReadOnlyList<TaskRow> GetTasks() => ListingFails is { } failure ? throw failure : _tasks.Select(entry => new TaskRow(entry.Key)
+    /// <summary>How often all tasks were listed.</summary>
+    public int Listings { get; private set; }
+
+    /// <summary>Called by <see cref="GetTasks"/> on the reading thread when it has read the tasks and before it hands them over; block in it to make a listing slow.</summary>
+    public Action? Listed { get; set; }
+
+    public IReadOnlyList<TaskRow> GetTasks()
     {
-        LastRunTime = _runTimes.GetValueOrDefault(entry.Key).Last,
-        NextRunTime = _runTimes.GetValueOrDefault(entry.Key).Next,
-        IsEnabled = entry.Value.Enabled,
-        State = StateOf(entry.Key),
-        IsHidden = entry.Value.Hidden,
-        Description = entry.Value.Description,
-        Author = entry.Value.Author,
-        Category = entry.Value.Category,
-        Tags = entry.Value.Tags,
-        CompletionActions = entry.Value.CompletionActions
-    }).ToList();
+        Listings++;
+        if (ListingFails is { } failure) throw failure;
+
+        var rows = _tasks.Select(entry => RowOf(entry.Key, entry.Value)).ToList();
+        Listed?.Invoke();
+        return rows;
+    }
+
+    public TaskRow? GetTask(string path) => _tasks.TryGetValue(path, out var draft) ? RowOf(path, draft) : null;
+
+    private TaskRow RowOf(string path, TaskDraft draft) => new(path)
+    {
+        LastRunTime = _runTimes.GetValueOrDefault(path).Last,
+        NextRunTime = _runTimes.GetValueOrDefault(path).Next,
+        IsEnabled = draft.Enabled,
+        State = StateOf(path),
+        IsHidden = draft.Hidden,
+        Description = draft.Description,
+        Author = draft.Author,
+        Category = draft.Category,
+        Tags = draft.Tags,
+        CompletionActions = draft.CompletionActions
+    };
 
     public bool Exists(string path) => _tasks.ContainsKey(path);
 

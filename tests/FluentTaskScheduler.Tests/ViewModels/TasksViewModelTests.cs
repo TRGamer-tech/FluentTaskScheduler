@@ -1,4 +1,5 @@
 using System.Text;
+using FluentTaskScheduler.History;
 using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Settings;
 using FluentTaskScheduler.Tests.Support;
@@ -17,15 +18,14 @@ public sealed class TasksViewModelTests : IDisposable
     private readonly ScriptedFilePicker _files = new();
     private readonly FakeAppLifetime _app = new() { IsElevated = true };
     private readonly FakeTimeProvider _time = new(new DateTimeOffset(2031, 5, 6, 14, 17, 0, TimeSpan.Zero));
+    private readonly FakeTaskEventStream _stream = new();
     private readonly SettingsStore _settings;
     private readonly TasksViewModel _tasks;
 
     public TasksViewModelTests()
     {
         _settings = new SettingsStore(_folder.Paths, _time);
-        var editors = new TaskEditorFactory(_store, _settings, _app, _files, new FakeNetworkProfiles(), _time);
-        _tasks = new TasksViewModel(_store, new TaskRunner(_store, _snooze, _notifier), _settings, _prompts, _files, _app,
-            new InlineUiThread(), _time, editors, new FakeTaskFolders(@"\Reports", @"\Reports\Old"));
+        _tasks = NewViewModel(new InlineUiThread());
 
         _store.Add(@"\Backup", draft: new TaskDraft { Category = "Maintenance", Tags = ["night"] })
               .Add(@"\Reports\Monthly", enabled: false)
@@ -40,8 +40,22 @@ public sealed class TasksViewModelTests : IDisposable
         _folder.Dispose();
     }
 
+    private TasksViewModel NewViewModel(IUiThread ui) =>
+        new(_store, new TaskRunner(_store, _snooze, _notifier), _settings, _prompts, _files, _app, ui, _time,
+            new TaskEditorFactory(_store, _settings, _app, _files, new FakeNetworkProfiles(), _time),
+            new FakeTaskFolders(@"\Reports", @"\Reports\Old"), _stream);
+
     private string[] Shown => _tasks.Tasks.Select(row => row.Path).ToArray();
     private TaskRow Row(string path) => _tasks.Find(path)!;
+
+    private static TaskChange Change(string path, TaskChangeKind kind) => new(path, kind, DateTimeOffset.UnixEpoch);
+
+    /// <summary>Lets the reload that reported changes have asked for happen, and waits until the list shows it.</summary>
+    private async Task AfterTheReloadDelayAsync()
+    {
+        _time.Advance(TasksViewModel.ReloadDelay);
+        await _tasks.PendingReads;
+    }
 
     [Fact]
     public async Task Loading_ShowsEveryTask_InTheOrderTaskSchedulerListsThem()
@@ -535,6 +549,233 @@ public sealed class TasksViewModelTests : IDisposable
 
         Assert.Null(await _tasks.BeginImportAsync());
         Assert.Empty(_prompts.Shown);
+    }
+
+    [Fact]
+    public async Task ARunThatATriggerStarts_ShowsOnItsRow_WithItsNewRunTimes_AndWithoutReadingEveryTask()
+    {
+        await _tasks.ReloadAsync();
+        TaskRow backup = Row(@"\Backup");
+        var started = new DateTime(2031, 5, 6, 14, 17, 0);
+        var next = new DateTime(2031, 5, 7, 14, 17, 0);
+
+        _store.Run(@"\Backup");
+        _store.SetRunTimes(@"\Backup", started, next);
+        _stream.Start(FakeTaskEventStream.Running(@"\Backup"));
+        await _tasks.PendingReads;
+
+        Assert.Equal(TaskRowState.Running, backup.State);
+        Assert.Equal(started, backup.LastRunTime);
+        Assert.Equal(next, backup.NextRunTime);
+        Assert.Equal(1, _store.Listings);
+    }
+
+    [Fact]
+    public async Task WhenARunIsOver_ItsRowSettles()
+    {
+        await _tasks.ReloadAsync();
+        TaskRow backup = Row(@"\Backup");
+        _store.Run(@"\Backup");
+        _stream.Start(FakeTaskEventStream.Running(@"\Backup"));
+        await _tasks.PendingReads;
+
+        _store.Finish(@"\Backup");
+        _stream.Complete(FakeTaskEventStream.Finished(@"\Backup", RunStatus.Succeeded));
+        await _tasks.PendingReads;
+
+        Assert.Equal(TaskRowState.Ready, backup.State);
+    }
+
+    [Fact]
+    public async Task WhenOneOfTwoInstancesIsOver_TheRowKeepsShowingTheTaskRunning()
+    {
+        await _tasks.ReloadAsync();
+        _store.Run(@"\Backup");
+
+        // Task Scheduler still has the task running: its other instance.
+        _stream.Complete(FakeTaskEventStream.Finished(@"\Backup", RunStatus.Succeeded));
+        await _tasks.PendingReads;
+
+        Assert.Equal(TaskRowState.Running, Row(@"\Backup").State);
+    }
+
+    [Fact]
+    public async Task WithTheRunningFilterOn_ATaskEntersTheListWhenItStarts_AndLeavesWhenItIsDone()
+    {
+        await _tasks.ReloadAsync();
+        _tasks.StatusFilterIndex = (int)TaskStatusFilter.Running;
+        Assert.Empty(Shown);
+
+        _store.Run(@"\cleanup");
+        _stream.Start(FakeTaskEventStream.Running(@"\cleanup"));
+        await _tasks.PendingReads;
+        Assert.Equal([@"\cleanup"], Shown);
+
+        _store.Finish(@"\cleanup");
+        _stream.Complete(FakeTaskEventStream.Finished(@"\cleanup", RunStatus.Failed));
+        await _tasks.PendingReads;
+        Assert.Empty(Shown);
+    }
+
+    [Fact]
+    public async Task ATaskThatIsGoneWhenItsRunIsReported_LeavesTheList()
+    {
+        // A task can be set to delete itself once it will not run again.
+        await _tasks.ReloadAsync();
+        _store.Delete(@"\cleanup");
+
+        _stream.Complete(FakeTaskEventStream.Finished(@"\cleanup", RunStatus.Succeeded));
+        await _tasks.PendingReads;
+
+        Assert.Equal([@"\Backup", @"\Reports\Monthly", @"\Reports\Weekly"], Shown);
+        Assert.Null(_tasks.Find(@"\cleanup"));
+    }
+
+    [Fact]
+    public async Task ATaskThatAnotherProgramRegisters_ShowsUpShortlyAfter_WithoutAProgressBar()
+    {
+        await _tasks.ReloadAsync();
+        bool progressShown = false;
+        _tasks.PropertyChanged += (_, e) => progressShown |= e.PropertyName == nameof(TasksViewModel.IsLoading);
+
+        _store.Add(@"\Reports\Yearly");
+        _stream.Change(Change(@"\Reports\Yearly", TaskChangeKind.Registered));
+        _stream.Change(Change(@"\Reports\Yearly", TaskChangeKind.Updated));
+        Assert.DoesNotContain(@"\Reports\Yearly", Shown);
+
+        await AfterTheReloadDelayAsync();
+
+        Assert.Contains(@"\Reports\Yearly", Shown);
+        Assert.False(progressShown);
+    }
+
+    [Fact]
+    public async Task ATaskThatAnotherProgramDeletes_Disappears_AndOneItChanges_ChangesInPlace()
+    {
+        await _tasks.ReloadAsync();
+        TaskRow backup = Row(@"\Backup");
+        _tasks.Select([backup]);
+
+        _store.Delete(@"\cleanup");
+        _store.SetEnabled(@"\Backup", false);
+        _stream.Change(Change(@"\cleanup", TaskChangeKind.Deleted));
+        _stream.Change(Change(@"\Backup", TaskChangeKind.Updated));
+        await AfterTheReloadDelayAsync();
+
+        Assert.Equal([@"\Backup", @"\Reports\Monthly", @"\Reports\Weekly"], Shown);
+        Assert.Same(backup, Row(@"\Backup"));
+        Assert.False(backup.IsEnabled);
+        Assert.True(backup.IsSelected);
+    }
+
+    [Fact]
+    public async Task ManyChangesInARow_AreAnsweredWithOneReload_AndALaterChangeWithAnother()
+    {
+        await _tasks.ReloadAsync();
+
+        for (int i = 0; i < 20; i++) _stream.Change(Change($@"\Setup\Task{i}", TaskChangeKind.Registered));
+        await AfterTheReloadDelayAsync();
+        Assert.Equal(2, _store.Listings);
+
+        _stream.Change(Change(@"\Backup", TaskChangeKind.Updated));
+        await AfterTheReloadDelayAsync();
+        Assert.Equal(3, _store.Listings);
+    }
+
+    [Fact]
+    public async Task ChangesThatKeepComing_DoNotPutTheReloadOff()
+    {
+        await _tasks.ReloadAsync();
+        _store.Add(@"\New");
+
+        _stream.Change(Change(@"\New", TaskChangeKind.Registered));
+        _time.Advance(TasksViewModel.ReloadDelay / 2);
+        _stream.Change(Change(@"\New", TaskChangeKind.Updated));
+        _time.Advance(TasksViewModel.ReloadDelay / 2);
+        await _tasks.PendingReads;
+
+        Assert.Contains(@"\New", Shown);
+    }
+
+    [Fact]
+    public async Task ASlowReload_DoesNotOverwriteWhatALaterReportAboutOneTaskFound()
+    {
+        await _tasks.ReloadAsync();
+        _store.Run(@"\Backup");
+
+        // The reload has read the tasks, Backup still running among them. Before it hands them
+        // over, the run ends and is reported.
+        _store.Listed = () =>
+        {
+            _store.Listed = null;
+            _store.Finish(@"\Backup");
+            _stream.Complete(FakeTaskEventStream.Finished(@"\Backup", RunStatus.Succeeded));
+
+            // A list that looked at the one task right away would be done by now, and would then
+            // be overwritten with what the reload holds. One that takes turns is still waiting.
+            Assert.False(_tasks.PendingReads.Wait(TimeSpan.FromMilliseconds(250)));
+        };
+        await _tasks.ReloadAsync();
+        await _tasks.PendingReads;
+
+        Assert.Equal(TaskRowState.Ready, Row(@"\Backup").State);
+        Assert.False(_tasks.HasLoadError);
+    }
+
+    [Fact]
+    public async Task WhenShowingOneReportFails_TheListStillReadsWhatComesAfter()
+    {
+        await _tasks.ReloadAsync();
+        TaskRow backup = Row(@"\Backup");
+        void Fail(object? sender, System.ComponentModel.PropertyChangedEventArgs e) => throw new InvalidOperationException("The view could not show the change.");
+        backup.PropertyChanged += Fail;
+        _store.Run(@"\Backup");
+
+        _stream.Start(FakeTaskEventStream.Running(@"\Backup"));
+        await _tasks.PendingReads;
+        backup.PropertyChanged -= Fail;
+
+        _store.Add(@"\New");
+        await _tasks.ReloadAsync();
+        Assert.Contains(@"\New", Shown);
+        Assert.Equal(TaskRowState.Running, backup.State);
+    }
+
+    [Fact]
+    public async Task AClosedWindow_NoLongerListens()
+    {
+        await _tasks.ReloadAsync();
+        _tasks.Dispose();
+        _store.Add(@"\New");
+        _store.Run(@"\Backup");
+
+        _stream.Start(FakeTaskEventStream.Running(@"\Backup"));
+        _stream.Change(Change(@"\New", TaskChangeKind.Registered));
+        await AfterTheReloadDelayAsync();
+
+        Assert.Equal(0, _stream.Subscribers);
+        Assert.Equal(1, _store.Listings);
+        Assert.Equal(TaskRowState.Ready, Row(@"\Backup").State);
+    }
+
+    [Fact]
+    public async Task AReportThatReachesTheUiThreadAfterTheWindowClosed_ChangesNothing()
+    {
+        _tasks.Dispose();
+        var ui = new BusyUiThread();
+        using TasksViewModel closing = NewViewModel(ui);
+        await closing.ReloadAsync();
+        _store.Run(@"\Backup");
+
+        _stream.Start(FakeTaskEventStream.Running(@"\Backup"));
+        _stream.Change(Change(@"\Backup", TaskChangeKind.Updated));
+        closing.Dispose();
+        ui.RunPosted();
+        _time.Advance(TasksViewModel.ReloadDelay);
+        await closing.PendingReads;
+
+        Assert.Equal(TaskRowState.Ready, closing.Find(@"\Backup")!.State);
+        Assert.Equal(1, _store.Listings);
     }
 
     [Fact]

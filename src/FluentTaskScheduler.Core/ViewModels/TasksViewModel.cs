@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Text;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FluentTaskScheduler.History;
 using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Settings;
@@ -32,10 +33,23 @@ public enum TaskStatusFilter
 /// The task list of one window: which tasks there are, which of them are shown and in what
 /// order, what is selected, and everything that can be done to tasks from the list.
 /// </summary>
+/// <remarks>
+/// While Task Scheduler's history log is on, the list keeps itself up to date: a run that starts
+/// or ends shows on its row, and tasks that anything on the computer creates, changes or deletes
+/// appear, change and disappear. While the log is off, the list is as current as its last reload,
+/// except for tasks started or stopped from here, which are asked about until they have settled.
+/// </remarks>
 public sealed partial class TasksViewModel : ObservableObject, IDisposable
 {
     private static readonly TimeSpan WatchInterval = TimeSpan.FromSeconds(2);
     private static readonly TimeSpan LongestWatch = TimeSpan.FromMinutes(10);
+
+    /// <summary>
+    /// How long the list waits after a task was reported as changed before it reads the tasks
+    /// again. Registering one task is reported as two changes, and a program that sets up
+    /// several tasks reports many in a row; they are all answered with one reload.
+    /// </summary>
+    internal static readonly TimeSpan ReloadDelay = TimeSpan.FromMilliseconds(500);
 
     private readonly ITaskStore _store;
     private readonly ITaskRunner _runner;
@@ -47,6 +61,7 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
     private readonly TimeProvider _time;
     private readonly TaskEditorFactory _editors;
     private readonly ITaskFolders _folders;
+    private readonly ITaskEventStream _stream;
 
     // Every task, by path. The rows in here are the ones shown: a reload updates them in place,
     // so selection and scroll position survive it.
@@ -54,10 +69,14 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
     private List<string> _storeOrder = [];
     private readonly Dictionary<string, DateTimeOffset> _watched = new(StringComparer.OrdinalIgnoreCase);
     private readonly ITimer _watchTimer;
+    private readonly ITimer _reloadTimer;
+    private bool _reloadPlanned;
+    private Task _reads = Task.CompletedTask;
     private IReadOnlyList<TaskRow> _selection = [];
+    private bool _disposed;
 
     public TasksViewModel(ITaskStore store, ITaskRunner runner, ISettingsStore settings, IPrompts prompts, IFilePicker files,
-        IAppLifetime app, IUiThread ui, TimeProvider time, TaskEditorFactory editors, ITaskFolders folders)
+        IAppLifetime app, IUiThread ui, TimeProvider time, TaskEditorFactory editors, ITaskFolders folders, ITaskEventStream stream)
     {
         _folders = folders;
         _store = store;
@@ -69,8 +88,13 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
         _ui = ui;
         _time = time;
         _editors = editors;
+        _stream = stream;
         _watchTimer = time.CreateTimer(_ => ui.Post(() => _ = CheckWatchedAsync()), null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+        _reloadTimer = time.CreateTimer(_ => ui.Post(ReloadAfterChange), null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
         _settings.Changed += OnSettingsChanged;
+        _stream.RunStarted += OnRunReported;
+        _stream.RunCompleted += OnRunReported;
+        _stream.TaskChanged += OnTaskChanged;
     }
 
     /// <summary>The tasks to show, in the order to show them.</summary>
@@ -157,21 +181,19 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
         IsLoading = true;
         try
         {
-            IReadOnlyList<TaskRow> fresh = await Task.Run(_store.GetTasks);
-            Merge(fresh);
-            LoadError = null;
-        }
-        catch (Exception ex)
-        {
-            // Whatever Task Scheduler answered: the list keeps what it had and says that it is stale.
-            Serilog.Log.Error(ex, "The tasks could not be loaded");
-            LoadError = ex.Message;
+            await InTurn(LoadAsync);
         }
         finally
         {
             IsLoading = false;
         }
     }
+
+    /// <summary>
+    /// Completes when everything the list has been asked to read so far is read and shown.
+    /// Tests wait on this instead of on the clock.
+    /// </summary>
+    internal Task PendingReads => _reads;
 
     /// <summary>Starts <paramref name="row"/>, or without one every selected task.</summary>
     [RelayCommand]
@@ -376,13 +398,99 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
 
     public void Dispose()
     {
+        _disposed = true;
         _settings.Changed -= OnSettingsChanged;
+        _stream.RunStarted -= OnRunReported;
+        _stream.RunCompleted -= OnRunReported;
+        _stream.TaskChanged -= OnTaskChanged;
         _watchTimer.Dispose();
+        _reloadTimer.Dispose();
     }
 
     private void OnSettingsChanged(object? sender, SettingsChangedEventArgs e)
     {
         if (e.Current.ShowHiddenTasks != e.Previous.ShowHiddenTasks) _ui.Post(Refilter);
+    }
+
+    // The stream reports on a thread of its own, and what the list holds belongs to the UI
+    // thread. What was posted there before the window closed can still arrive after it.
+    private void OnRunReported(object? sender, TaskRun run) => _ui.Post(() =>
+    {
+        if (!_disposed) _ = InTurn(() => RefreshRowAsync(run.TaskPath));
+    });
+
+    private void OnTaskChanged(object? sender, TaskChange change) => _ui.Post(() =>
+    {
+        if (_disposed || _reloadPlanned) return;
+        _reloadPlanned = true;
+        _reloadTimer.Change(ReloadDelay, Timeout.InfiniteTimeSpan);
+    });
+
+    private void ReloadAfterChange()
+    {
+        _reloadPlanned = false;
+        // No progress bar for this one: nobody asked for it, and it happens while the list is in use.
+        if (!_disposed) _ = InTurn(LoadAsync);
+    }
+
+    /// <summary>
+    /// Runs a read of Task Scheduler after the reads that were asked for before it. One at a time
+    /// and in order, a slow read of all tasks cannot overwrite what a later read of one task found.
+    /// </summary>
+    /// <param name="read">Deals with its own failures and never throws: the reads after it wait for it.</param>
+    private Task InTurn(Func<Task> read)
+    {
+        Task earlier = _reads;
+        return _reads = ReadAsync();
+
+        async Task ReadAsync()
+        {
+            await earlier;
+            await read();
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        try
+        {
+            IReadOnlyList<TaskRow> fresh = await Task.Run(_store.GetTasks);
+            Merge(fresh);
+            LoadError = null;
+        }
+        catch (Exception ex)
+        {
+            // Whatever Task Scheduler answered: the list keeps what it had and says that it is stale.
+            Serilog.Log.Error(ex, "The tasks could not be loaded");
+            LoadError = ex.Message;
+        }
+    }
+
+    /// <summary>Reads one task again, because a run of it started or ended: its state and its run times have changed.</summary>
+    private async Task RefreshRowAsync(string path)
+    {
+        if (!_all.ContainsKey(path)) return;
+        try
+        {
+            TaskRow? fresh = await Task.Run(() => _store.GetTask(path));
+            if (!_all.TryGetValue(path, out TaskRow? row)) return;
+
+            if (fresh is null)
+            {
+                Remove(row);
+            }
+            else
+            {
+                row.UpdateFrom(fresh);
+                Refilter();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Whatever went wrong, with Task Scheduler or with showing its answer: the row keeps
+            // what it has until the next report or reload, and the reads after this one go on.
+            Serilog.Log.Warning(ex, "Task {Path} could not be brought up to date after a run of it was reported", path);
+        }
     }
 
     private async Task SetSelectedEnabledAsync(bool enabled)

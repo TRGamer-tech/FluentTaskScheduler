@@ -6,6 +6,9 @@ public interface ITaskStore
     /// <summary>Every task the current user can see, in all folders.</summary>
     IReadOnlyList<TaskRow> GetTasks();
 
+    /// <summary>One task as <see cref="GetTasks"/> lists it, read afresh; null if it does not exist or this user cannot see it.</summary>
+    TaskRow? GetTask(string path);
+
     bool Exists(string path);
 
     /// <summary>The current state of each of the given tasks; a task that no longer exists is left out.</summary>

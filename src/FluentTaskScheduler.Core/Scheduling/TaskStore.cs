@@ -47,6 +47,12 @@ public sealed class TaskStore : ITaskStore
         foreach (var subFolder in subFolders) Collect(subFolder, rows);
     }
 
+    public TaskRow? GetTask(string path)
+    {
+        using var service = Open();
+        return service.GetTask(path) is { } task ? TaskRowReader.Read(task) : null;
+    }
+
     public bool Exists(string path)
     {
         using var service = Open();

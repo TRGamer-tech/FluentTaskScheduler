@@ -160,7 +160,7 @@ public sealed class ExecutionHistoryLogTests : IDisposable
 
         _stream.Complete(FakeTaskEventStream.Finished(@"\A", RunStatus.Succeeded, ended: InNovember));
 
-        Assert.Equal(0, _stream.RunSubscribers);
+        Assert.Equal(0, _stream.Subscribers);
         Assert.False(Directory.Exists(_folder.Paths.ExecutionHistoryFolder));
     }
 }

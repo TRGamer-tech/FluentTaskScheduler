@@ -23,7 +23,8 @@ public sealed class FoldersViewModelTests : IDisposable
         _settings = new SettingsStore(_folder.Paths, _time);
         var files = new ScriptedFilePicker();
         _tasks = new TasksViewModel(_store, new TaskRunner(_store, new FakeSnoozeGate(), new RecordingNotifier()), _settings, _prompts, files, _app,
-            new InlineUiThread(), _time, new TaskEditorFactory(_store, _settings, _app, files, new FakeNetworkProfiles(), _time), _taskFolders);
+            new InlineUiThread(), _time, new TaskEditorFactory(_store, _settings, _app, files, new FakeNetworkProfiles(), _time), _taskFolders,
+            new FakeTaskEventStream());
         _folders = new FoldersViewModel(_taskFolders, _tasks, _prompts, _app);
     }
 
