@@ -18,7 +18,10 @@ public sealed partial class TaskEditorDialog : ContentDialog
     private async void Save_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
         // The dialog stays open until the task is really saved; what is in the way shows at the top.
+        // It is kept open from the start, so that a failure nobody foresaw does not close it and
+        // throw away what was entered.
         ContentDialogButtonClickDeferral deferral = args.GetDeferral();
+        args.Cancel = true;
         try
         {
             args.Cancel = !await ViewModel.SaveAsync();
