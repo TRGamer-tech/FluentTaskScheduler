@@ -8,6 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Unit tests plus the tests that register real tasks in the runner's Task Scheduler.
   test:
     runs-on: windows-latest
     steps:
@@ -21,58 +22,24 @@ jobs:
 
       - name: Run tests
         run: >
-          dotnet test FluentTaskScheduler.Tests/FluentTaskScheduler.Tests.csproj
+          dotnet test tests/FluentTaskScheduler.Tests
           -c Release
-          -p:Platform=x64
           --logger "trx;LogFileName=test-results.trx"
+          --collect:"XPlat Code Coverage"
           --blame
+          --results-directory test-results
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v5
         with:
           name: test-results
-          path: FluentTaskScheduler.Tests/TestResults/
+          path: test-results/
 
-  ui-tests:
-    runs-on: windows-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: 8.0.x
-
-      - name: Build app
-        run: dotnet build FluentTaskScheduler.csproj -c Release -p:Platform=x64
-
-      # The hosted runner's desktop defaults to 1024x768, smaller than the app's default window.
-      - name: Set screen resolution
-        shell: pwsh
-        continue-on-error: true
-        run: Set-DisplayResolution -Width 1920 -Height 1080 -Force
-
-      - name: Run UI tests
-        env:
-          FTS_APP_EXE: ${{ github.workspace }}\bin\x64\Release\net8.0-windows10.0.19041.0\win-x64\FluentTaskScheduler.exe
-          FTS_UI_ARTIFACTS: ${{ github.workspace }}\ui-artifacts
-        run: >
-          dotnet test FluentTaskScheduler.UITests/FluentTaskScheduler.UITests.csproj
-          -c Release
-          --logger "console;verbosity=detailed"
-
-      - name: Upload UI screenshots
-        if: always()
-        uses: actions/upload-artifact@v5
-        with:
-          name: ui-artifacts
-          path: ui-artifacts/
-
-  build:
-    needs: test
+  # Publishes the app the way a release does, then drives the published exe through its UI.
+  app:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - platform: x64
@@ -95,13 +62,35 @@ jobs:
 
       - name: Publish
         run: >
-          dotnet publish
+          dotnet publish src/FluentTaskScheduler
           -c Release
           -p:Platform=${{ matrix.platform }}
-          --self-contained true
+          -o publish
 
-      - name: Upload artifact
+      - name: Upload app
         uses: actions/upload-artifact@v5
         with:
           name: FluentTaskScheduler-${{ matrix.rid }}
-          path: bin/${{ matrix.platform }}/Release/net8.0-windows10.0.19041.0/${{ matrix.rid }}/publish/
+          path: publish/
+
+      # The hosted runner's desktop defaults to 1024x768, smaller than the app's default window.
+      - name: Set screen resolution
+        shell: pwsh
+        continue-on-error: true
+        run: Set-DisplayResolution -Width 1920 -Height 1080 -Force
+
+      - name: Run UI tests
+        env:
+          FTS_APP_EXE: ${{ github.workspace }}\publish\FluentTaskScheduler.exe
+          FTS_UI_ARTIFACTS: ${{ github.workspace }}\ui-artifacts
+        run: >
+          dotnet test tests/FluentTaskScheduler.UITests
+          -c Release
+          --logger "console;verbosity=detailed"
+
+      - name: Upload UI screenshots
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: ui-artifacts-${{ matrix.rid }}
+          path: ui-artifacts/

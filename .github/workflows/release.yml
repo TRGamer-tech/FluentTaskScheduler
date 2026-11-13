@@ -50,11 +50,11 @@ jobs:
 
       - name: Publish
         run: >
-          dotnet publish
+          dotnet publish src/FluentTaskScheduler
           -c Release
-          -r ${{ matrix.rid }}
-          --self-contained
           -p:Platform=${{ matrix.platform }}
+          -p:Version=${{ steps.version.outputs.version }}
+          -o publish
 
       - name: vpk pack
         run: >
@@ -63,7 +63,7 @@ jobs:
           -v ${{ steps.version.outputs.version }}
           -c ${{ matrix.channel }}
           -o Releases/${{ matrix.platform }}
-          -p bin/${{ matrix.platform }}/Release/net8.0-windows10.0.19041.0/${{ matrix.rid }}/publish
+          -p publish
           -e FluentTaskScheduler.exe
           --msi --instLocation Either
           --msiBanner Assets/MSI-Banner.bmp

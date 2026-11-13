@@ -1,0 +1,11 @@
+<Project>
+    <PropertyGroup>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <!-- The library and its tests also build (and the pure tests run) on a non-Windows machine. -->
+        <EnableWindowsTargeting>true</EnableWindowsTargeting>
+        <!-- Dependencies ship their own translations; the app's languages live in Strings/. -->
+        <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    </PropertyGroup>
+</Project>

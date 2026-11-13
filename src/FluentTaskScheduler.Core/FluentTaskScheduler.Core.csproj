@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!-- Everything that does not need a window: tasks, snoozing, history, settings and the view
+         models. Keeping it free of WinUI is what makes it testable without starting the app. -->
+    <PropertyGroup>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <RootNamespace>FluentTaskScheduler</RootNamespace>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="FluentTaskScheduler.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+        <PackageReference Include="Serilog" Version="4.4.0" />
+        <PackageReference Include="TaskScheduler" Version="2.12.2" />
+    </ItemGroup>
+
+</Project>
