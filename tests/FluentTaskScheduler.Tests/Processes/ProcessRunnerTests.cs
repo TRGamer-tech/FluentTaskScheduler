@@ -91,18 +91,36 @@ public sealed class ProcessRunnerTests
         Assert.Equal("Zürich 東京 Ελλάδα.txt", Path.GetFileName(line.Text));
     }
 
+    /// <summary>
+    /// DISM writes in the OEM code page whatever its console is set to, and itself turns what that
+    /// code page cannot represent into "?". The rest has to arrive as written.
+    /// </summary>
     [SkippableFact]
-    public async Task WhatDismWrites_ArrivesIntact_InLanguagesTheCodePageOfThisMachineCannotShow()
+    public async Task WhatDismWrites_ArrivesAsDismWroteIt_InTheCodePageOfWindows()
     {
         Skip.IfNot(OperatingSystem.IsWindows(), SkipReason);
         Skip.IfNot(SchedulerSandbox.IsElevated, "DISM needs an elevated token");
         using var folder = new TempFolder();
+        string name = "Z" + LettersOfTheOemCodePage();
 
         // DISM names its log file when it fails, as it does at once for an image that does not exist.
-        await Run(QuickAction.Tool("Dism.exe", $"/LogPath:\"{folder.File("Zürich 東京 Ελλάδα.log")}\" /Get-ImageInfo /ImageFile:\"{folder.File("none.wim")}\""));
+        await Run(QuickAction.Dism($"/LogPath:\"{folder.File(name + ".log")}\" /Get-ImageInfo /ImageFile:\"{folder.File("none.wim")}\""));
 
         ProcessOutput logLine = Assert.Single(Lines, line => line.Text.Contains(".log"));
-        Assert.Contains("Zürich 東京 Ελλάδα.log", logLine.Text);
+        Assert.Contains(name + ".log", logLine.Text);
+    }
+
+    // Letters beyond ASCII that the OEM code page of this Windows can represent, read from the request DISM gets.
+    private static string LettersOfTheOemCodePage()
+    {
+        Encoding oem = Encoding.GetEncoding(QuickAction.Dism("").OutputEncoding.CodePage, EncoderFallback.ExceptionFallback, DecoderFallback.ExceptionFallback);
+        string letters = new(Enumerable.Range(0xC0, 0x40).Select(code => (char)code).Where(letter =>
+        {
+            try { return oem.GetString(oem.GetBytes(letter.ToString())) == letter.ToString(); }
+            catch (EncoderFallbackException) { return false; }
+        }).Take(6).ToArray());
+        Skip.If(letters.Length == 0, "The OEM code page of this Windows has no letters beyond ASCII to test with.");
+        return letters;
     }
 
     [SkippableFact]

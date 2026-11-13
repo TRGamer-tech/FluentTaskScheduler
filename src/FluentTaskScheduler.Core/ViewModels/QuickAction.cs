@@ -41,11 +41,15 @@ public sealed record QuickAction(string Id, string Glyph, ProcessRequest Request
             RequiresElevation = true,
             ReportsFindings = true
         },
-        new("DismHealth", "", Tool("Dism.exe", "/Online /Cleanup-Image /CheckHealth")) { RequiresElevation = true, ReportsFindings = true }
+        new("DismHealth", "", Dism("/Online /Cleanup-Image /CheckHealth")) { RequiresElevation = true, ReportsFindings = true }
     ];
 
     internal static ProcessRequest Tool(string fileName, string arguments) =>
         WindowsTools.InUtf8Console(WindowsTools.InSystemFolder(fileName), arguments);
+
+    // DISM writes in the OEM code page whatever its console is set to.
+    internal static ProcessRequest Dism(string arguments) =>
+        WindowsTools.InOemCodePage(WindowsTools.InSystemFolder("Dism.exe"), arguments);
 
     /// <param name="script">Must not contain double quotes: it travels inside one pair of them.</param>
     internal static ProcessRequest PowerShell(string script) =>

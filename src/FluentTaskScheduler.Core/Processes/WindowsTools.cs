@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace FluentTaskScheduler.Processes;
@@ -36,4 +37,26 @@ public static class WindowsTools
         {
             OutputEncoding = Encoding.UTF8
         };
+
+    /// <summary>
+    /// A request for a program that writes into a pipe in the OEM code page of Windows whatever
+    /// its console is set to, as DISM does. What that code page cannot represent, such a program
+    /// writes as "?"; everything else arrives intact.
+    /// </summary>
+    /// <param name="program">The full path of the program.</param>
+    public static ProcessRequest InOemCodePage(string program, string arguments) =>
+        new(program, arguments) { OutputEncoding = OemCodePage() };
+
+    private static Encoding OemCodePage()
+    {
+        if (!OperatingSystem.IsWindows()) return Encoding.UTF8;
+
+        // .NET knows the code pages of Windows other than UTF-8 and UTF-16 only once they are registered.
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        return Encoding.GetEncoding((int)GetOEMCP());
+    }
+
+    [DllImport("kernel32.dll")]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+    private static extern uint GetOEMCP();
 }
