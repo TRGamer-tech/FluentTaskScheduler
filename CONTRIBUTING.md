@@ -66,7 +66,7 @@ Please use the provided GitHub Issue templates. Fill them out completely. We can
 
 This project uses [Velopack](https://velopack.io/) for installers and auto-updates.
 
-**To release, push a tag.** Pushing `V1.X.X` runs `.github/workflows/release.yml`. It builds both architectures with the version taken from the tag, packs them and attaches everything to a **draft** GitHub Release. Review the draft, write the notes and publish it.
+**To release, push a tag.** Pushing `V1.X.X` runs `.github/workflows/release.yml`. It builds both architectures with the version taken from the tag and packs them. Then it installs the x64 MSI silently, the way winget and Chocolatey do, checks that the installed app answers `--list`, and uninstalls it again; only if that works does it attach everything to a **draft** GitHub Release. Review the draft, write the notes and publish it.
 
 The draft contains, and has to keep, exactly these files:
 
