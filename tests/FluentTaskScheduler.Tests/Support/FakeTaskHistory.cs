@@ -27,8 +27,12 @@ public sealed class FakeTaskHistory : ITaskHistory
         return EnableResult;
     }
 
+    /// <summary>Called by <see cref="GetEvents"/> on the reading thread before it reads, with the read's cancellation; block in it to make reading slow.</summary>
+    public Action<CancellationToken>? ReadingEvents { get; set; }
+
     public IReadOnlyList<TaskEvent> GetEvents(string taskPath, int maxCount, DateTimeOffset? from = null, DateTimeOffset? to = null, CancellationToken cancellation = default)
     {
+        ReadingEvents?.Invoke(cancellation);
         Requests.Add((taskPath, from, to));
         if (Unreadable) throw new HistoryUnavailableException("Microsoft-Windows-TaskScheduler/Operational", new UnauthorizedAccessException("Access is denied."));
         return Events.Where(e => (from is null || e.Time >= from) && (to is null || e.Time <= to))

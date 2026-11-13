@@ -372,6 +372,9 @@ public sealed partial class TaskDetailsViewModel : ObservableObject, IDisposable
     {
         _disposed = true;
         _snooze.Changed -= OnSnoozeChanged;
+        // What is still being read, of the history or of what surrounded an event, is of no use now.
+        _loading?.Cancel();
+        _lookingAround?.Cancel();
     }
 
     /// <returns>Why the task was not snoozed; null when it was.</returns>

@@ -398,6 +398,29 @@ public sealed class TaskDetailsViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task ClosingTheDetails_CancelsTheReadOfTheHistory_AndShowsNothingOfIt()
+    {
+        _history.Events.Add(new TaskEvent { Kind = TaskEventKind.RunStarted, EventId = 100, Time = _time.GetUtcNow().AddHours(-1), TaskPath = @"\Backup", RecordId = 1 });
+        using var reading = new ManualResetEventSlim();
+        CancellationToken read = default;
+        _history.ReadingEvents = cancellation =>
+        {
+            read = cancellation;
+            reading.Set();
+            cancellation.WaitHandle.WaitOne(TimeSpan.FromSeconds(5));
+        };
+        TaskDetailsViewModel details = Open(@"\Backup");
+        Task loading = details.LoadHistoryAsync();
+        Assert.True(reading.Wait(TimeSpan.FromSeconds(5)));
+
+        details.Dispose();
+        await loading;
+
+        Assert.True(read.IsCancellationRequested);
+        Assert.Empty(details.Entries);
+    }
+
+    [Fact]
     public void ClosedDetails_NoLongerFollowTheSnooze_EvenWithAChangePostedBeforeTheyClosed()
     {
         int listening = _snooze.Subscribers;
