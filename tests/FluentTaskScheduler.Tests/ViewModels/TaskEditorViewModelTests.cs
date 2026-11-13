@@ -220,18 +220,18 @@ public sealed class TaskEditorViewModelTests : IDisposable
     }
 
     [Fact]
-    public void TheCategoryBox_SuggestsTheSavedCategoriesThatBeginWithWhatIsTyped_ButNotTheOneTypedInFull()
+    public void TheCategoryBox_SuggestsTheSavedCategoriesThatContainWhatIsTyped_ButNotTheOneTypedInFull()
     {
-        _settings.Update(s => s with { SavedCategories = ["Work", "Workshop", "Homework", "Personal"] });
+        _settings.Update(s => s with { SavedCategories = ["Work", "Homework", "Personal"] });
         var editor = Edit(new TaskDraft());
 
-        Assert.Equal(["Work", "Workshop", "Homework", "Personal"], editor.SuggestCategories());
+        Assert.Equal(["Work", "Homework", "Personal"], editor.SuggestCategories());
 
         editor.Category = " wor";
-        Assert.Equal(["Work", "Workshop"], editor.SuggestCategories());
+        Assert.Equal(["Work", "Homework"], editor.SuggestCategories());
 
         editor.Category = "work";
-        Assert.Equal(["Workshop"], editor.SuggestCategories());
+        Assert.Equal(["Homework"], editor.SuggestCategories());
     }
 
     [Fact]

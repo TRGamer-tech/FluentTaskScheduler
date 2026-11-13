@@ -295,11 +295,13 @@ public sealed partial class TaskEditorViewModel : ObservableObject
         if (await _files.PickOpenFileAsync(Loc.Get("Dialog.ProgramScript"), Loc.Get("Editor.AllFiles"), "*") is { } path) action.Path = path;
     }
 
-    /// <summary>The saved categories that begin with what the category box holds, apart from that category itself.</summary>
+    /// <summary>The saved categories that contain what the category box holds, apart from that category itself.</summary>
     public IReadOnlyList<string> SuggestCategories()
     {
         string typed = Category.Trim();
-        return Suggest(_settings.Current.SavedCategories, typed, [typed]);
+        return _settings.Current.SavedCategories
+            .Where(category => category.Contains(typed, StringComparison.CurrentCultureIgnoreCase) && !category.Equals(typed, StringComparison.CurrentCultureIgnoreCase))
+            .ToList();
     }
 
     /// <summary>
@@ -309,8 +311,11 @@ public sealed partial class TaskEditorViewModel : ObservableObject
     /// </summary>
     public IReadOnlyList<string> SuggestTags()
     {
-        string[] tags = Tags.Split(',', StringSplitOptions.TrimEntries);
-        return Suggest(_settings.Current.SavedTags, tags[^1], tags);
+        string[] held = Tags.Split(',', StringSplitOptions.TrimEntries);
+        string typed = held[^1];
+        return _settings.Current.SavedTags
+            .Where(tag => tag.StartsWith(typed, StringComparison.CurrentCultureIgnoreCase) && !held.Contains(tag, StringComparer.CurrentCultureIgnoreCase))
+            .ToList();
     }
 
     /// <summary>Puts <paramref name="tag"/> in place of the tag being typed, with a comma after it for the next one.</summary>
@@ -466,11 +471,6 @@ public sealed partial class TaskEditorViewModel : ObservableObject
         text.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToValueList();
-
-    // What is typed is the start of a name, so only names that begin with it are offered.
-    private static List<string> Suggest(IEnumerable<string> saved, string typed, IEnumerable<string> held) =>
-        saved.Where(name => name.StartsWith(typed, StringComparison.CurrentCultureIgnoreCase) && !held.Contains(name, StringComparer.CurrentCultureIgnoreCase))
-             .ToList();
 
     private void RememberCategoryAndTags(TaskDraft saved) => _settings.Update(settings => settings with
     {
