@@ -218,15 +218,16 @@ public sealed class AppSession : IDisposable
     /// </summary>
     public void ChooseFile(string path)
     {
-        // The app runs elevated in these tests and then shows the classic dialog, in its own
-        // process. It is looked up through Windows rather than through the app's window, which
-        // does not answer while the dialog it opened is up.
+        // Elevated, the app shows the classic dialog in its own process; otherwise the picker of
+        // Windows, which may live in another process but belongs to the app's window. Either is
+        // looked up through Windows rather than through the app's window, which does not answer
+        // while the dialog it opened is up.
         AutomationElement? dialog = null, fileName = null;
         bool ready = Retry.WhileFalse(() =>
         {
             try
             {
-                nint handle = FindDialogWindow(_app.ProcessId);
+                nint handle = FindDialogWindow();
                 if (handle == 0) return false;
                 dialog = _automation.FromHandle(handle);
                 fileName = dialog.FindFirstDescendant(cf => cf.ByControlType(ControlType.Edit).And(cf.ByAutomationId("1148")));
@@ -237,7 +238,12 @@ public sealed class AppSession : IDisposable
                 return false; // the dialog's window exists before it can be talked to
             }
         }, TimeSpan.FromSeconds(30), TimeSpan.FromMilliseconds(500)).Success;
-        if (!ready || dialog is null || fileName is null) throw new InvalidOperationException("The app opened no file dialog with a box for the file name.");
+        if (!ready || dialog is null || fileName is null)
+        {
+            using (var screen = Capture.Screen()) screen.ToFile(Path.Combine(ArtifactsDir, "no-file-dialog.png"));
+            throw new InvalidOperationException(
+                "The app opened no file dialog with a box for the file name. Windows on the screen: " + string.Join("; ", VisibleWindows()));
+        }
 
         fileName.AsTextBox().Text = path;
 
@@ -246,23 +252,51 @@ public sealed class AppSession : IDisposable
         open.Press();
     }
 
-    // A visible top-level window of the classic dialog class that belongs to the process.
-    private static nint FindDialogWindow(int processId)
+    // A visible top-level dialog window that the app's process shows or its window owns.
+    private nint FindDialogWindow()
     {
         nint found = 0;
         EnumWindows((window, _) =>
         {
-            GetWindowThreadProcessId(window, out uint owner);
-            if (owner != processId || !IsWindowVisibleNative(window)) return true;
+            if (!IsWindowVisibleNative(window)) return true;
 
             var className = new StringBuilder(64);
             GetClassNameW(window, className, className.Capacity);
             if (className.ToString() != "#32770") return true;
 
+            GetWindowThreadProcessId(window, out uint process);
+            if (process != _app.ProcessId && GetWindow(window, OwnerWindow) != _windowHandle) return true;
+
             found = window;
             return false;
         }, 0);
         return found;
+    }
+
+    private const uint OwnerWindow = 4; // GW_OWNER
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern nint GetWindow(nint window, uint relation);
+
+    // Class, title and program of every visible top-level window, to tell what a test met instead of what it expected.
+    private static List<string> VisibleWindows()
+    {
+        var windows = new List<string>();
+        EnumWindows((window, _) =>
+        {
+            if (!IsWindowVisibleNative(window)) return true;
+            var className = new StringBuilder(64);
+            GetClassNameW(window, className, className.Capacity);
+            var title = new StringBuilder(128);
+            GetWindowTextW(window, title, title.Capacity);
+            GetWindowThreadProcessId(window, out uint owner);
+            string program;
+            try { using var process = Process.GetProcessById((int)owner); program = process.ProcessName; }
+            catch (ArgumentException) { program = "?"; }
+            windows.Add($"{className} \"{title}\" ({program} {owner})");
+            return true;
+        }, 0);
+        return windows;
     }
 
     private delegate bool WindowVisitor(nint window, nint parameter);
@@ -275,6 +309,9 @@ public sealed class AppSession : IDisposable
 
     [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
     private static extern int GetClassNameW(nint window, StringBuilder className, int capacity);
+
+    [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+    private static extern int GetWindowTextW(nint window, StringBuilder text, int capacity);
 
     /// <summary>
     /// The text of a dialog the app is showing, or null if there is none. A dialog nobody asked
