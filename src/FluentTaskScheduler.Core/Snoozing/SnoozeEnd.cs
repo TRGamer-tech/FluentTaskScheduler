@@ -6,7 +6,6 @@ public sealed record SnoozeEnd
     private SnoozeEnd() { }
 
     internal TimeSpan? Duration { get; private init; }
-    internal TimeOnly? TimeOfDay { get; private init; }
     internal DateTimeOffset? Moment { get; private init; }
 
     /// <summary>Once <paramref name="duration"/> has passed.</summary>
@@ -16,12 +15,6 @@ public sealed record SnoozeEnd
         ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(duration, TimeSpan.Zero);
         return new SnoozeEnd { Duration = duration };
     }
-
-    /// <summary>
-    /// The next time this computer's clock shows <paramref name="timeOfDay"/>: later today, or
-    /// tomorrow if that time has already passed today.
-    /// </summary>
-    public static SnoozeEnd At(TimeOnly timeOfDay) => new() { TimeOfDay = timeOfDay };
 
     /// <summary>
     /// At <paramref name="moment"/>, however long the snooze takes to start. A moment that has

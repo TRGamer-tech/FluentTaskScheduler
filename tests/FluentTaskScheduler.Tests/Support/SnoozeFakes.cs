@@ -65,7 +65,6 @@ public sealed class FakeSnoozeService : ISnoozeService
 
     private static string Describe(SnoozeEnd end) =>
         end.Duration is { } duration ? $"for {duration}"
-        : end.TimeOfDay is { } time ? $"until {time.ToString("HH:mm", CultureInfo.InvariantCulture)}"
         : end.Moment is { } moment ? $"until {moment.ToString("yyyy-MM-dd HH:mm zzz", CultureInfo.InvariantCulture)}"
         : "until restart";
 }

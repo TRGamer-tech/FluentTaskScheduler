@@ -1,4 +1,3 @@
-using System.Globalization;
 using FluentTaskScheduler.Snoozing;
 
 namespace FluentTaskScheduler.Tests.Snoozing;
@@ -28,21 +27,6 @@ public sealed class GlobalSnoozeTests : SnoozeTestBase
         AdvanceMinutes(1);
         Assert.False(snooze.BlocksRun(Backup));
         Assert.Null(snooze.State.Global);
-    }
-
-    [Theory]
-    [InlineData("17:30", "2026-03-10T17:30:00+02:00")] // still ahead today
-    [InlineData("08:00", "2026-03-11T08:00:00+02:00")] // passed today, so tomorrow
-    [InlineData("11:00", "2026-03-11T11:00:00+02:00")] // this very minute counts as passed
-    public async Task SnoozingUntilATimeOfDay_MeansTheNextTimeTheLocalClockShowsIt(string timeOfDay, string expectedEnd)
-    {
-        // 09:00 UTC is 11:00 on this computer.
-        Time.SetLocalTimeZone(TimeZoneInfo.CreateCustomTimeZone("Test", TimeSpan.FromHours(2), "Test", "Test"));
-        var snooze = await StartedService();
-
-        await snooze.SnoozeAllAsync(SnoozeEnd.At(TimeOnly.Parse(timeOfDay, CultureInfo.InvariantCulture)));
-
-        Assert.Equal(DateTimeOffset.Parse(expectedEnd, CultureInfo.InvariantCulture), snooze.State.Global?.Window.Until);
     }
 
     [Fact]

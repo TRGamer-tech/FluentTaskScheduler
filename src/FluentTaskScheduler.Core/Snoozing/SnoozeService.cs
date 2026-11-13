@@ -210,12 +210,7 @@ public sealed class SnoozeService : ISnoozeService, ISnoozeGate, IDisposable
     {
         if (end.Moment is { } moment) return new SnoozeWindow(moment.ToUniversalTime());
         if (end.Duration is { } duration) return new SnoozeWindow(_time.GetUtcNow() + duration);
-        if (end.TimeOfDay is not { } timeOfDay) return SnoozeWindow.UntilRestart;
-
-        DateTime now = _time.GetLocalNow().DateTime;
-        DateTime local = now.Date + timeOfDay.ToTimeSpan();
-        if (local <= now) local = local.AddDays(1);
-        return new SnoozeWindow(new DateTimeOffset(local, _time.LocalTimeZone.GetUtcOffset(local)).ToUniversalTime());
+        return SnoozeWindow.UntilRestart;
     }
 
     /// <summary>
