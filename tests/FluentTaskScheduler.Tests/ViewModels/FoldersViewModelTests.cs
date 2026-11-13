@@ -66,6 +66,32 @@ public sealed class FoldersViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task RevealingATaskOfAnotherFolder_ShowsAllFolders_AndTheFolderCanBeChosenAgain()
+    {
+        await _folders.ReloadAsync();
+        _folders.Selected = Node(@"\Jobs");
+
+        _folders.Reveal(@"\Reports\Monthly");
+
+        Assert.Null(_tasks.FolderPath);
+        Assert.Null(_folders.Selected);
+        _folders.Selected = Node(@"\Jobs");
+        Assert.Equal(@"\Jobs", _tasks.FolderPath);
+    }
+
+    [Fact]
+    public async Task RevealingATaskOfTheFolderShown_KeepsShowingThatFolder()
+    {
+        await _folders.ReloadAsync();
+        _folders.Selected = Node(@"\Jobs");
+
+        _folders.Reveal(@"\JOBS\Backup");
+
+        Assert.Equal(@"\Jobs", _tasks.FolderPath);
+        Assert.Equal(@"\Jobs", _folders.Selected?.Path);
+    }
+
+    [Fact]
     public async Task ReloadingKeepsWhatWasExpandedAndSelected()
     {
         await _folders.ReloadAsync();

@@ -71,6 +71,18 @@ public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewMode
         Selected = selected is not null ? nodes.GetValueOrDefault(selected) : null;
     }
 
+    /// <summary>
+    /// Lets the list show the task at <paramref name="taskPath"/>: the folder being shown stays if
+    /// the task is in it; otherwise the list shows the tasks of all folders, and the tree
+    /// highlights none, so that any folder can be chosen again.
+    /// </summary>
+    public void Reveal(string taskPath)
+    {
+        if (string.Equals(tasks.FolderPath, TaskPaths.ParentOf(taskPath), StringComparison.OrdinalIgnoreCase)) return;
+        Selected = null;
+        tasks.FolderPath = null;
+    }
+
     /// <summary>Asks for a name and creates a folder in <paramref name="parent"/>.</summary>
     public async Task CreateAsync(FolderNode parent)
     {

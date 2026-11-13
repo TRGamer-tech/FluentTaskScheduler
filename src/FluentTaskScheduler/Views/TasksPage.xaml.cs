@@ -45,7 +45,7 @@ public sealed partial class TasksPage : Page
     /// <summary>Selects the task at <paramref name="path"/> and scrolls to it, loading the list first if it does not have the task yet.</summary>
     public async Task ShowAsync(string path)
     {
-        ViewModel.FolderPath = null;
+        _folders.Reveal(path);
         ViewModel.SearchText = "";
         ViewModel.StatusFilterIndex = 0;
         if (ViewModel.Find(path) is null) await ViewModel.ReloadAsync();
