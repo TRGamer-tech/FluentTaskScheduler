@@ -675,6 +675,8 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
     {
         TaskAccessDeniedException => Loc.Format(_app.IsElevated ? "Tasks.Error.Denied" : "Tasks.Error.DeniedNotElevated", task.Name),
         TaskNotFoundException => Loc.Format("Tasks.Error.Gone", task.Name),
+        TaskExistsException taken => Loc.Format("Tasks.Error.NameTakenInFolder", task.Name, TaskPaths.ParentOf(taken.Path)),
+        TaskDuplicatedException twice => Loc.Format("Tasks.Error.Duplicated", twice.Path, twice.CopyPath),
         _ => $"{task.Name}: {ex.Message}"
     };
 

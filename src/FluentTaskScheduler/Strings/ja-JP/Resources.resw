@@ -1116,4 +1116,6 @@
   <data name="Templates.Tag.Display" xml:space="preserve"><value>ディスプレイ</value></data>
   <data name="Dashboard.Tasks.Unavailable" xml:space="preserve"><value>タスクを読み取れませんでした: {0}</value></data>
   <data name="Tasks.Error.Duplicated" xml:space="preserve"><value>タスクが「{0}」と「{1}」の 2 つになりました。どちらも削除できませんでした。タスク スケジューラでどちらか一方を削除してください。</value></data>
+  <data name="Tasks.Error.NameTakenInFolder" xml:space="preserve"><value>'{0}': フォルダー「{1}」には同じ名前のタスクが既にあります。</value></data>
+  <data name="Folders.Error.NameTaken" xml:space="preserve"><value>ここには「{0}」という名前のフォルダーが既にあります。別の名前を選んでください。</value></data>
 </root>

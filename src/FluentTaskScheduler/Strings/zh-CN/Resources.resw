@@ -1119,6 +1119,8 @@
   <data name="Templates.Tag.Display" xml:space="preserve"><value>显示器</value></data>
   <data name="Dashboard.Tasks.Unavailable" xml:space="preserve"><value>无法读取任务：{0}</value></data>
   <data name="Tasks.Error.Duplicated" xml:space="preserve"><value>该任务现在同时存在为“{0}”和“{1}”，两者都无法删除。请在任务计划程序中删除其中一个。</value></data>
+  <data name="Tasks.Error.NameTakenInFolder" xml:space="preserve"><value>“{0}”：文件夹“{1}”中已有同名任务。</value></data>
+  <data name="Folders.Error.NameTaken" xml:space="preserve"><value>此处已有名为“{0}”的文件夹。请选择其他名称。</value></data>
 </root>
 
 

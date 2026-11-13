@@ -1116,5 +1116,7 @@ Restart now to apply the update?</value></data>
   <data name="Templates.Tag.Display" xml:space="preserve"><value>display</value></data>
   <data name="Dashboard.Tasks.Unavailable" xml:space="preserve"><value>The tasks could not be read: {0}</value></data>
   <data name="Tasks.Error.Duplicated" xml:space="preserve"><value>The task now exists twice, as '{0}' and as '{1}': neither of the two could be removed. Delete one of them in Task Scheduler.</value></data>
+  <data name="Tasks.Error.NameTakenInFolder" xml:space="preserve"><value>'{0}': the folder '{1}' already has a task of that name.</value></data>
+  <data name="Folders.Error.NameTaken" xml:space="preserve"><value>Another folder here is already called '{0}'. Choose a different name.</value></data>
 </root>
 

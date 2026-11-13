@@ -78,7 +78,7 @@ public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewMode
         if (!await IsValidAsync(name)) return;
 
         string path = TaskPaths.Combine(parent.Path, name);
-        if (!await TryAsync(() => folders.Create(path))) return;
+        if (!await TryAsync(name, () => folders.Create(path))) return;
 
         parent.IsExpanded = true;
         await ReloadAsync();
@@ -100,14 +100,14 @@ public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewMode
         if (folder.IsRoot) return;
         string question = Loc.Format("Dialog.DeleteFolder.ContentFormat", folder.Name);
         if (!await prompts.ConfirmAsync(Loc.Get("Dialog.DeleteFolder.Title"), question, Loc.Get("Dialog.Common.Delete"), isDestructive: true)) return;
-        if (!await TryAsync(() => folders.Delete(folder.Path))) return;
+        if (!await TryAsync(folder.Name, () => folders.Delete(folder.Path))) return;
 
         await AfterChangeAsync(folder.Path, TaskPaths.ParentOf(folder.Path));
     }
 
     private async Task MoveAsync(FolderNode folder, string newPath)
     {
-        if (!await TryAsync(() => folders.MoveFolder(folder.Path, newPath))) return;
+        if (!await TryAsync(folder.Name, () => folders.MoveFolder(folder.Path, newPath))) return;
         // Snoozes know their tasks only by their paths, and those have changed with the folder's.
         await snooze.FolderMovedAsync(folder.Path, newPath);
         await AfterChangeAsync(folder.Path, newPath);
@@ -133,24 +133,39 @@ public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewMode
         return false;
     }
 
-    private async Task<bool> TryAsync(Action change)
+    /// <param name="name">The name of the folder that <paramref name="change"/> changes.</param>
+    private async Task<bool> TryAsync(string name, Action change)
     {
         try
         {
             await Task.Run(change);
             return true;
         }
-        catch (TaskAccessDeniedException)
-        {
-            await prompts.ShowErrorAsync(Loc.Get(app.IsElevated ? "Editor.Error.AccessDenied" : "Editor.Error.AccessDeniedNotElevated"));
-        }
         catch (Exception ex)
         {
-            // Task Scheduler refuses with whatever COM error fits; the text is the best there is to show.
-            Serilog.Log.Error(ex, "A folder operation failed");
-            await prompts.ShowErrorAsync(ex.Message);
+            await prompts.ShowErrorAsync(Describe(name, ex));
+            return false;
         }
-        return false;
+    }
+
+    /// <summary>What to tell the user when a change of the folder called <paramref name="name"/> failed.</summary>
+    private string Describe(string name, Exception ex)
+    {
+        switch (ex)
+        {
+            case TaskAccessDeniedException:
+                return Loc.Get(app.IsElevated ? "Editor.Error.AccessDenied" : "Editor.Error.AccessDeniedNotElevated");
+            case FolderExistsException taken:
+                return Loc.Format("Folders.Error.NameTaken", TaskPaths.NameOf(taken.Path));
+            case DirectoryNotFoundException:
+                return Loc.Format("Tasks.Error.Gone", name);
+            case TaskDuplicatedException twice:
+                return Loc.Format("Tasks.Error.Duplicated", twice.Path, twice.CopyPath);
+            default:
+                // Task Scheduler refuses with whatever COM error fits; the text is the best there is to show.
+                Serilog.Log.Error(ex, "A change of the folder {Name} failed", name);
+                return ex.Message;
+        }
     }
 
     private static IEnumerable<FolderNode> Flatten(IEnumerable<FolderNode> nodes) =>

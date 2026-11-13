@@ -475,6 +475,21 @@ public sealed class TasksViewModelTests : IDisposable
         Assert.Equal(["Error: Tasks.Error.Denied"], _prompts.Shown);
     }
 
+    [Theory]
+    [InlineData("name taken", "Tasks.Error.NameTakenInFolder")]
+    [InlineData("left twice", "Tasks.Error.Duplicated")]
+    public async Task AMoveTaskSchedulerTurnsDown_IsReportedInTheUsersLanguage(string refusal, string expected)
+    {
+        await _tasks.ReloadAsync();
+        _taskFolders.Fails = refusal == "name taken"
+            ? new TaskExistsException(@"\Reports\Backup")
+            : new TaskDuplicatedException(@"\Backup", @"\Reports\Backup", new UnauthorizedAccessException());
+
+        await _tasks.MoveToFolderAsync(Row(@"\Backup"), @"\Reports");
+
+        Assert.Equal([$"Error: {expected}"], _prompts.Shown);
+    }
+
     [Fact]
     public async Task Exporting_WritesTheTaskXml_InTheEncodingItDeclares()
     {

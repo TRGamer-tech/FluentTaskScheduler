@@ -187,6 +187,22 @@ public sealed class FoldersViewModelTests : IDisposable
         Assert.NotNull(Find(_folders.Roots, @"\Jobs"));
     }
 
+    [Theory]
+    [InlineData("name taken", "Folders.Error.NameTaken")]
+    [InlineData("deleted elsewhere", "Tasks.Error.Gone")]
+    public async Task ARenameTaskSchedulerTurnsDown_IsReportedInTheUsersLanguage(string refusal, string expected)
+    {
+        await _folders.ReloadAsync();
+        _taskFolders.Fails = refusal == "name taken"
+            ? new FolderExistsException(@"\Work")
+            : new DirectoryNotFoundException(@"The folder '\Jobs' does not exist.");
+        _prompts.Text = "Work";
+
+        await _folders.RenameAsync(Node(@"\Jobs"));
+
+        Assert.Equal($"Error: {expected}", _prompts.Shown.Last());
+    }
+
     [Fact]
     public async Task MovingTasksToAFolder_MovesEachSelectedTask()
     {
