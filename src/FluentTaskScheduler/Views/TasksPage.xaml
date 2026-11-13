@@ -116,7 +116,9 @@
                     </AppBarButton.KeyboardAccelerators>
                 </AppBarButton>
                 <AppBarButton x:Name="ImportButton" Icon="Import" Label="{x:Bind l:Loc.Get('Main.Toolbar.ImportTask')}" Click="Import_Click"/>
-                <AppBarButton x:Name="SortButton" Icon="Sort" Label="{x:Bind ViewModel.SortText, Mode=OneWay}">
+                <AppBarButton x:Name="SortButton" Icon="Sort" Label="{x:Bind ViewModel.SortText, Mode=OneWay}"
+                              ToolTipService.ToolTip="{x:Bind ViewModel.SortDescription, Mode=OneWay}"
+                              AutomationProperties.Name="{x:Bind ViewModel.SortDescription, Mode=OneWay}">
                     <AppBarButton.Flyout>
                         <MenuFlyout>
                             <MenuFlyoutItem x:Name="SortByNameItem" Text="{x:Bind l:Loc.Get('Main.Sort.Name')}" Command="{x:Bind ViewModel.SortByCommand}" CommandParameter="{x:Bind vm:TaskSort.Name}"/>

@@ -104,7 +104,7 @@
   <data name="Main.Header.Dashboard" xml:space="preserve"><value>仪表盘</value></data>
   <data name="Main.Toolbar.ImportTask" xml:space="preserve"><value>导入任务</value></data>
   <data name="Main.Toolbar.Refresh" xml:space="preserve"><value>刷新</value></data>
-  <data name="Main.Toolbar.SortButton" xml:space="preserve"><value>排序 ↕</value></data>
+  <data name="Main.Toolbar.SortButton" xml:space="preserve"><value>排序</value></data>
   <data name="Main.Toolbar.SortActiveFormat" xml:space="preserve"><value>排序 {0} {1}</value></data>
   <data name="Main.Sort.Name" xml:space="preserve"><value>名称</value></data>
   <data name="Main.Sort.Status" xml:space="preserve"><value>状态</value></data>
@@ -843,6 +843,9 @@
   <data name="Tasks.Error.OtherFormat" xml:space="preserve"><value>“{0}”：{1}</value></data>
   <data name="Folders.Error.Failed" xml:space="preserve"><value>无法更改文件夹：{0}</value></data>
   <data name="Dialog.Crash.Message" xml:space="preserve"><value>应用遇到了无法处理的错误。以下详细信息也已写入崩溃日志；报告问题时请附上这些信息。</value></data>
+  <data name="Main.Toolbar.SortedByFormat" xml:space="preserve"><value>按{0}排序（{1}）</value></data>
+  <data name="Main.Sort.Ascending" xml:space="preserve"><value>升序</value></data>
+  <data name="Main.Sort.Descending" xml:space="preserve"><value>降序</value></data>
 </root>
 
 

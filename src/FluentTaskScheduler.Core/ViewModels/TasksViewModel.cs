@@ -133,17 +133,22 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
     [ObservableProperty] private string? _folderPath;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(SortText))]
+    [NotifyPropertyChangedFor(nameof(SortText), nameof(SortDescription))]
     private TaskSort _sort;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(SortText))]
+    [NotifyPropertyChangedFor(nameof(SortText), nameof(SortDescription))]
     private bool _sortAscending = true;
 
     /// <summary>The caption of the sort button: what the list is sorted by, if anything.</summary>
     public string SortText => Sort == TaskSort.None
         ? Loc.Get("Main.Toolbar.SortButton")
         : Loc.Format("Main.Toolbar.SortActiveFormat", SortAscending ? "▲" : "▼", Loc.Get("Main.Sort." + Sort));
+
+    /// <summary>The same in words, for the tooltip and screen readers, which read the arrow of the caption as a symbol's name.</summary>
+    public string SortDescription => Sort == TaskSort.None
+        ? Loc.Get("Main.Toolbar.SortButton")
+        : Loc.Format("Main.Toolbar.SortedByFormat", Loc.Get("Main.Sort." + Sort), Loc.Get(SortAscending ? "Main.Sort.Ascending" : "Main.Sort.Descending"));
 
     /// <summary>
     /// False for a process without administrator rights: Windows then only lists the tasks this

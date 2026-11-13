@@ -103,8 +103,8 @@
   <data name="Main.Header.Dashboard" xml:space="preserve"><value>ダッシュボード</value></data>
   <data name="Main.Toolbar.ImportTask" xml:space="preserve"><value>タスクのインポート</value></data>
   <data name="Main.Toolbar.Refresh" xml:space="preserve"><value>更新</value></data>
-  <data name="Main.Toolbar.SortButton" xml:space="preserve"><value>並べ替え ↕</value></data>
-  <data name="Main.Toolbar.SortActiveFormat" xml:space="preserve"><value>{0} で並べ替え ({1})</value></data>
+  <data name="Main.Toolbar.SortButton" xml:space="preserve"><value>並べ替え</value></data>
+  <data name="Main.Toolbar.SortActiveFormat" xml:space="preserve"><value>{1}で並べ替え {0}</value></data>
   <data name="Main.Sort.Name" xml:space="preserve"><value>名前</value></data>
   <data name="Main.Sort.Status" xml:space="preserve"><value>状態</value></data>
   <data name="Main.Sort.NextRun" xml:space="preserve"><value>次回の実行</value></data>
@@ -842,4 +842,7 @@
   <data name="Tasks.Error.OtherFormat" xml:space="preserve"><value>「{0}」: {1}</value></data>
   <data name="Folders.Error.Failed" xml:space="preserve"><value>フォルダーを変更できませんでした: {0}</value></data>
   <data name="Dialog.Crash.Message" xml:space="preserve"><value>アプリで処理できないエラーが発生しました。以下の詳細はクラッシュログにも記録されています。問題を報告する際は、この詳細を添えてください。</value></data>
+  <data name="Main.Toolbar.SortedByFormat" xml:space="preserve"><value>{0}で並べ替え ({1})</value></data>
+  <data name="Main.Sort.Ascending" xml:space="preserve"><value>昇順</value></data>
+  <data name="Main.Sort.Descending" xml:space="preserve"><value>降順</value></data>
 </root>

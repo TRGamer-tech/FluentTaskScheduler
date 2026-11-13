@@ -103,8 +103,8 @@ Jetzt App neustarten?</value></data>
   <data name="Main.Header.Dashboard" xml:space="preserve"><value>Dashboard</value></data>
   <data name="Main.Toolbar.ImportTask" xml:space="preserve"><value>Aufgabe importieren</value></data>
   <data name="Main.Toolbar.Refresh" xml:space="preserve"><value>Aktualisieren</value></data>
-  <data name="Main.Toolbar.SortButton" xml:space="preserve"><value>Sortieren ↕</value></data>
-  <data name="Main.Toolbar.SortActiveFormat" xml:space="preserve"><value>Sortieren nach {0} {1}</value></data>
+  <data name="Main.Toolbar.SortButton" xml:space="preserve"><value>Sortieren</value></data>
+  <data name="Main.Toolbar.SortActiveFormat" xml:space="preserve"><value>Sortierung: {1} {0}</value></data>
   <data name="Main.Sort.Name" xml:space="preserve"><value>Name</value></data>
   <data name="Main.Sort.Status" xml:space="preserve"><value>Status</value></data>
   <data name="Main.Sort.NextRun" xml:space="preserve"><value>Nächster Start</value></data>
@@ -842,4 +842,7 @@ Jetzt App neustarten?</value></data>
   <data name="Tasks.Error.OtherFormat" xml:space="preserve"><value>„{0}“: {1}</value></data>
   <data name="Folders.Error.Failed" xml:space="preserve"><value>Der Ordner konnte nicht geändert werden: {0}</value></data>
   <data name="Dialog.Crash.Message" xml:space="preserve"><value>Die App ist auf einen Fehler gestossen, den sie nicht behandeln konnte. Die Details unten stehen auch im Absturzprotokoll; füge sie bitte bei, wenn du das Problem meldest.</value></data>
+  <data name="Main.Toolbar.SortedByFormat" xml:space="preserve"><value>Sortierung: {0}, {1}</value></data>
+  <data name="Main.Sort.Ascending" xml:space="preserve"><value>aufsteigend</value></data>
+  <data name="Main.Sort.Descending" xml:space="preserve"><value>absteigend</value></data>
 </root>

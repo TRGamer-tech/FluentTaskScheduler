@@ -196,17 +196,20 @@ public sealed class TasksViewModelTests : IDisposable
     }
 
     [Fact]
-    public async Task TheSortButton_SaysWhatTheListIsSortedBy()
+    public async Task TheSortButton_SaysWhatTheListIsSortedBy_AlsoInWords()
     {
         await _tasks.ReloadAsync();
         Assert.Equal("Main.Toolbar.SortButton", _tasks.SortText);
+        Assert.Equal("Main.Toolbar.SortButton", _tasks.SortDescription);
 
         var changes = new List<string?>();
         _tasks.PropertyChanged += (_, e) => changes.Add(e.PropertyName);
         _tasks.SortByCommand.Execute(TaskSort.LastRun);
 
         Assert.Contains(nameof(TasksViewModel.SortText), changes);
+        Assert.Contains(nameof(TasksViewModel.SortDescription), changes);
         Assert.Equal(TaskSort.LastRun, _tasks.Sort);
+        Assert.Equal("Main.Toolbar.SortedByFormat", _tasks.SortDescription);
     }
 
     [Fact]

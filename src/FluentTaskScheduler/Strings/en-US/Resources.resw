@@ -103,7 +103,7 @@ Restart now to apply the update?</value></data>
   <data name="Main.Header.Dashboard" xml:space="preserve"><value>Dashboard</value></data>
   <data name="Main.Toolbar.ImportTask" xml:space="preserve"><value>Import Task</value></data>
   <data name="Main.Toolbar.Refresh" xml:space="preserve"><value>Refresh</value></data>
-  <data name="Main.Toolbar.SortButton" xml:space="preserve"><value>Sort ↕</value></data>
+  <data name="Main.Toolbar.SortButton" xml:space="preserve"><value>Sort</value></data>
   <data name="Main.Toolbar.SortActiveFormat" xml:space="preserve"><value>Sort {0} {1}</value></data>
   <data name="Main.Sort.Name" xml:space="preserve"><value>Name</value></data>
   <data name="Main.Sort.Status" xml:space="preserve"><value>Status</value></data>
@@ -842,5 +842,8 @@ Restart now to apply the update?</value></data>
   <data name="Tasks.Error.OtherFormat" xml:space="preserve"><value>'{0}': {1}</value></data>
   <data name="Folders.Error.Failed" xml:space="preserve"><value>The folder could not be changed: {0}</value></data>
   <data name="Dialog.Crash.Message" xml:space="preserve"><value>The app ran into an error it could not handle. The details below are also in the crash log; please include them if you report the problem.</value></data>
+  <data name="Main.Toolbar.SortedByFormat" xml:space="preserve"><value>Sorted by {0}, {1}</value></data>
+  <data name="Main.Sort.Ascending" xml:space="preserve"><value>ascending</value></data>
+  <data name="Main.Sort.Descending" xml:space="preserve"><value>descending</value></data>
 </root>
 
