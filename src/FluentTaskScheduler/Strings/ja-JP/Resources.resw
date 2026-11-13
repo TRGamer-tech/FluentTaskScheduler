@@ -333,7 +333,7 @@
   <data name="ScriptEditor.Status.Starting" xml:space="preserve"><value>[PowerShellを起動中...]</value></data>
   <data name="ScriptEditor.Status.Stopped" xml:space="preserve"><value>[ユーザーによって停止されました]</value></data>
   <data name="ScriptEditor.Status.Saved" xml:space="preserve"><value>['{0}'としてライブラリに保存されました]</value></data>
-  <data name="Dialog.Crash.Title" xml:space="preserve"><value>予期せぬエラー</value></data>
+  <data name="Dialog.Crash.Title" xml:space="preserve"><value>問題が発生しました</value></data>
   <data name="Dialog.Crash.Copy" xml:space="preserve"><value>クリップボードにコピー</value></data>
   <data name="Main.Header.QuickActions" xml:space="preserve"><value>クイックアクション</value></data>
   <data name="Snooze.Status.EndsAt" xml:space="preserve"><value>グローバルスヌーズ有効中（{0} まで）</value></data>
@@ -841,4 +841,5 @@
   <data name="Tour.Title" xml:space="preserve"><value>FluentTaskScheduler へようこそ</value></data>
   <data name="Tasks.Error.OtherFormat" xml:space="preserve"><value>「{0}」: {1}</value></data>
   <data name="Folders.Error.Failed" xml:space="preserve"><value>フォルダーを変更できませんでした: {0}</value></data>
+  <data name="Dialog.Crash.Message" xml:space="preserve"><value>アプリで処理できないエラーが発生しました。以下の詳細はクラッシュログにも記録されています。問題を報告する際は、この詳細を添えてください。</value></data>
 </root>

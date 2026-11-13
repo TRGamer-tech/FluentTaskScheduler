@@ -333,7 +333,7 @@ Jetzt App neustarten?</value></data>
   <data name="ScriptEditor.Status.Starting" xml:space="preserve"><value>[PowerShell wird gestartet...]</value></data>
   <data name="ScriptEditor.Status.Stopped" xml:space="preserve"><value>[Vom Benutzer gestoppt]</value></data>
   <data name="ScriptEditor.Status.Saved" xml:space="preserve"><value>[In Bibliothek als '{0}' gespeichert]</value></data>
-  <data name="Dialog.Crash.Title" xml:space="preserve"><value>Unerwarteter Fehler</value></data>
+  <data name="Dialog.Crash.Title" xml:space="preserve"><value>Etwas ist schiefgelaufen</value></data>
   <data name="Dialog.Crash.Copy" xml:space="preserve"><value>In die Zwischenablage kopieren</value></data>
   <data name="Main.Header.QuickActions" xml:space="preserve"><value>Schnellaktionen</value></data>
   <data name="Snooze.Status.EndsAt" xml:space="preserve"><value>Globale Pause aktiv (endet um {0})</value></data>
@@ -841,4 +841,5 @@ Jetzt App neustarten?</value></data>
   <data name="Tour.Title" xml:space="preserve"><value>Willkommen bei FluentTaskScheduler</value></data>
   <data name="Tasks.Error.OtherFormat" xml:space="preserve"><value>„{0}“: {1}</value></data>
   <data name="Folders.Error.Failed" xml:space="preserve"><value>Der Ordner konnte nicht geändert werden: {0}</value></data>
+  <data name="Dialog.Crash.Message" xml:space="preserve"><value>Die App ist auf einen Fehler gestossen, den sie nicht behandeln konnte. Die Details unten stehen auch im Absturzprotokoll; füge sie bitte bei, wenn du das Problem meldest.</value></data>
 </root>

@@ -104,15 +104,23 @@ public sealed partial class ShellPage : Page, IShellNavigator
             Title = Loc.Get("Dialog.Crash.Title"),
             PrimaryButtonText = Loc.Get("Dialog.Crash.Copy"),
             CloseButtonText = Loc.Get("Dialog.Common.Close"),
-            Content = new ScrollViewer
+            Content = new StackPanel
             {
-                MaxHeight = 320,
-                Content = new TextBlock
+                Spacing = 12,
+                Children =
                 {
-                    Text = details,
-                    FontFamily = new FontFamily("Consolas"),
-                    IsTextSelectionEnabled = true,
-                    TextWrapping = TextWrapping.Wrap
+                    new TextBlock { Text = Loc.Get("Dialog.Crash.Message"), TextWrapping = TextWrapping.Wrap },
+                    new ScrollViewer
+                    {
+                        MaxHeight = 320,
+                        Content = new TextBlock
+                        {
+                            Text = details,
+                            FontFamily = new FontFamily("Consolas"),
+                            IsTextSelectionEnabled = true,
+                            TextWrapping = TextWrapping.Wrap
+                        }
+                    }
                 }
             }
         };

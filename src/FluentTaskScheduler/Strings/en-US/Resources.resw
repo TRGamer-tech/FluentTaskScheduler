@@ -333,7 +333,7 @@ Restart now to apply the update?</value></data>
   <data name="ScriptEditor.Status.Starting" xml:space="preserve"><value>[Starting PowerShell...]</value></data>
   <data name="ScriptEditor.Status.Stopped" xml:space="preserve"><value>[Stopped by user]</value></data>
   <data name="ScriptEditor.Status.Saved" xml:space="preserve"><value>[Saved to Library as '{0}']</value></data>
-  <data name="Dialog.Crash.Title" xml:space="preserve"><value>Unhandled Exception</value></data>
+  <data name="Dialog.Crash.Title" xml:space="preserve"><value>Something went wrong</value></data>
   <data name="Dialog.Crash.Copy" xml:space="preserve"><value>Copy to Clipboard</value></data>
   <data name="Snooze.Status.EndsAt" xml:space="preserve"><value>Global Snooze Active (Ends at {0})</value></data>
   <data name="Snooze.Status.UntilReboot" xml:space="preserve"><value>Global Snooze Active (until next restart)</value></data>
@@ -841,5 +841,6 @@ Restart now to apply the update?</value></data>
   <data name="Tour.Title" xml:space="preserve"><value>Welcome to FluentTaskScheduler</value></data>
   <data name="Tasks.Error.OtherFormat" xml:space="preserve"><value>'{0}': {1}</value></data>
   <data name="Folders.Error.Failed" xml:space="preserve"><value>The folder could not be changed: {0}</value></data>
+  <data name="Dialog.Crash.Message" xml:space="preserve"><value>The app ran into an error it could not handle. The details below are also in the crash log; please include them if you report the problem.</value></data>
 </root>
 

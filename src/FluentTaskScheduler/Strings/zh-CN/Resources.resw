@@ -334,7 +334,7 @@
   <data name="ScriptEditor.Status.Starting" xml:space="preserve"><value>[正在启动 PowerShell...]</value></data>
   <data name="ScriptEditor.Status.Stopped" xml:space="preserve"><value>[用户已停止]</value></data>
   <data name="ScriptEditor.Status.Saved" xml:space="preserve"><value>[已保存到库为 “{0}”]</value></data>
-  <data name="Dialog.Crash.Title" xml:space="preserve"><value>未处理的异常</value></data>
+  <data name="Dialog.Crash.Title" xml:space="preserve"><value>出现问题</value></data>
   <data name="Dialog.Crash.Copy" xml:space="preserve"><value>复制到剪贴板</value></data>
   <data name="Main.Header.QuickActions" xml:space="preserve"><value>快速操作</value></data>
   <data name="Snooze.Status.EndsAt" xml:space="preserve"><value>全局暂停已启用（将于 {0} 结束）</value></data>
@@ -842,6 +842,7 @@
   <data name="Tour.Title" xml:space="preserve"><value>欢迎使用 FluentTaskScheduler</value></data>
   <data name="Tasks.Error.OtherFormat" xml:space="preserve"><value>“{0}”：{1}</value></data>
   <data name="Folders.Error.Failed" xml:space="preserve"><value>无法更改文件夹：{0}</value></data>
+  <data name="Dialog.Crash.Message" xml:space="preserve"><value>应用遇到了无法处理的错误。以下详细信息也已写入崩溃日志；报告问题时请附上这些信息。</value></data>
 </root>
 
 
