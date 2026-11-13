@@ -19,11 +19,11 @@ public interface IDialogService : IPrompts
 
 public sealed class DialogService(WindowContext window) : IDialogService
 {
-    private readonly SemaphoreSlim _oneAtATime = new(1, 1);
-
     public async Task<ContentDialogResult> ShowAsync(ContentDialog dialog)
     {
-        await _oneAtATime.WaitAsync();
+        // WinUI refuses to open a second dialog in a window. The queue is the window's, so this
+        // also waits for a dialog that was opened before the window's content was rebuilt.
+        await window.DialogQueue.WaitAsync();
         try
         {
             dialog.XamlRoot = window.XamlRoot;
@@ -32,7 +32,7 @@ public sealed class DialogService(WindowContext window) : IDialogService
         }
         finally
         {
-            _oneAtATime.Release();
+            window.DialogQueue.Release();
         }
     }
 

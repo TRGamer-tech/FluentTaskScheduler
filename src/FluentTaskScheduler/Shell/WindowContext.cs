@@ -9,13 +9,26 @@ namespace FluentTaskScheduler.Shell;
 public sealed class WindowContext
 {
     private Window? _window;
+    private SemaphoreSlim? _dialogQueue;
 
-    public Window Window => _window ?? throw new InvalidOperationException("This scope has not been given its window yet.");
+    public Window Window => _window ?? throw NotAttached();
     public XamlRoot XamlRoot => Window.Content.XamlRoot;
     public nint Handle => WinRT.Interop.WindowNative.GetWindowHandle(Window);
 
     /// <summary>The theme the window currently shows, for dialogs opened in it.</summary>
     public ElementTheme Theme => (Window.Content as FrameworkElement)?.ActualTheme ?? ElementTheme.Default;
 
-    internal void Attach(Window window) => _window = window;
+    /// <summary>
+    /// Lets the window show one dialog at a time. It belongs to the window, not to the scope:
+    /// when the window's content is rebuilt, a dialog opened before stays open over the new content.
+    /// </summary>
+    public SemaphoreSlim DialogQueue => _dialogQueue ?? throw NotAttached();
+
+    internal void Attach(Window window, SemaphoreSlim dialogQueue)
+    {
+        _window = window;
+        _dialogQueue = dialogQueue;
+    }
+
+    private static InvalidOperationException NotAttached() => new("This scope has not been given its window yet.");
 }

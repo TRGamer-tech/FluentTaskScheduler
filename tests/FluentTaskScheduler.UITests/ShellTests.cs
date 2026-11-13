@@ -3,7 +3,7 @@ using FlaUI.Core.Tools;
 
 namespace FluentTaskScheduler.UITests;
 
-/// <summary>The window frame: navigation between pages, the pane, the app language.</summary>
+/// <summary>The window frame: navigation between pages, the pane, the app language, the window's dialogs.</summary>
 public class ShellTests
 {
     private static readonly (string Item, string Heading)[] Pages =
@@ -98,6 +98,35 @@ public class ShellTests
 
         Assert.Equal("Einstellungen", app.Require("NavSettings").Name);
         Assert.Equal("Geplante Aufgaben", app.Require("PageTitle").Name);
+    }
+
+    /// <summary>
+    /// Imported settings in another language rebuild the window under the message that says they
+    /// were imported. The rebuilt window asks at once for the welcome tour, which the imported
+    /// settings have not seen yet, and the tour has to wait for that message.
+    /// </summary>
+    [Fact]
+    public void ADialogOfARebuiltWindow_WaitsForTheMessageThatWasOpenBeforeTheRebuild()
+    {
+        using var app = AppSession.Launch("import-rebuild");
+        string file = Path.Combine(app.DataDir, "imported-settings.json");
+        File.WriteAllText(file, AppSession.FirstRunDone(("Language", "de-DE"), ("HasCompletedOnboarding", false)));
+
+        app.Require("NavSettings").Press();
+        app.Require("ImportSettingsButton", 30000).PressWithKeyboard();
+        app.ChooseFile(file);
+
+        // The message is worded before the language changes; the page under it already is in German.
+        Assert.True(app.FindByName("Import Successful", timeoutMs: 20000) != null, "The message that the settings were imported did not come up.");
+        Assert.True(app.Find(e => e.AutomationId == "PageTitle" && e.Name == "Einstellungen", 10000) != null, "The window was not rebuilt in German.");
+        app.Snapshot("message");
+        Assert.True(app.Find("TourSlideBody", 1000) == null, "The tour came up while the message was still open.");
+
+        app.Require("CloseButton").Press();
+
+        Assert.True(app.Find("TourSlideBody", 20000) != null, "The tour did not come up once the message was closed.");
+        app.Snapshot("tour");
+        Assert.False(app.HasExited);
     }
 
     private static int WidthOf(AppSession app, string automationId) =>

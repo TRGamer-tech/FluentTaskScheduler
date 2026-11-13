@@ -22,6 +22,9 @@ public sealed class WindowManager(IServiceProvider services, ISettingsStore sett
         public IServiceScope? Scope { get; set; }
         public ShellPage Shell { get; set; } = null!;
 
+        /// <summary>Lets the window show one dialog at a time, whichever of its scopes asks.</summary>
+        public SemaphoreSlim DialogQueue { get; } = new(1, 1);
+
         /// <summary>Counts up with every window that is hidden; 0 for a window that is showing.</summary>
         public int HiddenOrder { get; set; }
         public bool IsHidden => HiddenOrder > 0;
@@ -154,7 +157,7 @@ public sealed class WindowManager(IServiceProvider services, ISettingsStore sett
     {
         entry.Scope?.Dispose();
         entry.Scope = services.CreateScope();
-        entry.Scope.ServiceProvider.GetRequiredService<WindowContext>().Attach(entry.Window);
+        entry.Scope.ServiceProvider.GetRequiredService<WindowContext>().Attach(entry.Window, entry.DialogQueue);
 
         ShellPage shell = entry.Scope.ServiceProvider.GetRequiredService<ShellPage>();
         entry.Shell = shell;
