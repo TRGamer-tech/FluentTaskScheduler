@@ -159,5 +159,6 @@ public sealed class CommandLine(ITaskStore store, ITaskRunner runner, ITaskHisto
         output.WriteLine($"                          Write a task's history to a CSV file, {DefaultHistoryFile} unless a file is named");
         output.WriteLine("  --help                  Show this text");
         output.WriteLine("Exit code: 0 on success, 1 when the command failed, 2 when it was not understood.");
+        output.WriteLine("Shells may not wait for it: in PowerShell, pipe the output on (e.g. | Out-Host); cmd waits in batch files only.");
     }
 }

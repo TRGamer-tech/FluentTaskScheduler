@@ -187,6 +187,16 @@ FluentTaskScheduler.exe --disable "MyTaskName"
 FluentTaskScheduler.exe --export-history "MyTaskName" --output "C:\logs\history.csv"
 ```
 
+The exit code is 0 on success, 1 when the command failed and 2 when it was not understood.
+
+The app is a windowed program, and shells do not always wait for those: PowerShell waits only when the output goes into a pipeline or a variable, and cmd only inside a batch file. Without waiting, the answer appears after the next prompt and `$LASTEXITCODE` still holds the code of the command before. In PowerShell, pass the output on:
+
+```powershell
+$tasks = FluentTaskScheduler.exe --list | ConvertFrom-Json
+FluentTaskScheduler.exe --run "MyTaskName" | Out-Host
+if ($LASTEXITCODE -ne 0) { throw "The task was not started." }
+```
+
 ## Technology Stack
 
 - **Framework**: [.NET 8](https://dotnet.microsoft.com/download/dotnet/8.0)
