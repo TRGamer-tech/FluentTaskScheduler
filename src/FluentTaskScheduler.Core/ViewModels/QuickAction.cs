@@ -44,10 +44,10 @@ public sealed record QuickAction(string Id, string Glyph, ProcessRequest Request
         new("DismHealth", "", Tool("Dism.exe", "/Online /Cleanup-Image /CheckHealth")) { RequiresElevation = true, ReportsFindings = true }
     ];
 
-    private static ProcessRequest Tool(string fileName, string arguments) =>
+    internal static ProcessRequest Tool(string fileName, string arguments) =>
         WindowsTools.InUtf8Console(WindowsTools.InSystemFolder(fileName), arguments);
 
     /// <param name="script">Must not contain double quotes: it travels inside one pair of them.</param>
-    private static ProcessRequest PowerShell(string script) =>
+    internal static ProcessRequest PowerShell(string script) =>
         WindowsTools.InUtf8Console(WindowsTools.PowerShell, $"-NoProfile -NonInteractive -Command \"{script}\"");
 }

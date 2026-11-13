@@ -3,7 +3,9 @@ using System.Diagnostics;
 using System.Text;
 using FluentTaskScheduler.Library;
 using FluentTaskScheduler.Processes;
+using FluentTaskScheduler.Tests.Integration;
 using FluentTaskScheduler.Tests.Support;
+using FluentTaskScheduler.ViewModels;
 
 namespace FluentTaskScheduler.Tests.Processes;
 
@@ -74,13 +76,38 @@ public sealed class ProcessRunnerTests
         using var folder = new TempFolder();
         File.WriteAllText(folder.File("Zürich 東京 Ελλάδα.txt"), "");
 
-        // As a quick action starts its tool. where lists the files it finds by their full names.
-        int exitCode = await Run(WindowsTools.InUtf8Console(WindowsTools.InSystemFolder("where.exe"), $"/r \"{folder.Path}\" *"));
+        // ipconfig prints nothing a test could choose, so where stands in for it: where lists the files it finds by their full names.
+        int exitCode = await Run(QuickAction.Tool("where.exe", $"/r \"{folder.Path}\" *"));
 
         Assert.Equal(0, exitCode);
         ProcessOutput line = Assert.Single(Lines);
         Assert.False(line.IsError);
         Assert.Equal("Zürich 東京 Ελλάδα.txt", Path.GetFileName(line.Text));
+    }
+
+    [SkippableFact]
+    public async Task WhatDismWrites_ArrivesIntact_InLanguagesTheCodePageOfThisMachineCannotShow()
+    {
+        Skip.IfNot(OperatingSystem.IsWindows(), SkipReason);
+        Skip.IfNot(SchedulerSandbox.IsElevated, "DISM needs an elevated token");
+        using var folder = new TempFolder();
+
+        // DISM names its log file when it fails, as it does at once for an image that does not exist.
+        await Run(QuickAction.Tool("Dism.exe", $"/LogPath:\"{folder.File("Zürich 東京 Ελλάδα.log")}\" /Get-ImageInfo /ImageFile:\"{folder.File("none.wim")}\""));
+
+        ProcessOutput logLine = Assert.Single(Lines, line => line.Text.Contains(".log"));
+        Assert.Contains("Zürich 東京 Ελλάδα.log", logLine.Text);
+    }
+
+    [SkippableFact]
+    public async Task WhatThePowerShellOfAnActionWrites_ArrivesIntact_InLanguagesTheCodePageOfThisMachineCannotShow()
+    {
+        Skip.IfNot(OperatingSystem.IsWindows(), SkipReason);
+
+        int exitCode = await Run(QuickAction.PowerShell("Write-Output 'Zürich 東京 Ελλάδα'"));
+
+        Assert.Equal(0, exitCode);
+        Assert.Contains(new ProcessOutput("Zürich 東京 Ελλάδα", IsError: false), Lines);
     }
 
     [SkippableFact]
