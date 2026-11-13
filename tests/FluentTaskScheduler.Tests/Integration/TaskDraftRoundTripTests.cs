@@ -166,7 +166,7 @@ public class TaskDraftRoundTripTests
 
         Edit(sandbox, task, draft =>
         {
-            var trigger = new TriggerViewModel(draft.Triggers[0]);
+            var trigger = new TriggerViewModel(draft.Triggers[0], DateTime.Now);
             Assert.Equal(utc.ToLocalTime().TimeOfDay, trigger.StartTime);
             trigger.StartTime += TimeSpan.FromHours(1);
             Assert.True(trigger.TryBuild(out TriggerDraft changed, out string? problem), problem);

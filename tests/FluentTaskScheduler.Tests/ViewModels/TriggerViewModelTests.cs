@@ -9,6 +9,9 @@ public class TriggerViewModelTests
 {
     private static readonly DateTime Start = new(2031, 5, 6, 7, 8, 9);
 
+    /// <summary>The time of the editor's clock.</summary>
+    private static readonly DateTime Now = new(2031, 5, 6, 10, 20, 0);
+
     public static TheoryData<TriggerDraft> StoredTriggers => new()
     {
         new TriggerDraft { Type = TriggerType.Once, SourceIndex = 0, Start = Start, RandomDelay = TimeSpan.FromSeconds(90) },
@@ -31,7 +34,7 @@ public class TriggerViewModelTests
     [MemberData(nameof(StoredTriggers))]
     public void ATriggerNobodyTouched_BuildsIntoExactlyWhatItWasLoadedFrom(TriggerDraft stored)
     {
-        var trigger = new TriggerViewModel(stored);
+        var trigger = new TriggerViewModel(stored, Now);
 
         Assert.True(trigger.TryBuild(out TriggerDraft built, out string? problem), problem);
         Assert.Equal(stored, built);
@@ -40,7 +43,7 @@ public class TriggerViewModelTests
     [Fact]
     public void TheTimeOfDay_CanBeSet()
     {
-        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, SourceIndex = 0, Start = Start });
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, SourceIndex = 0, Start = Start }, Now);
 
         trigger.StartTime = new TimeSpan(21, 45, 0);
 
@@ -54,7 +57,7 @@ public class TriggerViewModelTests
     public void AMomentKeptWithItsTimeZone_KeepsItWhenChanged()
     {
         var zoned = DateTime.SpecifyKind(Start, DateTimeKind.Local);
-        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, SourceIndex = 0, Start = zoned, End = zoned.AddYears(1) });
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, SourceIndex = 0, Start = zoned, End = zoned.AddYears(1) }, Now);
 
         trigger.StartTime = new TimeSpan(21, 45, 0);
         trigger.EndDate = new DateTimeOffset(new DateTime(2033, 3, 4));
@@ -69,7 +72,7 @@ public class TriggerViewModelTests
     [Fact]
     public void TheDate_CanBeSet_AndTheTimeStays()
     {
-        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Once, SourceIndex = 0, Start = Start });
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Once, SourceIndex = 0, Start = Start }, Now);
 
         trigger.StartDate = new DateTimeOffset(new DateTime(2032, 1, 2));
 
@@ -80,7 +83,7 @@ public class TriggerViewModelTests
     [Fact]
     public void ChoosingWeekly_MakesAWeeklyTrigger_WithTheChosenDaysAndTime()
     {
-        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, Start = Start });
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, Start = Start }, Now);
 
         trigger.TypeIndex = TriggerViewModel.Types.ToList().IndexOf(TriggerType.Weekly);
         trigger.Weekdays = (int)(DaysOfTheWeek.Monday | DaysOfTheWeek.Thursday);
@@ -108,7 +111,7 @@ public class TriggerViewModelTests
     [InlineData(TriggerType.SessionStateChange, false)]
     public void OnlyTriggersThatFireAtATimeOfDay_ShowTheSchedule(TriggerType type, bool hasSchedule)
     {
-        var trigger = new TriggerViewModel(new TriggerDraft { Type = type });
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = type }, Now);
 
         Assert.Equal(hasSchedule, trigger.HasSchedule);
         Assert.Equal(type, trigger.Type);
@@ -122,7 +125,7 @@ public class TriggerViewModelTests
     [InlineData(TriggerType.SessionStateChange)]
     public void ANewTriggerTurnedIntoOneWithoutATimeOfDay_IsActiveAtOnce(TriggerType type)
     {
-        var trigger = new TriggerViewModel(NewTask.Trigger(new DateTime(2031, 5, 6, 10, 20, 0)))
+        var trigger = new TriggerViewModel(NewTask.Trigger(Now), Now)
         {
             TypeIndex = TriggerViewModel.Types.ToList().IndexOf(type),
             EventLog = "System"
@@ -135,7 +138,7 @@ public class TriggerViewModelTests
     [Fact]
     public void ATriggerWithoutATimeOfDay_KeepsWhenItBecomesActive_AcrossSuchTypes()
     {
-        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.AtLogon, SourceIndex = 0, Start = Start })
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.AtLogon, SourceIndex = 0, Start = Start }, Now)
         {
             TypeIndex = TriggerViewModel.Types.ToList().IndexOf(TriggerType.OnIdle)
         };
@@ -149,7 +152,7 @@ public class TriggerViewModelTests
     {
         for (int index = 0; index < TriggerViewModel.Types.Count; index++)
         {
-            var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, Start = Start }) { TypeIndex = index, EventLog = "System" };
+            var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, Start = Start }, Now) { TypeIndex = index, EventLog = "System" };
 
             Assert.True(trigger.TryBuild(out TriggerDraft built, out string? problem), problem);
             Assert.Equal(TriggerViewModel.Types[index], built.Type);
@@ -168,7 +171,7 @@ public class TriggerViewModelTests
             {
                 foreach (TriggerType to in TriggerViewModel.Types)
                 {
-                    var trigger = new TriggerViewModel(new TriggerDraft { Type = from, Start = Start, MonthlyByWeekday = byWeekday });
+                    var trigger = new TriggerViewModel(new TriggerDraft { Type = from, Start = Start, MonthlyByWeekday = byWeekday }, Now);
                     var before = flags.ToDictionary(flag => flag.Name, flag => flag.GetValue(trigger));
                     var announced = new List<string?>();
                     trigger.PropertyChanged += (_, e) => announced.Add(e.PropertyName);
@@ -185,7 +188,7 @@ public class TriggerViewModelTests
     [Fact]
     public void AnExpiry_CanBeAddedAndRemoved()
     {
-        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, Start = Start });
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, Start = Start }, Now);
 
         trigger.Expires = true;
         trigger.EndDate = new DateTimeOffset(new DateTime(2033, 3, 4));
@@ -204,7 +207,7 @@ public class TriggerViewModelTests
     [InlineData(" 90m ", "12h", 90, 720)]
     public void RepetitionIsTypedAsDurations(string every, string duration, int everyMinutes, int forMinutes)
     {
-        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, Start = Start })
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, Start = Start }, Now)
         {
             RepetitionInterval = every,
             RepetitionDuration = duration
@@ -218,7 +221,7 @@ public class TriggerViewModelTests
     [Fact]
     public void ClearingTheRepetition_TurnsItOff()
     {
-        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, Start = Start, RepetitionInterval = TimeSpan.FromMinutes(5) })
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, Start = Start, RepetitionInterval = TimeSpan.FromMinutes(5) }, Now)
         {
             RepetitionInterval = ""
         };
@@ -237,7 +240,7 @@ public class TriggerViewModelTests
     [InlineData("", "", "P30000Y", "Editor.Error.RandomDelayText")]
     public void ADurationThatCannotBeRead_IsReported_NotGuessed(string every, string duration, string delay, string expectedProblem)
     {
-        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, Start = Start })
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, Start = Start }, Now)
         {
             RepetitionInterval = every,
             RepetitionDuration = duration,
@@ -251,7 +254,7 @@ public class TriggerViewModelTests
     [Fact]
     public void AnEventTrigger_IsBuiltFromLogSourceAndId()
     {
-        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Event })
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Event }, Now)
         {
             EventLog = "Application",
             EventSource = "MyApp",
@@ -266,7 +269,7 @@ public class TriggerViewModelTests
     [Fact]
     public void AnEventIdThatIsNotANumber_IsReported()
     {
-        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Event }) { EventLog = "System", EventId = "seven" };
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Event }, Now) { EventLog = "System", EventId = "seven" };
 
         Assert.False(trigger.TryBuild(out _, out string? problem));
         Assert.Equal("Editor.Error.EventIdText", problem);
@@ -279,7 +282,7 @@ public class TriggerViewModelTests
     public void ATabInTheLogOrSource_IsReported_AndTheSummaryKeepsShowingTheStoredTrigger(string log, string source)
     {
         var stored = new TriggerDraft { Type = TriggerType.Event, SourceIndex = 0, EventSubscription = EventQuery.Build("Application", "", null) };
-        var trigger = new TriggerViewModel(stored) { EventLog = log, EventSource = source };
+        var trigger = new TriggerViewModel(stored, Now) { EventLog = log, EventSource = source };
 
         Assert.False(trigger.TryBuild(out _, out string? problem));
         Assert.Equal("Editor.Error.EventLogText", problem);
@@ -290,7 +293,7 @@ public class TriggerViewModelTests
     public void AnEventSubscriptionBeyondTheThreeFields_IsEditedAsXml_AndKeptVerbatim()
     {
         const string query = "<QueryList><Query Id=\"0\"><Select Path=\"System\">*[System[(Level=1 or Level=2)]]</Select></Query></QueryList>";
-        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Event, EventSubscription = query });
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Event, EventSubscription = query }, Now);
 
         Assert.True(trigger.CustomEventQuery);
         Assert.Equal(query, trigger.EventQueryXml);
@@ -303,7 +306,7 @@ public class TriggerViewModelTests
     [Fact]
     public void TickingCustomQuery_StartsFromWhatTheFieldsSay()
     {
-        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Event, SourceIndex = 0, EventSubscription = EventQuery.Build("Application", "VSS", 8224) });
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Event, SourceIndex = 0, EventSubscription = EventQuery.Build("Application", "VSS", 8224) }, Now);
 
         trigger.EventLog = "System";
         trigger.CustomEventQuery = true;
@@ -318,7 +321,7 @@ public class TriggerViewModelTests
     public void TickingCustomQuery_WithTheFieldsUntouched_ShowsTheStoredQueryAsWindowsWroteIt()
     {
         const string written = "<QueryList><Query Id=\"0\" Path=\"System\"><Select Path=\"System\">*[System[Provider[@Name='disk'] and EventID=7]]</Select></Query></QueryList>";
-        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Event, SourceIndex = 0, EventSubscription = written });
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Event, SourceIndex = 0, EventSubscription = written }, Now);
 
         trigger.CustomEventQuery = true;
 
@@ -328,7 +331,7 @@ public class TriggerViewModelTests
     [Fact]
     public void TickingCustomQuery_ForANewEventTrigger_StartsFromAQueryThatWorks()
     {
-        var trigger = new TriggerViewModel(NewTask.Trigger(new DateTime(2031, 5, 6, 10, 20, 0)))
+        var trigger = new TriggerViewModel(NewTask.Trigger(Now), Now)
         {
             TypeIndex = TriggerViewModel.Types.ToList().IndexOf(TriggerType.Event)
         };
@@ -348,7 +351,7 @@ public class TriggerViewModelTests
             int index = TriggerViewModel.SessionChanges.ToList().IndexOf(change);
             Assert.True(index >= 0, $"{change} is not offered.");
 
-            var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.SessionStateChange }) { SessionChangeIndex = index };
+            var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.SessionStateChange }, Now) { SessionChangeIndex = index };
             Assert.True(trigger.TryBuild(out TriggerDraft built, out _));
             Assert.Equal(change, built.SessionChange);
         }
@@ -357,7 +360,7 @@ public class TriggerViewModelTests
     [Fact]
     public void AnEmptyNumberBox_KeepsTheStoredInterval()
     {
-        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, Start = Start, DaysInterval = 4 }) { DaysInterval = double.NaN };
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, Start = Start, DaysInterval = 4 }, Now) { DaysInterval = double.NaN };
 
         Assert.True(trigger.TryBuild(out TriggerDraft built, out _));
         Assert.Equal(4, built.DaysInterval);
@@ -367,7 +370,7 @@ public class TriggerViewModelTests
     public void ATriggerTypeTheEditorDoesNotKnow_IsShownButNotEditable()
     {
         var stored = new TriggerDraft { Type = TriggerType.Unsupported, SourceIndex = 2, UnsupportedSummary = "Registration" };
-        var trigger = new TriggerViewModel(stored) { Enabled = false, TypeIndex = 3 };
+        var trigger = new TriggerViewModel(stored, Now) { Enabled = false, TypeIndex = 3 };
 
         Assert.False(trigger.IsEditable);
         Assert.True(trigger.TryBuild(out TriggerDraft built, out _));
@@ -377,7 +380,7 @@ public class TriggerViewModelTests
     [Fact]
     public void TheSummary_FollowsTheInput()
     {
-        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, Start = Start });
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, Start = Start }, Now);
         var changed = new List<string?>();
         trigger.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
         string before = trigger.Summary;

@@ -326,6 +326,18 @@ public sealed class TaskEditorViewModelTests : IDisposable
     }
 
     [Fact]
+    public void ATriggerWithoutAStart_GivenATimeOfDay_StartsAtTheNextFullHourOfTheEditorsClock()
+    {
+        var editor = Edit(Elaborate() with { Triggers = [new TriggerDraft { Type = TriggerType.AtLogon, SourceIndex = 0 }] });
+        TriggerViewModel trigger = editor.Triggers[0];
+
+        trigger.TypeIndex = TriggerViewModel.Types.ToList().IndexOf(TriggerType.Daily);
+
+        Assert.True(trigger.TryBuild(out TriggerDraft built, out _));
+        Assert.Equal(new DateTime(2031, 5, 6, 15, 0, 0), built.Start);
+    }
+
+    [Fact]
     public void TriggersCanBeReorderedAndRemoved()
     {
         var editor = Edit(Elaborate());

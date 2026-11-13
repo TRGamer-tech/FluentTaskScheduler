@@ -33,7 +33,11 @@ public sealed partial class TriggerViewModel : ObservableObject
     private readonly string _sourceRepetitionInterval, _sourceRepetitionDuration, _sourceRandomDelay;
     private readonly string _sourceEventLog = "", _sourceEventSource = "", _sourceEventId = "";
 
-    public TriggerViewModel(TriggerDraft source)
+    /// <param name="now">
+    /// The time of the editor's clock. A trigger without a start of its own, such as one at logon,
+    /// offers the start a new trigger would have, should it get a time of day.
+    /// </param>
+    public TriggerViewModel(TriggerDraft source, DateTime now)
     {
         _source = source;
         int type = IndexOf(Types, source.Type);
@@ -41,7 +45,7 @@ public sealed partial class TriggerViewModel : ObservableObject
         _typeIndex = Math.Max(type, 0);
         _enabled = source.Enabled;
 
-        DateTime start = source.Start ?? DateTime.Today.AddHours(DateTime.Now.Hour + 1);
+        DateTime start = source.Start ?? NewTask.Trigger(now).Start!.Value;
         _startDate = new DateTimeOffset(start.Date);
         _startTime = start.TimeOfDay;
         _expires = source.End is not null;

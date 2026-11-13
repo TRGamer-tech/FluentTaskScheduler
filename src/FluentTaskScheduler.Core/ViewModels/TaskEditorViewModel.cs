@@ -75,7 +75,8 @@ public sealed partial class TaskEditorViewModel : ObservableObject
         _tags = _shownTags = string.Join(", ", source.Tags);
         _enabled = source.Enabled;
 
-        Triggers = new ObservableCollection<TriggerViewModel>(source.Triggers.Select(trigger => new TriggerViewModel(trigger)));
+        DateTime now = time.GetLocalNow().DateTime;
+        Triggers = new ObservableCollection<TriggerViewModel>(source.Triggers.Select(trigger => new TriggerViewModel(trigger, now)));
         Actions = new ObservableCollection<ActionViewModel>(source.Actions.Select(action => new ActionViewModel(action)));
         _selectedTrigger = Triggers.FirstOrDefault();
         _selectedAction = Actions.FirstOrDefault();
@@ -253,7 +254,8 @@ public sealed partial class TaskEditorViewModel : ObservableObject
     [RelayCommand]
     private void AddTrigger()
     {
-        var trigger = new TriggerViewModel(NewTask.Trigger(_time.GetLocalNow().DateTime));
+        DateTime now = _time.GetLocalNow().DateTime;
+        var trigger = new TriggerViewModel(NewTask.Trigger(now), now);
         Triggers.Add(trigger);
         SelectedTrigger = trigger;
     }
