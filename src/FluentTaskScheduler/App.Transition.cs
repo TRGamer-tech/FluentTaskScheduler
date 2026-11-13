@@ -1,3 +1,5 @@
+using System.ComponentModel;
+using System.Diagnostics;
 using FluentTaskScheduler.Services;
 using FluentTaskScheduler.Settings;
 using FluentTaskScheduler.Shell;
@@ -32,6 +34,27 @@ public partial class App
 
     public void ApplySmoothScrolling(bool enable) =>
         _services!.GetRequiredService<ISettingsStore>().Update(settings => settings with { SmoothScrolling = enable });
+
+    // Completion actions and the execution history log read their switch from the new store.
+    public void ApplyTaskPipelines(bool enable) =>
+        _services!.GetRequiredService<ISettingsStore>().Update(settings => settings with { EnableTaskPipelines = enable });
+
+    public void ApplyExecutionHistoryLog(bool enable) =>
+        _services!.GetRequiredService<ISettingsStore>().Update(settings => settings with { EnableExecutionHistoryLog = enable });
+
+    public void OpenExecutionHistoryFolder()
+    {
+        string folder = _services!.GetRequiredService<AppPaths>().ExecutionHistoryFolder;
+        try
+        {
+            Directory.CreateDirectory(folder);
+            Process.Start(new ProcessStartInfo(folder) { UseShellExecute = true })?.Dispose();
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or Win32Exception)
+        {
+            Serilog.Log.Warning(ex, "The execution history folder {Folder} could not be opened", folder);
+        }
+    }
 
     // Stand-in until the reworked snooze service is in.
     private static void AddBridges(IServiceCollection services) =>

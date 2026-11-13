@@ -423,8 +423,7 @@ namespace FluentTaskScheduler
         {
             if (!_isLoaded) return;
             Settings.EnableTaskPipelines = TaskPipelinesToggle.IsOn;
-            // Start/stop the event-log watcher immediately so no restart is needed.
-            TaskPipelineService.ApplyEnabledSetting();
+            (Application.Current as App)?.ApplyTaskPipelines(TaskPipelinesToggle.IsOn);
             Serilog.Log.Information("{Message}", $"Task Pipelines: {(TaskPipelinesToggle.IsOn ? "enabled" : "disabled")}");
         }
 
@@ -463,21 +462,13 @@ namespace FluentTaskScheduler
             if (!_isLoaded) return;
             Settings.EnableExecutionHistoryLog = ExecHistoryLogToggle.IsOn;
             ExecHistoryFolderCard.Visibility = ExecHistoryLogToggle.IsOn ? Visibility.Visible : Visibility.Collapsed;
-            if (ExecHistoryLogToggle.IsOn)
-            {
-                ExecutionHistoryLogService.Start();
-                Serilog.Log.Information("Execution History Log: enabled");
-            }
-            else
-            {
-                ExecutionHistoryLogService.Stop();
-                Serilog.Log.Information("Execution History Log: disabled");
-            }
+            (Application.Current as App)?.ApplyExecutionHistoryLog(ExecHistoryLogToggle.IsOn);
+            Serilog.Log.Information("Execution History Log: {State}", ExecHistoryLogToggle.IsOn ? "enabled" : "disabled");
         }
 
         private void OpenExecHistoryFolderButton_Click(object sender, RoutedEventArgs e)
         {
-            ExecutionHistoryLogService.OpenLogFolder();
+            (Application.Current as App)?.OpenExecutionHistoryFolder();
         }
 
         private void OpenErrorLogButton_Click(object sender, RoutedEventArgs e)
