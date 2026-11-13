@@ -209,7 +209,13 @@ public sealed class TaskTests : IDisposable
         {
             // On a thread of its own: the classic file dialog may hold on to whoever opened it until it is closed.
             AutomationElement import = app.ToolbarButton("ImportButton");
-            var pressing = new Thread(import.Press) { IsBackground = true };
+            var pressing = new Thread(() =>
+            {
+                // A call that a dialog held up can end in an error when the dialog closes. Whether
+                // the press worked shows in what the app does next.
+                try { import.Press(); }
+                catch (Exception) { }
+            }) { IsBackground = true };
             pressing.Start();
             app.ChooseFile(file);
 

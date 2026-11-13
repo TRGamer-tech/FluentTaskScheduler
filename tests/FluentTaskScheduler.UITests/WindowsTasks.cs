@@ -77,7 +77,8 @@ public sealed class WindowsTasks : IDisposable
 
         // schtasks has no command for folders; the scripting interface of Task Scheduler does.
         string name = Folder.TrimStart('\\');
-        RunScript($"$folder = $scheduler.GetFolder('\\{name}'); $folder.GetTasks(1) | ForEach-Object {{ $folder.DeleteTask($_.Name, 0) }}; " +
+        RunScript($"try {{ $folder = $scheduler.GetFolder('\\{name}') }} catch {{ exit }}; " + // a test that registered nothing has no folder
+                  $"$folder.GetTasks(1) | ForEach-Object {{ $folder.DeleteTask($_.Name, 0) }}; " +
                   $"$scheduler.GetFolder('\\').DeleteFolder('{name}', 0)");
     }
 
