@@ -103,7 +103,7 @@ public sealed partial class ImportTaskViewModel : ObservableObject
     public async Task<bool> ImportAsync()
     {
         string name = Name.Trim();
-        if (TaskDraftValidator.Validate(new TaskDraft { Name = name, Actions = [new ActionDraft { Path = "." }] }) is [var invalid, ..])
+        if (TaskDraftValidator.CheckName(name) is { } invalid)
         {
             Problem = invalid.Message;
             return false;

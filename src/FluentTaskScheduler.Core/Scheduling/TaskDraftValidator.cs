@@ -24,8 +24,7 @@ public static class TaskDraftValidator
     {
         var problems = new List<DraftProblem>();
 
-        if (string.IsNullOrWhiteSpace(draft.Name)) problems.Add(new("Dialog.Error.EmptyName"));
-        else if (draft.Name.IndexOfAny(NotAllowedInNames) >= 0) problems.Add(new("Editor.Error.NameCharacters"));
+        if (CheckName(draft.Name) is { } name) problems.Add(name);
 
         if (draft.Actions.Count == 0) problems.Add(new("Editor.Error.NoAction"));
         for (int i = 0; i < draft.Actions.Count; i++)
@@ -55,6 +54,12 @@ public static class TaskDraftValidator
 
         return problems;
     }
+
+    /// <summary>What keeps <paramref name="name"/> from being the name of a task, if anything.</summary>
+    public static DraftProblem? CheckName(string name) =>
+        string.IsNullOrWhiteSpace(name) ? new("Dialog.Error.EmptyName")
+        : name.IndexOfAny(NotAllowedInNames) >= 0 ? new("Editor.Error.NameCharacters")
+        : null;
 
     private static string? Check(TriggerDraft trigger)
     {

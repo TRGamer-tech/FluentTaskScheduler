@@ -35,6 +35,7 @@ public class TaskDraftValidatorTests
     public void TheName_MustBeThere_AndFreeOfPathCharacters(string name, string expected)
     {
         Assert.Equal([expected], Problems(Valid() with { Name = name }));
+        Assert.Equal(expected, TaskDraftValidator.CheckName(name)?.Key);
     }
 
     [Fact]
