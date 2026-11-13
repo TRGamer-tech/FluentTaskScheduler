@@ -223,14 +223,19 @@ public sealed class TaskStore : ITaskStore
     public TaskImportInfo Inspect(string xml)
     {
         using var service = Open();
-        var principal = Parse(service, xml).Principal;
+        var definition = Parse(service, xml);
+        var principal = definition.Principal;
         string id = principal.LogonType == TaskLogonType.Group ? principal.GroupId ?? "" : principal.UserId ?? "";
 
+        // Read the way the editor reads a task, so the two agree on the account and on whether
+        // Windows keeps a password for it. (The library's RequiresPassword also says yes for "do
+        // not store password", S4U, whenever the account is not the current user's own name.)
+        TaskDraft task = TaskDraftReader.Read(definition);
         return new TaskImportInfo(
-            TaskAccounts.FromPrincipal(principal),
+            task.Account,
             AccountExistsHere: id.Length == 0 || TaskAccounts.Exists(id),
-            HighestPrivileges: principal.RunLevel == TaskRunLevel.Highest,
-            StoresPassword: principal.RequiresPassword());
+            task.HighestPrivileges,
+            task.StoresPassword);
     }
 
     public string Import(string xml, TaskImportOptions options)

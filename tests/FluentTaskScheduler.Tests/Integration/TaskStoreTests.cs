@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Security.Principal;
 using System.Text.RegularExpressions;
 using FluentTaskScheduler.Scheduling;
 using Microsoft.Win32.TaskScheduler;
@@ -315,6 +316,23 @@ public class TaskStoreTests
         {
             _out.WriteLine(Run("net.exe", $"user {user} /delete"));
         }
+    }
+
+    [SkippableFact]
+    public void ATaskThatKeepsNoPassword_NeedsNoneToBeImported()
+    {
+        // "Do not store password" (S4U) is chosen precisely so that Windows keeps no password.
+        Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
+        using var sandbox = new SchedulerSandbox();
+        using var me = WindowsIdentity.GetCurrent();
+        var definition = SampleTasks.Simple(sandbox.Service);
+        definition.Principal.UserId = me.User!.Value;
+        definition.Principal.LogonType = TaskLogonType.S4U;
+
+        var info = _store.Inspect(definition.XmlText);
+
+        Assert.Equal(TaskAccount.CurrentUser, info.Account);
+        Assert.False(info.StoresPassword);
     }
 
     [SkippableFact]
