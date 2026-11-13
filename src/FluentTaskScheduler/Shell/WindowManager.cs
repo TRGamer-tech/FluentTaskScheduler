@@ -53,6 +53,7 @@ public sealed class WindowManager(IServiceProvider services, ISettingsStore sett
     {
         if (MainWindow is not { } window) return;
         window.AppWindow.Show();
+        if (window.AppWindow.Presenter is OverlappedPresenter { State: OverlappedPresenterState.Minimized } presenter) presenter.Restore();
         window.Activate();
     }
 

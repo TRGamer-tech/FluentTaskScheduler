@@ -1,3 +1,7 @@
+using System.Diagnostics;
+using FlaUI.Core.Definitions;
+using FlaUI.Core.Tools;
+
 namespace FluentTaskScheduler.UITests;
 
 /// <summary>The window frame: navigation between pages, the pane, the app language.</summary>
@@ -40,6 +44,28 @@ public class ShellTests
         var screen = app.Screen;
         app.Log($"Window {window}, screen {screen}");
         Assert.True(screen.Contains(window), $"The window {window} reaches beyond the screen {screen}.");
+    }
+
+    [Fact]
+    public void StartingTheAppAgain_BringsBackTheWindowThatIsAlreadyOpen()
+    {
+        using var app = AppSession.Launch("second-start");
+        var window = app.Window.Patterns.Window.Pattern;
+        window.SetWindowVisualState(WindowVisualState.Minimized);
+        Assert.True(Retry.WhileFalse(() => window.WindowVisualState.Value == WindowVisualState.Minimized, TimeSpan.FromSeconds(10)).Success,
+            "The window could not be minimized.");
+
+        using var second = Process.Start(new ProcessStartInfo(AppSession.ExePath) { UseShellExecute = false })!;
+        try
+        {
+            Assert.True(second.WaitForExit(TimeSpan.FromSeconds(30)), "The second instance kept running.");
+            Assert.True(Retry.WhileFalse(() => window.WindowVisualState.Value == WindowVisualState.Normal, TimeSpan.FromSeconds(10)).Success,
+                "The first instance's window stayed minimized.");
+        }
+        finally
+        {
+            if (!second.HasExited) second.Kill();
+        }
     }
 
     [Fact]

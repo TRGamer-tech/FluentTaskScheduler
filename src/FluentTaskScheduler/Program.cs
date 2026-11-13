@@ -2,7 +2,6 @@ using System.Runtime.InteropServices;
 using FluentTaskScheduler.Cli;
 using FluentTaskScheduler.Notifications;
 using FluentTaskScheduler.Scheduling;
-using FluentTaskScheduler.Shell;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Velopack;
