@@ -544,7 +544,7 @@
   <data name="Snooze.SuspendTriggers" xml:space="preserve"><value>同时暂停计划触发器</value></data>
   <data name="Snooze.SuspendTriggersHint" xml:space="preserve"><value>通过任务计划程序 API 禁用所有已启用的任务，并在暂停结束时仅重新启用这些任务。受保护的系统任务将被跳过。</value></data>
   <data name="Snooze.Banner.Suspended" xml:space="preserve"><value>计划触发器已暂停，手动运行也会被阻止。暂停结束后任务将重新启用。</value></data>
-  <data name="Snooze.Banner.ManualOnly" xml:space="preserve"><value>从此应用启动的运行将被阻止。Windows 仍会触发计划触发器 —— 若要同时阻止它们，请在暂停时启用“同时暂停计划触发器”。</value></data>
+  <data name="Snooze.Banner.ManualOnly" xml:space="preserve"><value>从此应用启动的运行将被阻止。Windows 仍会触发计划触发器；若要同时阻止它们，请在暂停时启用“同时暂停计划触发器”。</value></data>
   <data name="Snooze.Error.RunBlocked" xml:space="preserve"><value>由于全局暂停已启用，未能启动“{0}”。</value></data>
   <data name="Snooze.Error.BatchBlocked" xml:space="preserve"><value>由于全局暂停已启用，{0} 个任务未能启动。</value></data>
   <data name="Snooze.Error.PastTime" xml:space="preserve"><value>请选择一个未来的时间。</value></data>
@@ -1072,6 +1072,12 @@
   <data name="Tour.Settings.Body" xml:space="preserve"><value>在设置中，你可以选择主题和语言、接收哪些通知、应用是否随 Windows 启动等等。应用启动时会检查更新。你可以随时在“设置”的“关于”中再次查看此导览。</value></data>
   <data name="WhatsNew.TitleFormat" xml:space="preserve"><value>版本 {0} 的新增内容</value></data>
   <data name="WhatsNew.ViewRelease" xml:space="preserve"><value>在 GitHub 上查看此版本</value></data>
+  <data name="Snooze.Error.NotRecorded" xml:space="preserve"><value>无法保存暂停，因此未做任何更改。{0}</value></data>
+  <data name="Snooze.Restore.MessageFormat" xml:space="preserve"><value>暂停已结束，但以下任务未能重新启用：{0}</value></data>
+  <data name="Snooze.Restore.MoreFormat" xml:space="preserve"><value>{0} 及另外 {1} 个任务</value></data>
+  <data name="Snooze.Restore.AccessDenied" xml:space="preserve"><value>Windows 拒绝了访问。在应用以管理员身份运行时暂停的任务，只能以管理员权限重新启用。</value></data>
+  <data name="Snooze.Unreadable.MessageFormat" xml:space="preserve"><value>之前的暂停所禁用的任务可能仍处于禁用状态，但不会在此列出。其记录无法读取，已保存为 {0}。</value></data>
+  <data name="Snooze.Dialog.Until" xml:space="preserve"><value>暂停所有任务，直到：</value></data>
 </root>
 
 

@@ -541,10 +541,10 @@ Jetzt App neustarten?</value></data>
   <data name="Snooze.SuspendTriggers" xml:space="preserve"><value>Geplante Auslöser ebenfalls deaktivieren</value></data>
   <data name="Snooze.SuspendTriggersHint" xml:space="preserve"><value>Deaktiviert jede aktivierte Aufgabe über die Aufgabenplanungs-API und aktiviert genau diese Aufgaben wieder, wenn die Pause endet. Geschützte Systemaufgaben werden übersprungen.</value></data>
   <data name="Snooze.Banner.Suspended" xml:space="preserve"><value>Geplante Auslöser sind deaktiviert und manuelle Starts werden blockiert. Aufgaben werden reaktiviert, wenn die Pause endet.</value></data>
-  <data name="Snooze.Banner.ManualOnly" xml:space="preserve"><value>Über diese App gestartete Läufe werden blockiert. Windows löst geplante Auslöser weiterhin aus - aktiviere "Geplante Auslöser ebenfalls deaktivieren", um auch diese zu stoppen.</value></data>
+  <data name="Snooze.Banner.ManualOnly" xml:space="preserve"><value>Über diese App gestartete Läufe werden blockiert. Windows löst geplante Auslöser weiterhin aus; um auch diese zu stoppen, beim Pausieren „Geplante Auslöser ebenfalls deaktivieren“ wählen.</value></data>
   <data name="Snooze.Error.RunBlocked" xml:space="preserve"><value>„{0}“ wurde nicht gestartet, da die globale Pause aktiv ist.</value></data>
   <data name="Snooze.Error.BatchBlocked" xml:space="preserve"><value>{0} Aufgabe(n) wurden nicht gestartet, da die globale Pause aktiv ist.</value></data>
-  <data name="Snooze.Error.PastTime" xml:space="preserve"><value>Wähle einen Zeitpunkt in der Zukunft.</value></data>
+  <data name="Snooze.Error.PastTime" xml:space="preserve"><value>Der Zeitpunkt muss in der Zukunft liegen.</value></data>
   <data name="Snooze.Error.Resume" xml:space="preserve"><value>Alle Aufgaben konnten nicht fortgesetzt werden: </value></data>
   <data name="Snooze.Toast.Started.Title" xml:space="preserve"><value>Globale Pause aktiviert</value></data>
   <data name="Snooze.Toast.Ended.Title" xml:space="preserve"><value>Globale Pause beendet</value></data>
@@ -1069,4 +1069,10 @@ Jetzt App neustarten?</value></data>
   <data name="Tour.Settings.Body" xml:space="preserve"><value>In den Einstellungen wählst du Design und Sprache, worüber du benachrichtigt wirst, ob die App mit Windows startet und mehr. Beim Start sucht die App nach Updates. Diese Tour findest du jederzeit unter Einstellungen, Über.</value></data>
   <data name="WhatsNew.TitleFormat" xml:space="preserve"><value>Neu in Version {0}</value></data>
   <data name="WhatsNew.ViewRelease" xml:space="preserve"><value>Diese Version auf GitHub ansehen</value></data>
+  <data name="Snooze.Error.NotRecorded" xml:space="preserve"><value>Die Pause konnte nicht gespeichert werden, deshalb wurde nichts geändert. {0}</value></data>
+  <data name="Snooze.Restore.MessageFormat" xml:space="preserve"><value>Eine Pause ist zu Ende, doch diese Aufgaben konnten nicht wieder aktiviert werden: {0}</value></data>
+  <data name="Snooze.Restore.MoreFormat" xml:space="preserve"><value>{0} und {1} weitere</value></data>
+  <data name="Snooze.Restore.AccessDenied" xml:space="preserve"><value>Windows hat den Zugriff verweigert. Eine Aufgabe, die pausiert wurde, während die App als Administrator lief, lässt sich nur mit Administratorrechten wieder aktivieren.</value></data>
+  <data name="Snooze.Unreadable.MessageFormat" xml:space="preserve"><value>Aufgaben, die eine frühere Pause deaktiviert hat, sind womöglich noch deaktiviert, ohne hier zu erscheinen. Ihre Aufzeichnung konnte nicht gelesen werden und wurde als {0} aufbewahrt.</value></data>
+  <data name="Snooze.Dialog.Until" xml:space="preserve"><value>Alle Aufgaben pausieren bis:</value></data>
 </root>

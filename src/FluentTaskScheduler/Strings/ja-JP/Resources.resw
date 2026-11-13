@@ -1069,4 +1069,10 @@
   <data name="Tour.Settings.Body" xml:space="preserve"><value>設定では、テーマや言語、通知の内容、Windows の起動時にアプリを起動するかどうかなどを選べます。アプリは起動時にアップデートを確認します。このツアーは、設定の「バージョン情報」からいつでも表示できます。</value></data>
   <data name="WhatsNew.TitleFormat" xml:space="preserve"><value>バージョン {0} の新機能</value></data>
   <data name="WhatsNew.ViewRelease" xml:space="preserve"><value>GitHub でこのリリースを表示</value></data>
+  <data name="Snooze.Error.NotRecorded" xml:space="preserve"><value>スヌーズを保存できなかったため、何も変更されていません。{0}</value></data>
+  <data name="Snooze.Restore.MessageFormat" xml:space="preserve"><value>スヌーズは終了しましたが、次のタスクを再び有効にできませんでした: {0}</value></data>
+  <data name="Snooze.Restore.MoreFormat" xml:space="preserve"><value>{0} ほか {1} 件</value></data>
+  <data name="Snooze.Restore.AccessDenied" xml:space="preserve"><value>Windows がアクセスを拒否しました。アプリを管理者として実行していたときにスヌーズしたタスクは、管理者権限でのみ再び有効にできます。</value></data>
+  <data name="Snooze.Unreadable.MessageFormat" xml:space="preserve"><value>以前のスヌーズで無効にされたタスクが、ここに表示されないまま無効になっている可能性があります。その記録は読み取れなかったため、{0} として保存されています。</value></data>
+  <data name="Snooze.Dialog.Until" xml:space="preserve"><value>すべてのタスクをスヌーズする期限:</value></data>
 </root>

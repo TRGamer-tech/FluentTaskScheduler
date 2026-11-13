@@ -1069,5 +1069,11 @@ Restart now to apply the update?</value></data>
   <data name="Tour.Settings.Body" xml:space="preserve"><value>In Settings you choose the theme and the language, what you are notified about, whether the app starts with Windows, and more. The app looks for updates when it starts. You can take this tour again under Settings, About.</value></data>
   <data name="WhatsNew.TitleFormat" xml:space="preserve"><value>What's new in version {0}</value></data>
   <data name="WhatsNew.ViewRelease" xml:space="preserve"><value>View this release on GitHub</value></data>
+  <data name="Snooze.Error.NotRecorded" xml:space="preserve"><value>The snooze could not be saved, so nothing was changed. {0}</value></data>
+  <data name="Snooze.Restore.MessageFormat" xml:space="preserve"><value>A snooze has ended, but these tasks could not be enabled again: {0}</value></data>
+  <data name="Snooze.Restore.MoreFormat" xml:space="preserve"><value>{0} and {1} more</value></data>
+  <data name="Snooze.Restore.AccessDenied" xml:space="preserve"><value>Windows refused access. A task that was snoozed while the app ran as administrator can only be enabled again with administrator rights.</value></data>
+  <data name="Snooze.Unreadable.MessageFormat" xml:space="preserve"><value>Tasks that an earlier snooze disabled may still be disabled without being listed here. Its record could not be read and was kept as {0}.</value></data>
+  <data name="Snooze.Dialog.Until" xml:space="preserve"><value>Snooze all tasks until:</value></data>
 </root>
 
