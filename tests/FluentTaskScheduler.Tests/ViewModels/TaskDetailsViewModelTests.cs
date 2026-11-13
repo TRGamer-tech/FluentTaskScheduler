@@ -142,6 +142,35 @@ public sealed class TaskDetailsViewModelTests : IDisposable
         Assert.Equal(to is null ? null : DateTimeOffset.Parse(to), asked.To);
     }
 
+    /// <summary>Central European time: an hour ahead of UTC, two in summer, which begins on the last Sunday of March and ends on the last Sunday of October.</summary>
+    private static TimeZoneInfo CentralEurope()
+    {
+        var summer = TimeZoneInfo.AdjustmentRule.CreateAdjustmentRule(DateTime.MinValue.Date, DateTime.MaxValue.Date, TimeSpan.FromHours(1),
+            TimeZoneInfo.TransitionTime.CreateFloatingDateRule(new DateTime(1, 1, 1, 2, 0, 0), 3, 5, DayOfWeek.Sunday),
+            TimeZoneInfo.TransitionTime.CreateFloatingDateRule(new DateTime(1, 1, 1, 3, 0, 0), 10, 5, DayOfWeek.Sunday));
+        return TimeZoneInfo.CreateCustomTimeZone("Central Europe", TimeSpan.FromHours(1), "Central Europe", "CET", "CEST", [summer]);
+    }
+
+    [Theory]
+    [InlineData("2031-03-30T10:00:00Z", HistoryPeriod.Today, "2031-03-30T00:00:00+01:00", null)]
+    [InlineData("2031-10-26T11:00:00Z", HistoryPeriod.Today, "2031-10-26T00:00:00+02:00", null)]
+    [InlineData("2031-03-31T10:00:00Z", HistoryPeriod.Yesterday, "2031-03-30T00:00:00+01:00", "2031-03-31T00:00:00+02:00")]
+    [InlineData("2031-04-02T10:00:00Z", HistoryPeriod.LastSevenDays, "2031-03-27T00:00:00+01:00", null)]
+    public async Task APeriodAroundAChangeOfDaylightSavingTime_StillBeginsAndEndsAtTheUsersMidnight(string now, HistoryPeriod period, string from, string? to)
+    {
+        var time = new FakeTimeProvider(DateTimeOffset.Parse(now));
+        time.SetLocalTimeZone(CentralEurope());
+        using TaskDetailsViewModel details = new TaskDetailsFactory(_store, _history, _snooze, _files, _clipboard, _app, new InlineUiThread(), time)
+            .Create(new TaskRow(@"\Backup"));
+        details.PeriodIndex = (int)period;
+
+        await details.LoadHistoryAsync();
+
+        var asked = _history.Requests[^1];
+        Assert.Equal(DateTimeOffset.Parse(from), asked.From);
+        Assert.Equal(to is null ? null : DateTimeOffset.Parse(to), asked.To);
+    }
+
     [Fact]
     public async Task ChoosingAnotherPeriod_ReadsTheHistoryAgain()
     {

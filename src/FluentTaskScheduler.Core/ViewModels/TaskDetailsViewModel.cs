@@ -263,16 +263,17 @@ public sealed partial class TaskDetailsViewModel : ObservableObject, IDisposable
         return string.Join(" · ", parts);
     }
 
-    // Days are the user's days: they begin at local midnight.
+    // Days are the user's days: they begin at local midnight. On a day daylight saving time begins
+    // or ends, midnight has another offset than the rest of the day.
     private (DateTimeOffset? From, DateTimeOffset? To) Bounds(HistoryPeriod period)
     {
-        DateTimeOffset now = _time.GetLocalNow();
-        DateTimeOffset today = new(now.Date, now.Offset);
+        DateTime today = _time.GetLocalNow().Date;
+        DateTimeOffset Midnight(DateTime day) => new(day, _time.LocalTimeZone.GetUtcOffset(day));
         return period switch
         {
-            HistoryPeriod.Today => (today, null),
-            HistoryPeriod.Yesterday => (today.AddDays(-1), today),
-            HistoryPeriod.LastSevenDays => (today.AddDays(-6), null),
+            HistoryPeriod.Today => (Midnight(today), null),
+            HistoryPeriod.Yesterday => (Midnight(today.AddDays(-1)), Midnight(today)),
+            HistoryPeriod.LastSevenDays => (Midnight(today.AddDays(-6)), null),
             _ => (null, null)
         };
     }
