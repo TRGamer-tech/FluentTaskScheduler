@@ -104,7 +104,8 @@ public class SettingsTests
         var bounds = toggle.BoundingRectangle;
         app.Snapshot("cards");
 
-        Assert.True(Math.Abs(bounds.Right - list.Right) <= 2, $"The switch ends at {bounds.Right}, the list in the card above it at {list.Right}.");
+        // A drop-down list's bounds reach 4 pixels past the box it draws; the two drawn edges line up.
+        Assert.True(Math.Abs(bounds.Right - list.Right) <= 6, $"The switch ends at {bounds.Right}, the list in the card above it at {list.Right}.");
 
         // The knob is 40 wide and belongs at the very right, with "On" or "Off" written to the left of it.
         // Not every version of the switch lets automation see that text; the screenshot shows it either way.
