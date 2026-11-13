@@ -18,7 +18,7 @@ public sealed partial class TriggerEditor : UserControl
         InitializeComponent();
 
         // Filled here rather than in XAML so that the order is the one the view model defines.
-        TriggerTypeBox.ItemsSource = TriggerViewModel.Types.Select(type => Loc.Get(TypeKey(type))).ToList();
+        TriggerTypeBox.ItemsSource = TriggerViewModel.Types.Select(type => Loc.Get(TriggerText.TypeKey(type))).ToList();
         TriggerSessionChange.ItemsSource = TriggerViewModel.SessionChanges.Select(change => Loc.Get(TriggerText.SessionChangeKey(change))).ToList();
     }
 
@@ -55,18 +55,4 @@ public sealed partial class TriggerEditor : UserControl
     public static Visibility CollapsedIf(bool condition) => condition ? Visibility.Collapsed : Visibility.Visible;
 
     private static FlagOption Day(string key, DaysOfTheWeek day) => new(Loc.Get(key), (int)day);
-
-    private static string TypeKey(TriggerType type) => type switch
-    {
-        TriggerType.Once => "Dialog.Trigger.Once",
-        TriggerType.Daily => "Dialog.Trigger.Daily",
-        TriggerType.Weekly => "Dialog.Trigger.Weekly",
-        TriggerType.Monthly => "Dialog.Trigger.Monthly",
-        TriggerType.AtLogon => "Trigger.AtLogon",
-        TriggerType.AtStartup => "Trigger.AtStartup",
-        TriggerType.OnIdle => "Trigger.OnIdle",
-        TriggerType.Event => "Dialog.Trigger.Event",
-        TriggerType.SessionStateChange => "Dialog.Trigger.Session",
-        _ => "Dialog.Trigger.__Unsupported"
-    };
 }

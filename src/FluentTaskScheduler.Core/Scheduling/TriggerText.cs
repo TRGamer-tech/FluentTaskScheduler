@@ -22,32 +22,41 @@ public static class TriggerText
 
     public static string Describe(TriggerDraft trigger)
     {
+        string type = Loc.Get(TypeKey(trigger.Type));
         string time = trigger.Start is { } start ? $" {Loc.Get("Trigger.At")} {start.ToString("t", CultureInfo.CurrentCulture)}" : "";
 
         return trigger.Type switch
         {
-            TriggerType.Once => trigger.Start is { } when
-                ? $"{Loc.Get("Dialog.Trigger.Once")}: {when.ToString("g", CultureInfo.CurrentCulture)}"
-                : Loc.Get("Dialog.Trigger.Once"),
+            TriggerType.Once => trigger.Start is { } when ? $"{type}: {when.ToString("g", CultureInfo.CurrentCulture)}" : type,
             TriggerType.Daily => trigger.DaysInterval > 1
-                ? $"{Loc.Get("Dialog.Trigger.Daily")} ({Loc.Format("Editor.Trigger.EveryNDays", trigger.DaysInterval)}){time}"
-                : $"{Loc.Get("Dialog.Trigger.Daily")}{time}",
-            TriggerType.Weekly => $"{Loc.Get("Dialog.Trigger.Weekly")} ({Names(Weekdays, d => trigger.DaysOfWeek.HasFlag(d))}){time}",
+                ? $"{type} ({Loc.Format("Editor.Trigger.EveryNDays", trigger.DaysInterval)}){time}"
+                : $"{type}{time}",
+            TriggerType.Weekly => $"{type} ({Names(Weekdays, d => trigger.DaysOfWeek.HasFlag(d))}){time}",
             TriggerType.Monthly when trigger.MonthlyByWeekday =>
-                $"{Loc.Get("Dialog.Trigger.Monthly")} ({Names(WeeksOfMonth, w => trigger.Weeks.HasFlag(w))}: {Names(Weekdays, d => trigger.DaysOfWeek.HasFlag(d))}){time}",
-            TriggerType.Monthly => $"{Loc.Get("Dialog.Trigger.Monthly")} ({DaysOfMonth(trigger)}){time}",
-            TriggerType.AtLogon => Loc.Get("Trigger.AtLogon"),
-            TriggerType.AtStartup => Loc.Get("Trigger.AtStartup"),
-            TriggerType.OnIdle => Loc.Get("Trigger.OnIdle"),
-            TriggerType.Event => EventQuery.TryParse(trigger.EventSubscription, out string log, out string source, out int? id)
-                ? $"{Loc.Get("Dialog.Trigger.Event")} ({string.Join(", ", new[] { log, source, id?.ToString() }.Where(part => !string.IsNullOrEmpty(part)))})"
-                : Loc.Get("Dialog.Trigger.Event"),
+                $"{type} ({Names(WeeksOfMonth, w => trigger.Weeks.HasFlag(w))}: {Names(Weekdays, d => trigger.DaysOfWeek.HasFlag(d))}){time}",
+            TriggerType.Monthly => $"{type} ({DaysOfMonth(trigger)}){time}",
+            TriggerType.Event when EventQuery.TryParse(trigger.EventSubscription, out string log, out string source, out int? id) =>
+                $"{type} ({string.Join(", ", new[] { log, source, id?.ToString() }.Where(part => !string.IsNullOrEmpty(part)))})",
             TriggerType.SessionStateChange => Loc.Format("Trigger.SessionStateChange", Loc.Get(SessionChangeKey(trigger.SessionChange))),
-            _ => trigger.UnsupportedSummary is { Length: > 0 } summary
-                ? $"{Loc.Get("Dialog.Trigger.__Unsupported")} ({summary})"
-                : Loc.Get("Dialog.Trigger.__Unsupported")
+            TriggerType.Unsupported when trigger.UnsupportedSummary is { Length: > 0 } summary => $"{type} ({summary})",
+            _ => type
         };
     }
+
+    /// <summary>Resource name for the name of a trigger type, as the editor's list of types shows it.</summary>
+    public static string TypeKey(TriggerType type) => type switch
+    {
+        TriggerType.Once => "Dialog.Trigger.Once",
+        TriggerType.Daily => "Dialog.Trigger.Daily",
+        TriggerType.Weekly => "Dialog.Trigger.Weekly",
+        TriggerType.Monthly => "Dialog.Trigger.Monthly",
+        TriggerType.AtLogon => "Trigger.AtLogon",
+        TriggerType.AtStartup => "Trigger.AtStartup",
+        TriggerType.OnIdle => "Trigger.OnIdle",
+        TriggerType.Event => "Dialog.Trigger.Event",
+        TriggerType.SessionStateChange => "Dialog.Trigger.Session",
+        _ => "Dialog.Trigger.__Unsupported"
+    };
 
     /// <summary>Resource name for a session change such as lock or remote connect.</summary>
     public static string SessionChangeKey(TaskSessionStateChangeType change) => change switch

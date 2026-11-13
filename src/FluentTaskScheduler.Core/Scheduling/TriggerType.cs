@@ -1,9 +1,8 @@
 namespace FluentTaskScheduler.Scheduling;
 
 /// <summary>
-/// The set of Windows Task Scheduler trigger kinds this app understands.
-/// Members are named to match the existing localization keys
-/// (e.g. "Dialog.Trigger." + TriggerType) exactly.
+/// The set of Windows Task Scheduler trigger kinds this app understands. What each is called
+/// for the user comes from <see cref="TriggerText.TypeKey"/>.
 /// </summary>
 public enum TriggerType
 {

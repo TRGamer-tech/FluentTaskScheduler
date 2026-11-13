@@ -37,15 +37,14 @@ public sealed class TemplateCard(BuiltInTemplate template, IAsyncRelayCommand cr
     private static string Describe(TaskTemplate template)
     {
         TriggerDraft trigger = template.Trigger;
+        string type = Loc.Get(TriggerText.TypeKey(trigger.Type));
         string time = template.At?.ToString("t", CultureInfo.CurrentCulture) ?? "";
         return trigger.Type switch
         {
-            TriggerType.Daily => $"{Loc.Get("Dialog.Trigger.Daily")} {time}",
-            TriggerType.Weekly => $"{Loc.Get("Dialog.Trigger.Weekly")} {DayNames(trigger.DaysOfWeek)} {time}",
-            TriggerType.AtLogon => Loc.Get("Trigger.AtLogon"),
-            // The resource names leave out the "Session" some members of the enumeration start with.
-            TriggerType.SessionStateChange => Loc.Format("Trigger.SessionStateChange", Loc.Get("Dialog.Sess." + trigger.SessionChange.ToString().Replace("Session", ""))),
-            _ => Loc.Get("Dialog.Trigger." + trigger.Type)
+            TriggerType.Daily => $"{type} {time}",
+            TriggerType.Weekly => $"{type} {DayNames(trigger.DaysOfWeek)} {time}",
+            TriggerType.SessionStateChange => Loc.Format("Trigger.SessionStateChange", Loc.Get(TriggerText.SessionChangeKey(trigger.SessionChange))),
+            _ => type
         };
     }
 

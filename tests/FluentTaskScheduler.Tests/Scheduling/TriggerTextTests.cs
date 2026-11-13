@@ -1,5 +1,7 @@
 using System.Globalization;
 using FluentTaskScheduler.Scheduling;
+using FluentTaskScheduler.Tests.Library;
+using FluentTaskScheduler.ViewModels;
 using DaysOfTheWeek = Microsoft.Win32.TaskScheduler.DaysOfTheWeek;
 using TaskSessionStateChangeType = Microsoft.Win32.TaskScheduler.TaskSessionStateChangeType;
 using WhichWeek = Microsoft.Win32.TaskScheduler.WhichWeek;
@@ -45,5 +47,29 @@ public sealed class TriggerTextTests : IDisposable
     {
         foreach (TaskSessionStateChangeType change in Enum.GetValues<TaskSessionStateChangeType>())
             Assert.StartsWith("Dialog.Sess.", TriggerText.SessionChangeKey(change));
+    }
+
+    [Fact]
+    public void EveryTypeTheEditorOffers_HasANameOfItsOwn()
+    {
+        string[] keys = TriggerViewModel.Types.Select(TriggerText.TypeKey).ToArray();
+
+        Assert.Equal(keys.Length, keys.Distinct().Count());
+        Assert.DoesNotContain(TriggerText.TypeKey(TriggerType.Unsupported), keys);
+    }
+
+    [Theory]
+    [MemberData(nameof(RepoFiles.Languages), MemberType = typeof(RepoFiles))]
+    public void TheNamesOfTypesAndSessionChanges_ExistInEveryLanguage(string language)
+    {
+        var texts = RepoFiles.Texts(language);
+        string[] keys =
+        [
+            .. Enum.GetValues<TriggerType>().Select(TriggerText.TypeKey),
+            .. Enum.GetValues<TaskSessionStateChangeType>().Select(TriggerText.SessionChangeKey)
+        ];
+
+        string[] missing = keys.Where(key => !texts.ContainsKey(key)).ToArray();
+        Assert.Empty(missing);
     }
 }
