@@ -16,9 +16,6 @@ namespace FluentTaskScheduler;
 /// <summary>The composition root: decides which services exist, starts them, and opens the first window.</summary>
 public partial class App : Application, IAppLifetime, IDisposable
 {
-    /// <summary>Argument a restarted instance is given so it waits for the one that started it to end.</summary>
-    public const string AfterRestartArgument = "--after-restart";
-
     private readonly SingleInstance _instance;
     private ServiceProvider? _services;
 
@@ -99,7 +96,7 @@ public partial class App : Application, IAppLifetime, IDisposable
     {
         try
         {
-            Process.Start(new ProcessStartInfo(Environment.ProcessPath!, AfterRestartArgument) { UseShellExecute = true, Verb = "runas" })?.Dispose();
+            Process.Start(new ProcessStartInfo(Environment.ProcessPath!, AppArguments.AfterRestart) { UseShellExecute = true, Verb = "runas" })?.Dispose();
         }
         catch (Win32Exception ex) when (ex.NativeErrorCode == 1223) // ERROR_CANCELLED: the user said no at the consent prompt
         {

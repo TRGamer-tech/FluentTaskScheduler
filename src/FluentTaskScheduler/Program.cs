@@ -1,4 +1,7 @@
 using System.Runtime.InteropServices;
+using FluentTaskScheduler.Cli;
+using FluentTaskScheduler.Notifications;
+using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Shell;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -19,8 +22,11 @@ public static class Program
         WinRT.ComWrappersSupport.InitializeComWrappers();
         RunUpdaterHooks();
 
+        // A command is answered and done, whether or not the app is already running.
+        if (CommandLine.Handles(args)) return RunCommandLine(args);
+
         // A restarted instance (e.g. as administrator) starts while the old one is still closing.
-        TimeSpan waitForPrevious = args.Contains(App.AfterRestartArgument) ? TimeSpan.FromSeconds(10) : TimeSpan.Zero;
+        TimeSpan waitForPrevious = args.Contains(AppArguments.AfterRestart) ? TimeSpan.FromSeconds(10) : TimeSpan.Zero;
         using var instance = new SingleInstance("FluentTaskScheduler", waitForPrevious);
         if (!instance.IsFirst)
         {
@@ -40,6 +46,19 @@ public static class Program
         // Start returns when the last window has closed.
         app?.Dispose();
         return 0;
+    }
+
+    private static int RunCommandLine(string[] args)
+    {
+        // A windowed program has no console of its own, so it borrows the one it was started
+        // from. Output that is redirected to a file or a pipe goes there either way.
+        AttachConsole(ParentProcess);
+
+        var store = new TaskStore();
+        var runner = new TaskRunner(store, new App.NoSnooze(), new SilentNotifier());
+        int exitCode = new CommandLine(store, runner, Console.Out).Run(args);
+        Console.Out.Flush();
+        return exitCode;
     }
 
     /// <summary>
@@ -77,6 +96,12 @@ public static class Program
             return false;
         }
     }
+
+    private const int ParentProcess = -1;
+
+    [DllImport("kernel32.dll")]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+    private static extern bool AttachConsole(int processId);
 
     [DllImport("Microsoft.ui.xaml.dll")]
     [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]

@@ -40,7 +40,7 @@ public partial class App
         services.AddSingleton<Notifications.INotifier, LegacyNotifier>();
     }
 
-    private sealed class NoSnooze : Scheduling.ISnoozeGate
+    internal sealed class NoSnooze : Scheduling.ISnoozeGate
     {
         public bool BlocksRun(string taskPath) => false;
         public void RecordSuppressedRun(string taskPath, Scheduling.RunOrigin origin) { }
