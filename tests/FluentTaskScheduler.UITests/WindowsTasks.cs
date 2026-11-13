@@ -52,6 +52,9 @@ public sealed class WindowsTasks : IDisposable
     /// <summary>Whether Task Scheduler may start the task: its definition says so unless it says otherwise.</summary>
     public bool IsEnabled(string name) => Value(name, "Settings", "Enabled") != "false";
 
+    /// <summary>Starts the task now, from outside the app.</summary>
+    public void Start(string name) => Run($"/Run /TN \"{PathOf(name)}\"");
+
     /// <summary>The task's definition as Task Scheduler stores it.</summary>
     public XElement Definition(string name)
     {
