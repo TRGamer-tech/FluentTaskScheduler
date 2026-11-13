@@ -376,14 +376,16 @@ public sealed partial class TaskEditorViewModel : ObservableObject
             problems.Add(new DraftProblem("Dialog.Error.InvalidIdleDuration", IdleDuration));
         if (!DurationInput.TryRead(RestartInterval, _shownRestartInterval, _source.RestartInterval, out TimeSpan restartInterval))
             problems.Add(new DraftProblem("Dialog.Error.InvalidRestartInterval", RestartInterval));
-        if (!DurationInput.TryRead(TimeLimit, _shownTimeLimit, _source.ExecutionTimeLimit, out TimeSpan timeLimit))
-            problems.Add(new DraftProblem("Dialog.Error.InvalidStopAfter", TimeLimit));
-        if (LimitRunTime && timeLimit <= TimeSpan.Zero && problems.Count == 0)
+        if (!DurationInput.TryRead(TimeLimit, _shownTimeLimit, _source.ExecutionTimeLimit, out TimeSpan timeLimit)
+            || (LimitRunTime && timeLimit <= TimeSpan.Zero))
             problems.Add(new DraftProblem("Dialog.Error.InvalidStopAfter", TimeLimit));
         if (NeedsPassword && Password.Length == 0) problems.Add(new DraftProblem("Editor.Error.PasswordNeeded"));
         if (problems.Count > 0) return false;
 
-        NetworkProfile? network = RunOnlyIfNetwork && NetworkIndex > 0 ? _networks[NetworkIndex - 1] : null;
+        // The network belongs to the network condition. While that is off, the network is not
+        // shown and stays as it was, like everything else the user cannot see.
+        NetworkProfile? network = NetworkIndex > 0 ? _networks[NetworkIndex - 1] : null;
+        bool networkKept = !RunOnlyIfNetwork || (network?.Id ?? Guid.Empty) == _source.NetworkId;
         draft = _source with
         {
             Name = Name.Trim(),
@@ -401,8 +403,8 @@ public sealed partial class TaskEditorViewModel : ObservableObject
             RunOnlyOnAcPower = RunOnlyOnAcPower,
             StopOnBattery = StopOnBattery,
             RunOnlyIfNetwork = RunOnlyIfNetwork,
-            NetworkId = network?.Id ?? Guid.Empty,
-            NetworkName = network is null ? "" : network.Id == _source.NetworkId ? _source.NetworkName : network.Name,
+            NetworkId = networkKept ? _source.NetworkId : network?.Id ?? Guid.Empty,
+            NetworkName = networkKept ? _source.NetworkName : network?.Name ?? "",
             WakeToRun = WakeToRun,
             HighestPrivileges = HighestPrivileges,
             Hidden = Hidden,

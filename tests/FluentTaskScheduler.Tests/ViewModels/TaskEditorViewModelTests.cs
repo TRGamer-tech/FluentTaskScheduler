@@ -418,6 +418,16 @@ public sealed class TaskEditorViewModelTests : IDisposable
     }
 
     [Fact]
+    public void ANetworkKeptWhileTheNetworkConditionIsOff_StaysWithTheTask()
+    {
+        TaskDraft loaded = Elaborate() with { RunOnlyIfNetwork = false };
+
+        Assert.True(Edit(loaded).TryBuild(out TaskDraft built, out _));
+
+        Assert.Equal(loaded, built);
+    }
+
+    [Fact]
     public void ANetworkTheMachineDoesNotList_StaysSelectable_SoTheTaskKeepsIt()
     {
         var elsewhere = Guid.NewGuid();
@@ -457,6 +467,18 @@ public sealed class TaskEditorViewModelTests : IDisposable
 
         Assert.False(editor.TryBuild(out _, out var problems));
         Assert.Equal([expected], problems.Select(problem => problem.Key));
+    }
+
+    [Fact]
+    public void AnEmptyRunTimeLimit_IsListedAlongWithTheOtherProblems()
+    {
+        var editor = Edit(Elaborate());
+        editor.TimeLimit = "";
+        editor.IdleDuration = "a bit";
+
+        Assert.False(editor.TryBuild(out _, out var problems));
+
+        Assert.Equal(["Dialog.Error.InvalidIdleDuration", "Dialog.Error.InvalidStopAfter"], problems.Select(problem => problem.Key));
     }
 
     [Fact]
