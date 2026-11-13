@@ -109,8 +109,7 @@ public sealed partial class LibraryViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private async Task NewScriptAsync()
     {
-        await _editor.NewCommand.ExecuteAsync(null);
-        _navigator.ShowScriptEditor();
+        if (await _editor.NewAsync()) _navigator.ShowScriptEditor();
     }
 
     private async Task CreateTaskAsync(TaskTemplate template)

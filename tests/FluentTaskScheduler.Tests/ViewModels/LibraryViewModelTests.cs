@@ -210,6 +210,20 @@ public sealed class LibraryViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task NewScript_StaysInTheLibrary_WhenTheEditorKeepsItsUnsavedScript()
+    {
+        LibraryViewModel library = NewLibrary();
+        _editor.Text = "not saved yet";
+        _prompts.Confirm = false;
+
+        await library.NewScriptCommand.ExecuteAsync(null);
+
+        Assert.Equal("not saved yet", _editor.Text);
+        Assert.Single(_prompts.Shown);
+        Assert.Empty(_navigator.Calls);
+    }
+
+    [Fact]
     public async Task TheList_FollowsTheLibrary_UntilTheWindowCloses()
     {
         LibraryViewModel library = NewLibrary();

@@ -342,7 +342,7 @@ public sealed class ScriptEditorViewModelTests : IDisposable
         _editor.Text = "Get-Date";
         await _editor.SaveCommand.ExecuteAsync(null);
 
-        await _editor.NewCommand.ExecuteAsync(null);
+        Assert.True(await _editor.NewAsync());
 
         Assert.Equal(("", "", ""), (_editor.Name, _editor.Description, _editor.Text));
         Assert.Empty(_prompts.Shown);
@@ -360,7 +360,7 @@ public sealed class ScriptEditorViewModelTests : IDisposable
         _editor.Text = "not saved yet";
         _prompts.Confirm = false;
 
-        await _editor.NewCommand.ExecuteAsync(null);
+        Assert.False(await _editor.NewAsync());
 
         Assert.Equal("not saved yet", _editor.Text);
         Assert.Single(_prompts.Shown);

@@ -92,10 +92,15 @@ public sealed partial class ScriptEditorViewModel(
         }
     }
 
+    /// <summary>Empties the editor for a new script. Asks first if that would discard changes.</summary>
+    /// <returns>False when the editor still holds what it held, because the user said no.</returns>
     [RelayCommand]
-    private async Task NewAsync()
+    public async Task<bool> NewAsync()
     {
-        if (await MayDiscardChangesAsync()) Load(null, "", "", "");
+        if (!await MayDiscardChangesAsync()) return false;
+
+        Load(null, "", "", "");
+        return true;
     }
 
     [RelayCommand(CanExecute = nameof(CanSave))]
