@@ -156,8 +156,11 @@ public class QuickActionsTests
     {
         using var app = AppSession.Launch("quick-action");
         app.Require("NavQuickActions").Press();
+        var run = app.Require("QuickAction.FlushDNS.Run");
+        // Every card has a Run button; a screen reader tells them apart by the action they run.
+        Assert.Equal("Run Flush DNS", run.Name);
 
-        app.Require("QuickAction.FlushDNS.Run").AsButton().Invoke();
+        run.AsButton().Invoke();
 
         bool succeeded = app.Find(e => e.AutomationId == "QuickAction.FlushDNS.Status" && e.Name == "Success", 60000) != null;
         app.Snapshot("ran");

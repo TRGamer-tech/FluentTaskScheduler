@@ -59,11 +59,13 @@
                                             Command="{x:Bind RunCommand}"
                                             Visibility="{x:Bind IsNotRunning, Mode=OneWay}"
                                             MinWidth="96"
+                                            AutomationProperties.Name="{x:Bind local:QuickActionsPage.ButtonName('QuickActions.RunFormat', Title)}"
                                             AutomationProperties.AutomationId="{x:Bind local:QuickActionsPage.IdOf(Id, 'Run')}"/>
                                     <Button Content="{x:Bind l:Loc.Get('Dialog.Common.Cancel')}"
                                             Command="{x:Bind CancelCommand}"
                                             Visibility="{x:Bind IsRunning, Mode=OneWay}"
                                             MinWidth="96"
+                                            AutomationProperties.Name="{x:Bind local:QuickActionsPage.ButtonName('QuickActions.CancelFormat', Title)}"
                                             AutomationProperties.AutomationId="{x:Bind local:QuickActionsPage.IdOf(Id, 'Cancel')}"/>
                                     <ProgressRing IsActive="{x:Bind IsRunning, Mode=OneWay}"
                                                   Visibility="{x:Bind IsRunning, Mode=OneWay}"

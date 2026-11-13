@@ -1123,5 +1123,7 @@ Restart now to apply the update?</value></data>
   <data name="Tasks.EnableFormat" xml:space="preserve"><value>Enable {0}</value></data>
   <data name="Snooze.Error.RecordUnreadable" xml:space="preserve"><value>The record of earlier snoozes in '{0}' could not be read and was left untouched. Nothing new can be recorded until the app has been restarted or that file has been moved away.</value></data>
   <data name="Clipboard.Busy" xml:space="preserve"><value>Nothing was copied: another program is using the clipboard. Try again in a moment.</value></data>
+  <data name="QuickActions.RunFormat" xml:space="preserve"><value>Run {0}</value></data>
+  <data name="QuickActions.CancelFormat" xml:space="preserve"><value>Cancel {0}</value></data>
 </root>
 
