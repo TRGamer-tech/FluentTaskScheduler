@@ -3,6 +3,7 @@ using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Tests.Library;
 using FluentTaskScheduler.ViewModels;
 using DaysOfTheWeek = Microsoft.Win32.TaskScheduler.DaysOfTheWeek;
+using MonthsOfTheYear = Microsoft.Win32.TaskScheduler.MonthsOfTheYear;
 using TaskSessionStateChangeType = Microsoft.Win32.TaskScheduler.TaskSessionStateChangeType;
 using WhichWeek = Microsoft.Win32.TaskScheduler.WhichWeek;
 
@@ -23,8 +24,11 @@ public sealed class TriggerTextTests : IDisposable
         { new TriggerDraft { Type = TriggerType.Daily, Start = Start }, "Dialog.Trigger.Daily Trigger.At 07:08" },
         { new TriggerDraft { Type = TriggerType.Daily, Start = Start, DaysInterval = 3 }, "Dialog.Trigger.Daily (Editor.Trigger.EveryNDays) Trigger.At 07:08" },
         { new TriggerDraft { Type = TriggerType.Weekly, Start = Start, DaysOfWeek = DaysOfTheWeek.Sunday | DaysOfTheWeek.Tuesday }, "Dialog.Trigger.Weekly (Dialog.Day.Tue, Dialog.Day.Sun) Trigger.At 07:08" },
+        { new TriggerDraft { Type = TriggerType.Weekly, Start = Start, WeeksInterval = 2, DaysOfWeek = DaysOfTheWeek.Monday }, "Dialog.Trigger.Weekly (Editor.Trigger.EveryNWeeks: Dialog.Day.Mon) Trigger.At 07:08" },
         { new TriggerDraft { Type = TriggerType.Monthly, Start = Start, DaysOfMonth = 0b100000000000001, LastDayOfMonth = true }, "Dialog.Trigger.Monthly (1, 15, Dialog.Week.Last) Trigger.At 07:08" },
+        { new TriggerDraft { Type = TriggerType.Monthly, Start = Start, DaysOfMonth = 1, Months = MonthsOfTheYear.March | MonthsOfTheYear.December }, "Dialog.Trigger.Monthly (1; Dialog.Month.Mar, Dialog.Month.Dec) Trigger.At 07:08" },
         { new TriggerDraft { Type = TriggerType.Monthly, Start = Start, MonthlyByWeekday = true, Weeks = WhichWeek.FirstWeek | WhichWeek.LastWeek, DaysOfWeek = DaysOfTheWeek.Monday }, "Dialog.Trigger.Monthly (Dialog.Week.First, Dialog.Week.Last: Dialog.Day.Mon) Trigger.At 07:08" },
+        { new TriggerDraft { Type = TriggerType.Monthly, Start = Start, MonthlyByWeekday = true, Weeks = WhichWeek.SecondWeek, DaysOfWeek = DaysOfTheWeek.Friday, Months = MonthsOfTheYear.January }, "Dialog.Trigger.Monthly (Dialog.Week.Second: Dialog.Day.Fri; Dialog.Month.Jan) Trigger.At 07:08" },
         { new TriggerDraft { Type = TriggerType.AtLogon }, "Trigger.AtLogon" },
         { new TriggerDraft { Type = TriggerType.AtStartup }, "Trigger.AtStartup" },
         { new TriggerDraft { Type = TriggerType.OnIdle }, "Trigger.OnIdle" },

@@ -1095,5 +1095,6 @@ Restart now to apply the update?</value></data>
   <data name="Library.EditScriptFormat" xml:space="preserve"><value>Edit script {0}</value></data>
   <data name="Library.DeleteScriptFormat" xml:space="preserve"><value>Delete script {0}</value></data>
   <data name="Editor.Error.NameTaken" xml:space="preserve"><value>Another task in this folder is already called '{0}'. Choose a different name.</value></data>
+  <data name="Editor.Trigger.EveryNWeeks" xml:space="preserve"><value>every {0} weeks</value></data>
 </root>
 

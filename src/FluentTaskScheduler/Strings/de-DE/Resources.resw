@@ -1095,4 +1095,5 @@ Jetzt App neustarten?</value></data>
   <data name="Library.EditScriptFormat" xml:space="preserve"><value>Skript {0} bearbeiten</value></data>
   <data name="Library.DeleteScriptFormat" xml:space="preserve"><value>Skript {0} löschen</value></data>
   <data name="Editor.Error.NameTaken" xml:space="preserve"><value>Eine andere Aufgabe in diesem Ordner trägt bereits den Namen „{0}“. Wähle einen anderen Namen.</value></data>
+  <data name="Editor.Trigger.EveryNWeeks" xml:space="preserve"><value>alle {0} Wochen</value></data>
 </root>

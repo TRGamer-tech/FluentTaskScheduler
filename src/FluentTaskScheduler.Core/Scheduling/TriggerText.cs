@@ -20,6 +20,14 @@ public static class TriggerText
         (WhichWeek.FourthWeek, "Dialog.Week.Fourth"), (WhichWeek.LastWeek, "Dialog.Week.Last")
     ];
 
+    private static readonly (MonthsOfTheYear Month, string Key)[] Months =
+    [
+        (MonthsOfTheYear.January, "Dialog.Month.Jan"), (MonthsOfTheYear.February, "Dialog.Month.Feb"), (MonthsOfTheYear.March, "Dialog.Month.Mar"),
+        (MonthsOfTheYear.April, "Dialog.Month.Apr"), (MonthsOfTheYear.May, "Dialog.Month.May"), (MonthsOfTheYear.June, "Dialog.Month.Jun"),
+        (MonthsOfTheYear.July, "Dialog.Month.Jul"), (MonthsOfTheYear.August, "Dialog.Month.Aug"), (MonthsOfTheYear.September, "Dialog.Month.Sep"),
+        (MonthsOfTheYear.October, "Dialog.Month.Oct"), (MonthsOfTheYear.November, "Dialog.Month.Nov"), (MonthsOfTheYear.December, "Dialog.Month.Dec")
+    ];
+
     public static string Describe(TriggerDraft trigger)
     {
         string type = Loc.Get(TypeKey(trigger.Type));
@@ -31,10 +39,10 @@ public static class TriggerText
             TriggerType.Daily => trigger.DaysInterval > 1
                 ? $"{type} ({Loc.Format("Editor.Trigger.EveryNDays", trigger.DaysInterval)}){time}"
                 : $"{type}{time}",
-            TriggerType.Weekly => $"{type} ({Names(Weekdays, d => trigger.DaysOfWeek.HasFlag(d))}){time}",
+            TriggerType.Weekly => $"{type} ({EveryNWeeks(trigger)}{Names(Weekdays, d => trigger.DaysOfWeek.HasFlag(d))}){time}",
             TriggerType.Monthly when trigger.MonthlyByWeekday =>
-                $"{type} ({Names(WeeksOfMonth, w => trigger.Weeks.HasFlag(w))}: {Names(Weekdays, d => trigger.DaysOfWeek.HasFlag(d))}){time}",
-            TriggerType.Monthly => $"{type} ({DaysOfMonth(trigger)}){time}",
+                $"{type} ({Names(WeeksOfMonth, w => trigger.Weeks.HasFlag(w))}: {Names(Weekdays, d => trigger.DaysOfWeek.HasFlag(d))}{InMonths(trigger)}){time}",
+            TriggerType.Monthly => $"{type} ({DaysOfMonth(trigger)}{InMonths(trigger)}){time}",
             TriggerType.Event when EventQuery.TryParse(trigger.EventSubscription, out string log, out string source, out int? id) =>
                 $"{type} ({string.Join(", ", new[] { log, source, id?.ToString() }.Where(part => !string.IsNullOrEmpty(part)))})",
             TriggerType.SessionStateChange => Loc.Format("Trigger.SessionStateChange", Loc.Get(SessionChangeKey(trigger.SessionChange))),
@@ -69,6 +77,13 @@ public static class TriggerText
         TaskSessionStateChangeType.RemoteDisconnect => "Dialog.Sess.RemoteDisconnect",
         _ => "Dialog.Trigger.__Unsupported"
     };
+
+    private static string EveryNWeeks(TriggerDraft trigger) =>
+        trigger.WeeksInterval > 1 ? Loc.Format("Editor.Trigger.EveryNWeeks", trigger.WeeksInterval) + ": " : "";
+
+    /// <summary>The months a monthly trigger is limited to. Every month goes without saying, and none at all is an error the editor reports.</summary>
+    private static string InMonths(TriggerDraft trigger) =>
+        trigger.Months is MonthsOfTheYear.AllMonths or 0 ? "" : "; " + Names(Months, m => trigger.Months.HasFlag(m));
 
     private static string DaysOfMonth(TriggerDraft trigger)
     {

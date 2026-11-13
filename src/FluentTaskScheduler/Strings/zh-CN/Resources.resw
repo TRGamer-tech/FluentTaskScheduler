@@ -1098,6 +1098,7 @@
   <data name="Library.EditScriptFormat" xml:space="preserve"><value>编辑脚本“{0}”</value></data>
   <data name="Library.DeleteScriptFormat" xml:space="preserve"><value>删除脚本“{0}”</value></data>
   <data name="Editor.Error.NameTaken" xml:space="preserve"><value>此文件夹中已有名为“{0}”的任务。请选择其他名称。</value></data>
+  <data name="Editor.Trigger.EveryNWeeks" xml:space="preserve"><value>每 {0} 周</value></data>
 </root>
 
 
