@@ -125,8 +125,10 @@ public sealed class AppSession : IDisposable
     private const string CloseCoveringWindowsVariable = "FTS_UI_CLOSE_COVERING_WINDOWS";
 
     /// <summary>
-    /// Mouse and keyboard input goes to whatever is on top. A hosted build machine can have a
-    /// first sign-in screen of Windows lying over everything, with nobody there to click it away.
+    /// Mouse input goes to whatever is on top, keyboard input to the window in the foreground. A
+    /// hosted build machine can have a first sign-in screen of Windows lying over everything, or a
+    /// window of its own keeping the foreground, as a System Properties dialog on the ARM64 one
+    /// did, with nobody there to click it away.
     /// </summary>
     private static void BringToFront(UIA3Automation automation, Application app, Window window)
     {
@@ -134,6 +136,8 @@ public sealed class AppSession : IDisposable
         {
             window.SetForeground();
             Thread.Sleep(500);
+
+            if (CloseForeignDialogInTheForeground(app)) continue;
 
             int owner = automation.FromPoint(window.BoundingRectangle.Center()).Properties.ProcessId.ValueOrDefault;
             if (owner == app.ProcessId) return;
@@ -153,6 +157,39 @@ public sealed class AppSession : IDisposable
         }
         throw new InvalidOperationException("The app's window is still covered by another window.");
     }
+
+    /// <summary>
+    /// Closes the dialog of another program that keeps the foreground, which Windows then does not
+    /// give to the app. Only a dialog is closed, and only closed: the foreground can also be the
+    /// build machine's own console, which must go on.
+    /// </summary>
+    /// <returns>Whether a dialog was closed.</returns>
+    private static bool CloseForeignDialogInTheForeground(Application app)
+    {
+        nint foreground = GetForegroundWindow();
+        GetWindowThreadProcessId(foreground, out uint owner);
+        if (foreground == 0 || owner == app.ProcessId || ClassName(foreground) != "#32770") return false;
+
+        if (Environment.GetEnvironmentVariable(CloseCoveringWindowsVariable) != "1")
+        {
+            throw new InvalidOperationException(
+                $"A dialog of process {owner} keeps the foreground, so keys would not reach the app. " +
+                $"Close it, or set {CloseCoveringWindowsVariable}=1 to let the tests close such dialogs.");
+        }
+
+        Console.WriteLine($"Closing a dialog of process {owner}: it keeps the foreground.");
+        PostMessageW(foreground, CloseMessage, 0, 0);
+        Thread.Sleep(500);
+        return true;
+    }
+
+    private const uint CloseMessage = 0x0010; // WM_CLOSE
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern nint GetForegroundWindow();
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool PostMessageW(nint window, uint message, nint wParam, nint lParam);
 
     /// <summary>
     /// Settings of someone who has seen the welcome tour and the release notes, with an English UI
@@ -285,9 +322,7 @@ public sealed class AppSession : IDisposable
         {
             if (!IsWindowVisibleNative(window)) return true;
 
-            var className = new StringBuilder(64);
-            GetClassNameW(window, className, className.Capacity);
-            if (className.ToString() != "#32770") return true;
+            if (ClassName(window) != "#32770") return true;
 
             GetWindowThreadProcessId(window, out uint process);
             if (process != _app.ProcessId && GetWindow(window, OwnerWindow) != _windowHandle) return true;
@@ -310,8 +345,7 @@ public sealed class AppSession : IDisposable
         EnumWindows((window, _) =>
         {
             if (!IsWindowVisibleNative(window)) return true;
-            var className = new StringBuilder(64);
-            GetClassNameW(window, className, className.Capacity);
+            string className = ClassName(window);
             var title = new StringBuilder(128);
             GetWindowTextW(window, title, title.Capacity);
             GetWindowThreadProcessId(window, out uint owner);
@@ -331,6 +365,13 @@ public sealed class AppSession : IDisposable
 
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern uint GetWindowThreadProcessId(nint window, out uint processId);
+
+    private static string ClassName(nint window)
+    {
+        var name = new StringBuilder(64);
+        GetClassNameW(window, name, name.Capacity);
+        return name.ToString();
+    }
 
     [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
     private static extern int GetClassNameW(nint window, StringBuilder className, int capacity);
