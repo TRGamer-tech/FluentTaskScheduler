@@ -37,12 +37,14 @@ public sealed partial class ShellPage : Page, IShellNavigator
     private readonly IServiceProvider _windowServices;
     private readonly TasksViewModel _tasks;
     private readonly FoldersViewModel _folders;
+    private readonly IPrompts _prompts;
 
-    public ShellPage(IServiceProvider windowServices, ISettingsStore settings, TasksViewModel tasks, FoldersViewModel folders)
+    public ShellPage(IServiceProvider windowServices, ISettingsStore settings, TasksViewModel tasks, FoldersViewModel folders, IPrompts prompts)
     {
         _windowServices = windowServices;
         _tasks = tasks;
         _folders = folders;
+        _prompts = prompts;
         InitializeComponent();
         if (settings.Current.IsOledMode) UseBlackContentAreaInDarkTheme();
 
@@ -90,7 +92,7 @@ public sealed partial class ShellPage : Page, IShellNavigator
     }
 
     /// <summary>Tells the user in this window what went wrong elsewhere, e.g. in the notification area.</summary>
-    public Task ShowErrorAsync(string message) => _windowServices.GetRequiredService<IPrompts>().ShowErrorAsync(message);
+    public Task ShowErrorAsync(string message) => _prompts.ShowErrorAsync(message);
 
     private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
