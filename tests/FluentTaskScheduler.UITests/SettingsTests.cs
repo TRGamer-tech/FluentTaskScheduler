@@ -119,13 +119,14 @@ public class SettingsTests
         Assert.True(textEnd <= bounds.Right - 40, $"The state text ends at {textEnd} and the switch at {bounds.Right}: the text is not before the knob.");
     }
 
-    [Fact]
+    [SkippableFact]
     public void TheCards_KeepToAMaximumWidth_CentredInAWideWindow()
     {
         using var app = OpenSettings("settings-wide");
         app.Resize(1900, 900);
         app.Snapshot("wide");
         var page = app.Require("SettingsScroller").BoundingRectangle;
+        Skip.If(page.Width < 1300, $"The screen leaves the page {page.Width} pixels, too few for cards of their maximum width with room on both sides.");
 
         // The first card is told by what sits at its two ends: the heading above it begins where
         // the card does, and the list in it ends where the card does, less the card's padding.

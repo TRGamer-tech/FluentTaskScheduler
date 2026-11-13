@@ -74,10 +74,15 @@ jobs:
           path: publish/
 
       # The hosted runner's desktop defaults to 1024x768, smaller than the app's default window.
+      # Only Windows Server has the command to change that; the ARM64 runner runs Windows 11.
       - name: Set screen resolution
         shell: pwsh
-        continue-on-error: true
-        run: Set-DisplayResolution -Width 1920 -Height 1080 -Force
+        run: |
+          if (Get-Command Set-DisplayResolution -ErrorAction SilentlyContinue) {
+            Set-DisplayResolution -Width 1920 -Height 1080 -Force
+          } else {
+            'This runner cannot change its screen resolution; the UI tests run at 1024x768.'
+          }
 
       - name: Run UI tests
         env:

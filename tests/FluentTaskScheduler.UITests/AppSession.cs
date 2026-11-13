@@ -198,7 +198,18 @@ public sealed class AppSession : IDisposable
     {
         if (Find(automationId, 3000) is { IsOffscreen: false } button) return button;
         Require("MoreButton").Press();
-        return Require(automationId);
+        var item = Require(automationId);
+
+        // The menu slides open; a real click before it has come to rest misses the item.
+        var last = item.BoundingRectangle;
+        Retry.WhileFalse(() =>
+        {
+            var now = item.BoundingRectangle;
+            bool still = now == last && !now.IsEmpty;
+            last = now;
+            return still;
+        }, TimeSpan.FromSeconds(3), TimeSpan.FromMilliseconds(150));
+        return item;
     }
 
     /// <summary>
