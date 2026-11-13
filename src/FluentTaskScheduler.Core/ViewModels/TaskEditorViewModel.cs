@@ -145,8 +145,6 @@ public sealed partial class TaskEditorViewModel : ObservableObject
 
     [ObservableProperty] private bool _enabled;
 
-    public IReadOnlyList<string> SavedCategories => _settings.Current.SavedCategories;
-
     public ObservableCollection<TriggerViewModel> Triggers { get; }
     public ObservableCollection<ActionViewModel> Actions { get; }
     public CompletionActionsViewModel CompletionActions { get; }
@@ -295,6 +293,15 @@ public sealed partial class TaskEditorViewModel : ObservableObject
     {
         ActionViewModel action = SelectedAction!;
         if (await _files.PickOpenFileAsync(Loc.Get("Dialog.ProgramScript"), Loc.Get("Editor.AllFiles"), "*") is { } path) action.Path = path;
+    }
+
+    /// <summary>The saved categories that contain what the category box holds, apart from that category itself.</summary>
+    public IReadOnlyList<string> SuggestCategories()
+    {
+        string typed = Category.Trim();
+        return _settings.Current.SavedCategories
+            .Where(category => category.Contains(typed, StringComparison.CurrentCultureIgnoreCase) && !category.Equals(typed, StringComparison.CurrentCultureIgnoreCase))
+            .ToList();
     }
 
     /// <summary>Checks the input and saves the task.</summary>

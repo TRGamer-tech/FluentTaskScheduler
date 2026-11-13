@@ -37,19 +37,11 @@ public sealed partial class TaskEditorDialog : ContentDialog
         }
     }
 
-    private void Category_GotFocus(object sender, RoutedEventArgs e) => SuggestCategories((AutoSuggestBox)sender);
+    private void Category_GotFocus(object sender, RoutedEventArgs e) => EditorCategory.ItemsSource = ViewModel.SuggestCategories();
 
     private void Category_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
-        if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput) SuggestCategories(sender);
-    }
-
-    private void SuggestCategories(AutoSuggestBox box)
-    {
-        string typed = box.Text.Trim();
-        box.ItemsSource = ViewModel.SavedCategories
-            .Where(category => category.Contains(typed, StringComparison.CurrentCultureIgnoreCase) && !category.Equals(typed, StringComparison.CurrentCultureIgnoreCase))
-            .ToList();
+        if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput) sender.ItemsSource = ViewModel.SuggestCategories();
     }
 
     private void RemoveOnSuccess_Click(object sender, RoutedEventArgs e) =>
