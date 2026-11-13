@@ -40,6 +40,9 @@ public sealed partial class ShellPage : Page, IShellNavigator
     private readonly IDialogService _dialogs;
     private readonly IClipboard _clipboard;
 
+    // Selections of a pane entry that the shell makes itself and that are still under way.
+    private int _selectionsFromCode;
+
     public ShellPage(IServiceProvider windowServices, ISettingsStore settings, TasksViewModel tasks, FoldersViewModel folders,
         IDialogService dialogs, IClipboard clipboard)
     {
@@ -80,7 +83,7 @@ public sealed partial class ShellPage : Page, IShellNavigator
     public void Navigate(string tag)
     {
         if (!Destinations.ContainsKey(tag)) tag = StartPage;
-        NavView.SelectedItem = NavView.FooterMenuItems.OfType<NavigationViewItem>().First(item => (string?)item.Tag == tag);
+        SelectInPane(NavView.FooterMenuItems.OfType<NavigationViewItem>().First(item => (string?)item.Tag == tag));
     }
 
     /// <param name="backdrop">One of the states in BackdropStates: Solid, Mica or Oled.</param>
@@ -159,7 +162,7 @@ public sealed partial class ShellPage : Page, IShellNavigator
     private void Folders_FolderChosen(object? sender, EventArgs e)
     {
         // The task list of one folder is no entry of the pane; none of them is selected then.
-        NavView.SelectedItem = null;
+        SelectInPane(null);
         Show("Tasks");
     }
 
@@ -167,7 +170,21 @@ public sealed partial class ShellPage : Page, IShellNavigator
     // a task of another folder. The pane's entry for all tasks is then selected as well.
     private void Tasks_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(TasksViewModel.FolderPath) && _tasks.FolderPath is null && CurrentPage == "Tasks") NavView.SelectedItem = NavAllTasks;
+        if (e.PropertyName == nameof(TasksViewModel.FolderPath) && _tasks.FolderPath is null && CurrentPage == "Tasks") SelectInPane(NavAllTasks);
+    }
+
+    /// <summary>Selects an entry of the pane, or none, as the shell's doing rather than the user's.</summary>
+    private void SelectInPane(NavigationViewItem? item)
+    {
+        _selectionsFromCode++;
+        try
+        {
+            NavView.SelectedItem = item;
+        }
+        finally
+        {
+            _selectionsFromCode--;
+        }
     }
 
     private void Show(string tag)
@@ -199,8 +216,9 @@ public sealed partial class ShellPage : Page, IShellNavigator
     {
         if (ReferenceEquals(args.InvokedItemContainer, NavAllTasks))
         {
-            // Unlike selecting the entry from code, as showing a task does, this is the user's choice.
-            _folders.ChooseAllTasks();
+            // Windows App SDK 1.5 also reports the shell's own selection of the entry as invoked
+            // after a click in the pane that selected nothing: New task, or the entry selected already.
+            if (_selectionsFromCode == 0) _folders.ChooseAllTasks();
         }
         else if (ReferenceEquals(args.InvokedItemContainer, NavAdd))
         {

@@ -380,6 +380,29 @@ public sealed class TaskTests : IDisposable
         Assert.True(highlighted, "The tree does not highlight the folder the list opened on.");
     }
 
+    [Fact]
+    public void ATemplateOpenedAfterPressingTheLibraryAgain_LeavesTheFolderChosenLast()
+    {
+        _windows.CreateDaily("Chosen last time");
+        using var app = AppSession.Launch("last-folder-template", AppSession.FirstRunDone(("LastFolderPath", _windows.Folder)));
+        Assert.True(app.Find(RowNamed("Chosen last time"), 20000) != null, "The list does not show the task of the folder chosen last.");
+
+        // Pressing the entry that is selected already leaves an invocation pending in the pane,
+        // which Windows App SDK 1.5 hands on to the entry the app selects next: All tasks, for
+        // the template's editor.
+        app.Require("NavScriptLibrary").Press();
+        app.Require("Template.TempCleanup", 20000);
+        app.Require("NavScriptLibrary").Press();
+        app.Require("Template.TempCleanup").Press();
+        app.Require("EditorName", 20000);
+        app.Snapshot("editor");
+        app.Require("CloseButton").Press();
+        Assert.True(AppSession.Eventually(() => app.Find("EditorName", 500) == null), "The editor did not close.");
+
+        Wait(); // settings are written half a second after a change
+        Assert.Equal(_windows.Folder, app.SavedSetting("LastFolderPath"));
+    }
+
     private const string ForeignTaskXml = """
         <?xml version="1.0" encoding="UTF-16"?>
         <Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
