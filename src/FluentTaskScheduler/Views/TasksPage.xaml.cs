@@ -15,14 +15,16 @@ public sealed partial class TasksPage : Page
 {
     private readonly IDialogService _dialogs;
     private readonly FoldersViewModel _folders;
+    private readonly TaskDetailsFactory _details;
     private bool _loaded;
-    private bool _editing;
+    private bool _dialogOpen;
     private TaskRow? _menuRow;
 
-    public TasksPage(TasksViewModel viewModel, FoldersViewModel folders, IDialogService dialogs)
+    public TasksPage(TasksViewModel viewModel, FoldersViewModel folders, TaskDetailsFactory details, IDialogService dialogs)
     {
         ViewModel = viewModel;
         _folders = folders;
+        _details = details;
         _dialogs = dialogs;
         InitializeComponent();
         Loaded += async (_, _) =>
@@ -62,9 +64,9 @@ public sealed partial class TasksPage : Page
 
     private async Task<string?> ShowEditorAsync(TaskEditorViewModel editor)
     {
-        // A second request (a shortcut pressed while the editor is open) would only queue up behind it.
-        if (_editing) return null;
-        _editing = true;
+        // A second request (a shortcut pressed while a dialog is open) would only queue up behind it.
+        if (_dialogOpen) return null;
+        _dialogOpen = true;
         try
         {
             var dialog = new TaskEditorDialog(editor);
@@ -72,7 +74,7 @@ public sealed partial class TasksPage : Page
         }
         finally
         {
-            _editing = false;
+            _dialogOpen = false;
         }
         if (editor.SavedPath is not { } path) return null;
 
@@ -88,6 +90,31 @@ public sealed partial class TasksPage : Page
     private async Task EditAsync(TaskRow row)
     {
         if (await ViewModel.EditAsync(row) is { } editor) await ShowEditorAsync(editor);
+    }
+
+    /// <summary>Shows the task's details. What the user asks for in there is carried out once the dialog has closed.</summary>
+    private async Task ShowDetailsAsync(TaskRow row)
+    {
+        if (_dialogOpen) return;
+        _dialogOpen = true;
+        var dialog = new TaskDetailsDialog(_details.Create(row));
+        try
+        {
+            await _dialogs.ShowAsync(dialog);
+        }
+        finally
+        {
+            _dialogOpen = false;
+        }
+
+        switch (dialog.Request)
+        {
+            case TaskDetailsRequest.Run: await ViewModel.RunCommand.ExecuteAsync(row); break;
+            case TaskDetailsRequest.Stop: await ViewModel.StopCommand.ExecuteAsync(row); break;
+            case TaskDetailsRequest.Edit: await EditAsync(row); break;
+            case TaskDetailsRequest.Export: await ViewModel.ExportCommand.ExecuteAsync(row); break;
+            case TaskDetailsRequest.Delete: await ViewModel.DeleteCommand.ExecuteAsync(row); break;
+        }
     }
 
     private static TaskRow RowOf(object sender) => (TaskRow)((FrameworkElement)sender).DataContext;
@@ -127,7 +154,7 @@ public sealed partial class TasksPage : Page
     {
         // A click that extends or toggles the selection is not a request to open the task.
         if (ViewModel.HasSeveralSelected || IsDown(Windows.System.VirtualKey.Control) || IsDown(Windows.System.VirtualKey.Shift)) return;
-        await EditAsync((TaskRow)e.ClickedItem);
+        await ShowDetailsAsync((TaskRow)e.ClickedItem);
     }
 
     private void TaskList_SelectionChanged(object sender, SelectionChangedEventArgs e) =>

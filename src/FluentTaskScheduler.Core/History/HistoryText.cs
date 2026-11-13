@@ -20,6 +20,10 @@ public static class HistoryText
         _ => "EventLevel.Information"
     });
 
+    public static string Status(RunStatus status) => Loc.Get("RunStatus." + status);
+
+    public static string Label(SystemEventKind kind) => Loc.Get("SystemEvent." + kind);
+
     /// <summary>
     /// A result code the way people look it up: a number up to 65535 is an exit code and stays
     /// decimal ("3"), anything larger is a Windows error and is written in hex ("0x80070002").

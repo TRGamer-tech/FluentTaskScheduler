@@ -940,5 +940,50 @@ Restart now to apply the update?</value></data>
   <data name="Toast.HiddenToTray.Body" xml:space="preserve"><value>The window was moved to the notification area. Select the icon there to bring it back.</value></data>
   <data name="Tray.Open" xml:space="preserve"><value>Open FluentTaskScheduler</value></data>
   <data name="Tray.ShowWindowFormat" xml:space="preserve"><value>Show {0}</value></data>
+  <data name="Details.NextRun" xml:space="preserve"><value>Next run</value></data>
+  <data name="Details.LastRun" xml:space="preserve"><value>Last run</value></data>
+  <data name="Details.Triggers" xml:space="preserve"><value>Triggers</value></data>
+  <data name="Details.Actions" xml:space="preserve"><value>Actions</value></data>
+  <data name="Details.History" xml:space="preserve"><value>History</value></data>
+  <data name="Details.Period.Today" xml:space="preserve"><value>Today</value></data>
+  <data name="Details.Period.Yesterday" xml:space="preserve"><value>Yesterday</value></data>
+  <data name="Details.Period.LastSevenDays" xml:space="preserve"><value>Last 7 days</value></data>
+  <data name="Details.Period.Everything" xml:space="preserve"><value>All time</value></data>
+  <data name="Details.History.Reload" xml:space="preserve"><value>Reload</value></data>
+  <data name="Details.History.ExportCsv" xml:space="preserve"><value>Export CSV</value></data>
+  <data name="Details.History.Copy" xml:space="preserve"><value>Copy</value></data>
+  <data name="Details.Stat.Total" xml:space="preserve"><value>Total runs</value></data>
+  <data name="Details.Stat.Succeeded" xml:space="preserve"><value>Succeeded</value></data>
+  <data name="Details.Stat.Failed" xml:space="preserve"><value>Failed</value></data>
+  <data name="Details.Stat.LastResult" xml:space="preserve"><value>Last result</value></data>
+  <data name="Details.History.Empty" xml:space="preserve"><value>Nothing was recorded in this period.</value></data>
+  <data name="Details.History.Off.Title" xml:space="preserve"><value>Windows is not recording task history</value></data>
+  <data name="Details.History.Off.Message" xml:space="preserve"><value>Runs leave no trace until history is switched on. What was recorded earlier is still shown.</value></data>
+  <data name="Details.History.SwitchOn" xml:space="preserve"><value>Switch on</value></data>
+  <data name="Details.History.SwitchOnDenied" xml:space="preserve"><value>Switching history on needs administrator rights. Restart the app as administrator and try again.</value></data>
+  <data name="Details.History.SwitchOnFailed" xml:space="preserve"><value>History could not be switched on. The app's log has the details.</value></data>
+  <data name="Details.History.Unavailable" xml:space="preserve"><value>The history could not be read: {0}</value></data>
+  <data name="Details.History.ResultFormat" xml:space="preserve"><value>Result: {0}</value></data>
+  <data name="Details.History.EventFormat" xml:space="preserve"><value>Event {0} ({1})</value></data>
+  <data name="Details.History.ActionFormat" xml:space="preserve"><value>Action: {0}</value></data>
+  <data name="Details.History.UserFormat" xml:space="preserve"><value>Account: {0}</value></data>
+  <data name="Details.History.RunFormat" xml:space="preserve"><value>Run: {0}</value></data>
+  <data name="Details.History.ExportTitle" xml:space="preserve"><value>Export history</value></data>
+  <data name="Details.History.ExportFailed" xml:space="preserve"><value>The file could not be written: {0}</value></data>
+  <data name="Details.History.Around" xml:space="preserve"><value>Around that time</value></data>
+  <data name="RunStatus.Running" xml:space="preserve"><value>Running</value></data>
+  <data name="RunStatus.Succeeded" xml:space="preserve"><value>Succeeded</value></data>
+  <data name="RunStatus.Failed" xml:space="preserve"><value>Failed</value></data>
+  <data name="RunStatus.CouldNotStart" xml:space="preserve"><value>Could not start</value></data>
+  <data name="RunStatus.Stopped" xml:space="preserve"><value>Stopped</value></data>
+  <data name="RunStatus.TimedOut" xml:space="preserve"><value>Timed out</value></data>
+  <data name="SystemEvent.Startup" xml:space="preserve"><value>Windows started</value></data>
+  <data name="SystemEvent.Shutdown" xml:space="preserve"><value>Windows shut down</value></data>
+  <data name="SystemEvent.ShutdownRequested" xml:space="preserve"><value>Shutdown or restart requested</value></data>
+  <data name="SystemEvent.UnexpectedShutdown" xml:space="preserve"><value>Unexpected shutdown</value></data>
+  <data name="SystemEvent.Sleep" xml:space="preserve"><value>Computer went to sleep</value></data>
+  <data name="SystemEvent.Resume" xml:space="preserve"><value>Computer woke up</value></data>
+  <data name="SystemEvent.Logon" xml:space="preserve"><value>A user logged on</value></data>
+  <data name="SystemEvent.Logoff" xml:space="preserve"><value>A user logged off</value></data>
 </root>
 

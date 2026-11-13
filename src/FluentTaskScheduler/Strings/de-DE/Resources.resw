@@ -940,4 +940,49 @@ Jetzt App neustarten?</value></data>
   <data name="Toast.HiddenToTray.Body" xml:space="preserve"><value>Das Fenster wurde in den Infobereich verschoben. Das Symbol dort bringt es zurück.</value></data>
   <data name="Tray.Open" xml:space="preserve"><value>FluentTaskScheduler öffnen</value></data>
   <data name="Tray.ShowWindowFormat" xml:space="preserve"><value>{0} anzeigen</value></data>
+  <data name="Details.NextRun" xml:space="preserve"><value>Nächste Ausführung</value></data>
+  <data name="Details.LastRun" xml:space="preserve"><value>Letzte Ausführung</value></data>
+  <data name="Details.Triggers" xml:space="preserve"><value>Trigger</value></data>
+  <data name="Details.Actions" xml:space="preserve"><value>Aktionen</value></data>
+  <data name="Details.History" xml:space="preserve"><value>Verlauf</value></data>
+  <data name="Details.Period.Today" xml:space="preserve"><value>Heute</value></data>
+  <data name="Details.Period.Yesterday" xml:space="preserve"><value>Gestern</value></data>
+  <data name="Details.Period.LastSevenDays" xml:space="preserve"><value>Letzte 7 Tage</value></data>
+  <data name="Details.Period.Everything" xml:space="preserve"><value>Gesamter Zeitraum</value></data>
+  <data name="Details.History.Reload" xml:space="preserve"><value>Neu laden</value></data>
+  <data name="Details.History.ExportCsv" xml:space="preserve"><value>CSV exportieren</value></data>
+  <data name="Details.History.Copy" xml:space="preserve"><value>Kopieren</value></data>
+  <data name="Details.Stat.Total" xml:space="preserve"><value>Ausführungen gesamt</value></data>
+  <data name="Details.Stat.Succeeded" xml:space="preserve"><value>Erfolgreich</value></data>
+  <data name="Details.Stat.Failed" xml:space="preserve"><value>Fehlgeschlagen</value></data>
+  <data name="Details.Stat.LastResult" xml:space="preserve"><value>Letztes Ergebnis</value></data>
+  <data name="Details.History.Empty" xml:space="preserve"><value>In diesem Zeitraum wurde nichts aufgezeichnet.</value></data>
+  <data name="Details.History.Off.Title" xml:space="preserve"><value>Windows zeichnet keinen Aufgabenverlauf auf</value></data>
+  <data name="Details.History.Off.Message" xml:space="preserve"><value>Ausführungen hinterlassen keine Spur, bis der Verlauf eingeschaltet wird. Früher Aufgezeichnetes wird weiterhin angezeigt.</value></data>
+  <data name="Details.History.SwitchOn" xml:space="preserve"><value>Einschalten</value></data>
+  <data name="Details.History.SwitchOnDenied" xml:space="preserve"><value>Zum Einschalten des Verlaufs sind Administratorrechte nötig. Die App als Administrator neu starten und erneut versuchen.</value></data>
+  <data name="Details.History.SwitchOnFailed" xml:space="preserve"><value>Der Verlauf konnte nicht eingeschaltet werden. Einzelheiten stehen im Protokoll der App.</value></data>
+  <data name="Details.History.Unavailable" xml:space="preserve"><value>Der Verlauf konnte nicht gelesen werden: {0}</value></data>
+  <data name="Details.History.ResultFormat" xml:space="preserve"><value>Ergebnis: {0}</value></data>
+  <data name="Details.History.EventFormat" xml:space="preserve"><value>Ereignis {0} ({1})</value></data>
+  <data name="Details.History.ActionFormat" xml:space="preserve"><value>Aktion: {0}</value></data>
+  <data name="Details.History.UserFormat" xml:space="preserve"><value>Konto: {0}</value></data>
+  <data name="Details.History.RunFormat" xml:space="preserve"><value>Ausführung: {0}</value></data>
+  <data name="Details.History.ExportTitle" xml:space="preserve"><value>Verlauf exportieren</value></data>
+  <data name="Details.History.ExportFailed" xml:space="preserve"><value>Die Datei konnte nicht geschrieben werden: {0}</value></data>
+  <data name="Details.History.Around" xml:space="preserve"><value>Um diese Zeit</value></data>
+  <data name="RunStatus.Running" xml:space="preserve"><value>Läuft</value></data>
+  <data name="RunStatus.Succeeded" xml:space="preserve"><value>Erfolgreich</value></data>
+  <data name="RunStatus.Failed" xml:space="preserve"><value>Fehlgeschlagen</value></data>
+  <data name="RunStatus.CouldNotStart" xml:space="preserve"><value>Konnte nicht gestartet werden</value></data>
+  <data name="RunStatus.Stopped" xml:space="preserve"><value>Gestoppt</value></data>
+  <data name="RunStatus.TimedOut" xml:space="preserve"><value>Zeitlimit überschritten</value></data>
+  <data name="SystemEvent.Startup" xml:space="preserve"><value>Windows wurde gestartet</value></data>
+  <data name="SystemEvent.Shutdown" xml:space="preserve"><value>Windows wurde heruntergefahren</value></data>
+  <data name="SystemEvent.ShutdownRequested" xml:space="preserve"><value>Herunterfahren oder Neustart angefordert</value></data>
+  <data name="SystemEvent.UnexpectedShutdown" xml:space="preserve"><value>Unerwartetes Herunterfahren</value></data>
+  <data name="SystemEvent.Sleep" xml:space="preserve"><value>Computer in den Energiesparmodus gewechselt</value></data>
+  <data name="SystemEvent.Resume" xml:space="preserve"><value>Computer aus dem Energiesparmodus aufgewacht</value></data>
+  <data name="SystemEvent.Logon" xml:space="preserve"><value>Ein Benutzer hat sich angemeldet</value></data>
+  <data name="SystemEvent.Logoff" xml:space="preserve"><value>Ein Benutzer hat sich abgemeldet</value></data>
 </root>

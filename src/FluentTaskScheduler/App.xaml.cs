@@ -104,6 +104,7 @@ public partial class App : Application, IAppLifetime, IDisposable
         services.AddScoped<ShellPage>();
         services.AddScoped<IShellNavigator>(window => window.GetRequiredService<ShellPage>());
         services.AddScoped<TaskEditorFactory>();
+        services.AddScoped<TaskDetailsFactory>();
         services.AddScoped<TasksViewModel>();
         services.AddScoped<FoldersViewModel>();
         services.AddScoped<TasksPage>();

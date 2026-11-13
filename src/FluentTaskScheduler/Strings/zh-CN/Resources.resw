@@ -943,6 +943,51 @@
   <data name="Toast.HiddenToTray.Body" xml:space="preserve"><value>窗口已移到通知区域。选择那里的图标即可将其恢复。</value></data>
   <data name="Tray.Open" xml:space="preserve"><value>打开 FluentTaskScheduler</value></data>
   <data name="Tray.ShowWindowFormat" xml:space="preserve"><value>显示 {0}</value></data>
+  <data name="Details.NextRun" xml:space="preserve"><value>下次运行</value></data>
+  <data name="Details.LastRun" xml:space="preserve"><value>上次运行</value></data>
+  <data name="Details.Triggers" xml:space="preserve"><value>触发器</value></data>
+  <data name="Details.Actions" xml:space="preserve"><value>操作</value></data>
+  <data name="Details.History" xml:space="preserve"><value>历史记录</value></data>
+  <data name="Details.Period.Today" xml:space="preserve"><value>今天</value></data>
+  <data name="Details.Period.Yesterday" xml:space="preserve"><value>昨天</value></data>
+  <data name="Details.Period.LastSevenDays" xml:space="preserve"><value>最近 7 天</value></data>
+  <data name="Details.Period.Everything" xml:space="preserve"><value>全部时间</value></data>
+  <data name="Details.History.Reload" xml:space="preserve"><value>重新加载</value></data>
+  <data name="Details.History.ExportCsv" xml:space="preserve"><value>导出 CSV</value></data>
+  <data name="Details.History.Copy" xml:space="preserve"><value>复制</value></data>
+  <data name="Details.Stat.Total" xml:space="preserve"><value>运行总数</value></data>
+  <data name="Details.Stat.Succeeded" xml:space="preserve"><value>成功</value></data>
+  <data name="Details.Stat.Failed" xml:space="preserve"><value>失败</value></data>
+  <data name="Details.Stat.LastResult" xml:space="preserve"><value>上次结果</value></data>
+  <data name="Details.History.Empty" xml:space="preserve"><value>此时间段内没有记录。</value></data>
+  <data name="Details.History.Off.Title" xml:space="preserve"><value>Windows 未记录任务历史</value></data>
+  <data name="Details.History.Off.Message" xml:space="preserve"><value>在启用历史记录之前，运行不会留下记录。之前记录的内容仍会显示。</value></data>
+  <data name="Details.History.SwitchOn" xml:space="preserve"><value>启用</value></data>
+  <data name="Details.History.SwitchOnDenied" xml:space="preserve"><value>启用历史记录需要管理员权限。请以管理员身份重新启动应用后重试。</value></data>
+  <data name="Details.History.SwitchOnFailed" xml:space="preserve"><value>无法启用历史记录。详细信息请查看应用日志。</value></data>
+  <data name="Details.History.Unavailable" xml:space="preserve"><value>无法读取历史记录：{0}</value></data>
+  <data name="Details.History.ResultFormat" xml:space="preserve"><value>结果：{0}</value></data>
+  <data name="Details.History.EventFormat" xml:space="preserve"><value>事件 {0}（{1}）</value></data>
+  <data name="Details.History.ActionFormat" xml:space="preserve"><value>操作：{0}</value></data>
+  <data name="Details.History.UserFormat" xml:space="preserve"><value>帐户：{0}</value></data>
+  <data name="Details.History.RunFormat" xml:space="preserve"><value>运行：{0}</value></data>
+  <data name="Details.History.ExportTitle" xml:space="preserve"><value>导出历史记录</value></data>
+  <data name="Details.History.ExportFailed" xml:space="preserve"><value>无法写入文件：{0}</value></data>
+  <data name="Details.History.Around" xml:space="preserve"><value>该时间前后</value></data>
+  <data name="RunStatus.Running" xml:space="preserve"><value>正在运行</value></data>
+  <data name="RunStatus.Succeeded" xml:space="preserve"><value>成功</value></data>
+  <data name="RunStatus.Failed" xml:space="preserve"><value>失败</value></data>
+  <data name="RunStatus.CouldNotStart" xml:space="preserve"><value>无法启动</value></data>
+  <data name="RunStatus.Stopped" xml:space="preserve"><value>已停止</value></data>
+  <data name="RunStatus.TimedOut" xml:space="preserve"><value>已超时</value></data>
+  <data name="SystemEvent.Startup" xml:space="preserve"><value>Windows 已启动</value></data>
+  <data name="SystemEvent.Shutdown" xml:space="preserve"><value>Windows 已关机</value></data>
+  <data name="SystemEvent.ShutdownRequested" xml:space="preserve"><value>已请求关机或重新启动</value></data>
+  <data name="SystemEvent.UnexpectedShutdown" xml:space="preserve"><value>意外关机</value></data>
+  <data name="SystemEvent.Sleep" xml:space="preserve"><value>计算机进入睡眠状态</value></data>
+  <data name="SystemEvent.Resume" xml:space="preserve"><value>计算机已唤醒</value></data>
+  <data name="SystemEvent.Logon" xml:space="preserve"><value>用户已登录</value></data>
+  <data name="SystemEvent.Logoff" xml:space="preserve"><value>用户已注销</value></data>
 </root>
 
 

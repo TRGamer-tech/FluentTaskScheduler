@@ -87,9 +87,7 @@ public sealed class TaskTests : IDisposable
 
         app.Require("SearchBox").AsTextBox().Enter("Nightly");
         var row = app.Find(RowNamed("Nightly"), 20000) ?? throw new InvalidOperationException("The task is not in the list.");
-        row.Click();
-
-        app.Require("EditorName", 20000);
+        OpenEditor(app, row);
         Expand(app, "EditorSettings");
         app.Snapshot("editor-settings");
         var limit = app.Require("EditorLimitRunTime").AsCheckBox();
@@ -109,12 +107,51 @@ public sealed class TaskTests : IDisposable
 
         // Opened again, the limit stays off instead of coming back.
         row = app.Find(RowNamed("Nightly"), 20000)!;
-        row.Click();
-        app.Require("EditorName", 20000);
+        OpenEditor(app, row);
         Expand(app, "EditorSettings");
         Assert.False(app.Require("EditorLimitRunTime").AsCheckBox().IsChecked, "The limit is shown as on again.");
         app.Snapshot("editor-reopened");
     }
+
+    [Fact]
+    public void ATasksDetails_ShowWhatItRuns_AndAfterARunWhatBecameOfIt()
+    {
+        _windows.CreateDaily("Detailed");
+        using var app = AppSession.Launch("details");
+        app.Require("SearchBox").AsTextBox().Enter("Detailed");
+        AutomationElement Row() => app.Find(RowNamed("Detailed"), 20000) ?? throw new InvalidOperationException("The task is not in the list.");
+
+        Row().Click();
+        app.Require("DetailsRunButton", 20000);
+        Assert.True(WaitFor(() => TextsOf(app, "DetailsActions").Contains("cmd.exe /c exit 0")), "The details do not show the task's action.");
+        Assert.NotEmpty(TextsOf(app, "DetailsTriggers"));
+        app.Snapshot("details-opened");
+
+        // Windows ships with task history switched off; the details offer to switch it on.
+        if (app.Find("DetailsSwitchLogOnButton", 3000) is { } switchOn)
+        {
+            switchOn.Press();
+            Assert.True(WaitFor(() => app.Find("DetailsSwitchLogOnButton", 500) is null), "History could not be switched on. " + ProblemsShown(app, "DetailsProblem"));
+        }
+
+        app.Require("DetailsRunButton").Press();
+        Assert.True(WaitFor(() => app.Find("DetailsRunButton", 500) is null), "Run did not close the details.");
+
+        // The log is written a moment after the fact.
+        Row().Click();
+        app.Require("DetailsReloadButton", 20000);
+        Assert.True(WaitFor(() =>
+        {
+            app.Require("DetailsReloadButton").Press();
+            Thread.Sleep(1500);
+            return app.Require("DetailsLastResult").Name == "Succeeded (0)";
+        }, seconds: 40), $"The history does not show the run; last result reads '{app.Require("DetailsLastResult").Name}'. " + ProblemsShown(app, "DetailsProblem"));
+        app.Snapshot("details-history");
+        Assert.NotNull(app.Find(element => element.ControlType == ControlType.ListItem && element.Parent?.AutomationId == "DetailsHistory", 5000));
+    }
+
+    private static string[] TextsOf(AppSession app, string automationId) =>
+        app.Find(automationId, 2000)?.FindAllDescendants().Select(element => element.Name).Where(name => name.Length > 0).ToArray() ?? [];
 
     /// <summary>
     /// The list reuses its rows as it scrolls. A row's switch must never take that for the user
@@ -263,6 +300,14 @@ public sealed class TaskTests : IDisposable
         element => element.ControlType == ControlType.ListItem && element.Name == name;
 
     private static void OpenFolderlessList(AppSession app) => app.Require("NavAllTasks").Press();
+
+    /// <summary>A click on a row shows the task's details; the editor is one button further.</summary>
+    private static void OpenEditor(AppSession app, AutomationElement row)
+    {
+        row.Click();
+        app.Require("DetailsEditButton", 20000).Press();
+        app.Require("EditorName", 20000);
+    }
 
     private static void Toggle(AppSession app, string name)
     {

@@ -940,4 +940,49 @@
   <data name="Toast.HiddenToTray.Body" xml:space="preserve"><value>ウィンドウは通知領域に移動しました。そこにあるアイコンを選択すると元に戻ります。</value></data>
   <data name="Tray.Open" xml:space="preserve"><value>FluentTaskScheduler を開く</value></data>
   <data name="Tray.ShowWindowFormat" xml:space="preserve"><value>{0} を表示</value></data>
+  <data name="Details.NextRun" xml:space="preserve"><value>次回の実行</value></data>
+  <data name="Details.LastRun" xml:space="preserve"><value>前回の実行</value></data>
+  <data name="Details.Triggers" xml:space="preserve"><value>トリガー</value></data>
+  <data name="Details.Actions" xml:space="preserve"><value>操作</value></data>
+  <data name="Details.History" xml:space="preserve"><value>履歴</value></data>
+  <data name="Details.Period.Today" xml:space="preserve"><value>今日</value></data>
+  <data name="Details.Period.Yesterday" xml:space="preserve"><value>昨日</value></data>
+  <data name="Details.Period.LastSevenDays" xml:space="preserve"><value>過去 7 日間</value></data>
+  <data name="Details.Period.Everything" xml:space="preserve"><value>全期間</value></data>
+  <data name="Details.History.Reload" xml:space="preserve"><value>再読み込み</value></data>
+  <data name="Details.History.ExportCsv" xml:space="preserve"><value>CSV をエクスポート</value></data>
+  <data name="Details.History.Copy" xml:space="preserve"><value>コピー</value></data>
+  <data name="Details.Stat.Total" xml:space="preserve"><value>実行回数</value></data>
+  <data name="Details.Stat.Succeeded" xml:space="preserve"><value>成功</value></data>
+  <data name="Details.Stat.Failed" xml:space="preserve"><value>失敗</value></data>
+  <data name="Details.Stat.LastResult" xml:space="preserve"><value>前回の結果</value></data>
+  <data name="Details.History.Empty" xml:space="preserve"><value>この期間の記録はありません。</value></data>
+  <data name="Details.History.Off.Title" xml:space="preserve"><value>Windows はタスクの履歴を記録していません</value></data>
+  <data name="Details.History.Off.Message" xml:space="preserve"><value>履歴を有効にするまで、実行は記録されません。以前に記録された内容は引き続き表示されます。</value></data>
+  <data name="Details.History.SwitchOn" xml:space="preserve"><value>有効にする</value></data>
+  <data name="Details.History.SwitchOnDenied" xml:space="preserve"><value>履歴を有効にするには管理者権限が必要です。アプリを管理者として再起動して、もう一度お試しください。</value></data>
+  <data name="Details.History.SwitchOnFailed" xml:space="preserve"><value>履歴を有効にできませんでした。詳細はアプリのログを確認してください。</value></data>
+  <data name="Details.History.Unavailable" xml:space="preserve"><value>履歴を読み取れませんでした: {0}</value></data>
+  <data name="Details.History.ResultFormat" xml:space="preserve"><value>結果: {0}</value></data>
+  <data name="Details.History.EventFormat" xml:space="preserve"><value>イベント {0} ({1})</value></data>
+  <data name="Details.History.ActionFormat" xml:space="preserve"><value>操作: {0}</value></data>
+  <data name="Details.History.UserFormat" xml:space="preserve"><value>アカウント: {0}</value></data>
+  <data name="Details.History.RunFormat" xml:space="preserve"><value>実行: {0}</value></data>
+  <data name="Details.History.ExportTitle" xml:space="preserve"><value>履歴をエクスポート</value></data>
+  <data name="Details.History.ExportFailed" xml:space="preserve"><value>ファイルを書き込めませんでした: {0}</value></data>
+  <data name="Details.History.Around" xml:space="preserve"><value>その前後の出来事</value></data>
+  <data name="RunStatus.Running" xml:space="preserve"><value>実行中</value></data>
+  <data name="RunStatus.Succeeded" xml:space="preserve"><value>成功</value></data>
+  <data name="RunStatus.Failed" xml:space="preserve"><value>失敗</value></data>
+  <data name="RunStatus.CouldNotStart" xml:space="preserve"><value>開始できませんでした</value></data>
+  <data name="RunStatus.Stopped" xml:space="preserve"><value>停止</value></data>
+  <data name="RunStatus.TimedOut" xml:space="preserve"><value>タイムアウト</value></data>
+  <data name="SystemEvent.Startup" xml:space="preserve"><value>Windows が起動しました</value></data>
+  <data name="SystemEvent.Shutdown" xml:space="preserve"><value>Windows がシャットダウンしました</value></data>
+  <data name="SystemEvent.ShutdownRequested" xml:space="preserve"><value>シャットダウンまたは再起動が要求されました</value></data>
+  <data name="SystemEvent.UnexpectedShutdown" xml:space="preserve"><value>予期しないシャットダウン</value></data>
+  <data name="SystemEvent.Sleep" xml:space="preserve"><value>コンピューターがスリープ状態になりました</value></data>
+  <data name="SystemEvent.Resume" xml:space="preserve"><value>コンピューターがスリープから復帰しました</value></data>
+  <data name="SystemEvent.Logon" xml:space="preserve"><value>ユーザーがログオンしました</value></data>
+  <data name="SystemEvent.Logoff" xml:space="preserve"><value>ユーザーがログオフしました</value></data>
 </root>
