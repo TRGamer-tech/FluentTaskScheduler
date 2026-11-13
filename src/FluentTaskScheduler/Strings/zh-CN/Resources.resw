@@ -1092,6 +1092,7 @@
   <data name="Dashboard.Runs.Title" xml:space="preserve"><value>最近 7 天的运行次数</value></data>
   <data name="Dashboard.NothingUpcoming" xml:space="preserve"><value>没有计划运行的任务。</value></data>
   <data name="Editor.Error.EventLogText" xml:space="preserve"><value>触发器 {0}：日志和源中不能包含制表符或换行符。</value></data>
+  <data name="Import.Error.Exists" xml:space="preserve"><value>此文件夹中已有任务“{0}”。请选择其他名称或文件夹。</value></data>
 </root>
 
 

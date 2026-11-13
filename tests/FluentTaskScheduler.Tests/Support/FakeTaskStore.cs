@@ -152,9 +152,12 @@ public sealed class FakeTaskStore : ITaskStore
     public TaskImportInfo Inspect(string xml) =>
         xml.Contains("<Task", StringComparison.Ordinal) ? ImportInfo : throw new FormatException("This is not a task exported from Task Scheduler.");
 
+    /// <summary>Like the real import, it never replaces a task that is already there.</summary>
     public string Import(string xml, TaskImportOptions options)
     {
         LastImport = options;
+        string path = options.FolderPath.TrimEnd('\\') + "\\" + options.Name;
+        if (Exists(path)) throw new TaskExistsException(path);
         return Save(new TaskDraft { Name = options.Name }, options.FolderPath);
     }
 

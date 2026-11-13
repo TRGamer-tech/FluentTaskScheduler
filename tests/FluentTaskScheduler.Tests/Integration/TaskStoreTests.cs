@@ -318,6 +318,20 @@ public class TaskStoreTests
     }
 
     [SkippableFact]
+    public void ImportingUnderANameThatIsTaken_LeavesTheTaskThatHasIt()
+    {
+        Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
+        using var sandbox = new SchedulerSandbox();
+        var existing = sandbox.Folder.RegisterTaskDefinition("Taken", SampleTasks.Simple(sandbox.Service));
+        string xml = existing.Xml.Replace("<Description>Simple</Description>", "<Description>Imported</Description>");
+
+        var refused = Assert.Throws<TaskExistsException>(() => _store.Import(xml, new TaskImportOptions(sandbox.FolderPath, "Taken")));
+
+        Assert.Equal(sandbox.PathOf("Taken"), refused.Path);
+        Assert.Equal("Simple", _store.Load(existing.Path).Description);
+    }
+
+    [SkippableFact]
     public void ImportingSomethingThatIsNotATask_IsRefusedClearly()
     {
         Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");

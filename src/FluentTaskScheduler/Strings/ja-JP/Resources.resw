@@ -1089,4 +1089,5 @@
   <data name="Dashboard.Runs.Title" xml:space="preserve"><value>過去 7 日間の実行回数</value></data>
   <data name="Dashboard.NothingUpcoming" xml:space="preserve"><value>実行が予定されているタスクはありません。</value></data>
   <data name="Editor.Error.EventLogText" xml:space="preserve"><value>トリガー {0}: ログとソースにタブや改行を含めることはできません。</value></data>
+  <data name="Import.Error.Exists" xml:space="preserve"><value>このフォルダーには既にタスク '{0}' があります。別の名前かフォルダーを選択してください。</value></data>
 </root>

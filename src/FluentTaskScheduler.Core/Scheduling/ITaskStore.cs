@@ -57,8 +57,9 @@ public interface ITaskStore
     /// <summary>What an exported task says about the account it runs as.</summary>
     TaskImportInfo Inspect(string xml);
 
-    /// <summary>Registers an exported task.</summary>
+    /// <summary>Registers an exported task. It never replaces a task that is already there.</summary>
     /// <returns>The path of the new task.</returns>
+    /// <exception cref="TaskExistsException">The folder already has a task of that name.</exception>
     string Import(string xml, TaskImportOptions options);
 }
 
@@ -82,6 +83,13 @@ public sealed class TaskNotFoundException : Exception
 {
     public string Path { get; }
     public TaskNotFoundException(string path) : base($"The task '{path}' does not exist.") => Path = path;
+}
+
+/// <summary>There already is a task at the given path, and it was not to be replaced.</summary>
+public sealed class TaskExistsException : Exception
+{
+    public string Path { get; }
+    public TaskExistsException(string path) : base($"There already is a task '{path}'.") => Path = path;
 }
 
 /// <summary>Windows refused the operation: the task is protected, or the change needs administrator rights.</summary>

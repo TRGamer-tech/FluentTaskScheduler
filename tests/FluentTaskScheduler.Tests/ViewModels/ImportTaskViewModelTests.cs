@@ -109,6 +109,19 @@ public class ImportTaskViewModelTests
         Assert.Equal(expected, import.NeedsElevation);
     }
 
+    [Fact]
+    public async Task ATaskOfTheSameNameInTheFolder_IsNotReplaced()
+    {
+        _store.Add(@"\Backup", draft: new TaskDraft { Description = "The one already there" });
+        var import = Import(Info(TaskAccount.CurrentUser));
+
+        Assert.False(await import.ImportAsync());
+
+        Assert.Equal("Import.Error.Exists", import.Problem);
+        Assert.Null(import.ImportedPath);
+        Assert.Equal("The one already there", _store.Load(@"\Backup").Description);
+    }
+
     [Theory]
     [InlineData(true, "Editor.Error.AccessDenied")]
     [InlineData(false, "Editor.Error.AccessDeniedNotElevated")]

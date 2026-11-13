@@ -127,6 +127,10 @@ public sealed partial class ImportTaskViewModel : ObservableObject
             Problem = "";
             return true;
         }
+        catch (TaskExistsException)
+        {
+            Problem = Loc.Format("Import.Error.Exists", name);
+        }
         catch (TaskAccessDeniedException)
         {
             Problem = Loc.Get(_app.IsElevated ? "Editor.Error.AccessDenied" : "Editor.Error.AccessDeniedNotElevated");
