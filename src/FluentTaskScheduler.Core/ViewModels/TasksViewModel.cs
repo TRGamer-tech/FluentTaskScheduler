@@ -79,7 +79,7 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
     /// <summary>1 from when the snooze is seen disabling or enabling tasks until a reload for that is planned. Set on any thread.</summary>
     private int _snoozeSwitchedTasks;
 
-    private Task _reads = Task.CompletedTask;
+    private readonly ReadQueue _reads = new();
     private IReadOnlyList<TaskRow> _selection = [];
     private bool _disposed;
 
@@ -192,7 +192,7 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
         IsLoading = true;
         try
         {
-            await InTurn(LoadAsync);
+            await _reads.Enqueue(LoadAsync);
         }
         finally
         {
@@ -204,7 +204,7 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
     /// Completes when everything the list has been asked to read so far is read and shown.
     /// Tests wait on this instead of on the clock.
     /// </summary>
-    internal Task PendingReads => _reads;
+    internal Task PendingReads => _reads.Pending;
 
     /// <summary>Starts <paramref name="row"/>, or without one every selected task.</summary>
     [RelayCommand]
@@ -430,7 +430,7 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
     // thread. What was posted there before the window closed can still arrive after it.
     private void OnRunReported(object? sender, TaskRun run) => _ui.Post(() =>
     {
-        if (!_disposed) _ = InTurn(() => RefreshRowAsync(run.TaskPath));
+        if (!_disposed) _ = _reads.Enqueue(() => RefreshRowAsync(run.TaskPath));
     });
 
     private void OnTaskChanged(object? sender, TaskChange change) => _ui.Post(PlanReload);
@@ -471,24 +471,7 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
     {
         _reloadPlanned = false;
         // No progress bar for this one: nobody asked for it, and it happens while the list is in use.
-        if (!_disposed) _ = InTurn(LoadAsync);
-    }
-
-    /// <summary>
-    /// Runs a read of Task Scheduler after the reads that were asked for before it. One at a time
-    /// and in order, a slow read of all tasks cannot overwrite what a later read of one task found.
-    /// </summary>
-    /// <param name="read">Deals with its own failures and never throws: the reads after it wait for it.</param>
-    private Task InTurn(Func<Task> read)
-    {
-        Task earlier = _reads;
-        return _reads = ReadAsync();
-
-        async Task ReadAsync()
-        {
-            await earlier;
-            await read();
-        }
+        if (!_disposed) _ = _reads.Enqueue(LoadAsync);
     }
 
     private async Task LoadAsync()
