@@ -339,10 +339,29 @@ public sealed class DashboardViewModelTests : IDisposable
         Assert.Equal(["Dashboard.AllCategories", "Reports"], _dashboard.Categories);
     }
 
-    // On one thread, as on the UI thread: otherwise the two refreshes can work their figures out
-    // at the same time on two threads, and the older can be shown last.
     [Fact]
-    public void ASlowReadOfAllTasks_CannotOverwriteWhatALaterReadFound() => OneThread.Run(async () =>
+    public async Task WhenTheTasksThatRanCannotBeReadAgain_TheDashboardKeepsWhatItHas_AndReadsThemOnTheNextReport()
+    {
+        await _dashboard.ShowAsync();
+        _store.Run(Fails);
+        _store.ReadingFails = new InvalidOperationException("The Task Scheduler service is not available.");
+
+        _stream.Start(FakeTaskEventStream.Running(Fails, started: _time.GetUtcNow()));
+        await AfterTheRefreshDelayAsync();
+
+        Assert.Equal((3, 0), (Figures.TotalTasks, Figures.RunningTasks));
+        Assert.False(_dashboard.HasProblem);
+
+        _store.ReadingFails = null;
+        _stream.Start(FakeTaskEventStream.Running(Fails, started: _time.GetUtcNow()));
+        await AfterTheRefreshDelayAsync();
+
+        Assert.Equal([Fails, Fails], _store.TasksRead);
+        Assert.Equal(Fails, Assert.Single(_dashboard.Running).TaskPath);
+    }
+
+    [Fact]
+    public async Task ASlowReadOfAllTasks_CannotOverwriteWhatALaterReadFound()
     {
         await _dashboard.ShowAsync();
 
@@ -373,7 +392,7 @@ public sealed class DashboardViewModelTests : IDisposable
         await Task.WhenAll(slow, later);
 
         Assert.Equal(5, Figures.TotalTasks);
-    });
+    }
 
     [Fact]
     public async Task OffScreen_RunsAreTakenNoteOf_ButNothingIsRead_AndBackOnScreenOnlyTheTasksAre()
