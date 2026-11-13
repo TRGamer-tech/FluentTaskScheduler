@@ -119,7 +119,7 @@ public class UpdateServiceTests
     {
         await NewService().OfferRestartAsync(_prompts, Ready);
 
-        Assert.Equal(["Dialog.UpdateAvailable.Title: Dialog.UpdateAvailable.ContentFormat [Dialog.UpdateAvailable.RestartNow]"], _prompts.Shown);
+        Assert.Equal(["Dialog.UpdateAvailable.Title: Dialog.UpdateAvailable.ContentFormat [Dialog.UpdateAvailable.RestartNow] [Dialog.Common.Later]"], _prompts.Shown);
         Assert.Equal(1, _updater.InstallerStarts);
         Assert.True(_app.ExitRequested);
     }

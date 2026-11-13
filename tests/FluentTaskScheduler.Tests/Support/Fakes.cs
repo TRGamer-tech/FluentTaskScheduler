@@ -46,9 +46,9 @@ public sealed class ScriptedPrompts : IPrompts
         return Task.CompletedTask;
     }
 
-    public Task<bool> ConfirmAsync(string title, string message, string confirmText, bool isDestructive = false)
+    public Task<bool> ConfirmAsync(string title, string message, string confirmText, bool isDestructive = false, string? declineText = null)
     {
-        Shown.Add($"{title}: {message} [{confirmText}]");
+        Shown.Add(declineText is null ? $"{title}: {message} [{confirmText}]" : $"{title}: {message} [{confirmText}] [{declineText}]");
         return Task.FromResult(Confirm);
     }
 

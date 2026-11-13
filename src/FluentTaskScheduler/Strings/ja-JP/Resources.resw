@@ -1036,7 +1036,7 @@
   <data name="Settings.Names.Remove" xml:space="preserve"><value>削除</value></data>
   <data name="Settings.About.ReleaseNotes.Desc" xml:space="preserve"><value>このバージョンの変更点を表示します。</value></data>
   <data name="Settings.About.Update.Checking" xml:space="preserve"><value>アップデートを確認しています...</value></data>
-  <data name="Settings.About.Update.ReadyFormat" xml:space="preserve"><value>バージョン {0} をダウンロードしました。アプリの再起動時にインストールされます。</value></data>
+  <data name="Settings.About.Update.ReadyFormat" xml:space="preserve"><value>バージョン {0} をダウンロードしました。アプリの再起動に同意するとインストールされます。後回しにした場合は、次回の起動時にもう一度確認します。</value></data>
   <data name="Settings.About.Update.Unavailable" xml:space="preserve"><value>このアプリは自動的に更新できません。winget、Scoop、Chocolatey など、インストールしたときと同じ方法で更新するか、GitHub から最新バージョンをダウンロードしてください。すべてのユーザー向けにインストールした場合は、アプリを管理者として実行している間だけ更新できます。</value></data>
   <data name="Settings.About.Repository.Title" xml:space="preserve"><value>GitHub のソースコード</value></data>
   <data name="Settings.About.Repository.Desc" xml:space="preserve"><value>FluentTaskScheduler はオープンソースです。ソースコードや新しいリリースを確認できます。</value></data>

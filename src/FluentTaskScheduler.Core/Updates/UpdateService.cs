@@ -94,7 +94,8 @@ public sealed class UpdateService(IUpdater updater, IAppLifetime lifetime)
         bool restart = await prompts.ConfirmAsync(
             Loc.Get("Dialog.UpdateAvailable.Title"),
             Loc.Format("Dialog.UpdateAvailable.ContentFormat", check.Version),
-            Loc.Get("Dialog.UpdateAvailable.RestartNow"));
+            Loc.Get("Dialog.UpdateAvailable.RestartNow"),
+            declineText: Loc.Get("Dialog.Common.Later"));
         if (!restart) return;
 
         try

@@ -1036,7 +1036,7 @@ Jetzt App neustarten?</value></data>
   <data name="Settings.Names.Remove" xml:space="preserve"><value>Entfernen</value></data>
   <data name="Settings.About.ReleaseNotes.Desc" xml:space="preserve"><value>Ansehen, was sich in dieser Version geändert hat.</value></data>
   <data name="Settings.About.Update.Checking" xml:space="preserve"><value>Suche nach Updates...</value></data>
-  <data name="Settings.About.Update.ReadyFormat" xml:space="preserve"><value>Version {0} wurde heruntergeladen und wird beim Neustart der App installiert.</value></data>
+  <data name="Settings.About.Update.ReadyFormat" xml:space="preserve"><value>Version {0} wurde heruntergeladen. Installiert wird sie, wenn du dem Neustart der App zustimmst; schiebst du ihn auf, fragt die App beim nächsten Start erneut.</value></data>
   <data name="Settings.About.Update.Unavailable" xml:space="preserve"><value>Diese Kopie der App kann sich nicht selbst aktualisieren. Aktualisiere sie so, wie du sie installiert hast, zum Beispiel mit winget, Scoop oder Chocolatey, oder lade die neueste Version von GitHub herunter. Eine Installation für alle Benutzer kann sich nur aktualisieren, während die App als Administrator läuft.</value></data>
   <data name="Settings.About.Repository.Title" xml:space="preserve"><value>Quellcode auf GitHub</value></data>
   <data name="Settings.About.Repository.Desc" xml:space="preserve"><value>FluentTaskScheduler ist Open Source. Sieh dir an, wie die App gemacht ist, und hol dir neue Versionen.</value></data>

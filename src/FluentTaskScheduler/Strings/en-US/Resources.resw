@@ -1036,7 +1036,7 @@ Restart now to apply the update?</value></data>
   <data name="Settings.Names.Remove" xml:space="preserve"><value>Remove</value></data>
   <data name="Settings.About.ReleaseNotes.Desc" xml:space="preserve"><value>See what changed in this version.</value></data>
   <data name="Settings.About.Update.Checking" xml:space="preserve"><value>Checking for updates...</value></data>
-  <data name="Settings.About.Update.ReadyFormat" xml:space="preserve"><value>Version {0} has been downloaded and will be installed when the app restarts.</value></data>
+  <data name="Settings.About.Update.ReadyFormat" xml:space="preserve"><value>Version {0} has been downloaded. It is installed when you agree to restart the app; if you put that off, the app asks again the next time it starts.</value></data>
   <data name="Settings.About.Update.Unavailable" xml:space="preserve"><value>This copy of the app cannot update itself. Update it the way you installed it, for example with winget, Scoop or Chocolatey, or download the latest version from GitHub. An installation for all users can only update itself while the app runs as administrator.</value></data>
   <data name="Settings.About.Repository.Title" xml:space="preserve"><value>Source Code on GitHub</value></data>
   <data name="Settings.About.Repository.Desc" xml:space="preserve"><value>FluentTaskScheduler is open source. See how it is made and get new releases.</value></data>

@@ -8,8 +8,9 @@ public interface IPrompts
     /// <summary>Shows <paramref name="message"/> under the standard error title.</summary>
     Task ShowErrorAsync(string message);
 
+    /// <param name="declineText">The button that answers no; Cancel when none is given.</param>
     /// <returns>True when the user chose <paramref name="confirmText"/>.</returns>
-    Task<bool> ConfirmAsync(string title, string message, string confirmText, bool isDestructive = false);
+    Task<bool> ConfirmAsync(string title, string message, string confirmText, bool isDestructive = false, string? declineText = null);
 
     /// <summary>Asks for a short text, such as a name.</summary>
     /// <returns>What the user entered, trimmed; null when the user cancelled or entered nothing.</returns>

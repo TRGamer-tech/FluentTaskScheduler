@@ -50,14 +50,14 @@ public sealed class DialogService(WindowContext window) : IDialogService
 
     public Task ShowErrorAsync(string message) => ShowMessageAsync(Loc.Get("Dialog.Error.Title"), message);
 
-    public async Task<bool> ConfirmAsync(string title, string message, string confirmText, bool isDestructive = false)
+    public async Task<bool> ConfirmAsync(string title, string message, string confirmText, bool isDestructive = false, string? declineText = null)
     {
         var dialog = new ContentDialog
         {
             Title = title,
             Content = Text(message),
             PrimaryButtonText = confirmText,
-            CloseButtonText = Loc.Get("Dialog.Common.Cancel"),
+            CloseButtonText = declineText ?? Loc.Get("Dialog.Common.Cancel"),
             // Enter must not carry out something that cannot be undone.
             DefaultButton = isDestructive ? ContentDialogButton.Close : ContentDialogButton.Primary
         };

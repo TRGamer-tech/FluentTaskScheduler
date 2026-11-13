@@ -1039,7 +1039,7 @@
   <data name="Settings.Names.Remove" xml:space="preserve"><value>删除</value></data>
   <data name="Settings.About.ReleaseNotes.Desc" xml:space="preserve"><value>查看此版本的更改内容。</value></data>
   <data name="Settings.About.Update.Checking" xml:space="preserve"><value>正在检查更新...</value></data>
-  <data name="Settings.About.Update.ReadyFormat" xml:space="preserve"><value>版本 {0} 已下载，将在应用重启时安装。</value></data>
+  <data name="Settings.About.Update.ReadyFormat" xml:space="preserve"><value>版本 {0} 已下载。同意重启应用后即会安装；如果推迟，应用会在下次启动时再次询问。</value></data>
   <data name="Settings.About.Update.Unavailable" xml:space="preserve"><value>此应用副本无法自行更新。请按安装时的方式更新，例如使用 winget、Scoop 或 Chocolatey，或从 GitHub 下载最新版本。为所有用户安装的应用只有在以管理员身份运行时才能自行更新。</value></data>
   <data name="Settings.About.Repository.Title" xml:space="preserve"><value>GitHub 上的源代码</value></data>
   <data name="Settings.About.Repository.Desc" xml:space="preserve"><value>FluentTaskScheduler 是开源软件。可以查看源代码并获取新版本。</value></data>
