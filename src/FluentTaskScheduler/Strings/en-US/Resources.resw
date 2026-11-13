@@ -1118,5 +1118,6 @@ Restart now to apply the update?</value></data>
   <data name="Tasks.Error.Duplicated" xml:space="preserve"><value>The task now exists twice, as '{0}' and as '{1}': neither of the two could be removed. Delete one of them in Task Scheduler.</value></data>
   <data name="Tasks.Error.NameTakenInFolder" xml:space="preserve"><value>'{0}': the folder '{1}' already has a task of that name.</value></data>
   <data name="Folders.Error.NameTaken" xml:space="preserve"><value>Another folder here is already called '{0}'. Choose a different name.</value></data>
+  <data name="Folders.Error.PartlyMoved" xml:space="preserve"><value>Some tasks could not be moved and stay in '{0}'. The others were moved.</value></data>
 </root>
 

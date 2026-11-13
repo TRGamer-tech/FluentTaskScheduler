@@ -122,15 +122,20 @@ public sealed class FakeSnoozeGate : ISnoozeGate
     public void RecordSuppressedRun(string taskPath, RunOrigin origin) => Suppressed.Add($"{taskPath} ({origin})");
 }
 
-/// <summary>Folders in memory; moving and deleting only change the list of folders.</summary>
-public sealed class FakeTaskFolders(params string[] folders) : ITaskFolders
+/// <summary>
+/// Folders in memory, with the tasks of a <see cref="FakeTaskStore"/> in them: moving a task or a
+/// folder moves the tasks in the store, and deleting a folder deletes its tasks. A task the store
+/// protects stays where it is, as one Windows does not let its user remove: moving it fails, and
+/// moving or deleting its folder does what it can and then fails.
+/// </summary>
+public sealed class FakeTaskFolders(FakeTaskStore tasks, params string[] folders) : ITaskFolders
 {
     private readonly List<string> _folders = ["\\", .. folders];
 
     /// <summary>Every change, in order, e.g. "MoveTask \\A\\T -> \\B".</summary>
     public List<string> Calls { get; } = [];
 
-    /// <summary>When set, every change fails with this.</summary>
+    /// <summary>When set, every change fails with this, and changes nothing.</summary>
     public Exception? Fails { get; set; }
 
     public IReadOnlyList<string> GetFolders() => _folders.ToList();
@@ -144,20 +149,62 @@ public sealed class FakeTaskFolders(params string[] folders) : ITaskFolders
     public void Delete(string path)
     {
         Record($"Delete {path}");
+        MustExist(path);
+        foreach (string task in TasksIn(path))
+        {
+            // Windows stops at the first task it may not delete.
+            if (tasks.Protected.Contains(task)) throw new TaskAccessDeniedException(path, new UnauthorizedAccessException());
+            tasks.Delete(task);
+        }
         _folders.RemoveAll(folder => TaskPaths.IsWithin(folder, path));
     }
 
     public string MoveTask(string taskPath, string folderPath)
     {
         Record($"MoveTask {taskPath} -> {folderPath}");
-        return TaskPaths.Combine(folderPath, TaskPaths.NameOf(taskPath));
+        string newPath = TaskPaths.Combine(folderPath, TaskPaths.NameOf(taskPath));
+        tasks.Move(taskPath, newPath);
+        return newPath;
     }
 
-    public void MoveFolder(string path, string newPath)
+    public IReadOnlyList<TaskMove> MoveFolder(string path, string newPath)
     {
         Record($"MoveFolder {path} -> {newPath}");
-        for (int i = 0; i < _folders.Count; i++)
-            if (TaskPaths.IsWithin(_folders[i], path)) _folders[i] = newPath + _folders[i][path.Length..];
+        MustExist(path);
+        var moved = new List<TaskMove>();
+        Exception? failure = null;
+        foreach (string task in TasksIn(path))
+        {
+            string to = newPath + task[path.Length..];
+            try
+            {
+                tasks.Move(task, to);
+                moved.Add(new TaskMove(task, to));
+            }
+            catch (TaskAccessDeniedException ex)
+            {
+                failure ??= ex;
+            }
+        }
+
+        if (failure is null)
+        {
+            for (int i = 0; i < _folders.Count; i++)
+                if (TaskPaths.IsWithin(_folders[i], path)) _folders[i] = newPath + _folders[i][path.Length..];
+            return moved;
+        }
+        if (moved.Count == 0) throw failure;
+
+        // The folder stays for the tasks that could not be moved, and the new one has the others.
+        _folders.AddRange(_folders.Where(folder => TaskPaths.IsWithin(folder, path)).Select(folder => newPath + folder[path.Length..]).ToList());
+        throw new FolderPartlyMovedException(moved, failure);
+    }
+
+    private List<string> TasksIn(string folder) => tasks.Paths.Where(task => TaskPaths.IsWithin(task, folder)).ToList();
+
+    private void MustExist(string folder)
+    {
+        if (!_folders.Contains(folder, StringComparer.OrdinalIgnoreCase)) throw new DirectoryNotFoundException($"The folder '{folder}' does not exist.");
     }
 
     private void Record(string call)

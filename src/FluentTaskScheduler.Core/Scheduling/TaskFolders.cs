@@ -26,19 +26,36 @@ public interface ITaskFolders
     /// <summary>
     /// Moves a folder with everything in it to <paramref name="newPath"/>; giving it a new name in
     /// the same place is a rename. A task that cannot be removed from the folder stays there, and
-    /// so does the folder; everything else moves, and the first such failure is thrown.
+    /// so does the folder; everything else moves.
     /// </summary>
+    /// <returns>Each task that moved, in the order the moves happened.</returns>
     /// <exception cref="FolderExistsException">There is already a folder at the new path.</exception>
     /// <exception cref="InvalidOperationException">The new path lies inside the folder.</exception>
-    /// <exception cref="TaskAccessDeniedException">Windows refused a part of the move.</exception>
-    void MoveFolder(string path, string newPath);
+    /// <exception cref="TaskAccessDeniedException">Windows refused the move; no task moved.</exception>
+    /// <exception cref="FolderPartlyMovedException">Some tasks moved, and at least one stayed where it was.</exception>
+    IReadOnlyList<TaskMove> MoveFolder(string path, string newPath);
 }
+
+/// <summary>A task that was given a new path, by a rename or by a move to another folder.</summary>
+public sealed record TaskMove(string From, string To);
 
 /// <summary>The name is taken: there is already a folder where a folder was to be moved or renamed to.</summary>
 public sealed class FolderExistsException : InvalidOperationException
 {
     public string Path { get; }
     public FolderExistsException(string path) : base($"There is already a folder '{path}'.") => Path = path;
+}
+
+/// <summary>
+/// A folder was moved only in part: the tasks in <see cref="Moved"/> went to the new folder, the
+/// others stayed where they were. The inner exception says why the first of those stayed.
+/// </summary>
+public sealed class FolderPartlyMovedException : Exception
+{
+    public IReadOnlyList<TaskMove> Moved { get; }
+
+    public FolderPartlyMovedException(IReadOnlyList<TaskMove> moved, Exception reason)
+        : base("Some tasks of the folder could not be moved.", reason) => Moved = moved;
 }
 
 /// <summary>
@@ -103,20 +120,37 @@ public sealed class TaskFolders : ITaskFolders
         }
     }
 
-    public void MoveFolder(string path, string newPath)
+    public IReadOnlyList<TaskMove> MoveFolder(string path, string newPath)
     {
         if (IsRoot(path)) throw new InvalidOperationException("The root folder cannot be moved.");
-        if (path == newPath) return;
 
-        // Task Scheduler takes a name that differs only in case for the folder that has it, so
-        // such a rename goes by way of a name of its own.
-        if (string.Equals(path, newPath, StringComparison.OrdinalIgnoreCase))
+        var moved = new List<TaskMove>();
+        if (path == newPath) return moved;
+        try
         {
-            string interim = $"{newPath} ({Guid.NewGuid().ToString("N")[..8]})";
-            MoveFolder(path, interim);
-            MoveFolder(interim, newPath);
-            return;
+            // Task Scheduler takes a name that differs only in case for the folder that has it, so
+            // such a rename goes by way of a name of its own.
+            if (string.Equals(path, newPath, StringComparison.OrdinalIgnoreCase))
+            {
+                string interim = $"{newPath} ({Guid.NewGuid().ToString("N")[..8]})";
+                Move(path, interim, moved);
+                Move(interim, newPath, moved);
+            }
+            else
+            {
+                Move(path, newPath, moved);
+            }
         }
+        catch (Exception ex) when (moved.Count > 0)
+        {
+            throw new FolderPartlyMovedException(moved, ex);
+        }
+        return moved;
+    }
+
+    /// <summary>The move of <see cref="MoveFolder"/>, adding each task to <paramref name="moved"/> once it has moved.</summary>
+    private static void Move(string path, string newPath, List<TaskMove> moved)
+    {
         if (TaskPaths.IsWithin(newPath, path)) throw new InvalidOperationException("A folder cannot be moved into itself.");
 
         using var service = new TaskService();
@@ -151,6 +185,7 @@ public sealed class TaskFolders : ITaskFolders
                 try
                 {
                     TaskRegistration.RemoveOriginal(folder, name, copyFolder, name);
+                    moved.Add(new TaskMove(TaskPaths.Combine(folder.Path, name), TaskPaths.Combine(copyFolder.Path, name)));
                 }
                 catch (Exception ex)
                 {

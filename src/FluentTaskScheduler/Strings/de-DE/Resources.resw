@@ -1118,4 +1118,5 @@ Jetzt App neustarten?</value></data>
   <data name="Tasks.Error.Duplicated" xml:space="preserve"><value>Die Aufgabe gibt es jetzt doppelt, als „{0}“ und als „{1}“: Keine der beiden konnte entfernt werden. Lösche eine davon in der Aufgabenplanung.</value></data>
   <data name="Tasks.Error.NameTakenInFolder" xml:space="preserve"><value>'{0}': Im Ordner „{1}“ gibt es schon eine Aufgabe mit diesem Namen.</value></data>
   <data name="Folders.Error.NameTaken" xml:space="preserve"><value>Hier gibt es schon einen anderen Ordner namens „{0}“. Wähle einen anderen Namen.</value></data>
+  <data name="Folders.Error.PartlyMoved" xml:space="preserve"><value>Einige Aufgaben konnten nicht verschoben werden und bleiben in „{0}“. Die anderen wurden verschoben.</value></data>
 </root>

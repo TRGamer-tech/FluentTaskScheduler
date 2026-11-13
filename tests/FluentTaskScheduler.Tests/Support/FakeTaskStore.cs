@@ -172,6 +172,20 @@ public sealed class FakeTaskStore : ITaskStore
     /// <summary>Marks a running task as finished, as Task Scheduler would.</summary>
     public void Finish(string path) => _running.Remove(path);
 
+    /// <summary>
+    /// Gives a task another path, as <see cref="FakeTaskFolders"/> does when it moves the task or
+    /// its folder. Like Windows, it leaves a protected task where it is and never replaces another task.
+    /// </summary>
+    public void Move(string from, string to)
+    {
+        TaskDraft task = Get(from);
+        if (Protected.Contains(from)) throw new TaskAccessDeniedException(from, new UnauthorizedAccessException());
+        if (!string.Equals(from, to, StringComparison.OrdinalIgnoreCase) && _tasks.ContainsKey(to)) throw new TaskExistsException(to);
+
+        _tasks.Remove(from);
+        _tasks[to] = task with { Name = NameOf(to) };
+    }
+
     private TaskRowState StateOf(string path) =>
         _running.Contains(path) ? TaskRowState.Running : _tasks[path].Enabled ? TaskRowState.Ready : TaskRowState.Disabled;
 

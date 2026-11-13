@@ -78,7 +78,15 @@ public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewMode
         if (!await IsValidAsync(name)) return;
 
         string path = TaskPaths.Combine(parent.Path, name);
-        if (!await TryAsync(name, () => folders.Create(path))) return;
+        try
+        {
+            await Task.Run(() => folders.Create(path));
+        }
+        catch (Exception ex)
+        {
+            await prompts.ShowErrorAsync(Describe(name, ex));
+            return;
+        }
 
         parent.IsExpanded = true;
         await ReloadAsync();
@@ -100,17 +108,50 @@ public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewMode
         if (folder.IsRoot) return;
         string question = Loc.Format("Dialog.DeleteFolder.ContentFormat", folder.Name);
         if (!await prompts.ConfirmAsync(Loc.Get("Dialog.DeleteFolder.Title"), question, Loc.Get("Dialog.Common.Delete"), isDestructive: true)) return;
-        if (!await TryAsync(folder.Name, () => folders.Delete(folder.Path))) return;
 
+        try
+        {
+            await Task.Run(() => folders.Delete(folder.Path));
+        }
+        catch (DirectoryNotFoundException)
+        {
+            // Someone else was faster; either way it is gone.
+        }
+        catch (Exception ex)
+        {
+            // Windows may have refused part way through, with some of the tasks deleted already.
+            await ReloadAsync();
+            await tasks.ReloadAsync();
+            await prompts.ShowErrorAsync(Describe(folder.Name, ex));
+            return;
+        }
         await AfterChangeAsync(folder.Path, TaskPaths.ParentOf(folder.Path));
     }
 
     private async Task MoveAsync(FolderNode folder, string newPath)
     {
-        if (!await TryAsync(folder.Name, () => folders.MoveFolder(folder.Path, newPath))) return;
-        // Snoozes know their tasks only by their paths, and those have changed with the folder's.
-        await snooze.FolderMovedAsync(folder.Path, newPath);
+        IReadOnlyList<TaskMove> moved;
+        var problems = new List<string>();
+        try
+        {
+            moved = await Task.Run(() => folders.MoveFolder(folder.Path, newPath));
+        }
+        catch (FolderPartlyMovedException ex)
+        {
+            moved = ex.Moved;
+            problems.Add(Loc.Format("Folders.Error.PartlyMoved", folder.Name));
+            problems.Add(Describe(folder.Name, ex.InnerException!));
+        }
+        catch (Exception ex)
+        {
+            await prompts.ShowErrorAsync(Describe(folder.Name, ex));
+            return;
+        }
+
+        // Snoozes know their tasks only by their paths. A task that stayed behind keeps its snooze.
+        foreach (TaskMove move in moved) await snooze.TaskMovedAsync(move.From, move.To);
         await AfterChangeAsync(folder.Path, newPath);
+        if (problems.Count > 0) await prompts.ShowErrorAsync(string.Join(Environment.NewLine, problems));
     }
 
     // The list may be showing the folder that just went away, or one inside it.
@@ -131,21 +172,6 @@ public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewMode
         if (TaskDraftValidator.CheckName(name) is not { } problem) return true;
         await prompts.ShowErrorAsync(problem.Message);
         return false;
-    }
-
-    /// <param name="name">The name of the folder that <paramref name="change"/> changes.</param>
-    private async Task<bool> TryAsync(string name, Action change)
-    {
-        try
-        {
-            await Task.Run(change);
-            return true;
-        }
-        catch (Exception ex)
-        {
-            await prompts.ShowErrorAsync(Describe(name, ex));
-            return false;
-        }
     }
 
     /// <summary>What to tell the user when a change of the folder called <paramref name="name"/> failed.</summary>

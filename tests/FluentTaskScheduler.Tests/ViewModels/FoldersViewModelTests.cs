@@ -10,7 +10,7 @@ public sealed class FoldersViewModelTests : IDisposable
 {
     private readonly TempFolder _folder = new();
     private readonly FakeTaskStore _store = new();
-    private readonly FakeTaskFolders _taskFolders = new(@"\Jobs", @"\Jobs\Nightly", @"\Reports");
+    private readonly FakeTaskFolders _taskFolders;
     private readonly ScriptedPrompts _prompts = new();
     private readonly FakeAppLifetime _app = new() { IsElevated = true };
     private readonly FakeTimeProvider _time = new();
@@ -22,6 +22,7 @@ public sealed class FoldersViewModelTests : IDisposable
     public FoldersViewModelTests()
     {
         _settings = new SettingsStore(_folder.Paths, _time);
+        _taskFolders = new FakeTaskFolders(_store, @"\Jobs", @"\Jobs\Nightly", @"\Reports");
         var files = new ScriptedFilePicker();
         _tasks = new TasksViewModel(_store, new TaskRunner(_store, new FakeSnoozeGate(), new RecordingNotifier()), _settings, _prompts, files, _app,
             new InlineUiThread(), _time, new TaskEditorFactory(_store, _settings, _app, files, new FakeNetworkProfiles(), _time, _snooze), _taskFolders,
@@ -121,12 +122,60 @@ public sealed class FoldersViewModelTests : IDisposable
     [Fact]
     public async Task RenamingAFolder_TakesTheSnoozesOfItsTasksAlong()
     {
+        _store.Add(@"\Jobs\Backup").Add(@"\Jobs\Nightly\Sync").Add(@"\Reports\Monthly");
         await _folders.ReloadAsync();
         _prompts.Text = "Work";
 
         await _folders.RenameAsync(Node(@"\Jobs"));
 
-        Assert.Equal([@"FolderMoved \Jobs -> \Work"], _snooze.Calls);
+        Assert.Equal([@"TaskMoved \Jobs\Backup -> \Work\Backup", @"TaskMoved \Jobs\Nightly\Sync -> \Work\Nightly\Sync"], _snooze.Calls);
+    }
+
+    [Fact]
+    public async Task AFolderWindowsMovesOnlyInPart_ShowsWhereEachTaskIsNow_AndSaysWhatStayedBehind()
+    {
+        _store.Add(@"\Jobs\Backup").Add(@"\Jobs\Kept").Protected.Add(@"\Jobs\Kept");
+        await _folders.ReloadAsync();
+        await _tasks.ReloadAsync();
+        _folders.Selected = Node(@"\Jobs");
+        _prompts.Text = "Work";
+
+        await _folders.RenameAsync(Node(@"\Jobs"));
+
+        // Only the task that moved takes its snooze along; the other one is still where its snooze is.
+        Assert.Equal([@"TaskMoved \Jobs\Backup -> \Work\Backup"], _snooze.Calls);
+        Assert.NotNull(Find(_folders.Roots, @"\Jobs"));
+        Assert.Equal(@"\Work", _folders.Selected?.Path);
+        Assert.Equal([@"\Work\Backup"], _tasks.Tasks.Select(row => row.Path));
+        Assert.NotNull(_tasks.Find(@"\Jobs\Kept"));
+        Assert.Equal($"Error: Folders.Error.PartlyMoved{Environment.NewLine}Editor.Error.AccessDenied", _prompts.Shown.Last());
+    }
+
+    [Fact]
+    public async Task AFolderWindowsDeletesOnlyInPart_LeavesTheTreeAndTheListShowingWhatIsLeft()
+    {
+        _store.Add(@"\Jobs\Backup").Add(@"\Jobs\Kept").Protected.Add(@"\Jobs\Kept");
+        await _folders.ReloadAsync();
+        await _tasks.ReloadAsync();
+
+        await _folders.DeleteAsync(Node(@"\Jobs"));
+
+        Assert.Null(_tasks.Find(@"\Jobs\Backup"));
+        Assert.NotNull(_tasks.Find(@"\Jobs\Kept"));
+        Assert.NotNull(Find(_folders.Roots, @"\Jobs"));
+        Assert.Equal("Error: Editor.Error.AccessDenied", _prompts.Shown.Last());
+    }
+
+    [Fact]
+    public async Task AFolderDeletedElsewhereMeanwhile_LeavesTheTree_WithoutAComplaint()
+    {
+        await _folders.ReloadAsync();
+        _taskFolders.Delete(@"\Reports");
+
+        await _folders.DeleteAsync(Node(@"\Reports"));
+
+        Assert.Null(Find(_folders.Roots, @"\Reports"));
+        Assert.DoesNotContain(_prompts.Shown, shown => shown.StartsWith("Error"));
     }
 
     [Fact]

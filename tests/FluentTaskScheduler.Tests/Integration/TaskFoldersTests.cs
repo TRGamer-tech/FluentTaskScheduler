@@ -79,8 +79,10 @@ public class TaskFoldersTests
         old.RegisterTaskDefinition("Free", SampleTasks.Simple(sandbox.Service));
         sandbox.RegisterUndeletable(old, "Kept");
 
-        Assert.Throws<TaskAccessDeniedException>(() => _folders.MoveFolder(sandbox.FolderPath + @"\Old", sandbox.FolderPath + @"\New"));
+        var partly = Assert.Throws<FolderPartlyMovedException>(() => _folders.MoveFolder(sandbox.FolderPath + @"\Old", sandbox.FolderPath + @"\New"));
 
+        Assert.IsType<TaskAccessDeniedException>(partly.InnerException);
+        Assert.Equal([new TaskMove(sandbox.FolderPath + @"\Old\Free", sandbox.FolderPath + @"\New\Free")], partly.Moved);
         Assert.True(_store.Exists(sandbox.FolderPath + @"\New\Free"));
         Assert.False(_store.Exists(sandbox.FolderPath + @"\Old\Free"));
         Assert.True(_store.Exists(sandbox.FolderPath + @"\Old\Kept"));
@@ -96,11 +98,16 @@ public class TaskFoldersTests
         old.RegisterTaskDefinition("One", SampleTasks.Simple(sandbox.Service));
         old.CreateFolder("Inner").RegisterTaskDefinition("Two", SampleTasks.Rich(sandbox.Service));
 
-        _folders.MoveFolder(sandbox.FolderPath + @"\Old", sandbox.FolderPath + @"\New");
+        IReadOnlyList<TaskMove> moved = _folders.MoveFolder(sandbox.FolderPath + @"\Old", sandbox.FolderPath + @"\New");
 
         Assert.True(_store.Exists(sandbox.FolderPath + @"\New\One"));
         Assert.True(_store.Exists(sandbox.FolderPath + @"\New\Inner\Two"));
         Assert.DoesNotContain(sandbox.FolderPath + @"\Old", _folders.GetFolders());
+        Assert.Equal(
+        [
+            new TaskMove(sandbox.FolderPath + @"\Old\One", sandbox.FolderPath + @"\New\One"),
+            new TaskMove(sandbox.FolderPath + @"\Old\Inner\Two", sandbox.FolderPath + @"\New\Inner\Two")
+        ], moved);
     }
 
     [SkippableFact]
@@ -110,10 +117,13 @@ public class TaskFoldersTests
         using var sandbox = new SchedulerSandbox();
         sandbox.Folder.CreateFolder("jobs").RegisterTaskDefinition("One", SampleTasks.Simple(sandbox.Service));
 
-        _folders.MoveFolder(sandbox.FolderPath + @"\jobs", sandbox.FolderPath + @"\Jobs");
+        IReadOnlyList<TaskMove> moved = _folders.MoveFolder(sandbox.FolderPath + @"\jobs", sandbox.FolderPath + @"\Jobs");
 
         Assert.Equal([sandbox.FolderPath + @"\Jobs"], _folders.GetFolders().Where(path => path.StartsWith(sandbox.FolderPath + @"\", StringComparison.Ordinal)));
         Assert.True(_store.Exists(sandbox.FolderPath + @"\Jobs\One"));
+        // The task goes by way of a folder with a name of its own, so it moves twice.
+        Assert.Equal(sandbox.FolderPath + @"\jobs\One", moved[0].From);
+        Assert.Equal(sandbox.FolderPath + @"\Jobs\One", moved[^1].To);
     }
 
     [SkippableFact]

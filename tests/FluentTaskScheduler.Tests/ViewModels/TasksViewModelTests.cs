@@ -20,7 +20,7 @@ public sealed class TasksViewModelTests : IDisposable
     private readonly FakeAppLifetime _app = new() { IsElevated = true };
     private readonly FakeTimeProvider _time = new(new DateTimeOffset(2031, 5, 6, 14, 17, 0, TimeSpan.Zero));
     private readonly FakeTaskEventStream _stream = new();
-    private readonly FakeTaskFolders _taskFolders = new(@"\Reports", @"\Reports\Old");
+    private readonly FakeTaskFolders _taskFolders;
     private readonly FakeSnoozeService _snoozeService = new();
     private readonly SettingsStore _settings;
     private readonly TasksViewModel _tasks;
@@ -28,6 +28,7 @@ public sealed class TasksViewModelTests : IDisposable
     public TasksViewModelTests()
     {
         _settings = new SettingsStore(_folder.Paths, _time);
+        _taskFolders = new FakeTaskFolders(_store, @"\Reports", @"\Reports\Old");
         _tasks = NewViewModel(new InlineUiThread());
 
         _store.Add(@"\Backup", draft: new TaskDraft { Category = "Maintenance", Tags = ["night"] })
