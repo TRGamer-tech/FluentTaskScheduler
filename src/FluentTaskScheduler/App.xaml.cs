@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Security.Principal;
 using FluentTaskScheduler.History;
 using FluentTaskScheduler.Library;
 using FluentTaskScheduler.Localization;
@@ -45,7 +46,13 @@ public partial class App : Application, IAppLifetime, IDisposable
         };
     }
 
-    public bool IsElevated { get; } = Helpers.ElevationHelper.IsElevated();
+    public bool IsElevated { get; } = RunsAsAdministrator();
+
+    private static bool RunsAsAdministrator()
+    {
+        using var identity = WindowsIdentity.GetCurrent();
+        return new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator);
+    }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
