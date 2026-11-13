@@ -35,10 +35,10 @@
     <!-- FluentTaskScheduler.Tests lives in a subfolder of this project; without this exclude, the
          default **/*.cs glob below would also pick up its (and its obj/bin) source files. -->
     <ItemGroup>
-        <Compile Remove="FluentTaskScheduler.Tests\**\*.cs" />
-        <EmbeddedResource Remove="FluentTaskScheduler.Tests\**\*" />
-        <None Remove="FluentTaskScheduler.Tests\**\*" />
-        <Page Remove="FluentTaskScheduler.Tests\**\*" />
+        <Compile Remove="FluentTaskScheduler.*Tests\**\*.cs" />
+        <EmbeddedResource Remove="FluentTaskScheduler.*Tests\**\*" />
+        <None Remove="FluentTaskScheduler.*Tests\**\*" />
+        <Page Remove="FluentTaskScheduler.*Tests\**\*" />
     </ItemGroup>
 
     <ItemGroup>

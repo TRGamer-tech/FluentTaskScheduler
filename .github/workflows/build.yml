@@ -33,6 +33,42 @@ jobs:
           name: test-results
           path: FluentTaskScheduler.Tests/TestResults/test-results.trx
 
+  ui-tests:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Build app
+        run: dotnet build FluentTaskScheduler.csproj -c Release -p:Platform=x64
+
+      # The hosted runner's desktop defaults to 1024x768, smaller than the app's default window.
+      - name: Set screen resolution
+        shell: pwsh
+        continue-on-error: true
+        run: Set-DisplayResolution -Width 1920 -Height 1080 -Force
+
+      - name: Run UI tests
+        env:
+          FTS_APP_EXE: ${{ github.workspace }}\bin\x64\Release\net8.0-windows10.0.19041.0\win-x64\FluentTaskScheduler.exe
+          FTS_UI_ARTIFACTS: ${{ github.workspace }}\ui-artifacts
+        run: >
+          dotnet test FluentTaskScheduler.UITests/FluentTaskScheduler.UITests.csproj
+          -c Release
+          --logger "console;verbosity=detailed"
+
+      - name: Upload UI screenshots
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: ui-artifacts
+          path: ui-artifacts/
+
   build:
     needs: test
     strategy:
