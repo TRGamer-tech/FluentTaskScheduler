@@ -12,8 +12,6 @@ namespace FluentTaskScheduler.Views;
 
 public sealed partial class ScriptEditorPage : Page
 {
-    private const string Indent = "    ";
-
     private bool _scrollQueued;
 
     public ScriptEditorPage(ScriptEditorViewModel viewModel)
@@ -55,9 +53,10 @@ public sealed partial class ScriptEditorPage : Page
         bool shift = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down);
         if (e.Key != VirtualKey.Tab || shift) return;
 
-        int caret = ScriptText.SelectionStart + Indent.Length;
-        ScriptText.SelectedText = Indent;
-        ScriptText.Select(caret, 0);
+        TextEdit edit = ScriptIndentation.Tab(ScriptText.Text, ScriptText.SelectionStart, ScriptText.SelectionLength);
+        ScriptText.Select(edit.Start, edit.Length);
+        ScriptText.SelectedText = edit.Replacement;
+        ScriptText.Select(edit.SelectionStart, edit.SelectionLength);
         e.Handled = true;
     }
 }

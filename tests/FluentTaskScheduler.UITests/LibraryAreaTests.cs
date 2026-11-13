@@ -1,4 +1,6 @@
 using FlaUI.Core.AutomationElements;
+using FlaUI.Core.Input;
+using FlaUI.Core.WindowsAPI;
 
 namespace FluentTaskScheduler.UITests;
 
@@ -75,6 +77,23 @@ public class ScriptEditorTests
         app.Require("NavScriptEditor").Press();
         app.Snapshot("editor");
         Assert.Equal("Write-Output 'fts-unsaved'", app.Require("ScriptEditorText").AsTextBox().Text.Trim());
+    }
+
+    [Fact]
+    public void Tab_IndentsTheSelectedLines_InsteadOfReplacingThem()
+    {
+        using var app = AppSession.Launch("script-indent");
+        app.Require("NavScriptEditor").Press();
+        var script = app.Require("ScriptEditorText").AsTextBox();
+        script.Text = "Get-Date\rGet-Item";
+
+        script.Focus();
+        Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
+        Keyboard.Type(VirtualKeyShort.TAB);
+
+        bool indented = AppSession.Eventually(() => script.Text.ReplaceLineEndings("\n") == "    Get-Date\n    Get-Item", seconds: 5);
+        app.Snapshot("indented");
+        Assert.True(indented, $"Tab left the script as \"{script.Text}\".");
     }
 
     /// <summary>Presses a toolbar button once the text typed before has made it available.</summary>
