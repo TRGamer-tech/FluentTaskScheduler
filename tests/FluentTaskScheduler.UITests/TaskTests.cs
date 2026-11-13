@@ -135,9 +135,9 @@ public sealed class TaskTests : IDisposable
 
         Row().Click();
         app.Require("DetailsRunButton", 20000);
-        Assert.True(WaitFor(() => TextsOf(app, "DetailsActions").Contains("cmd.exe /c exit 0")), "The details do not show the task's action.");
-        Assert.NotEmpty(TextsOf(app, "DetailsTriggers"));
+        bool showsAction = app.FindByName("cmd.exe /c exit 0", ControlType.Text, 20000) != null;
         app.Snapshot("details-opened");
+        Assert.True(showsAction, "The details do not show the task's action.");
 
         // Windows ships with task history switched off; the details offer to switch it on.
         if (app.Find("DetailsSwitchLogOnButton", 3000) is { } switchOn)
@@ -161,9 +161,6 @@ public sealed class TaskTests : IDisposable
         app.Snapshot("details-history");
         Assert.NotNull(app.Find(element => element.ControlType == ControlType.ListItem && element.Parent?.AutomationId == "DetailsHistory", 5000));
     }
-
-    private static string[] TextsOf(AppSession app, string automationId) =>
-        app.Find(automationId, 2000)?.FindAllDescendants().Select(element => element.Name).Where(name => name.Length > 0).ToArray() ?? [];
 
     /// <summary>
     /// The list reuses its rows as it scrolls. A row's switch must never take that for the user

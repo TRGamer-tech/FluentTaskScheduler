@@ -203,22 +203,54 @@ public sealed class AppSession : IDisposable
     /// </summary>
     public void ChooseFile(string path)
     {
-        // The app runs elevated in these tests and then shows the classic dialog, in its own process.
-        AutomationElement dialog = Retry.WhileNull(() =>
-                Window.FindAllChildren().Concat(_automation.GetDesktop().FindAllChildren())
-                      .FirstOrDefault(candidate => candidate.Properties.ClassName.ValueOrDefault == "#32770"
-                                                   && candidate.Properties.ProcessId.ValueOrDefault == _app.ProcessId),
-                TimeSpan.FromSeconds(20), TimeSpan.FromMilliseconds(250)).Result
-            ?? throw new InvalidOperationException("The app opened no file dialog.");
+        // The app runs elevated in these tests and then shows the classic dialog, in its own
+        // process. It is looked up through Windows rather than through the app's window, which
+        // does not answer while the dialog it opened is up.
+        nint handle = 0;
+        if (!Retry.WhileFalse(() => (handle = FindDialogWindow(_app.ProcessId)) != 0, TimeSpan.FromSeconds(20), TimeSpan.FromMilliseconds(250)).Success)
+            throw new InvalidOperationException("The app opened no file dialog.");
+        AutomationElement dialog = _automation.FromHandle(handle);
 
-        AutomationElement fileName = dialog.FindFirstDescendant(cf => cf.ByControlType(ControlType.Edit).And(cf.ByAutomationId("1148")))
-                                     ?? throw new InvalidOperationException("The file dialog has no box for the file name.");
+        AutomationElement fileName = Retry.WhileNull(
+                () => dialog.FindFirstDescendant(cf => cf.ByControlType(ControlType.Edit).And(cf.ByAutomationId("1148"))),
+                TimeSpan.FromSeconds(10)).Result
+            ?? throw new InvalidOperationException("The file dialog has no box for the file name.");
         fileName.AsTextBox().Text = path;
 
         AutomationElement open = dialog.FindFirstChild(cf => cf.ByAutomationId("1"))
                                  ?? throw new InvalidOperationException("The file dialog has no Open button.");
         open.Press();
     }
+
+    // A visible top-level window of the classic dialog class that belongs to the process.
+    private static nint FindDialogWindow(int processId)
+    {
+        nint found = 0;
+        EnumWindows((window, _) =>
+        {
+            GetWindowThreadProcessId(window, out uint owner);
+            if (owner != processId || !IsWindowVisibleNative(window)) return true;
+
+            var className = new StringBuilder(64);
+            GetClassNameW(window, className, className.Capacity);
+            if (className.ToString() != "#32770") return true;
+
+            found = window;
+            return false;
+        }, 0);
+        return found;
+    }
+
+    private delegate bool WindowVisitor(nint window, nint parameter);
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool EnumWindows(WindowVisitor visitor, nint parameter);
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern uint GetWindowThreadProcessId(nint window, out uint processId);
+
+    [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+    private static extern int GetClassNameW(nint window, StringBuilder className, int capacity);
 
     /// <summary>
     /// The text of a dialog the app is showing, or null if there is none. A dialog nobody asked
