@@ -742,7 +742,7 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.Error.InvalidRandomDelay" xml:space="preserve"><value>„{0}" ist kein gültiger Wert für die zufällige Verzögerung. Verwenden Sie eine ISO-8601-Dauer wie PT30M oder PT1H.</value></data>
   <data name="Dialog.Error.InvalidRestartInterval" xml:space="preserve"><value>"{0}" ist keine Dauer für das Neustartintervall. Schreib sie wie 1m oder 30m.</value></data>
   <data name="Dialog.Error.InvalidStopAfter" xml:space="preserve"><value>"{0}" ist keine Dauer für die längste Laufzeit. Schreib sie wie 90m, 12h oder 3d.</value></data>
-  <data name="Dialog.Error.RenameDuplicated" xml:space="preserve"><value>Umbenennen fehlgeschlagen: Sowohl „{0}" als auch „{1}" existieren jetzt. Bitte löschen Sie eines davon manuell in der Aufgabenplanung.</value></data>
+  <data name="Dialog.Error.RenameDuplicated" xml:space="preserve"><value>Umbenennen fehlgeschlagen: Sowohl „{0}" als auch „{1}" existieren jetzt. Lösche eine der beiden Aufgaben von Hand in der Aufgabenplanung.</value></data>
   <data name="Dialog.Error.RenameFailed" xml:space="preserve"><value>„{0}" konnte nicht in „{1}" umbenannt werden: Die alte Aufgabe konnte nicht gelöscht werden ({2}).</value></data>
   <data name="Dialog.Error.SaveTaskFailedPrefix" xml:space="preserve"><value>Aufgabe konnte nicht gespeichert werden: </value></data>
   <data name="Dialog.GetStarted" xml:space="preserve"><value>Los geht's</value></data>

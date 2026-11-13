@@ -28,9 +28,17 @@ public interface ITaskFolders
     /// the same place is a rename. A task that cannot be removed from the folder stays there, and
     /// so does the folder; everything else moves, and the first such failure is thrown.
     /// </summary>
-    /// <exception cref="InvalidOperationException">There is already a folder at the new path, or the new path lies inside the folder.</exception>
+    /// <exception cref="FolderExistsException">There is already a folder at the new path.</exception>
+    /// <exception cref="InvalidOperationException">The new path lies inside the folder.</exception>
     /// <exception cref="TaskAccessDeniedException">Windows refused a part of the move.</exception>
     void MoveFolder(string path, string newPath);
+}
+
+/// <summary>The name is taken: there is already a folder where a folder was to be moved or renamed to.</summary>
+public sealed class FolderExistsException : InvalidOperationException
+{
+    public string Path { get; }
+    public FolderExistsException(string path) : base($"There is already a folder '{path}'.") => Path = path;
 }
 
 /// <summary>
@@ -113,7 +121,7 @@ public sealed class TaskFolders : ITaskFolders
 
         using var service = new TaskService();
         TaskFolder source = Find(service, path);
-        if (Exists(service, newPath)) throw new InvalidOperationException($"There is already a folder '{newPath}'.");
+        if (Exists(service, newPath)) throw new FolderExistsException(newPath);
 
         try
         {

@@ -125,7 +125,7 @@ public class TaskFoldersTests
         sandbox.Folder.CreateFolder("B");
 
         Assert.Throws<InvalidOperationException>(() => _folders.MoveFolder(sandbox.FolderPath + @"\A", sandbox.FolderPath + @"\A\Sub"));
-        Assert.Throws<InvalidOperationException>(() => _folders.MoveFolder(sandbox.FolderPath + @"\A", sandbox.FolderPath + @"\B"));
+        Assert.Equal(sandbox.FolderPath + @"\B", Assert.Throws<FolderExistsException>(() => _folders.MoveFolder(sandbox.FolderPath + @"\A", sandbox.FolderPath + @"\B")).Path);
 
         Assert.True(_store.Exists(sandbox.FolderPath + @"\A\Keep"));
     }

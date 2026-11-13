@@ -292,7 +292,8 @@ public sealed class TaskStore : ITaskStore
         }
         catch (Exception ex) when (ex is System.Xml.XmlException or InvalidOperationException or ArgumentException or COMException)
         {
-            throw new FormatException("This is not a task exported from Task Scheduler: " + ex.Message, ex);
+            // The parser's words only: whoever shows this already says that the file is not a task.
+            throw new FormatException(ex.Message, ex);
         }
         return definition;
     }
