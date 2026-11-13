@@ -128,6 +128,23 @@ public sealed class CompletionActionServiceTests : IDisposable
     }
 
     [Fact]
+    public void ATargetThatIsDeletedJustAsItIsBeingStarted_IsReportedAsNotStarted_AndTheOtherTargetsStillStart()
+    {
+        Register(A, OnSuccess(B, C));
+
+        // Task Scheduler's answer for a task that went away after it was found.
+        _store.Before = (operation, path) =>
+        {
+            if (operation == "Run" && path == B) throw new FileNotFoundException("The system cannot find the file specified.");
+        };
+
+        _stream.Complete(Finished(A));
+
+        Assert.Equal([$"Run {C} unforced"], _store.Calls);
+        Assert.Equal("TaskCouldNotStart B: The system cannot find the file specified.", Assert.Single(_notifier.Shown));
+    }
+
+    [Fact]
     public void ATargetThatTaskSchedulerAcceptsButCannotStart_IsReportedAsNotStarted_WithWindowsReason()
     {
         Register(A, OnSuccess(B));

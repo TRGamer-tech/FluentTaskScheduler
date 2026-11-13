@@ -101,9 +101,9 @@ public sealed class CompletionActionService : IDisposable
         {
             outcome = _runner.Run(target, RunOrigin.CompletionAction);
         }
-        catch (Exception ex) when (ex is TaskNotFoundException or TaskAccessDeniedException or COMException)
+        catch (Exception ex) when (ex is TaskNotFoundException or TaskAccessDeniedException or COMException or IOException)
         {
-            // The runner has already logged the cause and told the user.
+            // The runner has already logged the cause and told the user. The other tasks are still to be started.
             Log.Warning("Completion action: {Target} could not be started after {Source} {Outcome}: {Reason}", target, plan.Source, OutcomeOf(plan.AfterSuccess), ex.Message);
             return;
         }
