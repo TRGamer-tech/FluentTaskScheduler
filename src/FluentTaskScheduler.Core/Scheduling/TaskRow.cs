@@ -8,9 +8,8 @@ public sealed partial class TaskRow : ObservableObject
     public TaskRow(string path)
     {
         Path = path;
-        int separator = path.LastIndexOf('\\');
-        Name = path[(separator + 1)..];
-        FolderPath = separator <= 0 ? "\\" : path[..separator];
+        Name = TaskPaths.NameOf(path);
+        FolderPath = TaskPaths.ParentOf(path);
     }
 
     /// <summary>Full path in Task Scheduler, e.g. \Backups\Nightly. Identifies the task.</summary>

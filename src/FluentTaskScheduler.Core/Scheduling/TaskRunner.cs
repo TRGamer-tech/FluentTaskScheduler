@@ -57,7 +57,7 @@ public sealed class TaskRunner : ITaskRunner
 
     public RunOutcome Run(string taskPath, RunOrigin origin = RunOrigin.Manual)
     {
-        string name = taskPath[(taskPath.LastIndexOf('\\') + 1)..];
+        string name = TaskPaths.NameOf(taskPath);
 
         if (_snooze.BlocksRun(taskPath))
         {

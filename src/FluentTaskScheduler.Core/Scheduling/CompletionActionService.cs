@@ -58,7 +58,7 @@ public sealed class CompletionActionService : IDisposable
         if (_rules.Started(run) is not { } request) return;
 
         Log.Information("Completion action: {Target} started because {Source} {Outcome}", request.Target, request.Source, OutcomeOf(request.AfterSuccess));
-        _notifier.CompletionActionStarted(NameOf(request.Source), NameOf(request.Target), request.AfterSuccess);
+        _notifier.CompletionActionStarted(TaskPaths.NameOf(request.Source), TaskPaths.NameOf(request.Target), request.AfterSuccess);
     }
 
     private void OnRunCompleted(object? sender, TaskRun run)
@@ -129,7 +129,7 @@ public sealed class CompletionActionService : IDisposable
     {
         string reason = run.ResultCode is { } code ? $"{WindowsMessage(code)} ({HistoryText.Code(code)})" : "";
         Log.Warning("Completion action: {Target} could not be started after {Source} {Outcome}: {Reason}", request.Target, request.Source, OutcomeOf(request.AfterSuccess), reason);
-        _notifier.TaskCouldNotStart(NameOf(request.Target), reason);
+        _notifier.TaskCouldNotStart(TaskPaths.NameOf(request.Target), reason);
     }
 
     /// <summary>Windows' own text for an error, in the language of Windows.</summary>
@@ -141,8 +141,6 @@ public sealed class CompletionActionService : IDisposable
     }
 
     private static string OutcomeOf(bool afterSuccess) => afterSuccess ? "succeeded" : "failed";
-
-    private static string NameOf(string taskPath) => taskPath[(taskPath.LastIndexOf('\\') + 1)..];
 
     /// <summary>
     /// Makes sure a run is acted on once on this computer, also when the app runs in the sessions
