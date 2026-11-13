@@ -170,27 +170,22 @@ public sealed class SnoozeViewModelTests : IDisposable
     }
 
     [Fact]
-    public void TheOptions_AreTheSettings()
+    public void TheToolbarsOptionToSuspendTriggers_IsTheSetting()
     {
         _snooze.SuspendsTriggers = true;
-        _snooze.IncludesMicrosoftTasks = true;
 
         Assert.True(_settings.Current.SnoozeSuspendsScheduledTasks);
-        Assert.True(_settings.Current.SnoozeIncludeMicrosoftTasks);
-        Assert.True(_snooze.ShowsMicrosoftTasksWarning);
     }
 
     [Fact]
     public void NoLongerSuspendingTriggers_LeavesTheTasksOfWindowsOutOfTheNextSuspension()
     {
-        _snooze.SuspendsTriggers = true;
-        _snooze.IncludesMicrosoftTasks = true;
+        _settings.Update(s => s with { SnoozeSuspendsScheduledTasks = true, SnoozeIncludeMicrosoftTasks = true });
 
         _snooze.SuspendsTriggers = false;
         _snooze.SuspendsTriggers = true;
 
         Assert.False(_settings.Current.SnoozeIncludeMicrosoftTasks);
-        Assert.False(_snooze.ShowsMicrosoftTasksWarning);
     }
 
     [Fact]
@@ -231,7 +226,7 @@ public sealed class SnoozeViewModelTests : IDisposable
         _settings.Update(s => s with { SnoozeSuspendsScheduledTasks = true });
         snooze.Dispose();
         ui.RunPosted();
-        _settings.Update(s => s with { SnoozeIncludeMicrosoftTasks = true });
+        _settings.Update(s => s with { SnoozeSuspendsScheduledTasks = false });
 
         Assert.False(snooze.IsSnoozed);
         Assert.Equal(0, changes);
@@ -240,16 +235,64 @@ public sealed class SnoozeViewModelTests : IDisposable
     }
 
     [Fact]
-    public void TheDialog_StartsAnHourFromNow_AndOffersTheOptionsOfTheSnoozeOfAllTasks()
+    public void TheDialog_StartsAnHourFromNow_WithTheOptionsAsTheyAreSet()
     {
+        _settings.Update(s => s with { SnoozeSuspendsScheduledTasks = true, SnoozeIncludeMicrosoftTasks = true });
+
         SnoozeUntilViewModel dialog = _snooze.PickMoment();
 
         Assert.Equal(new DateTime(2031, 5, 6), dialog.Date.Date);
         Assert.Equal(new TimeSpan(15, 17, 0), dialog.TimeOfDay);
         Assert.Equal("Snooze.Dialog.Title", dialog.Title);
         Assert.Equal("Snooze.Dialog.Until", dialog.UntilText);
-        Assert.Same(_snooze, dialog.AllTasks);
         Assert.True(dialog.IsForAllTasks);
+        Assert.True(dialog.SuspendsTriggers);
+        Assert.True(dialog.IncludesMicrosoftTasks);
+        Assert.True(dialog.ShowsMicrosoftTasksWarning);
+    }
+
+    [Fact]
+    public void InTheDialog_NoLongerSuspendingTriggers_UnticksTheTasksOfWindows_AndTakesTheWarningAway()
+    {
+        SnoozeUntilViewModel dialog = _snooze.PickMoment();
+        dialog.SuspendsTriggers = true;
+        dialog.IncludesMicrosoftTasks = true;
+        Assert.True(dialog.ShowsMicrosoftTasksWarning);
+
+        dialog.SuspendsTriggers = false;
+
+        Assert.False(dialog.IncludesMicrosoftTasks);
+        Assert.False(dialog.ShowsMicrosoftTasksWarning);
+    }
+
+    [Fact]
+    public void OptionsChosenInADialogThatIsNotConfirmed_AreNotSaved()
+    {
+        SnoozeUntilViewModel dialog = _snooze.PickMoment();
+
+        dialog.SuspendsTriggers = true;
+        dialog.IncludesMicrosoftTasks = true;
+
+        Assert.False(_settings.Current.SnoozeSuspendsScheduledTasks);
+        Assert.False(_settings.Current.SnoozeIncludeMicrosoftTasks);
+        Assert.False(_snooze.SuspendsTriggers);
+    }
+
+    [Fact]
+    public async Task AConfirmedDialog_SavesItsOptions_BeforeTheSnoozeStarts()
+    {
+        SnoozeUntilViewModel dialog = _snooze.PickMoment();
+        dialog.SuspendsTriggers = true;
+        dialog.IncludesMicrosoftTasks = true;
+        int requestsWhenSaved = -1;
+        _settings.Changed += (_, _) => requestsWhenSaved = _service.Calls.Count;
+
+        Assert.True(await dialog.SnoozeAsync());
+
+        Assert.Equal(0, requestsWhenSaved);
+        Assert.Single(_service.Calls);
+        Assert.True(_settings.Current.SnoozeSuspendsScheduledTasks);
+        Assert.True(_settings.Current.SnoozeIncludeMicrosoftTasks);
     }
 
     [Fact]
@@ -265,16 +308,18 @@ public sealed class SnoozeViewModelTests : IDisposable
     }
 
     [Fact]
-    public async Task AMomentThatHasPassed_IsRefused_AndNothingIsSnoozed()
+    public async Task AMomentThatHasPassed_IsRefused_AndNeitherSnoozesNorSavesTheOptions()
     {
         SnoozeUntilViewModel dialog = _snooze.PickMoment();
         dialog.TimeOfDay = new TimeSpan(14, 17, 0);
+        dialog.SuspendsTriggers = true;
 
         Assert.False(await dialog.SnoozeAsync());
 
         Assert.Equal("Snooze.Error.PastTime", dialog.Problem);
         Assert.True(dialog.HasProblem);
         Assert.Empty(_service.Calls);
+        Assert.False(_settings.Current.SnoozeSuspendsScheduledTasks);
     }
 
     [Fact]

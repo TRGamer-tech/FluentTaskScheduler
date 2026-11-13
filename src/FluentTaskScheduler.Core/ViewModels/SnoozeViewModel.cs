@@ -78,8 +78,8 @@ public sealed partial class SnoozeViewModel : ObservableObject, IDisposable
 
     /// <summary>
     /// Snoozing all tasks also disables them in Task Scheduler, so that Windows does not start them
-    /// either. Switching this off also switches off <see cref="IncludesMicrosoftTasks"/>: that one
-    /// is only ever on because it was chosen while its warning was in view.
+    /// either. Switching this off also switches off the inclusion of the tasks of Windows: that one
+    /// is only ever on because it was chosen in the snooze dialog while its warning was in view.
     /// </summary>
     public bool SuspendsTriggers
     {
@@ -90,16 +90,6 @@ public sealed partial class SnoozeViewModel : ObservableObject, IDisposable
             SnoozeIncludeMicrosoftTasks = value && s.SnoozeIncludeMicrosoftTasks
         });
     }
-
-    /// <summary>Suspending triggers reaches the tasks Windows has under \Microsoft\ as well.</summary>
-    public bool IncludesMicrosoftTasks
-    {
-        get => _settings.Current.SnoozeIncludeMicrosoftTasks;
-        set => _settings.Update(s => s with { SnoozeIncludeMicrosoftTasks = value });
-    }
-
-    /// <summary>Disabling the tasks of Windows can keep it from scanning for malware and updating itself until the snooze ends.</summary>
-    public bool ShowsMicrosoftTasksWarning => SuspendsTriggers && IncludesMicrosoftTasks;
 
     [RelayCommand]
     private async Task SnoozeAsync(SnoozeChoice choice)
@@ -113,9 +103,9 @@ public sealed partial class SnoozeViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private Task RetryRestoresAsync() => _snooze.RetryRestoresAsync();
 
-    /// <summary>For the dialog that snoozes all tasks until a moment of the user's choosing.</summary>
+    /// <summary>For the dialog that snoozes all tasks until a moment of the user's choosing, with the options of that snooze.</summary>
     public SnoozeUntilViewModel PickMoment() =>
-        new(Loc.Get("Snooze.Dialog.Title"), Loc.Get("Snooze.Dialog.Until"), this, _time, TrySnoozeAsync);
+        new(Loc.Get("Snooze.Dialog.Title"), Loc.Get("Snooze.Dialog.Until"), _settings, _time, TrySnoozeAsync);
 
     public void Dispose()
     {
@@ -151,15 +141,11 @@ public sealed partial class SnoozeViewModel : ObservableObject, IDisposable
 
     private void OnSettingsChanged(object? sender, SettingsChangedEventArgs change)
     {
-        if (change.Previous.SnoozeSuspendsScheduledTasks == change.Current.SnoozeSuspendsScheduledTasks
-            && change.Previous.SnoozeIncludeMicrosoftTasks == change.Current.SnoozeIncludeMicrosoftTasks) return;
+        if (change.Previous.SnoozeSuspendsScheduledTasks == change.Current.SnoozeSuspendsScheduledTasks) return;
 
         _ui.Post(() =>
         {
-            if (_disposed) return;
-            OnPropertyChanged(nameof(SuspendsTriggers));
-            OnPropertyChanged(nameof(IncludesMicrosoftTasks));
-            OnPropertyChanged(nameof(ShowsMicrosoftTasksWarning));
+            if (!_disposed) OnPropertyChanged(nameof(SuspendsTriggers));
         });
     }
 }
