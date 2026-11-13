@@ -24,12 +24,15 @@ namespace FluentTaskScheduler;
 public partial class App : Application, IAppLifetime, IDisposable
 {
     private readonly SingleInstance _instance;
+    private readonly Exception? _updaterFailure;
     private ServiceProvider? _services;
     private bool _crashReportPending;
 
-    internal App(SingleInstance instance)
+    /// <param name="updaterFailure">What went wrong in Velopack's start-up code, which runs before there is a log; null if nothing did.</param>
+    internal App(SingleInstance instance, Exception? updaterFailure)
     {
         _instance = instance;
+        _updaterFailure = updaterFailure;
         InitializeComponent();
 
         UnhandledException += (_, e) =>
@@ -65,6 +68,7 @@ public partial class App : Application, IAppLifetime, IDisposable
         Serilog.Log.Logger = logging.Logger;
         logging.Follow(_services.GetRequiredService<ISettingsStore>());
         Serilog.Log.Information("FluentTaskScheduler {Version} started", _services.GetRequiredService<AppInfo>().VersionText);
+        if (_updaterFailure is not null) Serilog.Log.Warning(_updaterFailure, "Velopack's start-up code failed; this copy may not be able to update itself");
 
         // Before anything saves the settings: the snooze state of version 1.9 lived in the settings
         // file, and the first save in the new format drops what the snooze service has not taken over.

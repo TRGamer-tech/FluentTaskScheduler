@@ -27,6 +27,7 @@ public static class Program
         // updater's install, update and uninstall steps arrive as command line arguments and end
         // the process when they apply. In a per-machine install the app folder is read-only for a
         // standard user; the updater would fail on its packages folder and could do nothing anyway.
+        Exception? updaterFailure = null;
         if (CanWriteToAppFolder())
         {
             try
@@ -47,8 +48,8 @@ public static class Program
             }
             catch (Exception ex)
             {
-                // Logging is not set up this early. The app is fully usable without the updater.
-                System.Diagnostics.Debug.WriteLine($"Updater hooks failed: {ex}");
+                // The app is fully usable without the updater. It logs why once it has its logger.
+                updaterFailure = ex;
             }
         }
 
@@ -70,7 +71,7 @@ public static class Program
         Application.Start(_ =>
         {
             SynchronizationContext.SetSynchronizationContext(new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread()));
-            app = new App(instance);
+            app = new App(instance, updaterFailure);
         });
 
         // Start returns when the last window has closed.
