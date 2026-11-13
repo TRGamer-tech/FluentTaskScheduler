@@ -268,6 +268,20 @@ public class TriggerViewModelTests
         Assert.Equal("Editor.Error.EventIdText", problem);
     }
 
+    /// <summary>The list of triggers reads the summary on every keystroke, so it must not fail either.</summary>
+    [Theory]
+    [InlineData("Application\t1000", "")]
+    [InlineData("Application", "My\tApp")]
+    public void ATabInTheLogOrSource_IsReported_AndTheSummaryKeepsShowingTheStoredTrigger(string log, string source)
+    {
+        var stored = new TriggerDraft { Type = TriggerType.Event, SourceIndex = 0, EventSubscription = EventQuery.Build("Application", "", null) };
+        var trigger = new TriggerViewModel(stored) { EventLog = log, EventSource = source };
+
+        Assert.False(trigger.TryBuild(out _, out string? problem));
+        Assert.Equal("Editor.Error.EventLogText", problem);
+        Assert.Equal(TriggerText.Describe(stored), trigger.Summary);
+    }
+
     [Fact]
     public void AnEventSubscriptionBeyondTheThreeFields_IsEditedAsXml_AndKeptVerbatim()
     {

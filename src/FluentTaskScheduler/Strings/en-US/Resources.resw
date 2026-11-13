@@ -1088,5 +1088,6 @@ Restart now to apply the update?</value></data>
   <data name="Dashboard.Refused.CompletionAction" xml:space="preserve"><value>Completion action</value></data>
   <data name="Dashboard.Runs.Title" xml:space="preserve"><value>Runs in the last 7 days</value></data>
   <data name="Dashboard.NothingUpcoming" xml:space="preserve"><value>No task is scheduled to run.</value></data>
+  <data name="Editor.Error.EventLogText" xml:space="preserve"><value>Trigger {0}: the log and the source must not contain tabs or line breaks.</value></data>
 </root>
 

@@ -1088,4 +1088,5 @@ Jetzt App neustarten?</value></data>
   <data name="Dashboard.Refused.CompletionAction" xml:space="preserve"><value>Abschlussaktion</value></data>
   <data name="Dashboard.Runs.Title" xml:space="preserve"><value>Ausführungen der letzten 7 Tage</value></data>
   <data name="Dashboard.NothingUpcoming" xml:space="preserve"><value>Für keine Aufgabe ist ein Start geplant.</value></data>
+  <data name="Editor.Error.EventLogText" xml:space="preserve"><value>Trigger {0}: Protokoll und Quelle dürfen keine Tabulatoren oder Zeilenumbrüche enthalten.</value></data>
 </root>

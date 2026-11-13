@@ -1091,6 +1091,7 @@
   <data name="Dashboard.Refused.CompletionAction" xml:space="preserve"><value>完成后操作</value></data>
   <data name="Dashboard.Runs.Title" xml:space="preserve"><value>最近 7 天的运行次数</value></data>
   <data name="Dashboard.NothingUpcoming" xml:space="preserve"><value>没有计划运行的任务。</value></data>
+  <data name="Editor.Error.EventLogText" xml:space="preserve"><value>触发器 {0}：日志和源中不能包含制表符或换行符。</value></data>
 </root>
 
 

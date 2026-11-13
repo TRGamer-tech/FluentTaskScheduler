@@ -207,17 +207,8 @@ public sealed partial class TriggerViewModel : ObservableObject
             }
             else if (EventLog != _sourceEventLog || EventSource != _sourceEventSource || EventId != _sourceEventId || _source.Type != TriggerType.Event)
             {
-                int? id = null;
-                if (EventId.Trim().Length > 0)
-                {
-                    if (!int.TryParse(EventId.Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out int parsed))
-                    {
-                        problem = "Editor.Error.EventIdText";
-                        return false;
-                    }
-                    id = parsed;
-                }
-                subscription = EventLog.Trim().Length == 0 ? "" : EventQuery.Build(EventLog.Trim(), EventSource.Trim(), id);
+                if (!TryReadEventFields(out string log, out string source, out int? id, out problem)) return false;
+                subscription = log.Length == 0 ? "" : EventQuery.Build(log, source, id);
             }
         }
 
@@ -245,6 +236,33 @@ public sealed partial class TriggerViewModel : ObservableObject
             EventSubscription = subscription,
             SessionChange = SessionChanges[SessionChangeIndex]
         };
+        return true;
+    }
+
+    /// <summary>The log, source and event ID fields as an event query takes them.</summary>
+    /// <param name="problem">Resource name of the message for a field that cannot go into a query.</param>
+    private bool TryReadEventFields(out string log, out string source, out int? id, out string? problem)
+    {
+        log = EventLog.Trim();
+        source = EventSource.Trim();
+        id = null;
+        problem = null;
+
+        // A name pasted from a table can bring a tab along, which no query can hold.
+        if (log.Any(char.IsControl) || source.Any(char.IsControl))
+        {
+            problem = "Editor.Error.EventLogText";
+            return false;
+        }
+        if (EventId.Trim() is { Length: > 0 } text)
+        {
+            if (!int.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out int parsed))
+            {
+                problem = "Editor.Error.EventIdText";
+                return false;
+            }
+            id = parsed;
+        }
         return true;
     }
 
