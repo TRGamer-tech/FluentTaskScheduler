@@ -104,8 +104,9 @@ public sealed class WindowsEventLog : IEventLog
         private readonly EventLogWatcher _watcher;
         private readonly Action<LogRecord> _onRecord;
         private readonly Action<Exception> _onFailure;
-        private Exception? _refusal;
-        private volatile bool _accepted;
+        private readonly object _gate = new();
+        private Exception? _failure;
+        private bool _accepted;
 
         public Subscription(string log, string query, Action<LogRecord> onRecord, Action<Exception> onFailure)
         {
@@ -126,29 +127,45 @@ public sealed class WindowsEventLog : IEventLog
 
             // The watcher does not check whether Windows accepted the subscription. A refused one
             // shows as a callback that carries the error, made on this thread before Enabled returns.
-            if (_refusal is { } refused)
+            // A failure on another thread a moment later is either seen here or reported to the caller.
+            Exception? refusal;
+            lock (_gate)
+            {
+                refusal = _failure;
+                _accepted = refusal is null;
+            }
+            if (refusal is not null)
             {
                 _watcher.Dispose();
-                throw new HistoryUnavailableException(log, refused);
+                throw new HistoryUnavailableException(log, refusal);
             }
-            _accepted = true;
         }
 
         public void Dispose() => _watcher.Dispose();
 
         private void OnWritten(object? sender, EventRecordWrittenEventArgs e)
         {
-            if (e.EventRecord is not { } record)
+            using var record = e.EventRecord;
+
+            // The watcher can keep calling after it has failed, repeating the failure or passing
+            // records that are no longer valid. A broken subscription says so once and is then silent.
+            if (Volatile.Read(ref _failure) is not null) return;
+
+            if (record is not null)
             {
-                var failure = e.EventException ?? new EventLogException("The event log ended the subscription without giving a reason.");
-                if (_accepted) _onFailure(failure);
-                else _refusal = failure;
+                if (Convert(record) is { } converted) _onRecord(converted);
                 return;
             }
 
-            LogRecord? converted;
-            using (record) converted = Convert(record);
-            if (converted is not null) _onRecord(converted);
+            var failure = e.EventException ?? new EventLogException("The event log ended the subscription without giving a reason.");
+            bool report;
+            lock (_gate)
+            {
+                if (_failure is not null) return;
+                _failure = failure;
+                report = _accepted;
+            }
+            if (report) _onFailure(failure);
         }
     }
 }
