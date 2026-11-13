@@ -56,16 +56,6 @@ public partial class App
         }
     }
 
-    // Stand-in until the reworked snooze service is in.
-    private static void AddBridges(IServiceCollection services) =>
-        services.AddSingleton<Scheduling.ISnoozeGate, NoSnooze>();
-
-    internal sealed class NoSnooze : Scheduling.ISnoozeGate
-    {
-        public bool BlocksRun(string taskPath) => false;
-        public void RecordSuppressedRun(string taskPath, Scheduling.RunOrigin origin) { }
-    }
-
     private static void StartLegacyServices()
     {
         var services = new ServiceCollection();

@@ -4,6 +4,7 @@ using FluentTaskScheduler.History;
 using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Notifications;
 using FluentTaskScheduler.Scheduling;
+using FluentTaskScheduler.Snoozing;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Velopack;
@@ -79,7 +80,8 @@ public static class Program
         Loc.Use(key => strings.Value.Find(key));
 
         var store = new TaskStore();
-        var runner = new TaskRunner(store, new App.NoSnooze(), new SilentNotifier());
+        // The snooze is the app's to manage; a command only reads whether one is on.
+        var runner = new TaskRunner(store, new ReadOnlySnoozeGate(new AppPaths(), new WindowsSession()), new SilentNotifier());
         int exitCode = new CommandLine(store, runner, new TaskHistory(new WindowsEventLog()), Console.Out).Run(args);
         Console.Out.Flush();
         return exitCode;

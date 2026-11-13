@@ -5,9 +5,11 @@ using FluentTaskScheduler.Library;
 using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Notifications;
 using FluentTaskScheduler.Processes;
+using FluentTaskScheduler.Reminders;
 using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Settings;
 using FluentTaskScheduler.Shell;
+using FluentTaskScheduler.Snoozing;
 using FluentTaskScheduler.ViewModels;
 using FluentTaskScheduler.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,6 +50,10 @@ public partial class App : Application, IAppLifetime, IDisposable
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         _services = ConfigureServices().BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
+
+        // Before anything saves the settings: the snooze state of version 1.9 lived in the settings
+        // file, and the first save in the new format drops what the snooze service has not taken over.
+        var snooze = _services.GetRequiredService<SnoozeService>();
         StartLegacyServices();
 
         _services.GetRequiredService<AppAppearance>().Start();
@@ -68,12 +74,27 @@ public partial class App : Application, IAppLifetime, IDisposable
         notifier.Start();
 
         _services.GetRequiredService<Tray>().Start();
+        _services.GetRequiredService<ReminderService>().Start();
+        _ = FinishSnoozesAsync(snooze);
+    }
+
+    // Re-enables what a snooze that ran out while the app was closed still holds disabled.
+    private static async Task FinishSnoozesAsync(SnoozeService snooze)
+    {
+        try
+        {
+            await snooze.StartAsync();
+        }
+        catch (Exception ex)
+        {
+            // Nothing awaits this at startup; what could not be re-enabled stays on record and is tried again.
+            Serilog.Log.Error(ex, "Finishing the snoozes of the last run failed");
+        }
     }
 
     private ServiceCollection ConfigureServices()
     {
         var services = new ServiceCollection();
-        AddBridges(services);
 
         // One per app
         services.AddSingleton<IAppLifetime>(this);
@@ -85,6 +106,11 @@ public partial class App : Application, IAppLifetime, IDisposable
         services.AddSingleton<ITaskStore, TaskStore>();
         services.AddSingleton<ITaskFolders, TaskFolders>();
         services.AddSingleton<ITaskRunner, TaskRunner>();
+        services.AddSingleton<IWindowsSession, WindowsSession>();
+        services.AddSingleton<SnoozeService>();
+        services.AddSingleton<ISnoozeService>(app => app.GetRequiredService<SnoozeService>());
+        services.AddSingleton<ISnoozeGate>(app => app.GetRequiredService<SnoozeService>());
+        services.AddSingleton<ReminderService>();
         services.AddSingleton<INetworkProfiles, RegistryNetworkProfiles>();
         services.AddSingleton<IEventLog, WindowsEventLog>();
         services.AddSingleton<ITaskHistory, TaskHistory>();
