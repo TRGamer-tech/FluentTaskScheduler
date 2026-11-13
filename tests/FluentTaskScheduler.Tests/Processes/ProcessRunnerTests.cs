@@ -248,6 +248,23 @@ public sealed class ProcessRunnerTests
         Assert.Equal([new ProcessOutput("Zürich 東京", IsError: false)], Lines);
     }
 
+    /// <summary>
+    /// The quick action shows the last lines sfc writes as its findings, so they have to arrive
+    /// with their text, however sfc ends them (ConsoleCodePageTests prints how it does).
+    /// </summary>
+    [SkippableFact]
+    public async Task WhatSfcWrites_ArrivesAsLinesOfText()
+    {
+        Skip.IfNot(OperatingSystem.IsWindows(), SkipReason);
+        // As the quick action runs it, but for its usage: a scan takes many minutes. Without
+        // administrator rights sfc says that it needs them instead, which serves as well.
+        ProcessRequest request = QuickAction.All.Single(action => action.Id == "SfcScannow").Request with { Arguments = "/?" };
+
+        await Run(request);
+
+        Assert.Contains(Lines, line => line.Text.Contains("sfc", StringComparison.OrdinalIgnoreCase));
+    }
+
     private static async Task WaitUntil(Func<bool> condition)
     {
         var watch = Stopwatch.StartNew();

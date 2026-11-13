@@ -46,6 +46,11 @@ internal static class ConsoleLines
                 char c = buffer[i];
                 if (afterReturn)
                 {
+                    // Another carriage return changes nothing: the line is back at its start already.
+                    // A program that writes CR LF through a C runtime stream in text mode, which
+                    // turns every LF into CR LF, ends its lines in CR CR LF.
+                    if (c == '\r') continue;
+
                     afterReturn = false;
                     if (c == '\n')
                     {

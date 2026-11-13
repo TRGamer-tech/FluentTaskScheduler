@@ -65,6 +65,13 @@ public sealed class ConsoleLinesTests
     }
 
     [Fact]
+    public async Task ACarriageReturnRightAfterAnother_ChangesNothing_SoLinesEndingInCrCrLfKeepTheirText()
+    {
+        Assert.Equal(["one", "two"], await Read("one\r\r\ntwo\r\r\n"));
+        Assert.Equal(["one...", "one"], await Read("one\r", "\r\n"));
+    }
+
+    [Fact]
     public async Task NothingIsReportedTwice_WhenAPieceAddsNothingToTheLine()
     {
         Assert.Equal(["one...", "one"], await Read("one", "\r", "\n"));

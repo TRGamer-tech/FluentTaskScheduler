@@ -54,6 +54,8 @@ public sealed class ConsoleCodePageTests : IDisposable
         // DISM names its log file when it fails, as it does at once for an image that does not exist.
         await RecordWithAndWithoutSwitch("DISM", WindowsTools.InSystemFolder("Dism.exe"),
             $"/LogPath:\"{_folder.File(Text + ".log")}\" /Get-ImageInfo /ImageFile:\"{_folder.File("none.wim")}\"");
+        // How sfc ends its lines. It writes its usage, or that it needs administrator rights.
+        await Record("sfc", new ProcessRequest(WindowsTools.InSystemFolder("sfc.exe"), "/?"));
 
         Assert.Contains("65001", Encoding.ASCII.GetString(switched));
         Assert.Equal(echo, echoAfterSwitch);
