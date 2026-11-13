@@ -819,10 +819,7 @@ namespace FluentTaskScheduler.ViewModels
 
         public void NavigateToTask(string taskPath)
         {
-            if (MainPage.Current != null)
-            {
-                MainPage.Current.NavigateToTask(taskPath);
-            }
+            App.Navigator?.ShowTask(taskPath);
         }
 
         public void StartAutoRefresh()

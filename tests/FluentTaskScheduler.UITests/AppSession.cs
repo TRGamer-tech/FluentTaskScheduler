@@ -22,33 +22,51 @@ public sealed class AppSession : IDisposable
     public Window Window { get; }
     public string ArtifactsDir { get; }
 
-    private AppSession(Application app, UIA3Automation automation, Window window, string artifactsDir)
+    /// <summary>The folder this instance of the app keeps its settings and state in.</summary>
+    public string DataDir { get; }
+
+    private AppSession(Application app, UIA3Automation automation, Window window, string artifactsDir, string dataDir)
     {
         _app = app;
         _automation = automation;
         Window = window;
         ArtifactsDir = artifactsDir;
+        DataDir = dataDir;
     }
 
     public static string ExePath =>
         Environment.GetEnvironmentVariable("FTS_APP_EXE")
         ?? throw new InvalidOperationException("Set FTS_APP_EXE to the built FluentTaskScheduler.exe.");
 
-    public static AppSession Launch(string scenario)
+    /// <summary>
+    /// Starts the app with a data folder of its own, so a test neither sees nor changes the
+    /// settings of whoever runs it.
+    /// </summary>
+    /// <param name="scenario">Names the folder the screenshots go to.</param>
+    /// <param name="settingsJson">Content of settings.json to start with; the default skips the first-run dialogs.</param>
+    public static AppSession Launch(string scenario, string settingsJson = FirstRunDone)
     {
         string artifacts = Path.Combine(
             Environment.GetEnvironmentVariable("FTS_UI_ARTIFACTS") ?? Path.Combine(AppContext.BaseDirectory, "artifacts"),
             scenario);
         Directory.CreateDirectory(artifacts);
 
-        var startInfo = new ProcessStartInfo(ExePath) { WorkingDirectory = Path.GetDirectoryName(ExePath)! };
+        string data = Path.Combine(Path.GetTempPath(), "FtsUiTests_" + Guid.NewGuid().ToString("N")[..8]);
+        Directory.CreateDirectory(data);
+        File.WriteAllText(Path.Combine(data, "settings.json"), settingsJson);
+
+        var startInfo = new ProcessStartInfo(ExePath) { WorkingDirectory = Path.GetDirectoryName(ExePath)!, UseShellExecute = false };
+        startInfo.Environment["FLUENTTASKSCHEDULER_DATA"] = data;
         var app = Application.Launch(startInfo);
         var automation = new UIA3Automation();
         var window = app.GetMainWindow(automation, TimeSpan.FromSeconds(60))
                      ?? throw new InvalidOperationException("The app did not show a main window within 60 s.");
         window.SetForeground();
-        return new AppSession(app, automation, window, artifacts);
+        return new AppSession(app, automation, window, artifacts, data);
     }
+
+    /// <summary>Settings of someone who has seen the welcome tour and the release notes, with an English UI.</summary>
+    public const string FirstRunDone = """{"Language":"en-US","HasCompletedOnboarding":true,"LastSeenVersion":"999.0.0"}""";
 
     public bool HasExited => _app.HasExited;
 
@@ -144,10 +162,19 @@ public sealed class AppSession : IDisposable
         File.AppendAllText(Path.Combine(ArtifactsDir, "log.txt"), line + Environment.NewLine);
     }
 
+    /// <summary>Resizes the window; sizes are in physical pixels.</summary>
+    public void Resize(int width, int height)
+    {
+        Window.Move(10, 10);
+        Window.Patterns.Transform.Pattern.Resize(width, height);
+        Thread.Sleep(1200); // the navigation pane animates between its modes
+    }
+
     public void Dispose()
     {
         try { if (!_app.HasExited) _app.Kill(); } catch { }
         _app.Dispose();
         _automation.Dispose();
+        try { Directory.Delete(DataDir, recursive: true); } catch (IOException) { } catch (UnauthorizedAccessException) { }
     }
 }

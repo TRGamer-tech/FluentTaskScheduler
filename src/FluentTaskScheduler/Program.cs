@@ -1,82 +1,84 @@
-using System;
 using System.Runtime.InteropServices;
+using FluentTaskScheduler.Shell;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Velopack;
 
-namespace FluentTaskScheduler
+namespace FluentTaskScheduler;
+
+public static class Program
 {
-    public static class Program
+    // Do not narrow the process's DLL search path here (SetDefaultDllDirectories, AddDllDirectory):
+    // XAML loads its theme resource DLLs by relative name and fails to start without the default
+    // order. Do not call Bootstrap.Initialize either: that is for apps that use the installed
+    // Windows App SDK runtime, while this one ships its own next to the exe.
+
+    [STAThread]
+    private static int Main(string[] args)
     {
-        [DllImport("Microsoft.ui.xaml.dll")]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
-        private static extern void XamlCheckProcessRequirements();
+        WinRT.ComWrappersSupport.InitializeComWrappers();
+        RunUpdaterHooks();
 
-        // NOTE: do not reintroduce SetDefaultDllDirectories/AddDllDirectory here. Narrowing the
-        // process-wide DLL search order breaks the LoadLibraryEx-by-relative-name calls that XAML
-        // uses to pull in its theme resource DLLs, which fails app startup with
-        // "Cannot locate resource from 'ms-appx:///Microsoft.UI.Xaml/Themes/themeresources.xaml'".
-        // The application directory is already first in the default search order, so for a
-        // self-contained build (runtime DLLs sit next to the exe) these calls bought us nothing.
-        //
-        // Likewise, do not call Bootstrap.Initialize: that is for framework-dependent unpackaged
-        // apps and adds the MSIX-installed runtime to the process package graph. This app is built
-        // WindowsAppSDKSelfContained, so the runtime next to the exe is the one to use.
-
-        [STAThread]
-        static void Main(string[] args)
+        // A restarted instance (e.g. as administrator) starts while the old one is still closing.
+        TimeSpan waitForPrevious = args.Contains(App.AfterRestartArgument) ? TimeSpan.FromSeconds(10) : TimeSpan.Zero;
+        using var instance = new SingleInstance("FluentTaskScheduler", waitForPrevious);
+        if (!instance.IsFirst)
         {
-            // Initialize ComWrappers as early as possible for WinRT support.
-            // This MUST be done before any WinRT types are accessed.
-            WinRT.ComWrappersSupport.InitializeComWrappers();
-
-            // VeloPack: Handle install/uninstall/update hooks before anything else.
-            // In a machine-wide install (C:\Program Files), non-admin users don't have write access,
-            // which causes Velopack to crash with UnauthorizedAccessException when it tries to 
-            // manage the 'packages' directory. We skip Velopack for non-admins in protected folders.
-            if (HasWriteAccessToAppDir())
-            {
-                try
-                {
-                    VelopackApp.Build().Run();
-                }
-                catch (Exception)
-                {
-                    // Catch-all for any other Velopack initialization issues
-                }
-            }
-
-            try
-            {
-                XamlCheckProcessRequirements();
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"XamlCheckProcessRequirements failed: {ex.Message}");
-            }
-
-            Application.Start((p) =>
-            {
-                var context = new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread());
-                System.Threading.SynchronizationContext.SetSynchronizationContext(context);
-                new App();
-            });
+            instance.AskFirstToShow();
+            return 0;
         }
 
-        private static bool HasWriteAccessToAppDir()
+        XamlCheckProcessRequirements();
+
+        App? app = null;
+        Application.Start(_ =>
         {
-            try
-            {
-                string appDir = AppDomain.CurrentDomain.BaseDirectory;
-                string testPath = System.IO.Path.Combine(appDir, ".velopack_write_test");
-                System.IO.File.WriteAllText(testPath, "test");
-                System.IO.File.Delete(testPath);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            SynchronizationContext.SetSynchronizationContext(new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread()));
+            app = new App(instance);
+        });
+
+        // Start returns when the last window has closed.
+        app?.Dispose();
+        return 0;
+    }
+
+    /// <summary>
+    /// Lets the updater run its install, update and uninstall steps, which arrive as command line
+    /// arguments and end the process when they apply.
+    /// </summary>
+    private static void RunUpdaterHooks()
+    {
+        // In a per-machine install the app folder is read-only for a standard user, and the
+        // updater fails on its packages folder. There is nothing it could do there anyway.
+        if (!CanWriteToAppFolder()) return;
+
+        try
+        {
+            VelopackApp.Build().Run();
+        }
+        catch (Exception ex)
+        {
+            // Logging is not set up this early. The app is fully usable without the updater.
+            System.Diagnostics.Debug.WriteLine($"Updater hooks failed: {ex}");
         }
     }
+
+    private static bool CanWriteToAppFolder()
+    {
+        string probe = Path.Combine(AppContext.BaseDirectory, ".write-test");
+        try
+        {
+            File.WriteAllText(probe, "");
+            File.Delete(probe);
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return false;
+        }
+    }
+
+    [DllImport("Microsoft.ui.xaml.dll")]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+    private static extern void XamlCheckProcessRequirements();
 }

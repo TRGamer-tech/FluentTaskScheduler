@@ -410,7 +410,6 @@ namespace FluentTaskScheduler
             Serilog.Log.Information("{Message}", $"Smooth Scrolling: {(enable ? "enabled" : "disabled")}");
             PageScrollViewer.IsScrollInertiaEnabled = enable;
             (Application.Current as App)?.ApplySmoothScrolling(enable);
-            MainPage.Current?.ApplySmoothScrollingSelf(enable);
         }
 
         private void ShowHiddenTasksToggle_Toggled(object sender, RoutedEventArgs e)
@@ -418,8 +417,6 @@ namespace FluentTaskScheduler
             if (!_isLoaded) return;
             Settings.ShowHiddenTasks = ShowHiddenTasksToggle.IsOn;
             Serilog.Log.Information("{Message}", $"Show Hidden Tasks: {(ShowHiddenTasksToggle.IsOn ? "enabled" : "disabled")}");
-            // Trigger refresh in main view if it exists
-            MainPage.Current?.ViewModel.ApplyFilters();
         }
 
         private void TaskPipelinesToggle_Toggled(object sender, RoutedEventArgs e)

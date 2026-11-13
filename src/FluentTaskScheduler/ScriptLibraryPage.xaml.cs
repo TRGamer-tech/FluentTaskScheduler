@@ -21,8 +21,6 @@ namespace FluentTaskScheduler
         private static string L(string key, string fallback) => LocalizationService.GetString(key, fallback);
         private ISettingsService Settings => App.Container.GetRequiredService<ISettingsService>();
 
-        private MainPage? _ownerMainPage;
-
         public ScriptLibraryPage()
         {
             this.InitializeComponent();
@@ -85,7 +83,6 @@ namespace FluentTaskScheduler
         protected override void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            if (e.Parameter is MainPage mp) _ownerMainPage = mp;
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -138,22 +135,8 @@ namespace FluentTaskScheduler
         {
             if (sender is not Button button || button.Tag is not TaskTemplate template) return;
 
-            var owner = _ownerMainPage ?? MainPage.Current;
-            if (owner == null)
-            {
-                Serilog.Log.Error("{Message}", $"Cannot deploy template '{template.Id}': no main page is available.");
-                return;
-            }
-
-            try
-            {
-                Serilog.Log.Information("{Message}", $"Deploying task template '{template.Id}'.");
-                owner.OpenCreateTaskFromTaskTemplate(template);
-            }
-            catch (Exception ex)
-            {
-                Serilog.Log.Error(ex, "{Message}", $"Failed to deploy task template '{template.Id}'.");
-            }
+            // Only the name is carried over until this page builds task drafts from its templates.
+            _ = App.Navigator?.CreateTaskAsync(new Scheduling.TaskDraft { Name = template.Name });
         }
 
         // ── Scripts ──────────────────────────────────────────────────────────────
@@ -161,7 +144,7 @@ namespace FluentTaskScheduler
         private void ScheduleButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.Tag is ScriptTemplateModel template)
-                (_ownerMainPage ?? MainPage.Current)?.OpenCreateTaskFromTemplate(template);
+                _ = App.Navigator?.CreateTaskAsync(new Scheduling.TaskDraft { Name = template.Name });
         }
 
         private async void CreateTemplateButton_Click(object sender, RoutedEventArgs e)
