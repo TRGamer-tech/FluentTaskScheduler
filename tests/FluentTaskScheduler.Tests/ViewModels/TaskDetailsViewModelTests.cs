@@ -66,7 +66,8 @@ public sealed class TaskDetailsViewModelTests : IDisposable
 
         await details.LoadAsync();
 
-        Assert.Equal(["Action.Unsupported (ComHandler {0000})"], details.Actions);
+        // The kind and the summary go into one line through a text of their own (ActionTextTests).
+        Assert.Equal(["Text.DetailFormat"], details.Actions);
     }
 
     [Fact]
