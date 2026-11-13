@@ -373,13 +373,9 @@ public class TaskDraftRoundTripTests
         var task = sandbox.Folder.RegisterTaskDefinition(draft.Name, definition);
         var reloaded = TaskDraftReader.Read(task);
 
-        Assert.Equal(draft.Tags, reloaded.Tags);
         Assert.Equal(draft.Triggers.Select((t, i) => t with { SourceIndex = i }), reloaded.Triggers);
         Assert.Equal(draft.Actions.Select((a, i) => a with { SourceIndex = i }), reloaded.Actions);
-        // Lists and the pipeline object compare by reference in a record; everything else by value.
-        Assert.Equal(
-            draft with { Tags = reloaded.Tags, Triggers = reloaded.Triggers, Actions = reloaded.Actions, CompletionActions = reloaded.CompletionActions },
-            reloaded);
+        Assert.Equal(draft with { Triggers = reloaded.Triggers, Actions = reloaded.Actions }, reloaded);
     }
 
     [SkippableFact]
