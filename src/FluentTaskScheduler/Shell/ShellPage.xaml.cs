@@ -107,10 +107,25 @@ public sealed partial class ShellPage : Page, IShellNavigator
         if (tag == CurrentPage) return;
 
         Destination destination = Destinations[tag];
+        if (destination.CreatedByFrame) PageHost.Navigate(destination.Page);
+        else PageHost.Content = BuildPage(destination.Page, tag);
         CurrentPage = tag;
         NavView.Header = Loc.Get(destination.TitleKey);
-        if (destination.CreatedByFrame) PageHost.Navigate(destination.Page);
-        else PageHost.Content = _windowServices.GetRequiredService(destination.Page);
+    }
+
+    private object BuildPage(Type page, string tag)
+    {
+        try
+        {
+            return _windowServices.GetRequiredService(page);
+        }
+        catch (Exception ex)
+        {
+            // Asked for through UI Automation, by a screen reader for instance, the failure goes
+            // back to the caller as a bare error code and never reaches the app's crash handler.
+            Serilog.Log.Error(ex, "The {Page} page could not be built", tag);
+            throw;
+        }
     }
 
     private async void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)

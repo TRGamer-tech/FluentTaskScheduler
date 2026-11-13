@@ -10,9 +10,18 @@ public class SettingsTests
     private static AppSession OpenSettings(string scenario)
     {
         var app = AppSession.Launch(scenario);
-        app.Require("NavSettings").Press();
-        app.Require("ThemeChoice", 30000);
-        return app;
+        try
+        {
+            app.Require("NavSettings").Press();
+            app.Require("ThemeChoice", 30000);
+            return app;
+        }
+        catch
+        {
+            // Keeps the app's logs and last screen, as the test's own using would have.
+            app.Dispose();
+            throw;
+        }
     }
 
     /// <summary>What a drop-down list shows as chosen.</summary>
