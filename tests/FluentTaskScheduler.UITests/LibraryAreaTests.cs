@@ -93,6 +93,24 @@ public class LibraryTests
         Assert.Null(app.Find("Template.Defrag", 1500));
         app.Snapshot("scripts");
     }
+
+    [Fact]
+    public void InANarrowWindow_TheTabsKeepTheirWidth_AndTheSearchBoxGivesWay()
+    {
+        // The tabs are widest in Japanese.
+        using var app = AppSession.Launch("library-narrow", """{"Language":"ja-JP","HasCompletedOnboarding":true,"LastSeenVersion":"999.0.0"}""");
+        app.Require("NavScriptLibrary").Press();
+        int fullWidth = app.Require("LibraryScriptsTab").BoundingRectangle.Width;
+
+        // The navigation pane folds into a menu button, and the page gets the whole window.
+        app.Resize(520, 800);
+        app.Snapshot("narrow");
+        var tab = app.Require("LibraryScriptsTab").BoundingRectangle;
+        var search = app.Require("LibrarySearch").BoundingRectangle;
+
+        Assert.True(tab.Width >= fullWidth - 1, $"The Scripts tab is {tab.Width} pixels wide in a narrow window and {fullWidth} in a wide one: it is cut off.");
+        Assert.True(search.Left > tab.Right, $"The search box begins at {search.Left}, before the Scripts tab ends at {tab.Right}.");
+    }
 }
 
 /// <summary>The quick actions: running one, and what the page says about administrator rights.</summary>

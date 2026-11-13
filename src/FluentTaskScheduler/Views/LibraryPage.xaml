@@ -12,10 +12,14 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <!-- A selector bar cuts off the tabs that do not fit, so the tabs keep their full width. The
+             search box keeps to the right and gives way instead: it shares what the tabs leave with
+             the gap before it, and is between half its width and all of it. -->
         <Grid Padding="24,8,24,8" ColumnSpacing="16">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*" MinWidth="120" MaxWidth="240"/>
             </Grid.ColumnDefinitions>
 
             <SelectorBar VerticalAlignment="Center" SelectionChanged="Sections_SelectionChanged">
@@ -26,7 +30,7 @@
                                  AutomationProperties.AutomationId="LibraryScriptsTab"/>
             </SelectorBar>
 
-            <AutoSuggestBox Grid.Column="1" Width="240" VerticalAlignment="Center"
+            <AutoSuggestBox Grid.Column="2" VerticalAlignment="Center"
                             QueryIcon="Find"
                             PlaceholderText="{x:Bind l:Loc.Get('Library.Search.Placeholder')}"
                             Text="{x:Bind ViewModel.SearchText, Mode=TwoWay}"
