@@ -28,12 +28,12 @@ jobs:
         include:
           - platform: x64
             arch: x64
-            runner: windows-latest
           - platform: ARM64
             arch: arm64
-            runner: windows-11-arm
 
-    runs-on: ${{ matrix.runner }}
+    # Both architectures are built on an x64 machine: the WiX tools Velopack brings along for
+    # the MSI are x64 programs and do not start on the ARM64 runner.
+    runs-on: windows-latest
 
     steps:
       - name: Checkout

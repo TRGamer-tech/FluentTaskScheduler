@@ -19,7 +19,25 @@ public static class Program
     private static int Main(string[] args)
     {
         WinRT.ComWrappersSupport.InitializeComWrappers();
-        RunUpdaterHooks();
+
+        // Before anything else, and in this very method (Velopack's packaging tool checks for that): the
+        // updater's install, update and uninstall steps arrive as command line arguments and end
+        // the process when they apply. In a per-machine install the app folder is read-only for a
+        // standard user; the updater would fail on its packages folder and could do nothing anyway.
+        if (CanWriteToAppFolder())
+        {
+            try
+            {
+                VelopackApp.Build()
+                    .OnBeforeUninstallFastCallback(_ => Shell.ToastNotifier.RemoveRegistration())
+                    .Run();
+            }
+            catch (Exception ex)
+            {
+                // Logging is not set up this early. The app is fully usable without the updater.
+                System.Diagnostics.Debug.WriteLine($"Updater hooks failed: {ex}");
+            }
+        }
 
         // A command is answered and done, whether or not the app is already running.
         if (CommandLine.Handles(args)) return RunCommandLine(args);
@@ -58,29 +76,6 @@ public static class Program
         int exitCode = new CommandLine(store, runner, Console.Out).Run(args);
         Console.Out.Flush();
         return exitCode;
-    }
-
-    /// <summary>
-    /// Lets the updater run its install, update and uninstall steps, which arrive as command line
-    /// arguments and end the process when they apply.
-    /// </summary>
-    private static void RunUpdaterHooks()
-    {
-        // In a per-machine install the app folder is read-only for a standard user, and the
-        // updater fails on its packages folder. There is nothing it could do there anyway.
-        if (!CanWriteToAppFolder()) return;
-
-        try
-        {
-            VelopackApp.Build()
-                .OnBeforeUninstallFastCallback(_ => Shell.ToastNotifier.RemoveRegistration())
-                .Run();
-        }
-        catch (Exception ex)
-        {
-            // Logging is not set up this early. The app is fully usable without the updater.
-            System.Diagnostics.Debug.WriteLine($"Updater hooks failed: {ex}");
-        }
     }
 
     private static bool CanWriteToAppFolder()
