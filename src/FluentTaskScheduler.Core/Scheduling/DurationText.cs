@@ -11,8 +11,9 @@ namespace FluentTaskScheduler.Scheduling;
 /// </summary>
 public static class DurationText
 {
+    // [0-9] rather than \d: \d also matches the digits of other scripts, which double.Parse refuses.
     private static readonly Regex Part = new(
-        @"\G\s*(?<n>\d+(?:[.,]\d+)?)\s*(?<u>days?|d|hours?|hrs?|h|minutes?|mins?|m|seconds?|secs?|s)\s*",
+        @"\G\s*(?<n>[0-9]+(?:[.,][0-9]+)?)\s*(?<u>days?|d|hours?|hrs?|h|minutes?|mins?|m|seconds?|secs?|s)\s*",
         RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     /// <summary>Parses the shorthand form or an ISO 8601 duration. An empty string is not a duration.</summary>
@@ -25,7 +26,7 @@ public static class DurationText
         if (text[0] is 'P' or 'p')
         {
             try { value = XmlConvert.ToTimeSpan(text.ToUpperInvariant()); return value >= TimeSpan.Zero; }
-            catch (FormatException) { return false; }
+            catch (Exception ex) when (ex is FormatException or OverflowException) { return false; }
         }
 
         double seconds = 0;

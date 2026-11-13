@@ -231,6 +231,8 @@ public class TriggerViewModelTests
     [InlineData("often", "", "", "Editor.Error.RepetitionText")]
     [InlineData("5m", "a while", "", "Editor.Error.RepetitionText")]
     [InlineData("", "", "soon", "Editor.Error.RandomDelayText")]
+    [InlineData("１５m", "", "", "Editor.Error.RepetitionText")]
+    [InlineData("", "", "P99999Y", "Editor.Error.RandomDelayText")]
     public void ADurationThatCannotBeRead_IsReported_NotGuessed(string every, string duration, string delay, string expectedProblem)
     {
         var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, Start = Start })
