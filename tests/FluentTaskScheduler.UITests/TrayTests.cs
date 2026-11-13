@@ -56,9 +56,7 @@ public class TrayTests
         Assert.True(Eventually(() => !app.IsWindowVisible), "Closing did not hide the window.");
 
         AutomationElement icon = FindIcon(app) ?? throw new InvalidOperationException("The app has no icon in the notification area. Found there: " + NotificationAreaNames(app));
-        icon.RightClick();
-        AutomationElement exit = Retry.WhileNull(() => MenuItem(app, "Exit"), TimeSpan.FromSeconds(10)).Result
-                                 ?? throw new InvalidOperationException("The icon's menu has no Exit entry.");
+        AutomationElement exit = MenuItemOf(icon, app, "Exit") ?? throw new InvalidOperationException("The icon's menu has no Exit entry.");
         exit.Press();
 
         Assert.True(Eventually(() => app.HasExited), "Exit in the icon's menu did not end the app.");
@@ -77,6 +75,17 @@ public class TrayTests
         if (arrow is null) return null;
         arrow.Click();
         return Retry.WhileNull(Search, TimeSpan.FromSeconds(10)).Result;
+    }
+
+    // Now and then the ARM64 build machine loses a right-click on the icon, so it is tried again.
+    private static AutomationElement? MenuItemOf(AutomationElement icon, AppSession app, string name)
+    {
+        for (int attempt = 0; attempt < 3; attempt++)
+        {
+            icon.RightClick();
+            if (Retry.WhileNull(() => MenuItem(app, name), TimeSpan.FromSeconds(5)).Result is { } item) return item;
+        }
+        return null;
     }
 
     private static AutomationElement? MenuItem(AppSession app, string name) =>
