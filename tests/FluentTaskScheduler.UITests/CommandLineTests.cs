@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO.Compression;
 using System.Text.Json;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Tools;
@@ -112,6 +113,60 @@ public class CommandLineTests
     }
 
     /// <summary>
+    /// An update the user put off stays downloaded in the installation's packages folder. The next
+    /// start of the exe must not install it in place of the command it was started for, and must
+    /// leave it there to be offered again.
+    /// </summary>
+    [Fact]
+    public void AnUpdateThatWasPutOff_LeavesTheCommandToAnswer()
+    {
+        string root = Path.Combine(Path.GetTempPath(), "FtsUiTests_" + Guid.NewGuid().ToString("N")[..8]);
+        try
+        {
+            // What Velopack's installer leaves: the updater, the app in "current" with a manifest of
+            // the installed release, and in "packages" what has been downloaded since.
+            string app = Path.Combine(root, "current");
+            CopyFolder(Path.GetDirectoryName(AppSession.ExePath)!, app);
+            File.WriteAllText(Path.Combine(app, "sq.version"), Nuspec("1.0.0"));
+            string update = Path.Combine(root, "packages", "FluentTaskScheduler-99.0.0-full.nupkg");
+            WritePackage(update, Nuspec("99.0.0"));
+            // Velopack only starts the updater and leaves the rest to it; any program that ends by itself stands in.
+            File.Copy(Path.Combine(Environment.SystemDirectory, "whoami.exe"), Path.Combine(root, "Update.exe"));
+
+            var (exitCode, output) = RunExe(Path.Combine(app, "FluentTaskScheduler.exe"), "--list");
+
+            Assert.True(output.TrimStart().StartsWith('['), $"--list ended with exit code {exitCode} and wrote '{output}' instead of the tasks.");
+            Assert.Equal(0, exitCode);
+            Assert.True(File.Exists(update), "The downloaded update is gone, so it cannot be offered again.");
+        }
+        finally
+        {
+            try { Directory.Delete(root, recursive: true); } catch (IOException) { } catch (UnauthorizedAccessException) { }
+        }
+    }
+
+    private static string Nuspec(string version) =>
+        $"""<?xml version="1.0" encoding="utf-8"?><package><metadata><id>FluentTaskScheduler</id><version>{version}</version></metadata></package>""";
+
+    private static void WritePackage(string path, string nuspec)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        using var package = ZipFile.Open(path, ZipArchiveMode.Create);
+        using var writer = new StreamWriter(package.CreateEntry("FluentTaskScheduler.nuspec").Open());
+        writer.Write(nuspec);
+    }
+
+    private static void CopyFolder(string from, string to)
+    {
+        foreach (string file in Directory.EnumerateFiles(from, "*", SearchOption.AllDirectories))
+        {
+            string copy = Path.Combine(to, Path.GetRelativePath(from, file));
+            Directory.CreateDirectory(Path.GetDirectoryName(copy)!);
+            File.Copy(file, copy);
+        }
+    }
+
+    /// <summary>
     /// The app is a windowed program, and those have no console. Started from one, it has to
     /// borrow it, or its answer goes nowhere.
     /// </summary>
@@ -172,9 +227,11 @@ public class CommandLineTests
         catch { return ""; } // a window that is just going away
     }
 
-    private static (int ExitCode, string Output) Run(params string[] arguments)
+    private static (int ExitCode, string Output) Run(params string[] arguments) => RunExe(AppSession.ExePath, arguments);
+
+    private static (int ExitCode, string Output) RunExe(string exe, params string[] arguments)
     {
-        var startInfo = new ProcessStartInfo(AppSession.ExePath) { RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
+        var startInfo = new ProcessStartInfo(exe) { RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
         foreach (string argument in arguments) startInfo.ArgumentList.Add(argument);
 
         using var process = Process.Start(startInfo)!;

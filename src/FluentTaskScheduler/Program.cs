@@ -32,6 +32,10 @@ public static class Program
             try
             {
                 VelopackApp.Build()
+                    // Velopack would install a downloaded update at the next start, whatever that start
+                    // is for: a command a script is waiting for, or a second start that should only bring
+                    // the window back. An update the user put off is offered again instead.
+                    .SetAutoApplyOnStartup(false)
                     .OnBeforeUninstallFastCallback(_ =>
                     {
                         // What the app left in Windows outside its own folders: its start at sign-in
