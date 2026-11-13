@@ -235,6 +235,45 @@ namespace FluentTaskScheduler.Tests.Integration
         }
 
         [SkippableFact]
+        public void ATaskWithAStoredPassword_CanOnlyBeSavedWithThatPassword()
+        {
+            // Windows keeps the password of a task that runs whether or not its user is logged on,
+            // and wants it again for every change. Editing must neither drop that logon type nor
+            // pretend the save worked.
+            Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
+            using var sandbox = new SchedulerSandbox();
+            string user = "ftstest" + Guid.NewGuid().ToString("N")[..5];
+            string password = "Ft5!" + Guid.NewGuid().ToString("N")[..9]; // net.exe asks for confirmation above 14 characters
+            _out.WriteLine(Run("net.exe", $"user {user} {password} /add"));
+            try
+            {
+                var task = sandbox.Folder.RegisterTaskDefinition("Stored", SampleTasks.Simple(sandbox.Service), TaskCreation.CreateOrUpdate, user, password, TaskLogonType.Password);
+                var draft = _store.Load(task.Path);
+                Assert.True(draft.StoresPassword);
+                Assert.Equal(TaskAccountKind.User, draft.Account.Kind);
+
+                Assert.Throws<TaskAccountException>(() => _store.Save(draft with { Hidden = true }, sandbox.FolderPath, task.Path));
+                Assert.Throws<TaskAccountException>(() => _store.Save(draft with { Hidden = true }, sandbox.FolderPath, task.Path, "not the password"));
+                Assert.False(_store.Load(task.Path).Hidden);
+
+                _store.Save(draft with { Hidden = true }, sandbox.FolderPath, task.Path, password);
+
+                var saved = _store.Load(task.Path);
+                Assert.True(saved.Hidden);
+                Assert.True(saved.StoresPassword);
+                Assert.Equal(TaskLogonType.Password, sandbox.Service.GetTask(task.Path).Definition.Principal.LogonType);
+
+                // Enabling and disabling does not re-register the task, so it needs no password.
+                _store.SetEnabled(task.Path, false);
+                Assert.False(_store.Load(task.Path).Enabled);
+            }
+            finally
+            {
+                _out.WriteLine(Run("net.exe", $"user {user} /delete"));
+            }
+        }
+
+        [SkippableFact]
         public void ImportingSomethingThatIsNotATask_IsRefusedClearly()
         {
             Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
