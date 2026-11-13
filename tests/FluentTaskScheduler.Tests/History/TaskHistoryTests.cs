@@ -154,6 +154,25 @@ public sealed class TaskHistoryTests
     }
 
     [Fact]
+    public void GetSystemEvents_PutsThemInTheOrderTheyHappened_WhichIsNotTheOrderTheSystemLogKeepsThemIn()
+    {
+        // As a real System log has it: the shutdown is recorded before the request that led to it.
+        var requested = new DateTimeOffset(2026, 11, 3, 17, 53, 14, 985, TimeSpan.Zero);
+        var shutDown = new DateTimeOffset(2026, 11, 3, 17, 53, 15, 308, TimeSpan.Zero);
+        var started = new DateTimeOffset(2026, 11, 3, 18, 24, 13, TimeSpan.Zero);
+        _log.Add(SystemEvent.Log,
+            SystemRecord("EventLog", 6006, 1, shutDown),
+            SystemRecord("User32", 1074, 2, requested),
+            SystemRecord("EventLog", 6005, 3, started));
+
+        var events = NewHistory().GetSystemEvents(shutDown, TimeSpan.FromHours(1));
+
+        Assert.Equal(
+            [new SystemEvent(SystemEventKind.ShutdownRequested, requested), new SystemEvent(SystemEventKind.Shutdown, shutDown), new SystemEvent(SystemEventKind.Startup, started)],
+            events);
+    }
+
+    [Fact]
     public void AQueryThatIsCancelledBeforeItStarts_ReadsNothing()
     {
         _log.Add(Channel, [.. Evidence.Log]);

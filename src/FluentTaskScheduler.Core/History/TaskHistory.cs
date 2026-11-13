@@ -48,7 +48,11 @@ public sealed class TaskHistory : ITaskHistory
     public IReadOnlyList<SystemEvent> GetSystemEvents(DateTimeOffset around, TimeSpan margin, CancellationToken cancellation = default)
     {
         string query = SystemEvent.Query(around - margin, around + margin);
-        return Read(SystemEvent.Log, query, newestFirst: false, SystemEvent.From, int.MaxValue, cancellation);
+        var events = Read(SystemEvent.Log, query, newestFirst: false, SystemEvent.From, int.MaxValue, cancellation);
+
+        // The System log is not written in the order things happened: its sources stamp their
+        // own events, and a shutdown is recorded ahead of the request that caused it.
+        return [.. events.OrderBy(e => e.Time)];
     }
 
     private List<T> Read<T>(string log, string query, bool newestFirst, Func<LogRecord, T?> interpret, int maxCount, CancellationToken cancellation)
