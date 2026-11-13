@@ -67,6 +67,17 @@ public sealed partial class SnoozeUntilViewModel : ObservableObject
 
     public bool HasProblem => Problem is not null;
 
+    /// <summary>
+    /// True from the moment the snooze is asked for until it has started or failed to. Suspending
+    /// the triggers of a few hundred tasks takes a while.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanSnooze))]
+    private bool _isSnoozing;
+
+    /// <summary>False while a snooze is being started: asking again would only queue a second one behind it.</summary>
+    public bool CanSnooze => !IsSnoozing;
+
     // The tasks of Windows are only ever included because that was chosen while the warning was in view.
     partial void OnSuspendsTriggersChanged(bool value)
     {
@@ -93,7 +104,16 @@ public sealed partial class SnoozeUntilViewModel : ObservableObject
             SnoozeIncludeMicrosoftTasks = SuspendsTriggers && IncludesMicrosoftTasks
         });
 
-        Problem = await _snooze(SnoozeEnd.Until(moment));
+        Problem = null;
+        IsSnoozing = true;
+        try
+        {
+            Problem = await _snooze(SnoozeEnd.Until(moment));
+        }
+        finally
+        {
+            IsSnoozing = false;
+        }
         return Problem is null;
     }
 }

@@ -358,5 +358,40 @@ public sealed class SnoozeViewModelTests : IDisposable
 
         Assert.Equal("Not saved. Access to the path is denied.", dialog.Problem);
         Assert.Empty(_prompts.Shown);
+        Assert.True(dialog.CanSnooze);
+    }
+
+    [Fact]
+    public async Task WhileTheSnoozeIsBeingStarted_TheDialogShowsIt_AndCannotBeConfirmedAgain()
+    {
+        _service.Hold = new TaskCompletionSource();
+        SnoozeUntilViewModel dialog = _snooze.PickMoment();
+        Assert.True(dialog.CanSnooze);
+
+        Task<bool> snoozing = dialog.SnoozeAsync();
+
+        Assert.True(dialog.IsSnoozing);
+        Assert.False(dialog.CanSnooze);
+
+        _service.Hold.SetResult();
+
+        Assert.True(await snoozing);
+        Assert.False(dialog.IsSnoozing);
+    }
+
+    [Fact]
+    public async Task AnotherAttempt_TakesTheProblemOfTheLastOneAway()
+    {
+        SnoozeUntilViewModel dialog = _snooze.PickMoment();
+        dialog.TimeOfDay = new TimeSpan(14, 17, 0);
+        Assert.False(await dialog.SnoozeAsync());
+
+        _service.Hold = new TaskCompletionSource();
+        dialog.TimeOfDay = new TimeSpan(15, 0, 0);
+        Task<bool> snoozing = dialog.SnoozeAsync();
+
+        Assert.False(dialog.HasProblem);
+        _service.Hold.SetResult();
+        Assert.True(await snoozing);
     }
 }

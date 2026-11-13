@@ -23,6 +23,9 @@ public sealed class FakeSnoozeService : ISnoozeService
     /// <summary>When set, every request fails with this.</summary>
     public Exception? Fails { get; set; }
 
+    /// <summary>When set, a request stays unanswered until the test completes this.</summary>
+    public TaskCompletionSource? Hold { get; set; }
+
     /// <summary>What <see cref="SnoozeTaskAsync"/> answers.</summary>
     public SnoozeTaskOutcome TaskOutcome { get; set; } = SnoozeTaskOutcome.Snoozed;
 
@@ -53,10 +56,11 @@ public sealed class FakeSnoozeService : ISnoozeService
 
     public Task RetryRestoresAsync() => RecordAsync("RetryRestores");
 
-    private Task RecordAsync(string call)
+    private async Task RecordAsync(string call)
     {
         Calls.Add(call);
-        return Fails is { } failure ? Task.FromException(failure) : Task.CompletedTask;
+        if (Hold is not null) await Hold.Task;
+        if (Fails is { } failure) throw failure;
     }
 
     private static string Describe(SnoozeEnd end) =>

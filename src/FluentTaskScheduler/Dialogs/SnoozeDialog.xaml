@@ -7,10 +7,13 @@
     PrimaryButtonText="{x:Bind l:Loc.Get('Snooze.Dialog.Confirm')}"
     CloseButtonText="{x:Bind l:Loc.Get('Dialog.Common.Cancel')}"
     DefaultButton="Primary"
-    PrimaryButtonClick="Snooze_Click">
+    IsPrimaryButtonEnabled="{x:Bind ViewModel.CanSnooze, Mode=OneWay}"
+    PrimaryButtonClick="Snooze_Click"
+    Closing="Dialog_Closing">
 
     <!-- The bars are collapsed as well as closed while they have nothing to say: a closed bar would still take the panel's spacing. -->
     <StackPanel Spacing="12" Width="440">
+        <ProgressBar IsIndeterminate="True" Visibility="{x:Bind ViewModel.IsSnoozing, Mode=OneWay}"/>
         <InfoBar x:Name="SnoozeProblem" Severity="Error" IsClosable="False"
                  IsOpen="{x:Bind ViewModel.HasProblem, Mode=OneWay}" Visibility="{x:Bind ViewModel.HasProblem, Mode=OneWay}"
                  Message="{x:Bind ViewModel.Problem, Mode=OneWay}"/>
