@@ -195,11 +195,11 @@ Jetzt neu starten, um das Update zu installieren?</value></data>
   <data name="Settings.Data.Import.Desc" xml:space="preserve"><value>Einstellungen aus einer zuvor exportierten Datei wiederherstellen.</value></data>
   <data name="Settings.Data.ImportBtn" xml:space="preserve"><value>Importieren...</value></data>
   <data name="Settings.Cat.Manage.Title" xml:space="preserve"><value>Kategorien verwalten</value></data>
-  <data name="Settings.Cat.Manage.Desc" xml:space="preserve"><value>Vordefinierte Kategorien für deine Aufgaben.</value></data>
+  <data name="Settings.Cat.Manage.Desc" xml:space="preserve"><value>Die Kategorien, die der Aufgabeneditor vorschlägt. Eine Kategorie, die du einer Aufgabe gibst, kommt hier hinzu.</value></data>
   <data name="Settings.Cat.Placeholder" xml:space="preserve"><value>Neuer Kategoriename...</value></data>
   <data name="Settings.Cat.AddBtn" xml:space="preserve"><value>Hinzufügen</value></data>
   <data name="Settings.Tag.Manage.Title" xml:space="preserve"><value>Tags verwalten</value></data>
-  <data name="Settings.Tag.Manage.Desc" xml:space="preserve"><value>Vordefinierte Tags für deine Aufgaben.</value></data>
+  <data name="Settings.Tag.Manage.Desc" xml:space="preserve"><value>Die Tags, die der Aufgabeneditor vorschlägt. Tags, die du einer Aufgabe gibst, kommen hier hinzu.</value></data>
   <data name="Settings.Tag.Placeholder" xml:space="preserve"><value>Neuer Tagname...</value></data>
   <data name="Settings.About.Update.Title" xml:space="preserve"><value>Nach Updates suchen</value></data>
   <data name="Settings.About.Update.Desc" xml:space="preserve"><value>Prüfen, ob eine neuere Version verfügbar ist.</value></data>

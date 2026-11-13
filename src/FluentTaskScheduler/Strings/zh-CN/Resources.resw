@@ -196,11 +196,11 @@
   <data name="Settings.Data.Import.Desc" xml:space="preserve"><value>从之前导出的文件恢复设置。</value></data>
   <data name="Settings.Data.ImportBtn" xml:space="preserve"><value>导入...</value></data>
   <data name="Settings.Cat.Manage.Title" xml:space="preserve"><value>管理分类</value></data>
-  <data name="Settings.Cat.Manage.Desc" xml:space="preserve"><value>任务的预定义分类。</value></data>
+  <data name="Settings.Cat.Manage.Desc" xml:space="preserve"><value>任务编辑器会建议这些分类。你为任务设置的分类会加入此处。</value></data>
   <data name="Settings.Cat.Placeholder" xml:space="preserve"><value>新分类名称...</value></data>
   <data name="Settings.Cat.AddBtn" xml:space="preserve"><value>添加</value></data>
   <data name="Settings.Tag.Manage.Title" xml:space="preserve"><value>管理标签</value></data>
-  <data name="Settings.Tag.Manage.Desc" xml:space="preserve"><value>任务的预定义标签。</value></data>
+  <data name="Settings.Tag.Manage.Desc" xml:space="preserve"><value>任务编辑器会建议这些标签。你为任务添加的标签会加入此处。</value></data>
   <data name="Settings.Tag.Placeholder" xml:space="preserve"><value>新标签名称...</value></data>
   <data name="Settings.About.Update.Title" xml:space="preserve"><value>检查更新</value></data>
   <data name="Settings.About.Update.Desc" xml:space="preserve"><value>检查是否有更新版本可用。</value></data>

@@ -195,11 +195,11 @@ Restart now to apply the update?</value></data>
   <data name="Settings.Data.Import.Desc" xml:space="preserve"><value>Restore settings from a previously exported file.</value></data>
   <data name="Settings.Data.ImportBtn" xml:space="preserve"><value>Import...</value></data>
   <data name="Settings.Cat.Manage.Title" xml:space="preserve"><value>Manage Categories</value></data>
-  <data name="Settings.Cat.Manage.Desc" xml:space="preserve"><value>Predefined categories for your tasks.</value></data>
+  <data name="Settings.Cat.Manage.Desc" xml:space="preserve"><value>The categories the task editor suggests. A category you give a task is added here.</value></data>
   <data name="Settings.Cat.Placeholder" xml:space="preserve"><value>New category name...</value></data>
   <data name="Settings.Cat.AddBtn" xml:space="preserve"><value>Add</value></data>
   <data name="Settings.Tag.Manage.Title" xml:space="preserve"><value>Manage Tags</value></data>
-  <data name="Settings.Tag.Manage.Desc" xml:space="preserve"><value>Predefined tags for your tasks.</value></data>
+  <data name="Settings.Tag.Manage.Desc" xml:space="preserve"><value>The tags the task editor suggests. Tags you give a task are added here.</value></data>
   <data name="Settings.Tag.Placeholder" xml:space="preserve"><value>New tag name...</value></data>
   <data name="Settings.About.Update.Title" xml:space="preserve"><value>Check for Updates</value></data>
   <data name="Settings.About.Update.Desc" xml:space="preserve"><value>Check if a newer version is available.</value></data>

@@ -279,6 +279,7 @@ public sealed class TaskEditorViewModelTests : IDisposable
     [InlineData("d", "disk, ")]
     [InlineData("nightly,", "nightly, disk, ")]
     [InlineData("backup ,nightly,  di", "backup ,nightly, disk, ")]
+    [InlineData("日次、d", "日次、disk, ")]
     public void AChosenTag_ReplacesTheTagBeingTyped_AndLeavesTheBoxReadyForTheNext(string typed, string expected)
     {
         var editor = Edit(new TaskDraft());
@@ -287,6 +288,19 @@ public sealed class TaskEditorViewModelTests : IDisposable
         editor.ChooseTag("disk");
 
         Assert.Equal(expected, editor.Tags);
+    }
+
+    [Fact]
+    public void TheCommaOfAJapaneseOrChineseInputMethod_SeparatesTagsToo()
+    {
+        _settings.Update(s => s with { SavedTags = ["日次", "disk", "docs"] });
+        var editor = Edit(Elaborate());
+
+        editor.Tags = "日次、ディスク，备份, d";
+
+        Assert.Equal(["disk", "docs"], editor.SuggestTags());
+        Assert.True(editor.TryBuild(out TaskDraft built, out _));
+        Assert.Equal(["日次", "ディスク", "备份", "d"], built.Tags);
     }
 
     [Fact]

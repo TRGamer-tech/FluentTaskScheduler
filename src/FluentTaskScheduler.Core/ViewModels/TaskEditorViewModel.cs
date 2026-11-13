@@ -304,6 +304,9 @@ public sealed partial class TaskEditorViewModel : ObservableObject
             .ToList();
     }
 
+    // A Japanese or Chinese input method types a comma of its own for the comma key.
+    private static readonly char[] TagSeparators = [',', '、', '，'];
+
     /// <summary>
     /// The saved tags that begin with the tag being typed, which is the text after the last comma,
     /// apart from the tags the box holds already. Before a tag is begun, that is every saved tag the
@@ -311,7 +314,7 @@ public sealed partial class TaskEditorViewModel : ObservableObject
     /// </summary>
     public IReadOnlyList<string> SuggestTags()
     {
-        string[] held = Tags.Split(',', StringSplitOptions.TrimEntries);
+        string[] held = Tags.Split(TagSeparators, StringSplitOptions.TrimEntries);
         string typed = held[^1];
         return _settings.Current.SavedTags
             .Where(tag => tag.StartsWith(typed, StringComparison.CurrentCultureIgnoreCase) && !held.Contains(tag, StringComparer.CurrentCultureIgnoreCase))
@@ -321,8 +324,9 @@ public sealed partial class TaskEditorViewModel : ObservableObject
     /// <summary>Puts <paramref name="tag"/> in place of the tag being typed, with a comma after it for the next one.</summary>
     public void ChooseTag(string tag)
     {
-        int comma = Tags.LastIndexOf(',');
-        Tags = (comma < 0 ? "" : Tags[..(comma + 1)] + " ") + tag + ", ";
+        int comma = Tags.LastIndexOfAny(TagSeparators);
+        string before = comma < 0 ? "" : Tags[..(comma + 1)] + (Tags[comma] == ',' ? " " : "");
+        Tags = before + tag + ", ";
     }
 
     /// <summary>Checks the input and saves the task.</summary>
@@ -468,7 +472,7 @@ public sealed partial class TaskEditorViewModel : ObservableObject
     };
 
     private static ValueList<string> ParseTags(string text) =>
-        text.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+        text.Split(TagSeparators, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToValueList();
 

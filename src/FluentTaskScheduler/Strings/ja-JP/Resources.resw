@@ -195,11 +195,11 @@
   <data name="Settings.Data.Import.Desc" xml:space="preserve"><value>以前エクスポートしたファイルから設定を復元します。</value></data>
   <data name="Settings.Data.ImportBtn" xml:space="preserve"><value>インポート...</value></data>
   <data name="Settings.Cat.Manage.Title" xml:space="preserve"><value>カテゴリの管理</value></data>
-  <data name="Settings.Cat.Manage.Desc" xml:space="preserve"><value>タスクの事前定義されたカテゴリ。</value></data>
+  <data name="Settings.Cat.Manage.Desc" xml:space="preserve"><value>タスクのエディターで候補として表示されるカテゴリです。タスクに設定したカテゴリはここに追加されます。</value></data>
   <data name="Settings.Cat.Placeholder" xml:space="preserve"><value>新しいカテゴリ名...</value></data>
   <data name="Settings.Cat.AddBtn" xml:space="preserve"><value>追加</value></data>
   <data name="Settings.Tag.Manage.Title" xml:space="preserve"><value>タグの管理</value></data>
-  <data name="Settings.Tag.Manage.Desc" xml:space="preserve"><value>タスクの事前定義されたタグ。</value></data>
+  <data name="Settings.Tag.Manage.Desc" xml:space="preserve"><value>タスクのエディターで候補として表示されるタグです。タスクに付けたタグはここに追加されます。</value></data>
   <data name="Settings.Tag.Placeholder" xml:space="preserve"><value>新しいタグ名...</value></data>
   <data name="Settings.About.Update.Title" xml:space="preserve"><value>アップデートを確認</value></data>
   <data name="Settings.About.Update.Desc" xml:space="preserve"><value>新しいバージョンが利用可能か確認します。</value></data>
