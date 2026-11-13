@@ -129,7 +129,7 @@ public sealed class TaskTests : IDisposable
         Assert.True(app.Find(element => element.ControlType == ControlType.ListItem, 30000) != null, "The list stayed empty.");
 
         var scroll = app.Require("TaskList").Patterns.Scroll.Pattern;
-        Assert.True(scroll.VerticallyScrollable.Value, "The list does not scroll, so no row is ever reused.");
+        Assert.True(WaitFor(() => scroll.VerticallyScrollable.Value), "The list does not scroll, so no row is ever reused.");
         for (int page = 0; page < 300 && scroll.VerticalScrollPercent.Value < 100; page++)
         {
             scroll.Scroll(ScrollAmount.NoAmount, ScrollAmount.LargeIncrement);

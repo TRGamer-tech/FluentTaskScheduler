@@ -68,7 +68,8 @@ public class TrayTests
     // that shows the hidden ones.
     private static AutomationElement? FindIcon(AppSession app)
     {
-        AutomationElement? Search() => ShellElements(app).FirstOrDefault(element => element.ControlType == ControlType.Button && NameOf(element).StartsWith("FluentTaskScheduler"));
+        // Windows puts more than the tooltip into the name, at least a leading blank.
+        AutomationElement? Search() => ShellElements(app).FirstOrDefault(element => element.ControlType == ControlType.Button && NameOf(element).Trim().StartsWith("FluentTaskScheduler"));
 
         if (Search() is { } visible) return visible;
         AutomationElement? arrow = ShellElements(app).FirstOrDefault(element =>
