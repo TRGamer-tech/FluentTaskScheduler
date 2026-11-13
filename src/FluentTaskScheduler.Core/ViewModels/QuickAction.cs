@@ -31,17 +31,17 @@ public sealed record QuickAction(string Id, string Glyph, ProcessRequest Request
 
     public static IReadOnlyList<QuickAction> All { get; } =
     [
-        new("FlushDNS", "", Tool("ipconfig.exe", "/flushdns")) { ReportsFindings = true },
-        new("ClearTemp", "", PowerShell(ClearTempScript)) { ConfirmFirst = true },
-        new("RestartExplorer", "", PowerShell(RestartExplorerScript)) { ConfirmFirst = true },
-        new("IPReleaseRenew", "", Tool("ipconfig.exe", "/renew")) { RequiresElevation = true },
+        new("FlushDNS", "\uE945", Tool("ipconfig.exe", "/flushdns")) { ReportsFindings = true },
+        new("ClearTemp", "\uE74D", PowerShell(ClearTempScript)) { ConfirmFirst = true },
+        new("RestartExplorer", "\uE895", PowerShell(RestartExplorerScript)) { ConfirmFirst = true },
+        new("IPReleaseRenew", "\uE839", Tool("ipconfig.exe", "/renew")) { RequiresElevation = true },
         // sfc writes UTF-16 whatever its console is set to.
-        new("SfcScannow", "", new ProcessRequest(WindowsTools.InSystemFolder("sfc.exe"), "/scannow") { OutputEncoding = Encoding.Unicode })
+        new("SfcScannow", "\uEA18", new ProcessRequest(WindowsTools.InSystemFolder("sfc.exe"), "/scannow") { OutputEncoding = Encoding.Unicode })
         {
             RequiresElevation = true,
             ReportsFindings = true
         },
-        new("DismHealth", "", Dism("/Online /Cleanup-Image /CheckHealth")) { RequiresElevation = true, ReportsFindings = true }
+        new("DismHealth", "\uE9D9", Dism("/Online /Cleanup-Image /CheckHealth")) { RequiresElevation = true, ReportsFindings = true }
     ];
 
     internal static ProcessRequest Tool(string fileName, string arguments) =>
