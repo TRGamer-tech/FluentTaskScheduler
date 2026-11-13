@@ -1008,4 +1008,10 @@
   <data name="Library.Scripts.DeleteFailed" xml:space="preserve"><value>スクリプトを削除できませんでした: {0}</value></data>
   <data name="Templates.IdleShutdown.Comment" xml:space="preserve"><value>スケジュールされたシャットダウンです。キャンセルするには shutdown /a を実行してください。</value></data>
   <data name="Templates.WeeklyReboot.Comment" xml:space="preserve"><value>スケジュールされた再起動です。キャンセルするには shutdown /a を実行してください。</value></data>
+  <data name="Shortcuts.NewTask" xml:space="preserve"><value>タスクを作成</value></data>
+  <data name="Shortcuts.Edit" xml:space="preserve"><value>選択したタスクを編集</value></data>
+  <data name="Shortcuts.Run" xml:space="preserve"><value>選択したタスクを実行</value></data>
+  <data name="Shortcuts.Delete" xml:space="preserve"><value>選択したタスクを削除</value></data>
+  <data name="Shortcuts.Refresh" xml:space="preserve"><value>タスク一覧を再読み込み</value></data>
+  <data name="Shortcuts.Help" xml:space="preserve"><value>この一覧を表示</value></data>
 </root>

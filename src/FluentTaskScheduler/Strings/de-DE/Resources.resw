@@ -1008,4 +1008,10 @@ Jetzt App neustarten?</value></data>
   <data name="Library.Scripts.DeleteFailed" xml:space="preserve"><value>Das Skript konnte nicht gelöscht werden: {0}</value></data>
   <data name="Templates.IdleShutdown.Comment" xml:space="preserve"><value>Geplantes Herunterfahren. Zum Abbrechen ausführen: shutdown /a</value></data>
   <data name="Templates.WeeklyReboot.Comment" xml:space="preserve"><value>Geplanter Neustart. Zum Abbrechen ausführen: shutdown /a</value></data>
+  <data name="Shortcuts.NewTask" xml:space="preserve"><value>Aufgabe erstellen</value></data>
+  <data name="Shortcuts.Edit" xml:space="preserve"><value>Ausgewählte Aufgabe bearbeiten</value></data>
+  <data name="Shortcuts.Run" xml:space="preserve"><value>Ausgewählte Aufgaben ausführen</value></data>
+  <data name="Shortcuts.Delete" xml:space="preserve"><value>Ausgewählte Aufgaben löschen</value></data>
+  <data name="Shortcuts.Refresh" xml:space="preserve"><value>Aufgabenliste neu laden</value></data>
+  <data name="Shortcuts.Help" xml:space="preserve"><value>Diese Übersicht anzeigen</value></data>
 </root>

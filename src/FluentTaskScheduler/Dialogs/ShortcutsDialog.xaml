@@ -1,0 +1,25 @@
+<ContentDialog
+    x:Class="FluentTaskScheduler.Dialogs.ShortcutsDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:l="using:FluentTaskScheduler.Localization"
+    xmlns:local="using:FluentTaskScheduler.Dialogs"
+    Title="{x:Bind l:Loc.Get('Main.ShortcutsDialog.Title')}"
+    CloseButtonText="{x:Bind l:Loc.Get('Dialog.Common.Close')}"
+    DefaultButton="Close">
+
+    <ItemsControl x:Name="ShortcutList" ItemsSource="{x:Bind Shortcuts}" MinWidth="340" IsTabStop="False">
+        <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="local:Shortcut">
+                <Grid ColumnSpacing="24" Margin="0,4,0,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{x:Bind Keys}" FontFamily="Consolas"/>
+                    <TextBlock Grid.Column="1" Text="{x:Bind Action}" TextWrapping="Wrap"/>
+                </Grid>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</ContentDialog>

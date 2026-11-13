@@ -1008,5 +1008,11 @@ Restart now to apply the update?</value></data>
   <data name="Library.Scripts.DeleteFailed" xml:space="preserve"><value>The script could not be deleted: {0}</value></data>
   <data name="Templates.IdleShutdown.Comment" xml:space="preserve"><value>Scheduled shutdown. To cancel it, run: shutdown /a</value></data>
   <data name="Templates.WeeklyReboot.Comment" xml:space="preserve"><value>Scheduled restart. To cancel it, run: shutdown /a</value></data>
+  <data name="Shortcuts.NewTask" xml:space="preserve"><value>Create a task</value></data>
+  <data name="Shortcuts.Edit" xml:space="preserve"><value>Edit the selected task</value></data>
+  <data name="Shortcuts.Run" xml:space="preserve"><value>Run the selected tasks</value></data>
+  <data name="Shortcuts.Delete" xml:space="preserve"><value>Delete the selected tasks</value></data>
+  <data name="Shortcuts.Refresh" xml:space="preserve"><value>Reload the task list</value></data>
+  <data name="Shortcuts.Help" xml:space="preserve"><value>Show this overview</value></data>
 </root>
 

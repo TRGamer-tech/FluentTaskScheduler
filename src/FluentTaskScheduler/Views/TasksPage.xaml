@@ -99,6 +99,13 @@
                         </MenuFlyout>
                     </AppBarButton.Flyout>
                 </AppBarButton>
+                <CommandBar.SecondaryCommands>
+                    <AppBarButton x:Name="ShortcutsButton" Icon="Keyboard" Label="{x:Bind l:Loc.Get('Main.ShortcutsDialog.Title')}" Click="Shortcuts_Click">
+                        <AppBarButton.KeyboardAccelerators>
+                            <KeyboardAccelerator Key="F1"/>
+                        </AppBarButton.KeyboardAccelerators>
+                    </AppBarButton>
+                </CommandBar.SecondaryCommands>
             </CommandBar>
         </Grid>
 

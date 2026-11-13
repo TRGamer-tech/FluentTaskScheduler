@@ -150,6 +150,20 @@ public sealed partial class TasksPage : Page
 
     private async void NewTask_Click(object sender, RoutedEventArgs e) => await CreateTaskAsync();
 
+    private async void Shortcuts_Click(object sender, RoutedEventArgs e)
+    {
+        if (_dialogOpen) return;
+        _dialogOpen = true;
+        try
+        {
+            await _dialogs.ShowAsync(new ShortcutsDialog());
+        }
+        finally
+        {
+            _dialogOpen = false;
+        }
+    }
+
     private async void TaskList_ItemClick(object sender, ItemClickEventArgs e)
     {
         // A click that extends or toggles the selection is not a request to open the task.

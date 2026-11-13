@@ -114,6 +114,18 @@ public sealed class TaskTests : IDisposable
     }
 
     [Fact]
+    public void TheShortcutOverview_ListsTheKeysOfTheTaskList()
+    {
+        using var app = AppSession.Launch("shortcuts");
+
+        app.ToolbarButton("ShortcutsButton").Press();
+
+        Assert.True(app.Find(element => element.Name == "Ctrl+N", 10000) != null, "The overview did not open or does not list Ctrl+N.");
+        Assert.NotNull(app.FindByName("Reload the task list"));
+        app.Snapshot("shortcuts");
+    }
+
+    [Fact]
     public void ATasksDetails_ShowWhatItRuns_AndAfterARunWhatBecameOfIt()
     {
         _windows.CreateDaily("Detailed");
