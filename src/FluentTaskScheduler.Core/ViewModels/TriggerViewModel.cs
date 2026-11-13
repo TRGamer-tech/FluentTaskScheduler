@@ -81,7 +81,8 @@ public sealed partial class TriggerViewModel : ObservableObject
     public bool IsEditable { get; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Type), nameof(HasSchedule), nameof(IsDaily), nameof(IsWeekly), nameof(IsMonthly), nameof(IsEvent), nameof(IsSessionChange))]
+    [NotifyPropertyChangedFor(nameof(Type), nameof(HasSchedule), nameof(IsDaily), nameof(IsWeekly), nameof(IsMonthly), nameof(IsMonthlyByDay), nameof(IsMonthlyByWeekday),
+        nameof(IsEvent), nameof(IsSessionChange))]
     private int _typeIndex;
 
     [ObservableProperty] private bool _enabled;

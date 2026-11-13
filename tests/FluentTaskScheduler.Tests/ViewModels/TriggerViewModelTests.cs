@@ -1,3 +1,4 @@
+using System.Reflection;
 using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.ViewModels;
 using Microsoft.Win32.TaskScheduler;
@@ -104,6 +105,32 @@ public class TriggerViewModelTests
 
             Assert.True(trigger.TryBuild(out TriggerDraft built, out string? problem), problem);
             Assert.Equal(TriggerViewModel.Types[index], built.Type);
+        }
+    }
+
+    /// <summary>The form shows and hides its parts by these flags, so it has to hear of every change.</summary>
+    [Fact]
+    public void ChangingTheType_AnnouncesEveryPartOfTheFormThatAppearsOrDisappears()
+    {
+        PropertyInfo[] flags = typeof(TriggerViewModel).GetProperties().Where(property => property.PropertyType == typeof(bool)).ToArray();
+
+        foreach (bool byWeekday in new[] { false, true })
+        {
+            foreach (TriggerType from in TriggerViewModel.Types)
+            {
+                foreach (TriggerType to in TriggerViewModel.Types)
+                {
+                    var trigger = new TriggerViewModel(new TriggerDraft { Type = from, Start = Start, MonthlyByWeekday = byWeekday });
+                    var before = flags.ToDictionary(flag => flag.Name, flag => flag.GetValue(trigger));
+                    var announced = new List<string?>();
+                    trigger.PropertyChanged += (_, e) => announced.Add(e.PropertyName);
+
+                    trigger.TypeIndex = TriggerViewModel.Types.ToList().IndexOf(to);
+
+                    foreach (PropertyInfo flag in flags.Where(flag => !Equals(flag.GetValue(trigger), before[flag.Name])))
+                        Assert.True(announced.Contains(flag.Name), $"From {from} to {to}: {flag.Name} changed without notice.");
+                }
+            }
         }
     }
 
