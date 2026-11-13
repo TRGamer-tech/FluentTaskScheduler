@@ -352,7 +352,7 @@
   <data name="Snooze.SuspendTriggersHint" xml:space="preserve"><value>通过任务计划程序 API 禁用所有已启用的任务，并在暂停结束时仅重新启用这些任务。受保护的系统任务将被跳过。</value></data>
   <data name="Snooze.Banner.Suspended" xml:space="preserve"><value>计划触发器已暂停，手动运行也会被阻止。暂停结束后任务将重新启用。</value></data>
   <data name="Snooze.Banner.ManualOnly" xml:space="preserve"><value>从此应用启动的运行会被阻止，但 Windows 仍会按计划启动任务。若要同时阻止这些运行，请在暂停时选择“同时暂停计划触发器”。</value></data>
-  <data name="Snooze.Error.BatchBlocked" xml:space="preserve"><value>{0} 个任务处于暂停状态，因此未能启动。</value></data>
+  <data name="Snooze.Error.BatchBlocked" xml:space="preserve"><value>{0} 个任务已暂停，因此未启动。</value></data>
   <data name="Snooze.Error.PastTime" xml:space="preserve"><value>请选择一个未来的时间。</value></data>
   <data name="Snooze.Toast.Started.Title" xml:space="preserve"><value>暂停已开始</value></data>
   <data name="Snooze.Toast.Ended.Title" xml:space="preserve"><value>暂停已结束</value></data>
@@ -825,7 +825,7 @@
   <data name="Templates.Tag.Battery" xml:space="preserve"><value>电池</value></data>
   <data name="Templates.Tag.Display" xml:space="preserve"><value>显示器</value></data>
   <data name="Dashboard.Tasks.Unavailable" xml:space="preserve"><value>无法读取任务：{0}</value></data>
-  <data name="Tasks.Error.Duplicated" xml:space="preserve"><value>该任务现在同时存在为“{0}”和“{1}”，两者都无法删除。请在任务计划程序中删除其中一个。</value></data>
+  <data name="Tasks.Error.Duplicated" xml:space="preserve"><value>该任务现在同时存在于“{0}”和“{1}”，两者都无法删除。请在任务计划程序中删除其中一个。</value></data>
   <data name="Tasks.Error.NameTakenInFolder" xml:space="preserve"><value>“{0}”：文件夹“{1}”中已有同名任务。</value></data>
   <data name="Folders.Error.NameTaken" xml:space="preserve"><value>此处已有名为“{0}”的文件夹。请选择其他名称。</value></data>
   <data name="Folders.Error.PartlyMoved" xml:space="preserve"><value>部分任务无法移动，仍留在“{0}”中。其他任务已移动。</value></data>
@@ -833,7 +833,7 @@
   <data name="Tasks.Error.OnlyWithPassword" xml:space="preserve"><value>“{0}”：只有在编辑器中输入其帐户的密码后才能更改此任务。</value></data>
   <data name="Tasks.SelectFormat" xml:space="preserve"><value>选择“{0}”</value></data>
   <data name="Tasks.EnableFormat" xml:space="preserve"><value>启用“{0}”</value></data>
-  <data name="Snooze.Error.RecordUnreadable" xml:space="preserve"><value>无法读取之前暂停的记录“{0}”，因此未对其做任何改动。在重启应用或将该文件移到别处之前，无法记录任何新内容。</value></data>
+  <data name="Snooze.Error.RecordUnreadable" xml:space="preserve"><value>无法读取之前暂停的记录“{0}”，因此未对其做任何改动。在重启应用之前，无法记录任何新内容。如有必要，请先将该文件移到别处，再重启应用。</value></data>
   <data name="Clipboard.Busy" xml:space="preserve"><value>未能复制：另一个程序正在使用剪贴板。请稍后重试。</value></data>
   <data name="QuickActions.RunFormat" xml:space="preserve"><value>运行“{0}”</value></data>
   <data name="QuickActions.CancelFormat" xml:space="preserve"><value>取消“{0}”</value></data>

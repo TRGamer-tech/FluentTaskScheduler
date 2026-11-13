@@ -351,7 +351,7 @@ Jetzt neu starten, um das Update zu installieren?</value></data>
   <data name="Snooze.SuspendTriggersHint" xml:space="preserve"><value>Deaktiviert jede aktivierte Aufgabe über die Aufgabenplanungs-API und aktiviert genau diese Aufgaben wieder, wenn die Pause endet. Geschützte Systemaufgaben werden übersprungen.</value></data>
   <data name="Snooze.Banner.Suspended" xml:space="preserve"><value>Geplante Trigger sind deaktiviert und manuelle Starts werden blockiert. Aufgaben werden reaktiviert, wenn die Pause endet.</value></data>
   <data name="Snooze.Banner.ManualOnly" xml:space="preserve"><value>Starts aus dieser App werden blockiert, aber Windows startet Aufgaben weiterhin nach Plan. Um auch das zu verhindern, wähle beim Pausieren „Geplante Trigger ebenfalls deaktivieren“.</value></data>
-  <data name="Snooze.Error.BatchBlocked" xml:space="preserve"><value>{0} Aufgabe(n) wurden nicht gestartet, weil sie pausiert sind.</value></data>
+  <data name="Snooze.Error.BatchBlocked" xml:space="preserve"><value>Wegen einer Pause nicht gestartete Aufgaben: {0}</value></data>
   <data name="Snooze.Error.PastTime" xml:space="preserve"><value>Wähle einen Zeitpunkt in der Zukunft.</value></data>
   <data name="Snooze.Toast.Started.Title" xml:space="preserve"><value>Pause gestartet</value></data>
   <data name="Snooze.Toast.Ended.Title" xml:space="preserve"><value>Pause beendet</value></data>
@@ -825,14 +825,14 @@ Jetzt neu starten, um das Update zu installieren?</value></data>
   <data name="Templates.Tag.Display" xml:space="preserve"><value>Bildschirm</value></data>
   <data name="Dashboard.Tasks.Unavailable" xml:space="preserve"><value>Die Aufgaben konnten nicht gelesen werden: {0}</value></data>
   <data name="Tasks.Error.Duplicated" xml:space="preserve"><value>Die Aufgabe gibt es jetzt doppelt, als „{0}“ und als „{1}“: Keine der beiden konnte entfernt werden. Lösche eine davon in der Aufgabenplanung.</value></data>
-  <data name="Tasks.Error.NameTakenInFolder" xml:space="preserve"><value>'{0}': Im Ordner „{1}“ gibt es schon eine Aufgabe mit diesem Namen.</value></data>
+  <data name="Tasks.Error.NameTakenInFolder" xml:space="preserve"><value>„{0}“: Im Ordner „{1}“ gibt es schon eine Aufgabe mit diesem Namen.</value></data>
   <data name="Folders.Error.NameTaken" xml:space="preserve"><value>Hier gibt es schon einen anderen Ordner namens „{0}“. Wähle einen anderen Namen.</value></data>
   <data name="Folders.Error.PartlyMoved" xml:space="preserve"><value>Einige Aufgaben konnten nicht verschoben werden und bleiben in „{0}“. Die anderen wurden verschoben.</value></data>
   <data name="Tasks.Error.CompletionActionsKept" xml:space="preserve"><value>Die Abschlussaktionen dieser Aufgaben starten Aufgaben noch unter ihrem früheren Pfad, weil diese Aufgaben nicht geändert werden konnten:</value></data>
-  <data name="Tasks.Error.OnlyWithPassword" xml:space="preserve"><value>'{0}': Diese Aufgabe lässt sich nur im Editor ändern, mit dem Kennwort ihres Kontos.</value></data>
+  <data name="Tasks.Error.OnlyWithPassword" xml:space="preserve"><value>„{0}“: Diese Aufgabe lässt sich nur im Editor mit dem Kennwort ihres Kontos ändern.</value></data>
   <data name="Tasks.SelectFormat" xml:space="preserve"><value>{0} auswählen</value></data>
   <data name="Tasks.EnableFormat" xml:space="preserve"><value>{0} aktivieren</value></data>
-  <data name="Snooze.Error.RecordUnreadable" xml:space="preserve"><value>Die Aufzeichnung früherer Pausen in „{0}“ konnte nicht gelesen werden und wurde unverändert gelassen. Bis die App neu gestartet oder diese Datei an einen anderen Ort verschoben wurde, kann nichts Neues aufgezeichnet werden.</value></data>
+  <data name="Snooze.Error.RecordUnreadable" xml:space="preserve"><value>Die Aufzeichnung früherer Pausen in „{0}“ konnte nicht gelesen werden und wurde unverändert gelassen. Bis zum Neustart der App kann nichts Neues aufgezeichnet werden. Verschiebe diese Datei nötigenfalls vorher an einen anderen Ort.</value></data>
   <data name="Clipboard.Busy" xml:space="preserve"><value>Es wurde nichts kopiert: Ein anderes Programm verwendet gerade die Zwischenablage. Versuche es gleich noch einmal.</value></data>
   <data name="QuickActions.RunFormat" xml:space="preserve"><value>„{0}“ ausführen</value></data>
   <data name="QuickActions.CancelFormat" xml:space="preserve"><value>„{0}“ abbrechen</value></data>

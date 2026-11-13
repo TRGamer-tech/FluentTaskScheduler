@@ -350,7 +350,7 @@ Restart now to apply the update?</value></data>
   <data name="Snooze.SuspendTriggersHint" xml:space="preserve"><value>Disables every enabled task through the Task Scheduler API and re-enables exactly those tasks when the snooze ends. Protected system tasks are skipped.</value></data>
   <data name="Snooze.Banner.Suspended" xml:space="preserve"><value>Scheduled triggers are suspended and manual runs are blocked. Tasks are re-enabled when the snooze ends.</value></data>
   <data name="Snooze.Banner.ManualOnly" xml:space="preserve"><value>Runs started from this app are blocked, but Windows still starts tasks on their schedule. Choose "Also suspend scheduled triggers" when you snooze to stop those too.</value></data>
-  <data name="Snooze.Error.BatchBlocked" xml:space="preserve"><value>{0} task(s) were not started because they are snoozed.</value></data>
+  <data name="Snooze.Error.BatchBlocked" xml:space="preserve"><value>Tasks not started because they are snoozed: {0}</value></data>
   <data name="Snooze.Error.PastTime" xml:space="preserve"><value>Pick a time in the future.</value></data>
   <data name="Snooze.Toast.Started.Title" xml:space="preserve"><value>Snooze started</value></data>
   <data name="Snooze.Toast.Ended.Title" xml:space="preserve"><value>Snooze ended</value></data>
@@ -832,7 +832,7 @@ Restart now to apply the update?</value></data>
   <data name="Tasks.Error.OnlyWithPassword" xml:space="preserve"><value>'{0}': this task can only be changed in the editor, with the password of its account.</value></data>
   <data name="Tasks.SelectFormat" xml:space="preserve"><value>Select {0}</value></data>
   <data name="Tasks.EnableFormat" xml:space="preserve"><value>Enable {0}</value></data>
-  <data name="Snooze.Error.RecordUnreadable" xml:space="preserve"><value>The record of earlier snoozes in '{0}' could not be read and was left untouched. Nothing new can be recorded until the app has been restarted or that file has been moved away.</value></data>
+  <data name="Snooze.Error.RecordUnreadable" xml:space="preserve"><value>The record of earlier snoozes in '{0}' could not be read and was left untouched. Nothing new can be recorded until the app has been restarted, if necessary after that file has been moved elsewhere.</value></data>
   <data name="Clipboard.Busy" xml:space="preserve"><value>Nothing was copied: another program is using the clipboard. Try again in a moment.</value></data>
   <data name="QuickActions.RunFormat" xml:space="preserve"><value>Run {0}</value></data>
   <data name="QuickActions.CancelFormat" xml:space="preserve"><value>Cancel {0}</value></data>

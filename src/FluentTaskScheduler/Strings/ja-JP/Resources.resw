@@ -825,14 +825,14 @@
   <data name="Templates.Tag.Display" xml:space="preserve"><value>ディスプレイ</value></data>
   <data name="Dashboard.Tasks.Unavailable" xml:space="preserve"><value>タスクを読み取れませんでした: {0}</value></data>
   <data name="Tasks.Error.Duplicated" xml:space="preserve"><value>タスクが「{0}」と「{1}」の 2 つになりました。どちらも削除できませんでした。タスク スケジューラでどちらか一方を削除してください。</value></data>
-  <data name="Tasks.Error.NameTakenInFolder" xml:space="preserve"><value>'{0}': フォルダー「{1}」には同じ名前のタスクが既にあります。</value></data>
+  <data name="Tasks.Error.NameTakenInFolder" xml:space="preserve"><value>「{0}」: フォルダー「{1}」には同じ名前のタスクが既にあります。</value></data>
   <data name="Folders.Error.NameTaken" xml:space="preserve"><value>ここには「{0}」という名前のフォルダーが既にあります。別の名前を選んでください。</value></data>
-  <data name="Folders.Error.PartlyMoved" xml:space="preserve"><value>一部のタスクは移動できず、「{0}」に残っています。ほかのタスクは移動しました。</value></data>
+  <data name="Folders.Error.PartlyMoved" xml:space="preserve"><value>一部のタスクは移動できず、「{0}」に残っています。他のタスクは移動しました。</value></data>
   <data name="Tasks.Error.CompletionActionsKept" xml:space="preserve"><value>次のタスクは変更できなかったため、完了時アクションでは引き続き以前のパスのタスクが開始されます:</value></data>
-  <data name="Tasks.Error.OnlyWithPassword" xml:space="preserve"><value>'{0}': このタスクは、アカウントのパスワードを入力してエディターでのみ変更できます。</value></data>
+  <data name="Tasks.Error.OnlyWithPassword" xml:space="preserve"><value>「{0}」: このタスクは、アカウントのパスワードを入力してエディターでのみ変更できます。</value></data>
   <data name="Tasks.SelectFormat" xml:space="preserve"><value>「{0}」を選択</value></data>
   <data name="Tasks.EnableFormat" xml:space="preserve"><value>「{0}」を有効にする</value></data>
-  <data name="Snooze.Error.RecordUnreadable" xml:space="preserve"><value>以前のスヌーズの記録「{0}」を読み取れなかったため、変更せずにそのままにしています。アプリを再起動するか、このファイルを別の場所へ移動するまで、新たに記録することはできません。</value></data>
+  <data name="Snooze.Error.RecordUnreadable" xml:space="preserve"><value>以前のスヌーズの記録「{0}」を読み取れなかったため、変更せずにそのままにしています。アプリを再起動するまで、新たに記録することはできません。必要に応じて、再起動の前にこのファイルを別の場所へ移動してください。</value></data>
   <data name="Clipboard.Busy" xml:space="preserve"><value>コピーできませんでした。別のプログラムがクリップボードを使用しています。しばらくしてから、もう一度お試しください。</value></data>
   <data name="QuickActions.RunFormat" xml:space="preserve"><value>「{0}」を実行</value></data>
   <data name="QuickActions.CancelFormat" xml:space="preserve"><value>「{0}」をキャンセル</value></data>
