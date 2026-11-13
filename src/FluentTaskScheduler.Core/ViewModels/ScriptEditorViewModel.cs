@@ -143,7 +143,7 @@ public sealed partial class ScriptEditorViewModel(
             Show(OutputKind.Note, Loc.Get("ScriptEditor.Status.Starting"));
 
             int exitCode = await runner.RunAsync(
-                WindowsTools.InUtf8Console($"\"{WindowsTools.PowerShell}\" {PowerShellCommand.ForFile(file)}"),
+                WindowsTools.InUtf8Console(WindowsTools.PowerShell, PowerShellCommand.ForFile(file)),
                 line => Show(line.IsError ? OutputKind.Error : OutputKind.Output, line.Text, line.IsComplete),
                 run.Token);
 

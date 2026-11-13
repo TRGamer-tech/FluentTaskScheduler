@@ -8,9 +8,9 @@ namespace FluentTaskScheduler.Tests.Processes;
 public sealed class WindowsToolsTests
 {
     [Fact]
-    public void ACommandLineForAUtf8Console_SwitchesTheCodePageFirst_AndIsReadAsUtf8()
+    public void AProgramInAUtf8Console_StartsOnceTheCodePageIsSwitched_AndIsReadAsUtf8()
     {
-        ProcessRequest request = WindowsTools.InUtf8Console("\"C:\\Tools\\tool.exe\" /a \"b c\"");
+        ProcessRequest request = WindowsTools.InUtf8Console(@"C:\Tools\tool.exe", "/a \"b c\"");
 
         Assert.Equal(WindowsTools.InSystemFolder("cmd.exe"), request.FileName);
         Assert.Equal($"/d /v:off /s /c \"\"{WindowsTools.InSystemFolder("chcp.com")}\" 65001 >nul & \"C:\\Tools\\tool.exe\" /a \"b c\"\"", request.Arguments);
@@ -23,6 +23,7 @@ public sealed class ProcessRunnerTests
 {
     private const string SkipReason = "runs Windows programs";
     private static readonly TimeSpan Patience = TimeSpan.FromSeconds(30);
+    private static readonly string Cmd = WindowsTools.InSystemFolder("cmd.exe");
 
     private readonly ProcessRunner _runner = new();
     private readonly ConcurrentQueue<ProcessOutput> _output = new();
@@ -30,8 +31,9 @@ public sealed class ProcessRunnerTests
     /// <summary>The lines as they ended up, without the states they went through while they were being written.</summary>
     private IEnumerable<ProcessOutput> Lines => _output.Where(line => line.IsComplete);
 
+    /// <summary>Runs a command line of cmd in the UTF-8 console, by a cmd that starts there.</summary>
     private Task<int> Run(string commandLine, CancellationToken cancellation = default) =>
-        _runner.RunAsync(WindowsTools.InUtf8Console(commandLine), _output.Enqueue, cancellation).WaitAsync(Patience);
+        _runner.RunAsync(WindowsTools.InUtf8Console(Cmd, $"/d /v:off /s /c \"{commandLine}\""), _output.Enqueue, cancellation).WaitAsync(Patience);
 
     [SkippableFact]
     public async Task WhatAProgramWrites_ArrivesIntact_InLanguagesTheCodePageOfThisMachineCannotShow()

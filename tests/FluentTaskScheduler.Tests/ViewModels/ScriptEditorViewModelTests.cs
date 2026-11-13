@@ -43,7 +43,7 @@ public sealed class ScriptEditorViewModelTests : IDisposable
         Task run = _editor.RunCommand.ExecuteAsync(null);
 
         ProcessRequest request = _runner.Last.Request;
-        Assert.Equal(WindowsTools.InUtf8Console($"\"{WindowsTools.PowerShell}\" {PowerShellCommand.ForFile(RunCopy)}"), request);
+        Assert.Equal(WindowsTools.InUtf8Console(WindowsTools.PowerShell, PowerShellCommand.ForFile(RunCopy)), request);
         Assert.Equal(_folder.Path, Path.GetDirectoryName(RunCopy));
         byte[] written = File.ReadAllBytes(RunCopy);
         Assert.Equal(new byte[] { 0xEF, 0xBB, 0xBF }, written[..3]);
