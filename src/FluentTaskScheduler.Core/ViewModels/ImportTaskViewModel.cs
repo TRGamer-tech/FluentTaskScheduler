@@ -147,10 +147,6 @@ public sealed partial class ImportTaskViewModel : ObservableObject
             Problem = "";
             return true;
         }
-        catch (TaskExistsException)
-        {
-            Problem = Loc.Format("Import.Error.Exists", name);
-        }
         catch (TaskAccessDeniedException)
         {
             Problem = Loc.Get(_app.IsElevated ? "Editor.Error.AccessDenied" : "Editor.Error.AccessDeniedNotElevated");
@@ -158,6 +154,10 @@ public sealed partial class ImportTaskViewModel : ObservableObject
         catch (TaskAccountException ex)
         {
             Problem = Loc.Format("Editor.Error.Account", ex.Message);
+        }
+        catch (TaskExistsException)
+        {
+            Problem = Loc.Format("Editor.Error.NameTaken", name);
         }
         catch (Exception ex)
         {

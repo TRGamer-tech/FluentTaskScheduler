@@ -128,9 +128,13 @@ public sealed class TaskStore : ITaskStore
         }
 
         TaskFolder folder = original?.Folder ?? TaskPaths.GetOrCreateFolder(service, folderPath);
-        TaskRegistration.Register(folder, draft.Name, definition, userId, password, logonType);
-
         bool renamed = original is not null && !string.Equals(original.Name, draft.Name, StringComparison.OrdinalIgnoreCase);
+
+        // Only a task saved under its own name replaces what is registered there. A new task, or
+        // one given a new name, must not take the place of a task that already has that name.
+        var creation = original is null || renamed ? TaskCreation.Create : TaskCreation.CreateOrUpdate;
+        TaskRegistration.Register(folder, draft.Name, definition, userId, password, logonType, creation);
+
         if (renamed) DeleteAfterRename(folder, original!.Name, draft.Name);
 
         return TaskPaths.Combine(folder.Path, draft.Name);
@@ -266,8 +270,7 @@ public sealed class TaskStore : ITaskStore
 
         var folder = TaskPaths.GetOrCreateFolder(service, options.FolderPath);
         string? password = logonType is TaskLogonType.Password or TaskLogonType.InteractiveTokenOrPassword ? options.Password : null;
-        TaskRegistration.Register(folder, options.Name, definition, userId, password, logonType, TaskCreation.Create);
-        return TaskPaths.Combine(folder.Path, options.Name);
+        return TaskRegistration.Register(folder, options.Name, definition, userId, password, logonType, TaskCreation.Create).Path;
     }
 
     /// <summary>

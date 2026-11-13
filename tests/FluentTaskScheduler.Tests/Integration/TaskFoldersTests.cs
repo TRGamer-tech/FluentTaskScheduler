@@ -47,12 +47,14 @@ public class TaskFoldersTests
         Skip.IfNot(SchedulerSandbox.IsElevated, NeedsElevation);
         using var sandbox = new SchedulerSandbox();
         var task = sandbox.Folder.RegisterTaskDefinition("Twin", SampleTasks.Simple(sandbox.Service));
-        sandbox.Folder.CreateFolder("Target").RegisterTaskDefinition("Twin", SampleTasks.Simple(sandbox.Service));
+        var other = SampleTasks.Simple(sandbox.Service);
+        other.RegistrationInfo.Description = "Was there first";
+        sandbox.Folder.CreateFolder("Target").RegisterTaskDefinition("Twin", other);
 
-        Assert.Throws<InvalidOperationException>(() => _folders.MoveTask(task.Path, sandbox.FolderPath + @"\Target"));
+        Assert.Throws<TaskExistsException>(() => _folders.MoveTask(task.Path, sandbox.FolderPath + @"\Target"));
 
         Assert.True(_store.Exists(task.Path));
-        Assert.True(_store.Exists(sandbox.FolderPath + @"\Target\Twin"));
+        Assert.Equal("Was there first", _store.Load(sandbox.FolderPath + @"\Target\Twin").Description);
     }
 
     [SkippableFact]

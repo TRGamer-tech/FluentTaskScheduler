@@ -122,6 +122,48 @@ public class TaskStoreTests
         Assert.Equal("Created by a test", _store.Load(newPath).Description);
     }
 
+    [SkippableFact]
+    public void ANewTask_NeverReplacesATaskOfTheSameName()
+    {
+        Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
+        using var sandbox = new SchedulerSandbox();
+        string path = _store.Save(NewDraft("Twin"), sandbox.FolderPath);
+        string before = _store.Export(path);
+
+        var refused = Assert.Throws<TaskExistsException>(() => _store.Save(NewDraft("Twin") with { Description = "The second one" }, sandbox.FolderPath));
+
+        Assert.Equal(path, refused.Path);
+        Assert.Empty(XmlDiff.Diff(before, _store.Export(path), "Date", "URI"));
+    }
+
+    [SkippableFact]
+    public void RenamingATaskOntoAnother_IsRefused_AndBothStayAsTheyWere()
+    {
+        Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
+        using var sandbox = new SchedulerSandbox();
+        string backup = _store.Save(NewDraft("Backup") with { Description = "Backs up" }, sandbox.FolderPath);
+        string cleanup = _store.Save(NewDraft("Cleanup") with { Description = "Cleans up" }, sandbox.FolderPath);
+
+        Assert.Throws<TaskExistsException>(() => _store.Save(_store.Load(cleanup) with { Name = "Backup" }, sandbox.FolderPath, cleanup));
+
+        Assert.Equal("Backs up", _store.Load(backup).Description);
+        Assert.Equal("Cleans up", _store.Load(cleanup).Description);
+    }
+
+    [SkippableFact]
+    public void ImportingUnderTheNameOfAnExistingTask_IsRefused_AndLeavesThatTaskAlone()
+    {
+        Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
+        using var sandbox = new SchedulerSandbox();
+        string path = _store.Save(NewDraft("Backup"), sandbox.FolderPath);
+        string before = _store.Export(path);
+        string other = _store.Export(_store.Save(NewDraft("Other") with { Description = "Something else" }, sandbox.FolderPath));
+
+        Assert.Throws<TaskExistsException>(() => _store.Import(other, new TaskImportOptions(sandbox.FolderPath, "Backup")));
+
+        Assert.Empty(XmlDiff.Diff(before, _store.Export(path), "Date", "URI"));
+    }
+
     [SkippableTheory]
     [InlineData("SYSTEM", TaskLogonType.ServiceAccount)]
     [InlineData(@"NT AUTHORITY\LOCAL SERVICE", TaskLogonType.ServiceAccount)]
@@ -335,20 +377,6 @@ public class TaskStoreTests
 
         Assert.Equal(TaskAccount.CurrentUser, info.Account);
         Assert.False(info.StoresPassword);
-    }
-
-    [SkippableFact]
-    public void ImportingUnderANameThatIsTaken_LeavesTheTaskThatHasIt()
-    {
-        Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
-        using var sandbox = new SchedulerSandbox();
-        var existing = sandbox.Folder.RegisterTaskDefinition("Taken", SampleTasks.Simple(sandbox.Service));
-        string xml = existing.Xml.Replace("<Description>Simple</Description>", "<Description>Imported</Description>");
-
-        var refused = Assert.Throws<TaskExistsException>(() => _store.Import(xml, new TaskImportOptions(sandbox.FolderPath, "Taken")));
-
-        Assert.Equal(sandbox.PathOf("Taken"), refused.Path);
-        Assert.Equal("Simple", _store.Load(existing.Path).Description);
     }
 
     [SkippableFact]

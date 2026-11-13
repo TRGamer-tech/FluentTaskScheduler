@@ -5,8 +5,9 @@ namespace FluentTaskScheduler.Tests.Support;
 /// <summary>
 /// Tasks in memory, behaving like <see cref="TaskStore"/> as far as callers can tell: paths
 /// compare without regard to case, a missing task throws <see cref="TaskNotFoundException"/>,
-/// and a path listed in <see cref="Protected"/> throws <see cref="TaskAccessDeniedException"/>
-/// for anything that would change or start it.
+/// a new, renamed or imported task never replaces another one but throws
+/// <see cref="TaskExistsException"/>, and a path listed in <see cref="Protected"/> throws
+/// <see cref="TaskAccessDeniedException"/> for anything that would change or start it.
 /// </summary>
 public sealed class FakeTaskStore : ITaskStore
 {
@@ -105,6 +106,9 @@ public sealed class FakeTaskStore : ITaskStore
     public string Save(TaskDraft draft, string folderPath, string? originalPath = null, string? password = null)
     {
         string path = folderPath.TrimEnd('\\') + "\\" + draft.Name;
+        bool sameTask = string.Equals(originalPath, path, StringComparison.OrdinalIgnoreCase);
+        if (!sameTask && _tasks.ContainsKey(path)) throw new TaskExistsException(path);
+
         Change("Save", originalPath ?? path, mustExist: originalPath is not null);
         LastPassword = password;
         if (originalPath is not null && !string.Equals(originalPath, path, StringComparison.OrdinalIgnoreCase))

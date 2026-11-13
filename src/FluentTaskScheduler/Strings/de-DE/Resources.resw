@@ -1081,7 +1081,6 @@ Jetzt App neustarten?</value></data>
   <data name="Dashboard.Runs.Title" xml:space="preserve"><value>Ausführungen der letzten 7 Tage</value></data>
   <data name="Dashboard.NothingUpcoming" xml:space="preserve"><value>Für keine Aufgabe ist ein Start geplant.</value></data>
   <data name="Editor.Error.EventLogText" xml:space="preserve"><value>Trigger {0}: Protokoll und Quelle dürfen keine Tabulatoren oder Zeilenumbrüche enthalten.</value></data>
-  <data name="Import.Error.Exists" xml:space="preserve"><value>In diesem Ordner gibt es schon eine Aufgabe '{0}'. Wähle einen anderen Namen oder Ordner.</value></data>
   <data name="Action.Unsupported" xml:space="preserve"><value>Nicht unterstützte Aktion</value></data>
   <data name="Editor.Action.Unsupported" xml:space="preserve"><value>Diese Art von Aktion kann hier nicht bearbeitet werden. Sie bleibt, wie sie ist.</value></data>
   <data name="Main.Status.Ready" xml:space="preserve"><value>Bereit</value></data>
@@ -1095,4 +1094,5 @@ Jetzt App neustarten?</value></data>
   <data name="Library.CreateTaskFromScriptFormat" xml:space="preserve"><value>Aufgabe aus Skript {0} erstellen</value></data>
   <data name="Library.EditScriptFormat" xml:space="preserve"><value>Skript {0} bearbeiten</value></data>
   <data name="Library.DeleteScriptFormat" xml:space="preserve"><value>Skript {0} löschen</value></data>
+  <data name="Editor.Error.NameTaken" xml:space="preserve"><value>Eine andere Aufgabe in diesem Ordner trägt bereits den Namen „{0}“. Wähle einen anderen Namen.</value></data>
 </root>

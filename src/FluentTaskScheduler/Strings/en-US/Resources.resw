@@ -1081,7 +1081,6 @@ Restart now to apply the update?</value></data>
   <data name="Dashboard.Runs.Title" xml:space="preserve"><value>Runs in the last 7 days</value></data>
   <data name="Dashboard.NothingUpcoming" xml:space="preserve"><value>No task is scheduled to run.</value></data>
   <data name="Editor.Error.EventLogText" xml:space="preserve"><value>Trigger {0}: the log and the source must not contain tabs or line breaks.</value></data>
-  <data name="Import.Error.Exists" xml:space="preserve"><value>There is already a task '{0}' in this folder. Choose another name or folder.</value></data>
   <data name="Action.Unsupported" xml:space="preserve"><value>Unsupported action</value></data>
   <data name="Editor.Action.Unsupported" xml:space="preserve"><value>This kind of action cannot be edited here. It stays as it is.</value></data>
   <data name="Main.Status.Ready" xml:space="preserve"><value>Ready</value></data>
@@ -1095,5 +1094,6 @@ Restart now to apply the update?</value></data>
   <data name="Library.CreateTaskFromScriptFormat" xml:space="preserve"><value>Create task from script {0}</value></data>
   <data name="Library.EditScriptFormat" xml:space="preserve"><value>Edit script {0}</value></data>
   <data name="Library.DeleteScriptFormat" xml:space="preserve"><value>Delete script {0}</value></data>
+  <data name="Editor.Error.NameTaken" xml:space="preserve"><value>Another task in this folder is already called '{0}'. Choose a different name.</value></data>
 </root>
 

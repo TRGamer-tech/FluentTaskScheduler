@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Microsoft.Win32.TaskScheduler;
+using ScheduledTask = Microsoft.Win32.TaskScheduler.Task;
 
 namespace FluentTaskScheduler.Scheduling;
 
@@ -10,7 +11,7 @@ internal static class TaskRegistration
     private const int LogonFailure = unchecked((int)0x8007052E);        // ERROR_LOGON_FAILURE: wrong or missing password
     private const int NoneMapped = unchecked((int)0x80070534);          // ERROR_NONE_MAPPED: the account does not exist
     private const int AccountRestriction = unchecked((int)0x8007052F);  // ERROR_ACCOUNT_RESTRICTION: e.g. blank password
-    private const int AlreadyExists = unchecked((int)0x800700B7);       // ERROR_ALREADY_EXISTS: the name is taken and may not be replaced
+    private const int AlreadyExists = unchecked((int)0x800700B7);       // ERROR_ALREADY_EXISTS: TaskCreation.Create found a task of that name
 
     /// <summary>
     /// The user ID and logon type that register a definition under the principal it already has,
@@ -23,16 +24,19 @@ internal static class TaskRegistration
         var logonType => (principal.UserId, logonType)
     };
 
-    /// <param name="creation"><see cref="TaskCreation.Create"/> to refuse a name that is taken instead of replacing that task.</param>
+    /// <param name="creation">
+    /// <see cref="TaskCreation.Create"/> for a task that must not take the place of another one,
+    /// <see cref="TaskCreation.CreateOrUpdate"/> only for saving a task under its own name.
+    /// </param>
+    /// <returns>The task as Task Scheduler registered it.</returns>
+    /// <exception cref="TaskExistsException">The folder already has a task of that name, and <paramref name="creation"/> does not allow replacing it.</exception>
     /// <exception cref="TaskAccessDeniedException">Windows refused the registration.</exception>
     /// <exception cref="TaskAccountException">The account or its password was not accepted.</exception>
-    /// <exception cref="TaskExistsException">The name is taken, and <paramref name="creation"/> does not allow replacing that task.</exception>
-    public static void Register(TaskFolder folder, string name, TaskDefinition definition, string? userId, string? password, TaskLogonType logonType,
-        TaskCreation creation = TaskCreation.CreateOrUpdate)
+    public static ScheduledTask Register(TaskFolder folder, string name, TaskDefinition definition, string? userId, string? password, TaskLogonType logonType, TaskCreation creation)
     {
         try
         {
-            folder.RegisterTaskDefinition(name, definition, creation, userId, password, logonType);
+            return folder.RegisterTaskDefinition(name, definition, creation, userId, password, logonType);
         }
         catch (Exception ex) when (TaskSchedulerErrors.IsAccessDenied(ex))
         {
@@ -44,7 +48,7 @@ internal static class TaskRegistration
         }
         catch (COMException ex) when (ex.HResult == AlreadyExists)
         {
-            throw new TaskExistsException(TaskPaths.Combine(folder.Path, name));
+            throw new TaskExistsException(TaskPaths.Combine(folder.Path, name), ex);
         }
     }
 }

@@ -1081,7 +1081,6 @@
   <data name="Dashboard.Runs.Title" xml:space="preserve"><value>過去 7 日間の実行回数</value></data>
   <data name="Dashboard.NothingUpcoming" xml:space="preserve"><value>実行が予定されているタスクはありません。</value></data>
   <data name="Editor.Error.EventLogText" xml:space="preserve"><value>トリガー {0}: ログとソースにタブや改行を含めることはできません。</value></data>
-  <data name="Import.Error.Exists" xml:space="preserve"><value>このフォルダーには既にタスク '{0}' があります。別の名前かフォルダーを選択してください。</value></data>
   <data name="Action.Unsupported" xml:space="preserve"><value>サポートされていない操作</value></data>
   <data name="Editor.Action.Unsupported" xml:space="preserve"><value>この種類の操作はここでは編集できません。現在の設定のまま保持されます。</value></data>
   <data name="Main.Status.Ready" xml:space="preserve"><value>準備完了</value></data>
@@ -1095,4 +1094,5 @@
   <data name="Library.CreateTaskFromScriptFormat" xml:space="preserve"><value>スクリプト「{0}」からタスクを作成</value></data>
   <data name="Library.EditScriptFormat" xml:space="preserve"><value>スクリプト「{0}」を編集</value></data>
   <data name="Library.DeleteScriptFormat" xml:space="preserve"><value>スクリプト「{0}」を削除</value></data>
+  <data name="Editor.Error.NameTaken" xml:space="preserve"><value>このフォルダーには「{0}」という名前のタスクが既にあります。別の名前を選んでください。</value></data>
 </root>

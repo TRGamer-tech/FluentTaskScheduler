@@ -142,16 +142,16 @@ public class ImportTaskViewModelTests
     }
 
     [Fact]
-    public async Task ATaskOfTheSameNameInTheFolder_IsNotReplaced()
+    public async Task ANameTheFolderAlreadyHas_IsRefused_AndTheTaskOfThatNameIsLeftAlone()
     {
-        _store.Add(@"\Backup", draft: new TaskDraft { Description = "The one already there" });
-        var import = Import(Info(TaskAccount.CurrentUser));
+        _store.Add(@"\Jobs\Backup", draft: new TaskDraft { Description = "Was there first" });
+        var import = Import(Info(TaskAccount.CurrentUser), currentFolder: @"\Jobs");
 
         Assert.False(await import.ImportAsync());
 
-        Assert.Equal("Import.Error.Exists", import.Problem);
+        Assert.Equal("Editor.Error.NameTaken", import.Problem);
         Assert.Null(import.ImportedPath);
-        Assert.Equal("The one already there", _store.Load(@"\Backup").Description);
+        Assert.Equal("Was there first", _store.Load(@"\Jobs\Backup").Description);
     }
 
     [Theory]

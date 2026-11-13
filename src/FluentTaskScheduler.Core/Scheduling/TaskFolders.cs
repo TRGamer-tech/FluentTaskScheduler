@@ -17,7 +17,7 @@ public interface ITaskFolders
 
     /// <summary>Moves a task into another folder.</summary>
     /// <returns>The task's new path.</returns>
-    /// <exception cref="InvalidOperationException">The folder already has a task of that name.</exception>
+    /// <exception cref="TaskExistsException">The folder already has a task of that name.</exception>
     string MoveTask(string taskPath, string folderPath);
 
     /// <summary>
@@ -78,9 +78,6 @@ public sealed class TaskFolders : ITaskFolders
         if (string.Equals(task.Folder.Path, folderPath, StringComparison.OrdinalIgnoreCase)) return task.Path;
 
         TaskFolder target = TaskPaths.GetOrCreateFolder(service, folderPath);
-        if (target.Tasks.Any(existing => string.Equals(existing.Name, task.Name, StringComparison.OrdinalIgnoreCase)))
-            throw new InvalidOperationException($"The folder '{folderPath}' already has a task named '{task.Name}'.");
-
         Copy(task, target);
         task.Folder.DeleteTask(task.Name);
         return TaskPaths.Combine(target.Path, task.Name);
@@ -137,11 +134,12 @@ public sealed class TaskFolders : ITaskFolders
         foreach (TaskFolder sub in source.SubFolders.ToList()) CopyContent(sub, target.CreateFolder(sub.Name));
     }
 
+    /// <exception cref="TaskExistsException">The target folder already has a task of that name; it is left as it is.</exception>
     private static void Copy(Microsoft.Win32.TaskScheduler.Task task, TaskFolder target)
     {
         TaskDefinition definition = task.Definition;
         var (userId, logonType) = TaskRegistration.Keeping(definition.Principal);
-        TaskRegistration.Register(target, task.Name, definition, userId, password: null, logonType);
+        TaskRegistration.Register(target, task.Name, definition, userId, password: null, logonType, TaskCreation.Create);
     }
 
     private static void DeleteWithContent(TaskFolder folder)

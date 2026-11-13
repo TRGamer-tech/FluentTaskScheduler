@@ -35,6 +35,7 @@ public interface ITaskStore
     /// </summary>
     /// <param name="password">The password of the task's account; only needed when Windows stores one for the task.</param>
     /// <returns>The path of the saved task.</returns>
+    /// <exception cref="TaskExistsException">A new task, or a task renamed, would take the place of another task.</exception>
     string Save(TaskDraft draft, string folderPath, string? originalPath = null, string? password = null);
 
     void SetEnabled(string path, bool enabled);
@@ -89,11 +90,11 @@ public sealed class TaskNotFoundException : Exception
     public TaskNotFoundException(string path) : base($"The task '{path}' does not exist.") => Path = path;
 }
 
-/// <summary>There already is a task at the given path, and it was not to be replaced.</summary>
-public sealed class TaskExistsException : Exception
+/// <summary>The name is taken: there is already a task where a task was to be created, imported, renamed or moved to.</summary>
+public sealed class TaskExistsException : InvalidOperationException
 {
     public string Path { get; }
-    public TaskExistsException(string path) : base($"There already is a task '{path}'.") => Path = path;
+    public TaskExistsException(string path, Exception? inner = null) : base($"There is already a task '{path}'.", inner) => Path = path;
 }
 
 /// <summary>Windows refused the operation: the task is protected, or the change needs administrator rights.</summary>
