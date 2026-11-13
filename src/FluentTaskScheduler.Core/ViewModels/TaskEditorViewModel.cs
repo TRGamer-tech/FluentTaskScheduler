@@ -321,6 +321,22 @@ public sealed partial class TaskEditorViewModel : ObservableObject
             Problems = Loc.Format("Editor.Error.Account", ex.Message);
             return false;
         }
+        catch (TaskExistsException)
+        {
+            Problems = Loc.Format("Editor.Error.NameTaken", draft.Name);
+            return false;
+        }
+        catch (TaskNotFoundException)
+        {
+            // Deleted elsewhere while the editor was open; what is gone is the task as it was loaded.
+            Problems = Loc.Format("Tasks.Error.Gone", _source.Name);
+            return false;
+        }
+        catch (TaskDuplicatedException ex)
+        {
+            Problems = Loc.Format("Tasks.Error.Duplicated", ex.Path, ex.CopyPath);
+            return false;
+        }
         catch (Exception ex)
         {
             // Task Scheduler rejects a definition with whatever COM error fits; the text is the best there is to show.

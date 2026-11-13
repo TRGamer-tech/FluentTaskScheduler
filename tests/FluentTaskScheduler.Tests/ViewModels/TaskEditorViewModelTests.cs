@@ -1,6 +1,8 @@
 using System.Diagnostics;
+using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Settings;
+using FluentTaskScheduler.Tests.Snoozing;
 using FluentTaskScheduler.Tests.Support;
 using FluentTaskScheduler.ViewModels;
 using Microsoft.Extensions.Time.Testing;
@@ -479,5 +481,80 @@ public sealed class TaskEditorViewModelTests : IDisposable
         Assert.True(Edit(new TaskDraft(), path: null).IsNew);
         Assert.Equal("Editor.Title.New", Edit(new TaskDraft(), path: null).Title);
         Assert.False(Edit(Elaborate()).IsNew);
+    }
+}
+
+/// <summary>
+/// What the editor says when Task Scheduler turns a save down, with the names filled in. The texts
+/// are installed in <see cref="Loc"/>, so these tests run apart from the others.
+/// </summary>
+[Collection(LocalizedTextCollection.Name)]
+public sealed class TaskEditorSaveFailureTests : IDisposable
+{
+    private readonly TempFolder _folder = new();
+    private readonly FakeTaskStore _store = new();
+    private readonly FakeTimeProvider _time = new();
+    private readonly SettingsStore _settings;
+
+    public TaskEditorSaveFailureTests()
+    {
+        Loc.Use(key => key switch
+        {
+            "Editor.Error.NameTaken" => "{0} is taken",
+            "Tasks.Error.Gone" => "{0} is gone",
+            "Tasks.Error.Duplicated" => "{0} and {1} both exist",
+            _ => null
+        });
+        _settings = new SettingsStore(_folder.Paths, _time);
+    }
+
+    public void Dispose()
+    {
+        _settings.Dispose();
+        _folder.Dispose();
+        Loc.Use(static _ => null);
+    }
+
+    private TaskEditorViewModel Edit(string name, string? path) =>
+        new TaskEditorFactory(_store, _settings, new FakeAppLifetime(), new ScriptedFilePicker(), new FakeNetworkProfiles(), _time, new FakeSnoozeService())
+            .Create(new TaskDraft { Name = name, Actions = [new ActionDraft { SourceIndex = 0, Path = "nightly.exe" }] }, @"\Jobs", path, []);
+
+    [Fact]
+    public async Task ANameAnotherTaskInTheFolderHas_IsReportedAsTaken()
+    {
+        _store.Add(@"\Jobs\Report");
+        var editor = Edit("Report", path: null);
+
+        Assert.False(await editor.SaveAsync());
+
+        Assert.Equal("Report is taken", editor.Problems);
+    }
+
+    [Theory]
+    [InlineData("Nightly")]
+    [InlineData("Daily")]
+    public async Task ATaskDeletedWhileItWasBeingEdited_IsReportedGone_UnderTheNameItWasOpenedWith(string savedAs)
+    {
+        var editor = Edit("Nightly", @"\Jobs\Nightly");
+        editor.Name = savedAs;
+
+        Assert.False(await editor.SaveAsync());
+
+        Assert.Equal("Nightly is gone", editor.Problems);
+    }
+
+    [Fact]
+    public async Task ARenameThatLeftTheTaskTwice_SaysWhereBothAre()
+    {
+        _store.Add(@"\Jobs\Nightly").Before = (operation, _) =>
+        {
+            if (operation == "Save") throw new TaskDuplicatedException(@"\Jobs\Nightly", @"\Jobs\Daily", new UnauthorizedAccessException());
+        };
+        var editor = Edit("Nightly", @"\Jobs\Nightly");
+        editor.Name = "Daily";
+
+        Assert.False(await editor.SaveAsync());
+
+        Assert.Equal(@"\Jobs\Nightly and \Jobs\Daily both exist", editor.Problems);
     }
 }

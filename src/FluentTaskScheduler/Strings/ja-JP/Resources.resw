@@ -1115,4 +1115,5 @@
   <data name="Templates.Tag.Battery" xml:space="preserve"><value>バッテリー</value></data>
   <data name="Templates.Tag.Display" xml:space="preserve"><value>ディスプレイ</value></data>
   <data name="Dashboard.Tasks.Unavailable" xml:space="preserve"><value>タスクを読み取れませんでした: {0}</value></data>
+  <data name="Tasks.Error.Duplicated" xml:space="preserve"><value>タスクが「{0}」と「{1}」の 2 つになりました。どちらも削除できませんでした。タスク スケジューラでどちらか一方を削除してください。</value></data>
 </root>
