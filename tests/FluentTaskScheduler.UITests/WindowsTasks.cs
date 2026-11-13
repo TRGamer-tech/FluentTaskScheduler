@@ -49,6 +49,9 @@ public sealed class WindowsTasks : IDisposable
 
     public bool Exists(string name) => TryRun($"/Query /TN \"{PathOf(name)}\"", out _);
 
+    /// <summary>Whether Task Scheduler may start the task: its definition says so unless it says otherwise.</summary>
+    public bool IsEnabled(string name) => Value(name, "Settings", "Enabled") != "false";
+
     /// <summary>The task's definition as Task Scheduler stores it.</summary>
     public XElement Definition(string name)
     {
