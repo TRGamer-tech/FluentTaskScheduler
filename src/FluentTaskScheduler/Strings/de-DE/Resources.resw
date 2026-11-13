@@ -1090,4 +1090,6 @@ Jetzt App neustarten?</value></data>
   <data name="Dashboard.NothingUpcoming" xml:space="preserve"><value>Für keine Aufgabe ist ein Start geplant.</value></data>
   <data name="Editor.Error.EventLogText" xml:space="preserve"><value>Trigger {0}: Protokoll und Quelle dürfen keine Tabulatoren oder Zeilenumbrüche enthalten.</value></data>
   <data name="Import.Error.Exists" xml:space="preserve"><value>In diesem Ordner gibt es schon eine Aufgabe '{0}'. Wähle einen anderen Namen oder Ordner.</value></data>
+  <data name="Action.Unsupported" xml:space="preserve"><value>Nicht unterstützte Aktion</value></data>
+  <data name="Editor.Action.Unsupported" xml:space="preserve"><value>Diese Art von Aktion kann hier nicht bearbeitet werden. Sie bleibt, wie sie ist.</value></data>
 </root>

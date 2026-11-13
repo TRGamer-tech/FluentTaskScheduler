@@ -20,7 +20,7 @@ public sealed partial class ActionViewModel(ActionDraft source) : ObservableObje
     public bool IsEditable => source.IsEditable;
 
     /// <summary>The action in one line, for the list of actions.</summary>
-    public string Summary => source.UnsupportedSummary ?? $"{Path} {Arguments}".Trim();
+    public string Summary => ActionText.Describe(Build());
 
     public ActionDraft Build() => IsEditable
         ? source with { Path = Path, Arguments = Arguments, WorkingDirectory = WorkingDirectory }

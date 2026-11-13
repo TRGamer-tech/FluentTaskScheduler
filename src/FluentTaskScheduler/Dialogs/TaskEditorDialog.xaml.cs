@@ -17,6 +17,8 @@ public sealed partial class TaskEditorDialog : ContentDialog
 
     public static Visibility VisibleIfNone(int count) => count == 0 ? Visibility.Visible : Visibility.Collapsed;
 
+    public static Visibility VisibleIfUnsupported(ActionViewModel? action) => action is { IsEditable: false } ? Visibility.Visible : Visibility.Collapsed;
+
     private async void Save_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
         // The dialog stays open until the task is really saved; what is in the way shows at the top.

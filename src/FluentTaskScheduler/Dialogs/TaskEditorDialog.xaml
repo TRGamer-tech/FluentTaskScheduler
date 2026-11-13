@@ -152,6 +152,9 @@
                         </Button>
                     </StackPanel>
                 </Grid>
+                <TextBlock Text="{x:Bind l:Loc.Get('Editor.Action.Unsupported')}" TextWrapping="Wrap"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Visibility="{x:Bind local:TaskEditorDialog.VisibleIfUnsupported(ViewModel.SelectedAction), Mode=OneWay}"/>
                 <StackPanel Spacing="8" Visibility="{x:Bind ViewModel.SelectedAction.IsEditable, Mode=OneWay, FallbackValue=Collapsed}">
                     <Grid ColumnSpacing="8">
                         <Grid.ColumnDefinitions>
