@@ -172,19 +172,9 @@ Scoop uses the **portable zips** (no installer required).
    scoop install packaging\scoop\fluenttaskscheduler.json
    ```
 
-4. **Option A: submit to** [ScoopInstaller/Extras](https://github.com/ScoopInstaller/Extras) (preferred for non-mainstream apps):
-   - Fork the bucket, copy `fluenttaskscheduler.json` to the `bucket/` folder, open a PR.
+4. The published manifest lives in [ScoopInstaller/Extras](https://github.com/ScoopInstaller/Extras) as `bucket/fluenttaskscheduler.json`. Its `checkver` and `autoupdate` sections let the bucket pick up a new release by itself, with new URLs and hashes. Anything else that changes in the manifest here needs a pull request to that bucket.
 
-5. **Option B: maintain your own bucket** (e.g. `TRGamer-tech/scoop-bucket`):
-   - Create a repo, put the JSON in its root.
-   - Users add it with:
-
-     ```powershell
-     scoop bucket add trgamertech https://github.com/TRGamer-tech/scoop-bucket
-     scoop install fluenttaskscheduler
-     ```
-
-> **`autoupdate` support:** The manifest includes `checkver` and `autoupdate` sections. Bucket maintainers can run `scoop checkver fluenttaskscheduler` to detect new releases and generate updated hashes.
+> **`bin` names the app in `current`, not the `FluentTaskScheduler.exe` at the top of the zip.** That one is Velopack's launcher: it starts the app and returns at once with its own exit code, so a command such as `FluentTaskScheduler --list` through the Scoop shim would not wait for the answer and would always report success. The shortcut keeps pointing at the launcher, which is the right thing to start the window with.
 
 ---
 

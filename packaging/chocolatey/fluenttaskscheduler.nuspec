@@ -11,23 +11,17 @@
     <licenseUrl>https://github.com/TRGamer-tech/FluentTaskScheduler/blob/main/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <iconUrl>https://raw.githubusercontent.com/TRGamer-tech/FluentTaskScheduler/main/Assets/AppIcon.png</iconUrl>
-    <summary>A modern WinUI 3 wrapper for the Windows Task Scheduler.</summary>
+    <summary>A WinUI 3 app to view, create, run, snooze and manage the tasks of the Windows Task Scheduler.</summary>
     <description><![CDATA[
-FluentTaskScheduler is a professional-grade, modern alternative to the legacy Windows Task Scheduler.
-Built with WinUI 3 and .NET 8, it offers a clean Fluent Design interface to create, edit, and monitor
-scheduled tasks without the dated MMC snap-in.
+FluentTaskScheduler is a WinUI 3 app for the tasks of the Windows Task Scheduler. It lists all tasks
+with their state and next run, and lets you create, edit, run, stop, enable, disable, move, delete,
+export and import them. It shows each task's history from the Task Scheduler event log and a
+dashboard of the runs of the last seven days. You can snooze all tasks or a single task, start other
+tasks when a task succeeds or fails, and create tasks from built-in templates and your own
+PowerShell scripts. A command line lists tasks as JSON, starts, enables and disables tasks, and
+exports a task's history as CSV.
 
-**Key features:**
-- Live dashboard with activity stream and history charts
-- Full trigger support: Daily, Weekly, Monthly, At Logon, At Startup, On Event, Session State Change
-- Conditions: idle, AC power, battery, network availability, wake-to-run
-- Batch operations, smart search, folder management, import/export
-- ARM64 native support
-- System tray with running-task badge
-- Auto-updates via Velopack
-- Full CLI interface (`--list`, `--run`, `--enable`, `--disable`, `--export-history`)
-
-**Requirements:** Windows 10 1809 (build 17763) or later.
+**Requirements:** Windows 10 version 1809 (build 17763) or later, x64 or ARM64.
     ]]></description>
     <tags>task-scheduler automation windows winui3 fluent productivity admin</tags>
     <releaseNotes>https://github.com/TRGamer-tech/FluentTaskScheduler/releases/tag/V1.9.0</releaseNotes>

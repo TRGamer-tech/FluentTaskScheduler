@@ -11,13 +11,15 @@ PackageUrl: https://github.com/TRGamer-tech/FluentTaskScheduler
 License: MIT
 LicenseUrl: https://github.com/TRGamer-tech/FluentTaskScheduler/blob/main/LICENSE
 Copyright: Copyright (c) TRGamer-tech
-ShortDescription: A modern WinUI 3 wrapper for the Windows Task Scheduler.
+ShortDescription: A WinUI 3 app to view, create, run, snooze and manage the tasks of the Windows Task Scheduler.
 Description: |-
-  FluentTaskScheduler is a professional-grade, modern alternative to the legacy Windows Task Scheduler.
-  Built with WinUI 3 and .NET 8, it offers a clean Fluent Design interface for creating, editing, and
-  monitoring scheduled tasks. Features include a live dashboard, task history charts, smart search,
-  folder management, batch operations, ARM64 support, system tray integration, auto-updates via Velopack,
-  and full CLI support.
+  FluentTaskScheduler is a WinUI 3 app for the tasks of the Windows Task Scheduler. It lists all tasks
+  with their state and next run, and lets you create, edit, run, stop, enable, disable, move, delete,
+  export and import them. It shows each task's history from the Task Scheduler event log and a
+  dashboard of the runs of the last seven days. You can snooze all tasks or a single task, start other
+  tasks when a task succeeds or fails, and create tasks from built-in templates and your own
+  PowerShell scripts. A command line lists tasks as JSON, starts, enables and disables tasks, and
+  exports a task's history as CSV. It runs on Windows 10 version 1809 or later, on x64 and ARM64.
 Moniker: fluenttaskscheduler
 Tags:
   - task-scheduler
