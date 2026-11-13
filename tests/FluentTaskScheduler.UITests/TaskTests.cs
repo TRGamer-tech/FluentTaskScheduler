@@ -1,6 +1,9 @@
 using System.Drawing;
+using System.Text.Json.Nodes;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
+using FlaUI.Core.Input;
+using FlaUI.Core.WindowsAPI;
 
 namespace FluentTaskScheduler.UITests;
 
@@ -76,6 +79,42 @@ public sealed class TaskTests : IDisposable
             DateTime start = DateTime.Parse(WindowsTasks.Root.Value(name, "Triggers", "CalendarTrigger", "StartBoundary")!);
             Assert.Equal(5, start.Minute);
             Assert.Equal(0, start.Second);
+        }
+        finally
+        {
+            WindowsTasks.Root.Delete(name);
+        }
+    }
+
+    /// <summary>
+    /// The tags box suggests the tags kept in the settings. Enter takes the suggestion picked in the
+    /// list and, with no list open, saves the task, as Enter does in the editor's other fields.
+    /// </summary>
+    [Fact]
+    public void ATagChosenFromTheSuggestions_CompletesTheOneTyped_AndEnterSavesTheTask()
+    {
+        string name = "FtsUiTests_Tags_" + Guid.NewGuid().ToString("N")[..8];
+        using var app = AppSession.Launch("tags", AppSession.FirstRunDone(("SavedTags", new JsonArray("nightly", "disk"))));
+        OpenFolderlessList(app);
+
+        app.ToolbarButton("NewTaskButton").Press();
+        app.Require("EditorName", 20000).AsTextBox().Text = name;
+        app.Require("EditorProgram").AsTextBox().Text = "cmd.exe";
+        var tags = app.Find(element => element.ControlType == ControlType.Edit && element.Parent?.AutomationId == "EditorTags")
+                   ?? throw new InvalidOperationException("The tags box has no text box.");
+        tags.AsTextBox().Enter("backup, ni");
+        Wait(); // the box suggests once the typing pauses
+        app.Snapshot("tag-suggested");
+        Keyboard.Type(VirtualKeyShort.DOWN);
+        Keyboard.Type(VirtualKeyShort.ENTER);
+        Wait();
+        app.Snapshot("tag-chosen");
+        Keyboard.Type(VirtualKeyShort.ENTER);
+
+        try
+        {
+            Assert.True(AppSession.Eventually(() => WindowsTasks.Root.Exists(name)), "Enter did not save the task. " + ProblemsShown(app));
+            Assert.Contains("\"Tags\":[\"backup\",\"nightly\"]", WindowsTasks.Root.Value(name, "RegistrationInfo", "Description"));
         }
         finally
         {

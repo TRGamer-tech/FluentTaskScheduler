@@ -1,5 +1,6 @@
 using FluentTaskScheduler.ViewModels;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using VirtualKey = Windows.System.VirtualKey;
@@ -70,13 +71,16 @@ public sealed partial class TaskEditorDialog : ContentDialog
         if (args.ChosenSuggestion is string tag) ViewModel.ChooseTag(tag);
     }
 
-    // Escape, too, puts back the text last typed into an AutoSuggestBox, and the box keeps the key
-    // even when it has no list to close. Then Escape cancels the editor here, as in its other fields.
+    // An AutoSuggestBox keeps Enter and Escape even when it has no list to close: Enter submits no
+    // suggestion, and Escape, too, puts back the text last typed into it. Without a list, the keys
+    // do here what they do in the editor's other fields: Escape cancels, and Enter presses Save,
+    // through the button, so that saving runs as after a click and ends with Save as the result.
     private void SuggestionBox_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key != VirtualKey.Escape || ((AutoSuggestBox)sender).IsSuggestionListOpen) return;
+        if (e.Key is not (VirtualKey.Enter or VirtualKey.Escape) || ((AutoSuggestBox)sender).IsSuggestionListOpen) return;
         e.Handled = true;
-        Hide();
+        if (e.Key == VirtualKey.Enter) new ButtonAutomationPeer((Button)GetTemplateChild("PrimaryButton")).Invoke();
+        else Hide();
     }
 
     private void RemoveOnSuccess_Click(object sender, RoutedEventArgs e) =>
