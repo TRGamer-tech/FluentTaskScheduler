@@ -27,8 +27,8 @@ namespace FluentTaskScheduler.Tests.Integration
         /// <summary>Applies <paramref name="edit"/> to the task the way the editor does and returns what changed in its XML.</summary>
         private List<string> Edit(SchedulerSandbox sandbox, ScheduledTask task, Func<TaskDraft, TaskDraft> edit)
         {
-            string before = task.Xml;
             var current = sandbox.Service.GetTask(task.Path);
+            string before = current.Xml;
             var definition = current.Definition;
             var baseline = TaskDraftReader.Read(current);
 
@@ -286,10 +286,44 @@ namespace FluentTaskScheduler.Tests.Integration
 
             Assert.Equal(TaskAccount.CurrentUser, AccountOf("Mine", null, TaskLogonType.InteractiveToken));
             Assert.Equal(TaskAccount.System, AccountOf("System", "SYSTEM", TaskLogonType.ServiceAccount));
-            Assert.Equal(TaskAccount.System, AccountOf("SystemSid", "S-1-5-18", TaskLogonType.ServiceAccount));
             Assert.Equal(TaskAccountKind.LocalService, AccountOf("LocalService", @"NT AUTHORITY\LOCAL SERVICE", TaskLogonType.ServiceAccount).Kind);
             Assert.Equal(TaskAccountKind.NetworkService, AccountOf("NetworkService", @"NT AUTHORITY\NETWORK SERVICE", TaskLogonType.ServiceAccount).Kind);
             Assert.Equal(TaskAccountKind.Group, AccountOf("Group", @"BUILTIN\Users", TaskLogonType.Group).Kind);
+        }
+
+        [Theory]
+        [InlineData("S-1-5-18", TaskAccountKind.System)]
+        [InlineData("SYSTEM", TaskAccountKind.System)]
+        [InlineData(@"NT AUTHORITY\SYSTEM", TaskAccountKind.System)]
+        [InlineData("S-1-5-19", TaskAccountKind.LocalService)]
+        [InlineData("LOCAL SERVICE", TaskAccountKind.LocalService)]
+        [InlineData("S-1-5-20", TaskAccountKind.NetworkService)]
+        [InlineData("NETWORK SERVICE", TaskAccountKind.NetworkService)]
+        [InlineData("S-1-5-21-1111111111-2222222222-3333333333-1001", TaskAccountKind.User)]
+        [InlineData(@"OTHERPC\nobody", TaskAccountKind.User)]
+        public void AUserId_IsClassifiedByWhatItStandsFor(string userId, TaskAccountKind expected)
+        {
+            Assert.Equal(expected, TaskAccounts.Classify(userId, TaskLogonType.InteractiveToken).Kind);
+        }
+
+        [Fact]
+        public void TheCurrentUser_IsRecognisedBySidAndByName()
+        {
+            using var identity = System.Security.Principal.WindowsIdentity.GetCurrent();
+
+            Assert.Equal(TaskAccount.CurrentUser, TaskAccounts.Classify(identity.User!.Value, TaskLogonType.InteractiveToken));
+            Assert.Equal(TaskAccount.CurrentUser, TaskAccounts.Classify(identity.Name, TaskLogonType.InteractiveToken));
+            Assert.Equal(TaskAccount.CurrentUser, TaskAccounts.Classify(Environment.UserName, TaskLogonType.S4U));
+        }
+
+        [Fact]
+        public void AnAccountFromAnotherMachine_KeepsItsNameAndIsReportedMissing()
+        {
+            const string foreign = "S-1-5-21-1111111111-2222222222-3333333333-1001";
+
+            Assert.Equal(new TaskAccount(TaskAccountKind.User, foreign), TaskAccounts.Classify(foreign, TaskLogonType.InteractiveToken));
+            Assert.False(TaskAccounts.Exists(foreign));
+            Assert.True(TaskAccounts.Exists("SYSTEM"));
         }
     }
 }

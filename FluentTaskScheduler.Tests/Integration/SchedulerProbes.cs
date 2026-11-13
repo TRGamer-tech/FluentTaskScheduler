@@ -91,59 +91,6 @@ namespace FluentTaskScheduler.Tests.Integration
         }
 
         [SkippableFact]
-        public void CurrentServices_EditRoundTrip()
-        {
-            Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
-            using var sandbox = new SchedulerSandbox();
-
-            var connection = new TaskSchedulerConnection();
-            var events = new TaskEventLogService(connection);
-            var crud = new TaskCrudService(connection, events);
-
-            // A task as rich as the definition above, minus the pieces the editor refuses to open.
-            var td = SampleTasks.Rich(sandbox.Service);
-            var system = sandbox.Folder.RegisterTaskDefinition("RichSystem", td, TaskCreation.CreateOrUpdate, "SYSTEM", null, TaskLogonType.ServiceAccount);
-            RoundTrip(crud, sandbox, system);
-
-            // A plain task the way a user would create it for themselves, with the run time limit switched off.
-            var simple = SampleTasks.Simple(sandbox.Service);
-            simple.Settings.ExecutionTimeLimit = TimeSpan.Zero;
-            var mine = sandbox.Folder.RegisterTaskDefinition("SimpleMine", simple);
-            RoundTrip(crud, sandbox, mine);
-        }
-
-        private void RoundTrip(TaskCrudService crud, SchedulerSandbox sandbox, ScheduledTask task)
-        {
-            string before = task.Xml;
-            _out.WriteLine($"--- {task.Name}: describing each trigger with Trigger.ToString() ---");
-            foreach (var trigger in task.Definition.Triggers)
-            {
-                _out.WriteLine($"  about to describe {trigger.GetType().Name}");
-                try { _out.WriteLine($"  -> {trigger}"); }
-                catch (Exception ex) { _out.WriteLine($"  -> THROWS {ex.GetType().Name} {ex.Message}"); }
-            }
-            _out.WriteLine($"--- {task.Name}: GetTaskDetails ---");
-            var model = crud.GetTaskDetails(task.Path);
-            _out.WriteLine($"--- {task.Name}: GetTaskDetails returned ---");
-            if (model == null) { _out.WriteLine($"{task.Name}: GetTaskDetails returned null"); return; }
-
-            _out.WriteLine($"--- {task.Name}: model as loaded ---");
-            _out.WriteLine($"StopIfRunsLongerThan='{model.StopIfRunsLongerThan}' TaskPriority={model.TaskPriority} RunAsUser='{model.RunAsUser}' RunAsSystem={model.RunAsSystem} " +
-                           $"DeleteExpiredTaskAfter={model.DeleteExpiredTaskAfter} HasUnsupportedElements={model.HasUnsupportedElements} ({model.UnsupportedElementsDescription})");
-            foreach (var trigger in model.TriggersList)
-                _out.WriteLine($"  trigger {trigger.TriggerType} '{trigger.ScheduleInfo}' session={trigger.SessionStateChangeType} log={trigger.EventLog} src={trigger.EventSource} id={trigger.EventId}");
-
-            try
-            {
-                _out.WriteLine($"--- {task.Name}: RegisterTask ---");
-                crud.RegisterTask(sandbox.FolderPath, model);
-                _out.WriteLine($"--- {task.Name}: RegisterTask returned ---");
-                Report($"{task.Name}: load into the model and save again unchanged", before, sandbox.Service.GetTask(task.Path).Xml);
-            }
-            catch (Exception ex) { _out.WriteLine($"{task.Name}: RegisterTask FAILED: {ex}"); }
-        }
-
-        [SkippableFact]
         public void Library_PrincipalFormats()
         {
             Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
@@ -182,7 +129,7 @@ namespace FluentTaskScheduler.Tests.Integration
             using var sandbox = new SchedulerSandbox();
 
             string user = "ftsprobe" + Guid.NewGuid().ToString("N")[..5];
-            string password = "Fts!" + Guid.NewGuid().ToString("N")[..14] + "aA1";
+            string password = "Ft5!" + Guid.NewGuid().ToString("N")[..9]; // net.exe prompts above 14 characters
             _out.WriteLine("net user add: " + Run("net", $"user {user} {password} /add"));
             try
             {
@@ -259,45 +206,6 @@ namespace FluentTaskScheduler.Tests.Integration
                         try { _out.WriteLine($"{name} {trigger.GetType().Name}: {trigger}"); }
                         catch (Exception ex) { _out.WriteLine($"{name} {trigger.GetType().Name}: THROWS {ex.GetType().Name} {ex.Message}"); }
                     }
-                }
-            }
-            finally
-            {
-                (Thread.CurrentThread.CurrentCulture, Thread.CurrentThread.CurrentUICulture) = original;
-            }
-        }
-
-        [SkippableFact]
-        public void CurrentServices_MappingEveryTaskOnThisMachine()
-        {
-            Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
-
-            var original = (Thread.CurrentThread.CurrentCulture, Thread.CurrentThread.CurrentUICulture);
-            try
-            {
-                foreach (string name in new[] { "en-US", "de-DE", "ja-JP", "zh-CN" })
-                {
-                    var culture = new CultureInfo(name);
-                    Thread.CurrentThread.CurrentCulture = culture;
-                    Thread.CurrentThread.CurrentUICulture = culture;
-
-                    using var ts = new TaskService();
-                    int total = 0, failed = 0;
-                    var failures = new List<string>();
-                    var watch = Stopwatch.StartNew();
-                    foreach (var task in ts.RootFolder.AllTasks)
-                    {
-                        total++;
-                        System.IO.File.AppendAllText(System.IO.Path.Combine(Environment.GetEnvironmentVariable("FTS_PROBE_LOG_DIR") ?? System.IO.Path.GetTempPath(), "probes-current-task.log"), $"{name} {task.Path}{Environment.NewLine}");
-                        try { TaskModelMapper.MapTaskToModel(task); }
-                        catch (Exception ex)
-                        {
-                            failed++;
-                            if (failures.Count < 15) failures.Add($"    {task.Path}: {ex.GetType().Name} {ex.Message}");
-                        }
-                    }
-                    _out.WriteLine($"{name}: {total} tasks, {failed} could not be mapped, {watch.ElapsedMilliseconds} ms");
-                    foreach (string failure in failures) _out.WriteLine(failure);
                 }
             }
             finally

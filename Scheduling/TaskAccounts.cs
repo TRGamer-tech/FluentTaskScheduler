@@ -43,10 +43,14 @@ namespace FluentTaskScheduler.Scheduling
                 if (sid.Equals(current.User)) return TaskAccount.CurrentUser;
             }
 
-            return new TaskAccount(TaskAccountKind.User, DisplayName(userId));
+            return new TaskAccount(TaskAccountKind.User, sid is null ? userId : DisplayName(sid.Value));
         }
 
-        /// <summary>The user ID and logon type to register a task with when its account was chosen in the editor.</summary>
+        /// <summary>
+        /// The user ID and logon type to register a task with for the given account. The service
+        /// account names are the spellings the TaskScheduler library accepts; what a task reports
+        /// as its own user ID ("LOCAL SERVICE") is not among them.
+        /// </summary>
         public static (string? UserId, TaskLogonType LogonType) ToRegistration(TaskAccount account) => account.Kind switch
         {
             TaskAccountKind.System => ("SYSTEM", TaskLogonType.ServiceAccount),
@@ -64,6 +68,15 @@ namespace FluentTaskScheduler.Scheduling
             TaskAccountKind.User => account.Name,
             _ => null
         };
+
+        /// <summary>Whether Windows knows the account (a SID or a name) on this computer.</summary>
+        public static bool Exists(string account) => TryGetSid(account) is { } sid && IsResolvable(sid);
+
+        private static bool IsResolvable(SecurityIdentifier sid)
+        {
+            try { sid.Translate(typeof(NTAccount)); return true; }
+            catch (Exception ex) when (ex is IdentityNotMappedException or SystemException) { return false; }
+        }
 
         private static SecurityIdentifier? TryGetSid(string account)
         {
