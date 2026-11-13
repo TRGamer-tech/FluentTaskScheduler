@@ -205,6 +205,19 @@ public class MarkdownTests
     }
 
     [Fact]
+    public void AnIssueOfAnotherProject_KeepsThatProjectInItsShortName_AsOnGitHub()
+    {
+        const string runtime = "https://github.com/dotnet/runtime/issues/12345";
+        Assert.Equal(
+            [Plain("Fixed a crash in the runtime: "), Link("dotnet/runtime#12345", runtime)],
+            Runs("Fixed a crash in the runtime: " + runtime));
+
+        // GitHub does not tell owners and names apart by case: this is the app's own project.
+        const string own = "https://github.com/trgamer-tech/fluenttaskscheduler/pull/31";
+        Assert.Equal([Link("#31", own)], Runs(own));
+    }
+
+    [Fact]
     public void ATable_GivesItsCellsRowByRow_HeadingsFirst()
     {
         const string table = """

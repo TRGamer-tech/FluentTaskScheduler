@@ -331,11 +331,22 @@ public static partial class Markdown
         return end;
     }
 
-    private static void AddAddress(string address, MarkdownRun style, List<MarkdownRun> runs)
+    private static void AddAddress(string address, MarkdownRun style, List<MarkdownRun> runs) =>
+        runs.Add(style with { Text = IssueReference(address) ?? address, Link = address });
+
+    /// <summary>
+    /// The short name GitHub gives the issue or pull request at <paramref name="address"/>: "#12"
+    /// in this project, "owner/name#12" in another; null for any other address. The notes GitHub
+    /// generates write out the address of every pull request they list.
+    /// </summary>
+    private static string? IssueReference(string address)
     {
-        // GitHub writes out the address of every pull request it lists; "#12" says the same.
-        string text = IssueAddress().Match(address) is { Success: true } issue ? "#" + issue.Groups[1].Value : address;
-        runs.Add(style with { Text = text, Link = address });
+        if (IssueAddress().Match(address) is not { Success: true } issue) return null;
+
+        string repository = issue.Groups["repository"].Value;
+        string number = issue.Groups["number"].Value;
+        // GitHub does not tell owners and names apart by case.
+        return repository.Equals(AppInfo.Repository, StringComparison.OrdinalIgnoreCase) ? "#" + number : repository + "#" + number;
     }
 
     [GeneratedRegex("<!--.*?-->", RegexOptions.Singleline)]
@@ -356,6 +367,6 @@ public static partial class Markdown
     [GeneratedRegex(@"^(\s*)([-*+]|\d{1,9}[.)])\s+(\S.*)$")]
     private static partial Regex ListItem();
 
-    [GeneratedRegex(@"^https://github\.com/[^/]+/[^/]+/(?:pull|issues)/(\d+)$")]
+    [GeneratedRegex(@"^https://github\.com/(?<repository>[^/]+/[^/]+)/(?:pull|issues)/(?<number>\d+)$")]
     private static partial Regex IssueAddress();
 }
