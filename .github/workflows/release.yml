@@ -140,10 +140,12 @@ jobs:
             throw "The installer ended with exit code $($install.ExitCode)."
           }
 
-          $roots = "$env:ProgramFiles\FluentTaskScheduler", "$env:LOCALAPPDATA\FluentTaskScheduler"
-          $exe = $roots | ForEach-Object { Join-Path $_ 'current\FluentTaskScheduler.exe' } | Where-Object { Test-Path $_ } | Select-Object -First 1
+          # Where the installer puts the app depends on whether it installs for one user or for all.
+          $roots = $env:ProgramFiles, ${env:ProgramFiles(x86)}, $env:LOCALAPPDATA, $env:ProgramData
+          $exe = Get-ChildItem $roots -Filter FluentTaskScheduler.exe -Recurse -Depth 3 -ErrorAction SilentlyContinue |
+                 Where-Object { $_.Directory.Name -eq 'current' } | Select-Object -First 1 -ExpandProperty FullName
           if (-not $exe) {
-            Get-ChildItem $roots -Recurse -Depth 1 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
+            Select-String -Path install.log -Pattern 'INSTALLFOLDER|APPLICATIONFOLDER|TARGETDIR|ALLUSERS|InstallLocation' | Select-Object -First 30 -ExpandProperty Line
             throw 'The installed app was not found.'
           }
           "Installed: $exe, version $((Get-Item $exe).VersionInfo.FileVersion)"
