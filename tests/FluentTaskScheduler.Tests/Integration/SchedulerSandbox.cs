@@ -15,6 +15,10 @@ public sealed class SchedulerSandbox : IDisposable
     private const string NoDeleting = "D:(D;;SD;;;WD)(A;;FA;;;WD)";
     private const string Deletable = "D:(A;;FA;;;WD)";
 
+    // As in the file system, the right to delete what a folder holds (DT) lets an administrator
+    // delete a task that denies it. Everything else the folder and its contents allow everyone.
+    private const string NoDeletingContents = "D:(D;;DT;;;WD)(A;OICI;FA;;;WD)";
+
     private bool _hasUndeletable;
 
     public TaskService Service { get; } = new();
@@ -47,13 +51,24 @@ public sealed class SchedulerSandbox : IDisposable
 
     public string PathOf(string taskName) => FolderPath + "\\" + taskName;
 
-    /// <summary>Registers a simple task in <paramref name="folder"/> that nobody may delete until the sandbox is disposed.</summary>
+    /// <summary>
+    /// Registers a simple task in <paramref name="folder"/> that nobody may delete until the sandbox
+    /// is disposed. The other tasks of the folder stay deletable. Skips the test where this account
+    /// may delete it all the same, since the test would then prove nothing.
+    /// </summary>
     public ScheduledTask RegisterUndeletable(TaskFolder folder, string name)
     {
         _hasUndeletable = true;
-        var task = folder.RegisterTaskDefinition(name, SampleTasks.Simple(Service), TaskCreation.CreateOrUpdate, null, null, TaskLogonType.InteractiveToken, NoDeleting);
-        Assert.True(TaskSchedulerErrors.IsAccessDenied(Record.Exception(() => folder.DeleteTask(name))),
-            "Task Scheduler deleted a task whose security descriptor denies that, so the test proves nothing.");
+        folder.SetSecurityDescriptorSddlForm(NoDeletingContents, TaskSetSecurityOptions.None);
+        var task = folder.RegisterTaskDefinition(name, SampleTasks.Simple(Service));
+        // Set on the registered task rather than given at registration, so that the definition a
+        // move copies cannot carry it along. Without the flag, Task Scheduler would add an entry
+        // that allows the task's own account everything.
+        task.SetSecurityDescriptorSddlForm(NoDeleting, TaskSetSecurityOptions.DontAddPrincipalAce);
+
+        string taskSecurity = task.GetSecurityDescriptorSddlForm(), folderSecurity = folder.GetSecurityDescriptorSddlForm();
+        Skip.IfNot(TaskSchedulerErrors.IsAccessDenied(Record.Exception(() => folder.DeleteTask(name))),
+            $"This account may delete a task with the security descriptor {taskSecurity} in a folder with {folderSecurity}, so no task can be made undeletable here.");
         return task;
     }
 

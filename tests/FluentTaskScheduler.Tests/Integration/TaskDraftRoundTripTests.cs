@@ -222,8 +222,10 @@ public class TaskDraftRoundTripTests
         using var sandbox = new SchedulerSandbox();
         var start = new DateTime(2030, 1, 2, 8, 0, 0, DateTimeKind.Utc);
         var task = RegisterWithTrigger(sandbox, new DailyTrigger { StartBoundary = start, EndBoundary = start.AddMinutes(30) });
-        _out.WriteLine(task.Xml);
-        Assert.Contains("<StartBoundary>2030-01-02T08:00:00Z</StartBoundary>", task.Xml);
+        string stored = StartBoundaryIn(task.Xml);
+        _out.WriteLine($"Stored: {stored}");
+        Assert.Matches(ZoneAtTheEnd, stored);
+        Assert.Equal(start, DateTimeOffset.Parse(stored, System.Globalization.CultureInfo.InvariantCulture).UtcDateTime);
 
         var read = ReadTrigger(sandbox, task);
         Assert.Equal(start.ToLocalTime(), read.Start);
