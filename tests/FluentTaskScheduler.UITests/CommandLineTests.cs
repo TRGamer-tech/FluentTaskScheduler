@@ -43,6 +43,8 @@ public class CommandLineTests
     public void Run_StartsTheTask()
     {
         using var tasks = new WindowsTasks();
+        // Unquoted, as the command cannot have quotation marks. That takes a TEMP without spaces,
+        // which Windows sees to by building it from the short form of the profile's path.
         string marker = Path.Combine(Path.GetTempPath(), "FtsUiTests_" + Guid.NewGuid().ToString("N")[..8] + ".txt");
         tasks.CreateDaily("Started", $"cmd.exe /c echo ran>{marker}");
         try

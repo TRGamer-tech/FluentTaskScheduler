@@ -111,8 +111,9 @@ public class TrayTests
     /// <summary>What the icon is called, which is its tooltip; empty while it cannot be found.</summary>
     private static string IconName(AppSession app) => FindIcon(app) is { } icon ? icon.NameOrEmpty() : "";
 
-    // The icon is a button named after its tooltip. Windows puts a new icon behind the arrow
-    // that shows the hidden ones.
+    // The icon is a button named after its tooltip, in the taskbar or behind the arrow that shows
+    // the hidden ones, where Windows puts a new icon. The arrow is found by its English name: on a
+    // Windows in another language, the icon has to be shown in the taskbar itself.
     private static AutomationElement? FindIcon(AppSession app)
     {
         // Windows puts more than the tooltip into the name, at least a leading blank.
