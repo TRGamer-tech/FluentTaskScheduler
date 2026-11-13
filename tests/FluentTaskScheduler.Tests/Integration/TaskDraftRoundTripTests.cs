@@ -74,7 +74,7 @@ public class TaskDraftRoundTripTests
         yield return Case("hidden", d => d with { Hidden = !d.Hidden }, "/Task/Settings/Hidden");
         yield return Case("highest privileges", d => d with { HighestPrivileges = !d.HighestPrivileges }, "/Task/Principals/Principal/RunLevel");
         yield return Case("run only if idle", d => d with { RunOnlyIfIdle = !d.RunOnlyIfIdle }, "/Task/Settings/RunOnlyIfIdle");
-        yield return Case("idle duration", d => d with { IdleDuration = TimeSpan.FromMinutes(33) }, "/Task/Settings/IdleSettings/Duration");
+        yield return Case("idle duration", d => d with { RunOnlyIfIdle = true, IdleDuration = TimeSpan.FromMinutes(33) }, "/Task/Settings/RunOnlyIfIdle", "/Task/Settings/IdleSettings/Duration");
         yield return Case("stop on idle end", d => d with { StopOnIdleEnd = !d.StopOnIdleEnd }, "/Task/Settings/IdleSettings/StopOnIdleEnd");
         yield return Case("ac power", d => d with { RunOnlyOnAcPower = !d.RunOnlyOnAcPower }, "/Task/Settings/DisallowStartIfOnBatteries");
         yield return Case("stop on battery", d => d with { StopOnBattery = !d.StopOnBattery }, "/Task/Settings/StopIfGoingOnBatteries");
@@ -100,6 +100,17 @@ public class TaskDraftRoundTripTests
         _out.WriteLine(name);
 
         AssertOnlyChanged(Edit(sandbox, RegisterRichSystemTask(sandbox), edit), expectedPaths);
+    }
+
+    [SkippableFact]
+    public void AnIdleDurationWhileTheIdleConditionIsOff_IsLeftAlone()
+    {
+        // The editor hides the duration while the condition is off, and what was typed there
+        // before, such as a value Task Scheduler refuses, goes along unseen.
+        Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
+        using var sandbox = new SchedulerSandbox();
+
+        Assert.Empty(Edit(sandbox, RegisterRichSystemTask(sandbox), draft => draft with { IdleDuration = TimeSpan.FromSeconds(30) }));
     }
 
     [SkippableFact]

@@ -40,7 +40,9 @@ internal static class TaskDraftWriter
         if (draft.Hidden != baseline?.Hidden) settings.Hidden = draft.Hidden;
 
         if (draft.RunOnlyIfIdle != baseline?.RunOnlyIfIdle) settings.RunOnlyIfIdle = draft.RunOnlyIfIdle;
-        if (draft.IdleDuration != baseline?.IdleDuration) settings.IdleSettings.IdleDuration = draft.IdleDuration;
+        // The duration belongs to the idle condition. While that is off, the validator does not
+        // check it and nothing here writes it: Task Scheduler would refuse less than a minute.
+        if (draft.RunOnlyIfIdle && draft.IdleDuration != baseline?.IdleDuration) settings.IdleSettings.IdleDuration = draft.IdleDuration;
         if (draft.StopOnIdleEnd != baseline?.StopOnIdleEnd) settings.IdleSettings.StopOnIdleEnd = draft.StopOnIdleEnd;
         if (draft.RunOnlyOnAcPower != baseline?.RunOnlyOnAcPower) settings.DisallowStartIfOnBatteries = draft.RunOnlyOnAcPower;
         if (draft.StopOnBattery != baseline?.StopOnBattery) settings.StopIfGoingOnBatteries = draft.StopOnBattery;
