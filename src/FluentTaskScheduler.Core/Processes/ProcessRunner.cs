@@ -27,7 +27,8 @@ public sealed class ProcessRunner : IProcessRunner
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 StandardOutputEncoding = request.OutputEncoding,
-                StandardErrorEncoding = request.OutputEncoding
+                StandardErrorEncoding = request.OutputEncoding,
+                WorkingDirectory = request.WorkingDirectory
             }
         };
 

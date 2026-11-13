@@ -12,6 +12,9 @@ public sealed record ProcessRequest(string FileName, string Arguments = "")
     /// unless they are told otherwise; see <see cref="WindowsTools.InUtf8Console"/>.
     /// </summary>
     public Encoding OutputEncoding { get; init; } = Encoding.UTF8;
+
+    /// <summary>The folder the program starts in; null for the current folder of this app.</summary>
+    public string? WorkingDirectory { get; init; }
 }
 
 /// <summary>One line a program wrote, as it stands at the moment.</summary>

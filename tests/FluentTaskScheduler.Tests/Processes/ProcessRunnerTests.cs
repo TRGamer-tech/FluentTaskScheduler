@@ -207,6 +207,17 @@ public sealed class ProcessRunnerTests
     }
 
     [SkippableFact]
+    public async Task AProgram_StartsInTheFolderTheRequestNames()
+    {
+        Skip.IfNot(OperatingSystem.IsWindows(), SkipReason);
+        using var folder = new TempFolder();
+
+        await Run(new ProcessRequest(Cmd, "/d /c type nul > started-here.txt") { WorkingDirectory = folder.Path });
+
+        Assert.True(File.Exists(folder.File("started-here.txt")));
+    }
+
+    [SkippableFact]
     public async Task AProgramThatDoesNotExist_FailsWithTheReasonWindowsGives()
     {
         Skip.IfNot(OperatingSystem.IsWindows(), SkipReason);

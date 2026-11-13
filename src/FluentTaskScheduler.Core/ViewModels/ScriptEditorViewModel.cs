@@ -154,8 +154,14 @@ public sealed partial class ScriptEditorViewModel(
             ScriptFile.Write(file, Text);
             Show(OutputKind.Note, Loc.Get("ScriptEditor.Status.Starting"));
 
+            // In the system folder, where Task Scheduler starts a task that names no folder of its own:
+            // a path relative to the current folder leads where it would lead in the task.
+            ProcessRequest request = WindowsTools.InUtf8Console(WindowsTools.PowerShell, PowerShellCommand.ForFile(file)) with
+            {
+                WorkingDirectory = Environment.SystemDirectory
+            };
             int exitCode = await runner.RunAsync(
-                WindowsTools.InUtf8Console(WindowsTools.PowerShell, PowerShellCommand.ForFile(file)),
+                request,
                 line => Show(line.IsError ? OutputKind.Error : OutputKind.Output, line.Text, line.IsComplete),
                 run.Token);
 

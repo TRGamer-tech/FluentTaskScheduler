@@ -46,7 +46,7 @@ public sealed class ScriptEditorViewModelTests : IDisposable
         Task run = _editor.RunCommand.ExecuteAsync(null);
 
         ProcessRequest request = _runner.Last.Request;
-        Assert.Equal(WindowsTools.InUtf8Console(WindowsTools.PowerShell, PowerShellCommand.ForFile(RunCopy)), request);
+        Assert.Equal(WindowsTools.InUtf8Console(WindowsTools.PowerShell, PowerShellCommand.ForFile(RunCopy)) with { WorkingDirectory = Environment.SystemDirectory }, request);
         Assert.Equal(_folder.Path, Path.GetDirectoryName(RunCopy));
         byte[] written = File.ReadAllBytes(RunCopy);
         Assert.Equal(new byte[] { 0xEF, 0xBB, 0xBF }, written[..3]);
@@ -56,6 +56,19 @@ public sealed class ScriptEditorViewModelTests : IDisposable
         await run;
 
         Assert.False(File.Exists(RunCopy));
+    }
+
+    [Fact]
+    public async Task AScript_RunsInTheFolderThatATaskMadeFromItStartsIn()
+    {
+        _editor.Text = "Get-ChildItem *.log";
+
+        Task run = _editor.RunCommand.ExecuteAsync(null);
+
+        // A task made from a script names no folder to start in, so Task Scheduler starts it in the system folder.
+        Assert.Equal(Environment.SystemDirectory, _runner.Last.Request.WorkingDirectory);
+        _runner.Last.Exits();
+        await run;
     }
 
     [Fact]
