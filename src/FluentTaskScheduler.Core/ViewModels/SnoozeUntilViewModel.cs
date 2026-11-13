@@ -26,6 +26,11 @@ public sealed partial class SnoozeUntilViewModel : ObservableObject
         _time = time;
         _snooze = snooze;
 
+        // The pickers and the moment picked in them are in the time zone Windows uses now. .NET
+        // keeps the zone it read first until its cache is cleared, and the date picker hands its
+        // date over in that zone, so it has to be fresh before the pickers are filled.
+        TimeZoneInfo.ClearCachedData();
+
         // An hour from now, to the minute, is where the pickers start.
         DateTime start = time.GetLocalNow().DateTime.AddHours(1);
         _date = new DateTimeOffset(start.Date);

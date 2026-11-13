@@ -3,6 +3,7 @@ using FluentTaskScheduler.History;
 using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Snoozing;
 using FluentTaskScheduler.Tests.History;
+using FluentTaskScheduler.Tests.Snoozing;
 using FluentTaskScheduler.Tests.Support;
 using FluentTaskScheduler.ViewModels;
 using Microsoft.Extensions.Time.Testing;
@@ -439,5 +440,25 @@ public sealed class TaskDetailsViewModelTests : IDisposable
     {
         for (int i = 0; i < 200 && !condition(); i++) await Task.Delay(10);
         Assert.True(condition(), "It did not happen within two seconds.");
+    }
+}
+
+/// <summary>Apart from the other tests, for the reason <see cref="LocalizedTextCollection"/> gives.</summary>
+[Collection(LocalizedTextCollection.Name)]
+public sealed class TaskDetailsTimeZoneTests
+{
+    [Fact]
+    public async Task TheHistory_IsReadInTheTimeZoneTheComputerUsesNow()
+    {
+        using TaskDetailsViewModel details = new TaskDetailsFactory(new FakeTaskStore(), new FakeTaskHistory(), new FakeSnoozeService(),
+            new ScriptedFilePicker(), new FakeClipboard(), new FakeAppLifetime(), new InlineUiThread(), new FakeTimeProvider()).Create(new TaskRow(@"\Backup"));
+
+        // .NET keeps the zone it read first until its cache is cleared, and reads it into a new
+        // object afterwards: that new object is what a test can see of a fresh read.
+        TimeZoneInfo readBefore = TimeZoneInfo.Local;
+
+        await details.LoadHistoryAsync();
+
+        Assert.NotSame(readBefore, TimeZoneInfo.Local);
     }
 }

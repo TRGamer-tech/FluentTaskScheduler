@@ -7,8 +7,10 @@ namespace FluentTaskScheduler.Tests.Reminders;
 
 /// <summary>
 /// Announcing tasks before they run. The lead time is the default of five minutes unless a test
-/// changes it; the clock starts at <see cref="SnoozeTestBase.Start"/>.
+/// changes it; the clock starts at <see cref="SnoozeTestBase.Start"/>. Apart from the other tests,
+/// for the reason <see cref="LocalizedTextCollection"/> gives.
 /// </summary>
+[Collection(LocalizedTextCollection.Name)]
 public sealed class ReminderServiceTests : SnoozeTestBase
 {
     private const string Backup = @"\Backup";

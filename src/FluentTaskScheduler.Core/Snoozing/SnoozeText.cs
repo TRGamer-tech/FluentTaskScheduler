@@ -36,6 +36,10 @@ public static class SnoozeText
     /// <summary>The time alone for an end later today; date and time for an end on another day.</summary>
     private static string EndTime(DateTimeOffset until, TimeProvider time)
     {
+        // In the time zone Windows uses now. .NET keeps the zone it read first until its cache is
+        // cleared; on a laptop taken to another zone, the end would otherwise be shown hours off.
+        TimeZoneInfo.ClearCachedData();
+
         DateTimeOffset local = TimeZoneInfo.ConvertTime(until, time.LocalTimeZone);
         bool today = local.Date == time.GetLocalNow().Date;
         return local.ToString(today ? "t" : "g", CultureInfo.CurrentCulture);

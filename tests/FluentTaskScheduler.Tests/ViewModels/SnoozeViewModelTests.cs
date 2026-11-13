@@ -314,6 +314,18 @@ public sealed class SnoozeViewModelTests : IDisposable
     }
 
     [Fact]
+    public void TheDialog_IsInTheTimeZoneTheComputerUsesNow()
+    {
+        // .NET keeps the zone it read first until its cache is cleared, and reads it into a new
+        // object afterwards: that new object is what a test can see of a fresh read.
+        TimeZoneInfo readBefore = TimeZoneInfo.Local;
+
+        _snooze.PickMoment();
+
+        Assert.NotSame(readBefore, TimeZoneInfo.Local);
+    }
+
+    [Fact]
     public void InTheDialog_NoLongerSuspendingTriggers_UnticksTheTasksOfWindows_AndTakesTheWarningAway()
     {
         SnoozeUntilViewModel dialog = _snooze.PickMoment();

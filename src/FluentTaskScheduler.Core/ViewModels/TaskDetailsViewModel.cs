@@ -184,6 +184,10 @@ public sealed partial class TaskDetailsViewModel : ObservableObject, IDisposable
     [RelayCommand]
     public async Task LoadHistoryAsync()
     {
+        // The user's days and times are those of the time zone Windows uses now. .NET keeps the
+        // zone it read first until its cache is cleared.
+        TimeZoneInfo.ClearCachedData();
+
         _loading?.Cancel();
         var loading = _loading = new CancellationTokenSource();
         IsLoading = true;

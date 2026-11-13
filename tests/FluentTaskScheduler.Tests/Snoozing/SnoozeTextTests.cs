@@ -8,7 +8,9 @@ namespace FluentTaskScheduler.Tests.Snoozing;
 
 /// <summary>
 /// <see cref="Loc"/> is one lookup for the whole process. Tests that install texts in it run in
-/// this collection, apart from all other tests, and take the texts out again.
+/// this collection, apart from all other tests, and take the texts out again. So do the tests that
+/// check that the time zone of the computer is read afresh: .NET keeps that zone for the whole
+/// process as well, and another test clearing its cache meanwhile would pass for the code tested.
 /// </summary>
 [CollectionDefinition(Name, DisableParallelization = true)]
 public sealed class LocalizedTextCollection
@@ -70,6 +72,19 @@ public sealed class SnoozeTextTests : IDisposable
 
         Assert.Equal("Snoozed until 21:30", SnoozeText.OneTask(new SnoozeWindow(Now.AddHours(1.5)), _time));
         Assert.Equal("Snoozed until 03/11/2026 01:30", SnoozeText.OneTask(new SnoozeWindow(Now.AddHours(5.5)), _time));
+    }
+
+    [Fact]
+    public void TheEnd_IsGivenInTheTimeZoneTheComputerUsesNow()
+    {
+        // In the app the zone comes from .NET, which reads it once and keeps it until its cache is
+        // cleared; read again, it is a new object. A test cannot change the zone of the computer,
+        // so the new object is what it can see.
+        TimeZoneInfo readBefore = TimeZoneInfo.Local;
+
+        SnoozeText.AllTasks(new SnoozeWindow(Now.AddHours(1)), _time);
+
+        Assert.NotSame(readBefore, TimeZoneInfo.Local);
     }
 
     [Fact]
