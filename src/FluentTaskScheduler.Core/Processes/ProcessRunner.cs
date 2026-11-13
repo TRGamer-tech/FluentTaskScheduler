@@ -68,7 +68,8 @@ public sealed class ProcessRunner : IProcessRunner
             }
         }
 
-        Task reading = Task.WhenAll(Pump(process.StandardOutput, isError: false), Pump(process.StandardError, isError: true));
+        StreamReader output = process.StandardOutput, errors = process.StandardError;
+        Task reading = Task.WhenAll(Pump(output, isError: false), Pump(errors, isError: true));
 
         int exitCode;
         using (cancellation.Register(Kill))
@@ -83,10 +84,13 @@ public sealed class ProcessRunner : IProcessRunner
         await Task.WhenAny(reading, Task.Delay(DrainTime, CancellationToken.None));
         lock (gate) ended = true;
 
-        // A read that is still waiting keeps the streams in use, so the process object has to stay until it returns.
+        // The readers are closed once their reads have returned, which lets go of the pipes. Disposing
+        // the process does not close them: it leaves streams it has handed out to whoever took them.
         _ = reading.ContinueWith(done =>
         {
             if (done.Exception is { } failure) Serilog.Log.Warning(failure, "Reading the output of {Program} failed", request.FileName);
+            output.Dispose();
+            errors.Dispose();
             process.Dispose();
         }, TaskScheduler.Default);
 
