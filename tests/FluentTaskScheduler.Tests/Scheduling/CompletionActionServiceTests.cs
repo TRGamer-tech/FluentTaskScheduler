@@ -112,7 +112,7 @@ public sealed class CompletionActionServiceTests : IDisposable
         _stream.Start(FakeTaskEventStream.Running(B));
 
         Assert.Equal([$"Run {B} unforced"], _store.Calls);
-        Assert.Equal([@"TaskCouldNotStart Gone: The task '\Jobs\Gone' does not exist.", "CompletionActionStarted A -> B (success)"], _notifier.Shown);
+        Assert.Equal(["TaskCouldNotStart Gone: Tasks.Error.Gone", "CompletionActionStarted A -> B (success)"], _notifier.Shown);
     }
 
     [Fact]
@@ -124,7 +124,7 @@ public sealed class CompletionActionServiceTests : IDisposable
         _stream.Complete(Finished(A));
 
         Assert.Equal([$"Run {C} unforced"], _store.Calls);
-        Assert.StartsWith("TaskCouldNotStart B: ", Assert.Single(_notifier.Shown));
+        Assert.Equal("TaskCouldNotStart B: Tasks.Error.Denied", Assert.Single(_notifier.Shown));
     }
 
     [Fact]
@@ -268,6 +268,17 @@ public sealed class CompletionActionServiceTests : IDisposable
         new TaskRunner(_store, _snooze, _notifier).Run(B);
 
         Assert.Equal([$"Run {B}"], _store.Calls);
+    }
+
+    [Fact]
+    public void WhatTheUserStartsByHand_AndCannotBeStarted_IsLeftToWhereTheyStartedItToReport()
+    {
+        _store.Protected.Add(B);
+
+        Assert.Throws<TaskAccessDeniedException>(() => new TaskRunner(_store, _snooze, _notifier).Run(B));
+        Assert.Throws<TaskNotFoundException>(() => new TaskRunner(_store, _snooze, _notifier).Run(@"\Jobs\Gone"));
+
+        Assert.Empty(_notifier.Shown);
     }
 
     [Fact]

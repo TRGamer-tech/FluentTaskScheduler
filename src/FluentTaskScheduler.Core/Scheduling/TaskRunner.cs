@@ -1,3 +1,4 @@
+using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Notifications;
 
 namespace FluentTaskScheduler.Scheduling;
@@ -38,7 +39,8 @@ public interface ITaskRunner
 
 /// <summary>
 /// The one place a run request from the app goes through: it honours the snooze, starts the
-/// task and tells the user what happened. The store itself only talks to Task Scheduler.
+/// task and tells the user what happened, unless that is left to whoever asked. The store
+/// itself only talks to Task Scheduler.
 /// </summary>
 public sealed class TaskRunner : ITaskRunner
 {
@@ -73,7 +75,9 @@ public sealed class TaskRunner : ITaskRunner
         catch (Exception ex)
         {
             Serilog.Log.Error(ex, "Task {Path} could not be started ({Origin})", taskPath, origin);
-            _notifier.TaskCouldNotStart(name, ex.Message);
+            // Whoever starts a task by hand is told by what they started it from. A completion
+            // action happens in the background, so nobody else would tell the user.
+            if (origin == RunOrigin.CompletionAction) _notifier.TaskCouldNotStart(name, Reason(ex, name));
             throw;
         }
 
@@ -81,4 +85,12 @@ public sealed class TaskRunner : ITaskRunner
         if (origin == RunOrigin.Manual) _notifier.TaskStarted(name);
         return RunOutcome.Started;
     }
+
+    private static string Reason(Exception ex, string name) => ex switch
+    {
+        TaskNotFoundException => Loc.Format("Tasks.Error.Gone", name),
+        TaskAccessDeniedException => Loc.Format("Tasks.Error.Denied", name),
+        // Task Scheduler's own reason, in the language of Windows.
+        _ => ex.Message
+    };
 }
