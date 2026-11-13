@@ -45,6 +45,7 @@ public class TaskStoreTests
         Assert.True(row.IsEnabled);
         Assert.Null(row.LoadError);
         Assert.NotNull(row.NextRunTime);
+        Assert.Null(row.LastRunTime); // it has never run
 
         var draft = _store.Load(path);
         Assert.Equal("Fresh", draft.Name);

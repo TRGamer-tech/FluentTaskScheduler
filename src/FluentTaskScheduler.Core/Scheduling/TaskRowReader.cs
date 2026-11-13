@@ -47,5 +47,9 @@ internal static class TaskRowReader
         _ => TaskRowState.Unknown
     };
 
-    private static DateTime? NullIfNever(DateTime value) => value == DateTime.MinValue ? null : value;
+    // Task Scheduler gives a task that never ran this moment as its last run, and a task that is
+    // not going to run again no moment at all.
+    private static readonly DateTime NeverRan = new(1999, 11, 30);
+
+    private static DateTime? NullIfNever(DateTime value) => value == DateTime.MinValue || value == NeverRan ? null : value;
 }
