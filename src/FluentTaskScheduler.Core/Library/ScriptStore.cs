@@ -199,13 +199,24 @@ public sealed class ScriptStore
         }
         catch (JsonException ex)
         {
-            // Keep what was there: the next save would otherwise overwrite the only record of the user's scripts.
-            string backup = Path.ChangeExtension(_listFile, ".unreadable.json");
-            File.Move(_listFile, backup, overwrite: true);
+            // Keep what was there: the next save would otherwise overwrite the only record of the
+            // user's scripts. An empty list takes its place, as without a list the next read would
+            // take over the scripts of version 1.9 once more.
+            string backup = UnusedBackupName();
+            File.Move(_listFile, backup);
             UnreadableListBackup = backup;
             Serilog.Log.Error(ex, "The list of saved scripts {Path} could not be read and was set aside as {Backup}", _listFile, backup);
+            WriteList([]);
             return [];
         }
+    }
+
+    /// <summary>A name for a list that cannot be read, which leaves any set aside before untouched.</summary>
+    private string UnusedBackupName()
+    {
+        string backup = Path.ChangeExtension(_listFile, ".unreadable.json");
+        for (int number = 2; File.Exists(backup); number++) backup = Path.ChangeExtension(_listFile, $".unreadable.{number}.json");
+        return backup;
     }
 
     private static List<Entry> Parse(string json) =>

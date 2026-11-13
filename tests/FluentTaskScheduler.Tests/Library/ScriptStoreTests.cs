@@ -189,8 +189,12 @@ public sealed class ScriptStoreTests : IDisposable
     {
         Directory.CreateDirectory(ScriptsFolder);
         File.WriteAllText(ListFile, content);
+        // The list of version 1.9 was taken over when the broken list was first written; starting
+        // over must not bring its scripts back.
+        File.WriteAllText(_folder.File("user_templates.json"), """[{ "Name": "From 1.9", "Command": "robocopy.exe" }]""");
         ScriptStore store = NewStore();
 
+        Assert.All(store.GetScripts(), script => Assert.True(script.IsBuiltIn));
         Assert.All(store.GetScripts(), script => Assert.True(script.IsBuiltIn));
 
         Assert.NotNull(store.UnreadableListBackup);
@@ -198,6 +202,22 @@ public sealed class ScriptStoreTests : IDisposable
         store.Save(null, "New", "", "Write-Output 1");
         Assert.Equal("New", OnlyUserScript(store).Name);
         Assert.Equal(content, File.ReadAllText(store.UnreadableListBackup));
+    }
+
+    [Fact]
+    public void AListThatCannotBeRead_IsSetAside_WithoutReplacingOneSetAsideBefore()
+    {
+        Directory.CreateDirectory(ScriptsFolder);
+        File.WriteAllText(ListFile, "{ broken");
+        ScriptStore first = NewStore();
+        first.GetScripts();
+
+        File.WriteAllText(ListFile, "{ broken again");
+        ScriptStore afterARestart = NewStore();
+        afterARestart.GetScripts();
+
+        Assert.Equal("{ broken", File.ReadAllText(first.UnreadableListBackup!));
+        Assert.Equal("{ broken again", File.ReadAllText(afterARestart.UnreadableListBackup!));
     }
 
     [Fact]
