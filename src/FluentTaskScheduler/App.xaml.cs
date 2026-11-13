@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using FluentTaskScheduler.History;
 using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Notifications;
 using FluentTaskScheduler.Scheduling;
@@ -49,6 +50,11 @@ public partial class App : Application, IAppLifetime, IDisposable
 
         _services.GetRequiredService<AppAppearance>().Start();
 
+        // What acts on finished runs exists before the stream starts to report them.
+        _services.GetRequiredService<CompletionActionService>();
+        _services.GetRequiredService<ExecutionHistoryLog>();
+        _services.GetRequiredService<TaskEventStream>().Start();
+
         var windows = _services.GetRequiredService<WindowManager>();
         windows.OpenWindow();
 
@@ -78,6 +84,12 @@ public partial class App : Application, IAppLifetime, IDisposable
         services.AddSingleton<ITaskFolders, TaskFolders>();
         services.AddSingleton<ITaskRunner, TaskRunner>();
         services.AddSingleton<INetworkProfiles, RegistryNetworkProfiles>();
+        services.AddSingleton<IEventLog, WindowsEventLog>();
+        services.AddSingleton<ITaskHistory, TaskHistory>();
+        services.AddSingleton<TaskEventStream>();
+        services.AddSingleton<ITaskEventStream>(app => app.GetRequiredService<TaskEventStream>());
+        services.AddSingleton<CompletionActionService>();
+        services.AddSingleton<ExecutionHistoryLog>();
         services.AddSingleton<ToastNotifier>();
         services.AddSingleton<INotifier>(app => app.GetRequiredService<ToastNotifier>());
         services.AddSingleton<WindowManager>();
