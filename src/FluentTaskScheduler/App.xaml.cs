@@ -4,7 +4,6 @@ using System.Security.Principal;
 using FluentTaskScheduler.Dialogs;
 using FluentTaskScheduler.History;
 using FluentTaskScheduler.Library;
-using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Logging;
 using FluentTaskScheduler.Notifications;
 using FluentTaskScheduler.Processes;
@@ -18,8 +17,6 @@ using FluentTaskScheduler.ViewModels;
 using FluentTaskScheduler.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 
 namespace FluentTaskScheduler;
 
@@ -28,6 +25,7 @@ public partial class App : Application, IAppLifetime, IDisposable
 {
     private readonly SingleInstance _instance;
     private ServiceProvider? _services;
+    private bool _crashReportPending;
 
     internal App(SingleInstance instance)
     {
@@ -203,33 +201,31 @@ public partial class App : Application, IAppLifetime, IDisposable
         Serilog.Log.CloseAndFlush();
     }
 
+    // Must not throw: WinUI would report that as unhandled as well, and call this again.
     private void ReportCrash(Exception exception)
     {
         Serilog.Log.Fatal(exception, "Unhandled exception in the UI");
-        if (_services?.GetService<WindowManager>()?.MainWindow?.Content is not FrameworkElement { XamlRoot: { } root }) return;
 
-        string details = exception.ToString();
-        var dialog = new ContentDialog
+        // Errors tend to come in bursts. While one report is waiting or open, the log has to do for the others.
+        if (_crashReportPending || _services?.GetService<WindowManager>()?.MainShell is not { } shell) return;
+        _ = ShowCrashReportAsync(shell, exception.ToString());
+    }
+
+    private async Task ShowCrashReportAsync(ShellPage shell, string details)
+    {
+        _crashReportPending = true;
+        try
         {
-            XamlRoot = root,
-            Title = Loc.Get("Dialog.Crash.Title"),
-            PrimaryButtonText = Loc.Get("Dialog.Crash.Copy"),
-            CloseButtonText = Loc.Get("Dialog.Common.Close"),
-            Content = new ScrollViewer
-            {
-                MaxHeight = 320,
-                Content = new TextBlock
-                {
-                    Text = details,
-                    FontFamily = new FontFamily("Consolas"),
-                    IsTextSelectionEnabled = true,
-                    TextWrapping = TextWrapping.Wrap
-                }
-            }
-        };
-        dialog.PrimaryButtonClick += (_, _) => _services.GetRequiredService<IClipboard>().SetText(details);
-
-        // Another dialog may be open; then the log entry above has to do.
-        _ = dialog.ShowAsync();
+            await shell.ShowCrashReportAsync(details);
+        }
+        catch (Exception ex)
+        {
+            // Nothing awaits the report. The exception it was to show is in the log either way.
+            Serilog.Log.Error(ex, "The report of an unhandled exception could not be shown");
+        }
+        finally
+        {
+            _crashReportPending = false;
+        }
     }
 }

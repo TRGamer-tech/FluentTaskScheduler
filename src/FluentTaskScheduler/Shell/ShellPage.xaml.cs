@@ -36,14 +36,17 @@ public sealed partial class ShellPage : Page, IShellNavigator
     private readonly IServiceProvider _windowServices;
     private readonly TasksViewModel _tasks;
     private readonly FoldersViewModel _folders;
-    private readonly IPrompts _prompts;
+    private readonly IDialogService _dialogs;
+    private readonly IClipboard _clipboard;
 
-    public ShellPage(IServiceProvider windowServices, ISettingsStore settings, TasksViewModel tasks, FoldersViewModel folders, IPrompts prompts)
+    public ShellPage(IServiceProvider windowServices, ISettingsStore settings, TasksViewModel tasks, FoldersViewModel folders,
+        IDialogService dialogs, IClipboard clipboard)
     {
         _windowServices = windowServices;
         _tasks = tasks;
         _folders = folders;
-        _prompts = prompts;
+        _dialogs = dialogs;
+        _clipboard = clipboard;
         InitializeComponent();
         if (settings.Current.IsOledMode) UseBlackContentAreaInDarkTheme();
 
@@ -91,7 +94,31 @@ public sealed partial class ShellPage : Page, IShellNavigator
     }
 
     /// <summary>Tells the user in this window what went wrong elsewhere, e.g. in the notification area.</summary>
-    public Task ShowErrorAsync(string message) => _prompts.ShowErrorAsync(message);
+    public Task ShowErrorAsync(string message) => _dialogs.ShowErrorAsync(message);
+
+    /// <summary>Shows what an unhandled exception said, once the dialog the window may be showing has closed.</summary>
+    public Task ShowCrashReportAsync(string details)
+    {
+        var dialog = new ContentDialog
+        {
+            Title = Loc.Get("Dialog.Crash.Title"),
+            PrimaryButtonText = Loc.Get("Dialog.Crash.Copy"),
+            CloseButtonText = Loc.Get("Dialog.Common.Close"),
+            Content = new ScrollViewer
+            {
+                MaxHeight = 320,
+                Content = new TextBlock
+                {
+                    Text = details,
+                    FontFamily = new FontFamily("Consolas"),
+                    IsTextSelectionEnabled = true,
+                    TextWrapping = TextWrapping.Wrap
+                }
+            }
+        };
+        dialog.PrimaryButtonClick += (_, _) => _clipboard.SetText(details);
+        return _dialogs.ShowAsync(dialog);
+    }
 
     private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
