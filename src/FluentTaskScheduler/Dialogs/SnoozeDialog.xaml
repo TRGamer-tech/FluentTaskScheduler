@@ -9,22 +9,22 @@
     DefaultButton="Primary"
     PrimaryButtonClick="Snooze_Click">
 
+    <!-- The bars are collapsed as well as closed while they have nothing to say: a closed bar would still take the panel's spacing. -->
     <StackPanel Spacing="12" Width="440">
         <InfoBar x:Name="SnoozeProblem" Severity="Error" IsClosable="False"
-                 IsOpen="{x:Bind ViewModel.HasProblem, Mode=OneWay}"
+                 IsOpen="{x:Bind ViewModel.HasProblem, Mode=OneWay}" Visibility="{x:Bind ViewModel.HasProblem, Mode=OneWay}"
                  Message="{x:Bind ViewModel.Problem, Mode=OneWay}"/>
 
         <TextBlock Text="{x:Bind l:Loc.Get('Snooze.Dialog.Intro')}" TextWrapping="Wrap"
                    Visibility="{x:Bind ViewModel.IsForAllTasks}"/>
 
+        <!-- One below the other: side by side, the two pickers need more room than a dialog has. -->
         <StackPanel Spacing="8">
             <TextBlock Text="{x:Bind ViewModel.UntilText}" TextWrapping="Wrap"/>
-            <StackPanel Orientation="Horizontal" Spacing="12">
-                <DatePicker x:Name="SnoozeDate" AutomationProperties.Name="{x:Bind ViewModel.UntilText}"
-                            Date="{x:Bind ViewModel.Date, Mode=TwoWay}"/>
-                <TimePicker x:Name="SnoozeTime" AutomationProperties.Name="{x:Bind ViewModel.UntilText}"
-                            Time="{x:Bind ViewModel.TimeOfDay, Mode=TwoWay}"/>
-            </StackPanel>
+            <DatePicker x:Name="SnoozeDate" AutomationProperties.Name="{x:Bind ViewModel.UntilText}"
+                        Date="{x:Bind ViewModel.Date, Mode=TwoWay}"/>
+            <TimePicker x:Name="SnoozeTime" AutomationProperties.Name="{x:Bind ViewModel.UntilText}"
+                        Time="{x:Bind ViewModel.TimeOfDay, Mode=TwoWay}"/>
         </StackPanel>
 
         <!-- What a snooze of all tasks reaches. A task snoozed on its own is always disabled. -->
@@ -40,6 +40,7 @@
                       IsChecked="{x:Bind ViewModel.AllTasks.IncludesMicrosoftTasks, Mode=TwoWay}"/>
             <InfoBar x:Name="SnoozeMicrosoftWarning" Margin="28,0,0,0" Severity="Warning" IsClosable="False"
                      IsOpen="{x:Bind ViewModel.AllTasks.ShowsMicrosoftTasksWarning, Mode=OneWay}"
+                     Visibility="{x:Bind ViewModel.AllTasks.ShowsMicrosoftTasksWarning, Mode=OneWay}"
                      Message="{x:Bind l:Loc.Get('Snooze.IncludeMicrosoftTasksWarning')}"/>
         </StackPanel>
     </StackPanel>
