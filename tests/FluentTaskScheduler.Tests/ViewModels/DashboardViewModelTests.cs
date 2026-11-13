@@ -307,6 +307,68 @@ public sealed class DashboardViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task AfterRunsAreReported_OnlyTheTasksThatRanAreReadAgain_OfThoseTheDashboardHas()
+    {
+        await _dashboard.ShowAsync();
+        _store.Run(Succeeds);
+
+        _stream.Start(FakeTaskEventStream.Running(Succeeds, started: Now));
+        _stream.Start(FakeTaskEventStream.Running(@"\Microsoft\Windows\Defrag\ScheduledDefrag", started: Now));
+        await AfterTheRefreshDelayAsync();
+
+        Assert.Equal([Succeeds], _store.TasksRead);
+        Assert.Equal(1, _store.Listings);
+        Assert.Equal(Succeeds, Assert.Single(_dashboard.Running).TaskPath);
+    }
+
+    [Fact]
+    public async Task ATaskThatIsGoneWhenItIsReadAgainAfterARun_IsNoLongerCounted()
+    {
+        await _dashboard.ShowAsync();
+        _store.Delete(Fails);
+
+        _stream.Complete(FakeTaskEventStream.Finished(Fails, RunStatus.Failed, resultCode: 3, ended: Now));
+        await AfterTheRefreshDelayAsync();
+
+        Assert.Equal(2, Figures.TotalTasks);
+        Assert.Equal(["Dashboard.AllCategories", "Reports"], _dashboard.Categories);
+    }
+
+    [Fact]
+    public async Task ASlowReadOfAllTasks_CannotOverwriteWhatALaterReadFound()
+    {
+        await _dashboard.ShowAsync();
+
+        // A task is registered. The read that follows has listed the tasks, but not handed them
+        // over yet when the next task is registered and read.
+        using var listing = new ManualResetEventSlim();
+        using var handOver = new ManualResetEventSlim();
+        _store.Listed = () =>
+        {
+            _store.Listed = null;
+            listing.Set();
+            handOver.Wait();
+        };
+        _store.Add(@"\First");
+        _stream.Change(new TaskChange(@"\First", TaskChangeKind.Registered, Now));
+        _time.Advance(DashboardViewModel.RefreshDelay);
+        Task slow = _dashboard.PendingRefresh;
+        listing.Wait();
+
+        _store.Add(@"\Second");
+        _stream.Change(new TaskChange(@"\Second", TaskChangeKind.Registered, Now));
+        _time.Advance(DashboardViewModel.RefreshDelay);
+        Task later = _dashboard.PendingRefresh;
+
+        // A later read that went ahead without waiting for the slow one has shown its tasks by now.
+        await Task.WhenAny(later, Task.Delay(TimeSpan.FromMilliseconds(250)));
+        handOver.Set();
+        await Task.WhenAll(slow, later);
+
+        Assert.Equal(5, Figures.TotalTasks);
+    }
+
+    [Fact]
     public async Task OffScreen_RunsAreTakenNoteOf_ButNothingIsRead_AndBackOnScreenOnlyTheTasksAre()
     {
         await _dashboard.ShowAsync();

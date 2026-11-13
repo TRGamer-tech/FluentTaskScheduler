@@ -13,9 +13,9 @@ namespace FluentTaskScheduler.ViewModels;
 /// </summary>
 /// <remarks>
 /// The history is read when the page first comes on screen. From then on the dashboard follows
-/// what Task Scheduler reports: a run that starts or ends is added to what it has, and the tasks
-/// are read again shortly after. Off screen it only takes note of the runs; the tasks are read
-/// again when it comes back.
+/// what Task Scheduler reports: a run that starts or ends is added to what it has, and its task
+/// is read again shortly after; when a task is registered, changed or deleted, all of them are.
+/// Off screen it only takes note of the runs; all tasks are read again when it comes back.
 /// </remarks>
 public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 {
@@ -40,7 +40,12 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     private Dictionary<string, TaskRun> _recorded = [];
     private readonly Dictionary<string, TaskRun> _reported = [];
 
-    private int _taskReadsBegun, _taskReadShown;
+    // What the next refresh reads again: the tasks whose runs were reported, or all tasks once
+    // one was registered, changed or deleted.
+    private readonly HashSet<string> _tasksThatRan = new(StringComparer.OrdinalIgnoreCase);
+    private bool _tasksChanged;
+
+    private readonly ReadQueue _reads = new();
     private bool _isShown, _hasRead, _refreshPlanned, _choosing;
 
     public DashboardViewModel(ITaskStore store, ITaskHistory history, ITaskEventStream stream, ISnoozeService snooze,
@@ -118,12 +123,15 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 
     /// <summary>
     /// Tells the dashboard that its page came on screen. The first time it reads everything;
-    /// after that only the tasks, which also change unreported while Windows records no history.
+    /// after that all tasks, which change unreported while it is off screen or while Windows
+    /// records no history.
     /// </summary>
     public Task ShowAsync()
     {
         _isShown = true;
-        return _hasRead ? RefreshAsync() : LoadAsync();
+        if (!_hasRead) return LoadAsync();
+        _tasksChanged = true;
+        return RefreshAsync();
     }
 
     /// <summary>Tells the dashboard that its page left the screen.</summary>
@@ -143,7 +151,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
             // The history about to be read holds the runs reported so far, and has the newer word
             // on them. A run reported from here on may be in it or not yet; it is kept.
             List<KeyValuePair<string, TaskRun>> reportedBefore = [.. _reported];
-            Task tasks = ReadTasksAsync();
+            Task tasks = _reads.Enqueue(ReadAllTasksAsync);
             try
             {
                 IReadOnlyList<TaskRun> runs = await Task.Run(() => _history.GetRuns(since, _closing.Token), _closing.Token);
@@ -204,13 +212,16 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         if (_closing.IsCancellationRequested) return;
         Remember(run);
         if (!_isShown) return;
+        _tasksThatRan.Add(run.TaskPath);
         Present();
         PlanRefresh();
     });
 
     private void OnTaskChanged(object? sender, TaskChange change) => _ui.Post(() =>
     {
-        if (!_closing.IsCancellationRequested && _isShown) PlanRefresh();
+        if (_closing.IsCancellationRequested || !_isShown) return;
+        _tasksChanged = true;
+        PlanRefresh();
     });
 
     private void OnSnoozeChanged(object? sender, EventArgs e) => _ui.Post(() =>
@@ -238,24 +249,31 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     /// <summary>The read of the tasks that the last report set off. Tests wait on this instead of on the clock.</summary>
     internal Task PendingRefresh { get; private set; } = Task.CompletedTask;
 
-    /// <summary>Reads the tasks again: their states and run times move on. The runs are known already.</summary>
+    /// <summary>
+    /// Reads again what the reports since the last refresh concern: the tasks that ran, whose
+    /// states and run times have moved on, or all tasks once one was registered, changed or
+    /// deleted. The runs themselves are known already.
+    /// </summary>
     private async Task RefreshAsync()
     {
         _refreshPlanned = false;
 
         // A refresh planned just before the page left the screen is done when it comes back.
         if (_closing.IsCancellationRequested || !_isShown) return;
-        await ReadTasksAsync();
+
+        List<string> ran = [.. _tasksThatRan];
+        bool changed = _tasksChanged;
+        _tasksThatRan.Clear();
+        _tasksChanged = false;
+        await _reads.Enqueue(changed ? ReadAllTasksAsync : () => ReadTasksAsync(ran));
         Present();
     }
 
-    /// <summary>Reads the tasks, and on the way whether Windows records history. Never throws.</summary>
-    private async Task ReadTasksAsync()
+    /// <summary>Reads all tasks, and on the way whether Windows records history. Never throws.</summary>
+    private async Task ReadAllTasksAsync()
     {
-        int read = ++_taskReadsBegun;
-        IReadOnlyList<TaskRow>? tasks = null;
-        LogState state = LogState.Enabled;
-        string? problem = null;
+        IReadOnlyList<TaskRow> tasks;
+        LogState state;
         try
         {
             (tasks, state) = await Task.Run(() => (_store.GetTasks(), _history.GetLogState()));
@@ -264,17 +282,38 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         {
             // Whatever Task Scheduler answered: the dashboard keeps the tasks it had and says why.
             Serilog.Log.Error(ex, "The tasks could not be read for the dashboard");
-            problem = ex.Message;
+            TasksProblem = ex.Message;
+            return;
         }
 
-        // What a read that began later found is shown already.
-        if (read < _taskReadShown) return;
-        _taskReadShown = read;
-        TasksProblem = problem;
-        if (tasks is null) return;
-
+        TasksProblem = null;
         _tasks = tasks;
         IsLogOff = state == LogState.Disabled;
+        ShowChoices();
+    }
+
+    /// <summary>Reads those of the given tasks again that the dashboard has, and drops one that is gone. Never throws.</summary>
+    private async Task ReadTasksAsync(IReadOnlyCollection<string> paths)
+    {
+        // A run of a task the dashboard does not have is one of a task this user cannot see, or
+        // of a new task, which the report of its registration brings in.
+        HashSet<string> had = _tasks.Select(task => task.Path).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        List<string> known = paths.Where(had.Contains).ToList();
+        if (known.Count == 0) return;
+
+        Dictionary<string, TaskRow?> fresh;
+        try
+        {
+            fresh = await Task.Run(() => known.ToDictionary(path => path, _store.GetTask, StringComparer.OrdinalIgnoreCase));
+        }
+        catch (Exception ex)
+        {
+            // Whatever went wrong: the dashboard keeps what it has until the next report or refresh.
+            Serilog.Log.Warning(ex, "The tasks that ran could not be read again for the dashboard");
+            return;
+        }
+
+        _tasks = _tasks.Select(task => fresh.TryGetValue(task.Path, out TaskRow? row) ? row : task).OfType<TaskRow>().ToList();
         ShowChoices();
     }
 
