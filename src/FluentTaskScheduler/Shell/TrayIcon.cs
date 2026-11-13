@@ -30,7 +30,12 @@ internal sealed class TrayIcon : IDisposable
     private readonly nint _window;
     private nint _icon;
     private string _tooltip = "";
-    private bool _visible;
+
+    /// <summary>Between <see cref="Show"/> and <see cref="Hide"/>: the icon is to be in the taskbar.</summary>
+    private bool _wanted;
+
+    /// <summary>The taskbar has the icon. A wanted icon may lack it while there is no taskbar, or while Explorer does not answer.</summary>
+    private bool _added;
 
     public TrayIcon()
     {
@@ -48,6 +53,10 @@ internal sealed class TrayIcon : IDisposable
         // the taskbar is created anew.
         _window = CreateWindowExW(0, WindowClassName, "", 0, 0, 0, 0, 0, 0, 0, _module, 0);
         if (_window == 0) throw new Win32Exception();
+
+        // Windows keeps Explorer's messages from a program that runs as administrator unless it
+        // lets them through. Without this, the icon would not come back after Explorer restarts.
+        ChangeWindowMessageFilterEx(_window, TaskbarCreated, MSGFLT_ALLOW, 0);
     }
 
     /// <summary>The user clicked the icon.</summary>
@@ -55,8 +64,6 @@ internal sealed class TrayIcon : IDisposable
 
     /// <summary>The user asked for the icon's menu. Answer with <see cref="ShowMenu"/>.</summary>
     public event Action? MenuRequested;
-
-    public bool IsVisible => _visible;
 
     /// <summary>Uses <paramref name="icon"/> from now on and takes charge of destroying it.</summary>
     public void SetIcon(nint icon)
@@ -75,17 +82,17 @@ internal sealed class TrayIcon : IDisposable
 
     public void Show()
     {
-        if (_visible) return;
-        NOTIFYICONDATAW data = Describe(NIF_MESSAGE | NIF_ICON | NIF_TIP);
-        _visible = Shell_NotifyIconW(NIM_ADD, ref data);
+        _wanted = true;
+        Add();
     }
 
     public void Hide()
     {
-        if (!_visible) return;
+        _wanted = false;
+        if (!_added) return;
         NOTIFYICONDATAW data = Describe(0);
         Shell_NotifyIconW(NIM_DELETE, ref data);
-        _visible = false;
+        _added = false;
     }
 
     /// <summary>Opens a menu at the mouse pointer and carries out what the user chooses from it.</summary>
@@ -139,9 +146,29 @@ internal sealed class TrayIcon : IDisposable
 
     private void Update()
     {
-        if (!_visible) return;
+        if (!_wanted) return;
+
+        // An icon that could not be added is tried again with every change.
+        if (!_added)
+        {
+            Add();
+            return;
+        }
+
         NOTIFYICONDATAW data = Describe(NIF_ICON | NIF_TIP);
         Shell_NotifyIconW(NIM_MODIFY, ref data);
+    }
+
+    /// <summary>
+    /// Adding fails while there is no taskbar, until Explorer announces one, and can time out
+    /// while Explorer is busy, as it is while the user signs in. An add that timed out may have
+    /// got through after all; the icon then takes a modification instead.
+    /// </summary>
+    private void Add()
+    {
+        if (_added) return;
+        NOTIFYICONDATAW data = Describe(NIF_MESSAGE | NIF_ICON | NIF_TIP);
+        _added = Shell_NotifyIconW(NIM_ADD, ref data) || Shell_NotifyIconW(NIM_MODIFY, ref data);
     }
 
     private NOTIFYICONDATAW Describe(int fields) => new()
@@ -171,11 +198,11 @@ internal sealed class TrayIcon : IDisposable
                 return 0;
             }
 
-            if (message == TaskbarCreated && _visible)
+            if (message == TaskbarCreated)
             {
                 // The new taskbar starts without the icon.
-                _visible = false;
-                Show();
+                _added = false;
+                if (_wanted) Add();
                 return 0;
             }
         }
@@ -203,6 +230,7 @@ internal sealed class TrayIcon : IDisposable
     private const uint WM_CONTEXTMENU = 0x007B, WM_LBUTTONUP = 0x0202, WM_RBUTTONUP = 0x0205;
     private const uint MF_STRING = 0x0000, MF_GRAYED = 0x0001, MF_POPUP = 0x0010, MF_SEPARATOR = 0x0800;
     private const uint TPM_RIGHTBUTTON = 0x0002, TPM_NONOTIFY = 0x0080, TPM_RETURNCMD = 0x0100;
+    private const uint MSGFLT_ALLOW = 1;
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     private struct WNDCLASSEXW
@@ -269,6 +297,9 @@ internal sealed class TrayIcon : IDisposable
 
     [DllImport("user32.dll")]
     private static extern bool DestroyWindow(nint window);
+
+    [DllImport("user32.dll")]
+    private static extern bool ChangeWindowMessageFilterEx(nint window, uint message, uint action, nint changeFilterStruct);
 
     [DllImport("user32.dll")]
     private static extern nint DefWindowProcW(nint window, uint message, nuint wParam, nint lParam);
