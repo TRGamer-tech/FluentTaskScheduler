@@ -855,6 +855,32 @@ public sealed class TasksViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task AReloadAskedForDuringAnother_ReadsTheTasksAgain_AfterIt()
+    {
+        await _tasks.ReloadAsync();
+        using var reading = new ManualResetEventSlim();
+        using var release = new ManualResetEventSlim();
+        _store.Listed = () =>
+        {
+            _store.Listed = null;
+            reading.Set();
+            release.Wait(TimeSpan.FromSeconds(5));
+        };
+        Task first = _tasks.ReloadAsync();
+        Assert.True(reading.Wait(TimeSpan.FromSeconds(5)));
+
+        // Registered after the first reload has read the tasks, as by a move just made.
+        _store.Add(@"\Reports\Yearly");
+        Task second = _tasks.ReloadAsync();
+        release.Set();
+        await second;
+
+        Assert.Contains(@"\Reports\Yearly", Shown);
+        await first;
+        Assert.False(_tasks.IsLoading);
+    }
+
+    [Fact]
     public async Task WhenShowingOneReportFails_TheListStillReadsWhatComesAfter()
     {
         await _tasks.ReloadAsync();

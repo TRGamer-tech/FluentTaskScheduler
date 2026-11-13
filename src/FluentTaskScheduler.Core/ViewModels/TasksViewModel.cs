@@ -80,6 +80,10 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
     private int _snoozeSwitchedTasks;
 
     private readonly ReadQueue _reads = new();
+
+    /// <summary>How many of the reloads that show progress are not done yet.</summary>
+    private int _reloads;
+
     private IReadOnlyList<TaskRow> _selection = [];
     private bool _disposed;
 
@@ -182,10 +186,14 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
     }
 
     /// <summary>Reads the tasks from Task Scheduler and brings the list up to date.</summary>
+    /// <remarks>
+    /// A reload asked for while another is under way reads again after it: the earlier one may
+    /// have read the tasks before whatever the caller changed.
+    /// </remarks>
     [RelayCommand]
     public async Task ReloadAsync()
     {
-        if (IsLoading) return;
+        _reloads++;
         IsLoading = true;
         try
         {
@@ -193,7 +201,7 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
         }
         finally
         {
-            IsLoading = false;
+            IsLoading = --_reloads > 0;
         }
     }
 
