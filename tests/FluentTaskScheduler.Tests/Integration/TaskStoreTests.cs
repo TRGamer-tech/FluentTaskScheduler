@@ -155,6 +155,7 @@ public class TaskStoreTests
 
         _store.Run(path);
         Assert.True(WaitFor(() => _store.GetStates(new[] { path })[path] == TaskRowState.Running), "The task did not start.");
+        Assert.True(_store.CountRunningTasks() >= 1, "The running task was not counted.");
         _store.Stop(path);
         Assert.True(WaitFor(() => _store.GetStates(new[] { path })[path] != TaskRowState.Running), "The task did not stop.");
 

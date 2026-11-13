@@ -795,8 +795,8 @@ Jetzt App neustarten?</value></data>
   <data name="Settings.UpdateApplyFailed.Content" xml:space="preserve"><value>Das Update konnte nicht angewendet werden. Überprüfen Sie das Protokoll für Details oder versuchen Sie es später erneut.</value></data>
   <data name="Snooze.IncludeMicrosoftTasks" xml:space="preserve"><value>Auch Microsofts eigene geplante Aufgaben pausieren (Defender, Windows Update, Wartung...)</value></data>
   <data name="Snooze.IncludeMicrosoftTasksWarning" xml:space="preserve"><value>Nicht empfohlen: Das Deaktivieren dieser Aufgaben kann Windows-Sicherheitsscans, Updates und Wartung bis zum Ende der Pause beeinträchtigen.</value></data>
-  <data name="Tray.CloseWindowFormat" xml:space="preserve"><value>✕  {0} schließen</value></data>
-  <data name="Tray.ExitAll" xml:space="preserve"><value>Alle beenden</value></data>
+  <data name="Tray.CloseWindowFormat" xml:space="preserve"><value>{0} schliessen</value></data>
+  <data name="Tray.ExitAll" xml:space="preserve"><value>Beenden</value></data>
   <data name="Tray.NewWindow" xml:space="preserve"><value>Neues Fenster</value></data>
   <data name="Tray.NoHiddenWindows" xml:space="preserve"><value>(Keine ausgeblendeten Fenster)</value></data>
   <data name="Trigger.Run" xml:space="preserve"><value>Ausführen:</value></data>
@@ -930,4 +930,14 @@ Jetzt App neustarten?</value></data>
   <data name="EventResult.327" xml:space="preserve"><value>Gestoppt (Akkubetrieb)</value></data>
   <data name="EventResult.328" xml:space="preserve"><value>Gestoppt (nicht mehr im Leerlauf)</value></data>
   <data name="EventResult.330" xml:space="preserve"><value>Gestoppt (durch Benutzer)</value></data>
+  <data name="Toast.TaskStarted.Title" xml:space="preserve"><value>Aufgabe gestartet: {0}</value></data>
+  <data name="Toast.TaskStarted.Body" xml:space="preserve"><value>Die Aufgabe wurde manuell gestartet.</value></data>
+  <data name="Toast.TaskNotStarted.Title" xml:space="preserve"><value>Aufgabe konnte nicht gestartet werden: {0}</value></data>
+  <data name="Toast.Upcoming.Title" xml:space="preserve"><value>Anstehende Aufgabe: {0}</value></data>
+  <data name="Toast.Upcoming.Soon" xml:space="preserve"><value>Wird in weniger als einer Minute ausgeführt.</value></data>
+  <data name="Toast.Upcoming.Minutes" xml:space="preserve"><value>Wird in {0} Minuten ausgeführt.</value></data>
+  <data name="Toast.HiddenToTray.Title" xml:space="preserve"><value>FluentTaskScheduler läuft weiter</value></data>
+  <data name="Toast.HiddenToTray.Body" xml:space="preserve"><value>Das Fenster wurde in den Infobereich verschoben. Das Symbol dort bringt es zurück.</value></data>
+  <data name="Tray.Open" xml:space="preserve"><value>FluentTaskScheduler öffnen</value></data>
+  <data name="Tray.ShowWindowFormat" xml:space="preserve"><value>{0} anzeigen</value></data>
 </root>

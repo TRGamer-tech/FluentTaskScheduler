@@ -31,6 +31,9 @@ public sealed record AppSettings
     public bool EnableTrayIcon { get; init; } = true;
     public bool MinimizeToTray { get; init; }
 
+    /// <summary>The user has been told once that a closed window lives on in the notification area.</summary>
+    public bool HasSeenTrayHint { get; init; }
+
     public bool EnableLogging { get; init; } = true;
     public bool SeparateLogFiles { get; init; } = true;
     public bool EnableExecutionHistoryLog { get; init; }

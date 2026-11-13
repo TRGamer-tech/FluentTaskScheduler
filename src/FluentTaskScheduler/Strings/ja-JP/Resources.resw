@@ -795,8 +795,8 @@
   <data name="Settings.UpdateApplyFailed.Content" xml:space="preserve"><value>更新の適用に失敗しました。詳細はログを確認するか、後でもう一度お試しください。</value></data>
   <data name="Snooze.IncludeMicrosoftTasks" xml:space="preserve"><value>Microsoft 独自の予約タスクも一時停止する (Defender、Windows Update、メンテナンスなど)</value></data>
   <data name="Snooze.IncludeMicrosoftTasksWarning" xml:space="preserve"><value>推奨されません。これらを無効にすると、スヌーズが終了するまで Windows のセキュリティ スキャン、更新、メンテナンスが妨げられる可能性があります。</value></data>
-  <data name="Tray.CloseWindowFormat" xml:space="preserve"><value>✕  {0} を閉じる</value></data>
-  <data name="Tray.ExitAll" xml:space="preserve"><value>すべて終了</value></data>
+  <data name="Tray.CloseWindowFormat" xml:space="preserve"><value>{0} を閉じる</value></data>
+  <data name="Tray.ExitAll" xml:space="preserve"><value>終了</value></data>
   <data name="Tray.NewWindow" xml:space="preserve"><value>新しいウィンドウ</value></data>
   <data name="Tray.NoHiddenWindows" xml:space="preserve"><value>(非表示のウィンドウはありません)</value></data>
   <data name="Trigger.Run" xml:space="preserve"><value>実行:</value></data>
@@ -930,4 +930,14 @@
   <data name="EventResult.327" xml:space="preserve"><value>停止（バッテリー駆動）</value></data>
   <data name="EventResult.328" xml:space="preserve"><value>停止（アイドル終了）</value></data>
   <data name="EventResult.330" xml:space="preserve"><value>停止（ユーザー操作）</value></data>
+  <data name="Toast.TaskStarted.Title" xml:space="preserve"><value>タスクを開始しました: {0}</value></data>
+  <data name="Toast.TaskStarted.Body" xml:space="preserve"><value>タスクは手動で開始されました。</value></data>
+  <data name="Toast.TaskNotStarted.Title" xml:space="preserve"><value>タスクを開始できませんでした: {0}</value></data>
+  <data name="Toast.Upcoming.Title" xml:space="preserve"><value>まもなく実行されるタスク: {0}</value></data>
+  <data name="Toast.Upcoming.Soon" xml:space="preserve"><value>1 分以内に実行されます。</value></data>
+  <data name="Toast.Upcoming.Minutes" xml:space="preserve"><value>{0} 分後に実行されます。</value></data>
+  <data name="Toast.HiddenToTray.Title" xml:space="preserve"><value>FluentTaskScheduler は引き続き実行中です</value></data>
+  <data name="Toast.HiddenToTray.Body" xml:space="preserve"><value>ウィンドウは通知領域に移動しました。そこにあるアイコンを選択すると元に戻ります。</value></data>
+  <data name="Tray.Open" xml:space="preserve"><value>FluentTaskScheduler を開く</value></data>
+  <data name="Tray.ShowWindowFormat" xml:space="preserve"><value>{0} を表示</value></data>
 </root>

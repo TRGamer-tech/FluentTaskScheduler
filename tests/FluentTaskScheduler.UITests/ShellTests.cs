@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using FlaUI.Core.Definitions;
 using FlaUI.Core.Tools;
 
@@ -55,17 +54,10 @@ public class ShellTests
         Assert.True(Retry.WhileFalse(() => window.WindowVisualState.Value == WindowVisualState.Minimized, TimeSpan.FromSeconds(10)).Success,
             "The window could not be minimized.");
 
-        using var second = Process.Start(new ProcessStartInfo(AppSession.ExePath) { UseShellExecute = false })!;
-        try
-        {
-            Assert.True(second.WaitForExit(TimeSpan.FromSeconds(30)), "The second instance kept running.");
-            Assert.True(Retry.WhileFalse(() => window.WindowVisualState.Value == WindowVisualState.Normal, TimeSpan.FromSeconds(10)).Success,
-                "The first instance's window stayed minimized.");
-        }
-        finally
-        {
-            if (!second.HasExited) second.Kill();
-        }
+        app.StartAgain();
+
+        Assert.True(Retry.WhileFalse(() => window.WindowVisualState.Value == WindowVisualState.Normal, TimeSpan.FromSeconds(10)).Success,
+            "The first instance's window stayed minimized.");
     }
 
     [Fact]

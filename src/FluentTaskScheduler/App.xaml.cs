@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using FluentTaskScheduler.Localization;
+using FluentTaskScheduler.Notifications;
 using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Settings;
 using FluentTaskScheduler.Shell;
@@ -51,8 +52,14 @@ public partial class App : Application, IAppLifetime, IDisposable
         var windows = _services.GetRequiredService<WindowManager>();
         windows.OpenWindow();
 
+        // Starting the app again and clicking one of its notifications both ask for the window.
         var ui = _services.GetRequiredService<IUiThread>();
         _instance.OnShowRequested(() => ui.Post(windows.ShowMainWindow));
+        var notifier = _services.GetRequiredService<ToastNotifier>();
+        notifier.Activated += () => ui.Post(windows.ShowMainWindow);
+        notifier.Start();
+
+        _services.GetRequiredService<Tray>().Start();
     }
 
     private ServiceCollection ConfigureServices()
@@ -71,8 +78,11 @@ public partial class App : Application, IAppLifetime, IDisposable
         services.AddSingleton<ITaskFolders, TaskFolders>();
         services.AddSingleton<ITaskRunner, TaskRunner>();
         services.AddSingleton<INetworkProfiles, RegistryNetworkProfiles>();
+        services.AddSingleton<ToastNotifier>();
+        services.AddSingleton<INotifier>(app => app.GetRequiredService<ToastNotifier>());
         services.AddSingleton<WindowManager>();
         services.AddSingleton<AppAppearance>();
+        services.AddSingleton<Tray>();
 
         // One per window
         services.AddScoped<WindowContext>();

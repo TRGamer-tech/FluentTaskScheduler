@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using FluentTaskScheduler.Localization;
+using FluentTaskScheduler.Notifications;
 using FluentTaskScheduler.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Windowing;
@@ -12,7 +13,7 @@ namespace FluentTaskScheduler.Shell;
 /// Creates the app's windows and keeps track of them. Each window gets its own service scope,
 /// so its pages and view models live and die with it.
 /// </summary>
-public sealed class WindowManager(IServiceProvider services, ISettingsStore settings)
+public sealed class WindowManager(IServiceProvider services, ISettingsStore settings, INotifier notifier)
 {
     private sealed class Entry(Window window, int number)
     {
@@ -20,12 +21,27 @@ public sealed class WindowManager(IServiceProvider services, ISettingsStore sett
         public int Number { get; } = number;
         public IServiceScope? Scope { get; set; }
         public ShellPage Shell { get; set; } = null!;
+
+        /// <summary>Counts up with every window that is hidden; 0 for a window that is showing.</summary>
+        public int HiddenOrder { get; set; }
+        public bool IsHidden => HiddenOrder > 0;
+        public bool ClosesForGood { get; set; }
     }
+
+    /// <summary>A window that lives on in the notification area after being closed or minimized.</summary>
+    public sealed record HiddenWindow(string Title, Action Show, Action Close);
 
     private readonly List<Entry> _windows = [];
     private int _opened;
+    private int _hidden;
 
     public Window? MainWindow => _windows.FirstOrDefault()?.Window;
+
+    /// <summary>The hidden windows, in the order they were hidden.</summary>
+    public IReadOnlyList<HiddenWindow> HiddenWindows =>
+        _windows.Where(entry => entry.IsHidden).OrderBy(entry => entry.HiddenOrder)
+                .Select(entry => new HiddenWindow(entry.Window.Title, () => Show(entry), () => CloseForGood(entry)))
+                .ToList();
 
     public void OpenWindow()
     {
@@ -40,6 +56,21 @@ public sealed class WindowManager(IServiceProvider services, ISettingsStore sett
 
         // Only the first window's size is remembered; the others are side views.
         if (entry.Number == 1) window.AppWindow.Changed += RememberSize;
+
+        // While the app has its icon in the notification area, closing a window only hides it,
+        // and so does minimizing it if the user asked for that.
+        window.AppWindow.Closing += (_, args) =>
+        {
+            if (entry.ClosesForGood || !settings.Current.EnableTrayIcon) return;
+            args.Cancel = true;
+            Hide(entry);
+        };
+        window.AppWindow.Changed += (sender, _) =>
+        {
+            if (!entry.IsHidden && settings.Current is { EnableTrayIcon: true, MinimizeToTray: true }
+                && sender.Presenter is OverlappedPresenter { State: OverlappedPresenterState.Minimized }) Hide(entry);
+        };
+
         window.Closed += (_, _) =>
         {
             _windows.Remove(entry);
@@ -51,10 +82,50 @@ public sealed class WindowManager(IServiceProvider services, ISettingsStore sett
     /// <summary>Brings the first window to the front, e.g. when the app is started a second time.</summary>
     public void ShowMainWindow()
     {
-        if (MainWindow is not { } window) return;
-        window.AppWindow.Show();
-        if (window.AppWindow.Presenter is OverlappedPresenter { State: OverlappedPresenterState.Minimized } presenter) presenter.Restore();
-        window.Activate();
+        if (_windows.FirstOrDefault() is { } first) Show(first);
+    }
+
+    /// <summary>Brings back the window that was hidden last, or the first window if none is hidden.</summary>
+    public void ShowLastHidden()
+    {
+        if (_windows.Where(entry => entry.IsHidden).MaxBy(entry => entry.HiddenOrder) is { } last) Show(last);
+        else ShowMainWindow();
+    }
+
+    public void ShowAllHidden()
+    {
+        foreach (Entry entry in _windows.Where(entry => entry.IsHidden).ToList()) Show(entry);
+    }
+
+    /// <summary>Closes every window, hidden ones included, which ends the app.</summary>
+    public void CloseAll()
+    {
+        foreach (Entry entry in _windows.ToList()) CloseForGood(entry);
+    }
+
+    private static void Show(Entry entry)
+    {
+        entry.HiddenOrder = 0;
+        AppWindow window = entry.Window.AppWindow;
+        window.Show();
+        if (window.Presenter is OverlappedPresenter { State: OverlappedPresenterState.Minimized } presenter) presenter.Restore();
+        entry.Window.Activate();
+    }
+
+    private void Hide(Entry entry)
+    {
+        entry.HiddenOrder = ++_hidden;
+        entry.Window.AppWindow.Hide();
+
+        if (settings.Current.HasSeenTrayHint) return;
+        notifier.HiddenToTray();
+        settings.Update(current => current with { HasSeenTrayHint = true });
+    }
+
+    private static void CloseForGood(Entry entry)
+    {
+        entry.ClosesForGood = true;
+        entry.Window.Close();
     }
 
     /// <summary>Applies the current theme settings to every window.</summary>

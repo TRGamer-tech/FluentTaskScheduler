@@ -1,0 +1,299 @@
+using System.ComponentModel;
+using System.Runtime.InteropServices;
+
+namespace FluentTaskScheduler.Shell;
+
+/// <summary>
+/// One entry of the notification area icon's menu: with an action it can be chosen, with
+/// children it opens a submenu, with neither it is a greyed caption.
+/// </summary>
+internal sealed record TrayMenuItem(string Text, Action? Invoke = null, IReadOnlyList<TrayMenuItem>? Children = null)
+{
+    public static TrayMenuItem Separator { get; } = new("");
+}
+
+/// <summary>
+/// An icon in the notification area of the taskbar. Windows offers an unpackaged WinUI app no
+/// managed API for one, so this talks to the shell directly. Create and use it on the UI thread.
+/// </summary>
+internal sealed class TrayIcon : IDisposable
+{
+    private const string WindowClassName = "FluentTaskScheduler.TrayIcon";
+    private const uint IconMessage = 0x0401; // WM_USER + 1
+    private const int MaxTooltipLength = 127;
+
+    // Explorer announces a new taskbar with this message, e.g. after it crashed and was restarted.
+    private static readonly uint TaskbarCreated = RegisterWindowMessageW("TaskbarCreated");
+
+    private readonly WindowProc _windowProc; // kept in a field so the delegate outlives the native window
+    private readonly nint _module = GetModuleHandleW(null);
+    private readonly nint _window;
+    private nint _icon;
+    private string _tooltip = "";
+    private bool _visible;
+
+    public TrayIcon()
+    {
+        _windowProc = OnMessage;
+        var windowClass = new WNDCLASSEXW
+        {
+            cbSize = Marshal.SizeOf<WNDCLASSEXW>(),
+            lpfnWndProc = Marshal.GetFunctionPointerForDelegate(_windowProc),
+            hInstance = _module,
+            lpszClassName = WindowClassName
+        };
+        if (RegisterClassExW(ref windowClass) == 0) throw new Win32Exception();
+
+        // An ordinary window that is never shown. A message-only window would not be told when
+        // the taskbar is created anew.
+        _window = CreateWindowExW(0, WindowClassName, "", 0, 0, 0, 0, 0, 0, 0, _module, 0);
+        if (_window == 0) throw new Win32Exception();
+    }
+
+    /// <summary>The user clicked the icon.</summary>
+    public event Action? Clicked;
+
+    /// <summary>The user asked for the icon's menu. Answer with <see cref="ShowMenu"/>.</summary>
+    public event Action? MenuRequested;
+
+    public bool IsVisible => _visible;
+
+    /// <summary>Uses <paramref name="icon"/> from now on and takes charge of destroying it.</summary>
+    public void SetIcon(nint icon)
+    {
+        nint previous = _icon;
+        _icon = icon;
+        Update();
+        if (previous != 0) DestroyIcon(previous);
+    }
+
+    public void SetTooltip(string text)
+    {
+        _tooltip = text.Length > MaxTooltipLength ? text[..MaxTooltipLength] : text;
+        Update();
+    }
+
+    public void Show()
+    {
+        if (_visible) return;
+        NOTIFYICONDATAW data = Describe(NIF_MESSAGE | NIF_ICON | NIF_TIP);
+        _visible = Shell_NotifyIconW(NIM_ADD, ref data);
+    }
+
+    public void Hide()
+    {
+        if (!_visible) return;
+        NOTIFYICONDATAW data = Describe(0);
+        Shell_NotifyIconW(NIM_DELETE, ref data);
+        _visible = false;
+    }
+
+    /// <summary>Opens a menu at the mouse pointer and carries out what the user chooses from it.</summary>
+    public void ShowMenu(IReadOnlyList<TrayMenuItem> items)
+    {
+        var actions = new List<Action>();
+        nint menu = BuildMenu(items, actions);
+        try
+        {
+            GetCursorPos(out POINT pointer);
+
+            // A menu of a window that is not in the foreground would not close when the user
+            // clicks somewhere else. The posted message afterwards makes the foreground change stick.
+            SetForegroundWindow(_window);
+            int chosen = TrackPopupMenuEx(menu, TPM_RETURNCMD | TPM_NONOTIFY | TPM_RIGHTBUTTON, pointer.X, pointer.Y, _window, 0);
+            PostMessageW(_window, 0, 0, 0);
+
+            if (chosen > 0) actions[chosen - 1]();
+        }
+        finally
+        {
+            DestroyMenu(menu); // takes the submenus with it
+        }
+    }
+
+    private static nint BuildMenu(IReadOnlyList<TrayMenuItem> items, List<Action> actions)
+    {
+        nint menu = CreatePopupMenu();
+        foreach (TrayMenuItem item in items)
+        {
+            if (item.Text.Length == 0)
+            {
+                AppendMenuW(menu, MF_SEPARATOR, 0, null);
+            }
+            else if (item.Children is { } children)
+            {
+                AppendMenuW(menu, MF_POPUP, (nuint)BuildMenu(children, actions), item.Text);
+            }
+            else if (item.Invoke is { } invoke)
+            {
+                actions.Add(invoke);
+                AppendMenuW(menu, MF_STRING, (nuint)actions.Count, item.Text);
+            }
+            else
+            {
+                AppendMenuW(menu, MF_STRING | MF_GRAYED, 0, item.Text);
+            }
+        }
+        return menu;
+    }
+
+    private void Update()
+    {
+        if (!_visible) return;
+        NOTIFYICONDATAW data = Describe(NIF_ICON | NIF_TIP);
+        Shell_NotifyIconW(NIM_MODIFY, ref data);
+    }
+
+    private NOTIFYICONDATAW Describe(int fields) => new()
+    {
+        cbSize = Marshal.SizeOf<NOTIFYICONDATAW>(),
+        hWnd = _window,
+        uID = 1,
+        uFlags = fields,
+        uCallbackMessage = (int)IconMessage,
+        hIcon = _icon,
+        szTip = _tooltip,
+        szInfo = "",
+        szInfoTitle = ""
+    };
+
+    private nint OnMessage(nint window, uint message, nuint wParam, nint lParam)
+    {
+        try
+        {
+            if (message == IconMessage)
+            {
+                switch ((uint)lParam & 0xFFFF)
+                {
+                    case WM_LBUTTONUP: Clicked?.Invoke(); break;
+                    case WM_RBUTTONUP or WM_CONTEXTMENU: MenuRequested?.Invoke(); break;
+                }
+                return 0;
+            }
+
+            if (message == TaskbarCreated && _visible)
+            {
+                // The new taskbar starts without the icon.
+                _visible = false;
+                Show();
+                return 0;
+            }
+        }
+        catch (Exception ex)
+        {
+            // An exception must not travel back into Windows through this callback.
+            Serilog.Log.Error(ex, "Handling a message of the notification area icon failed");
+            return 0;
+        }
+        return DefWindowProcW(window, message, wParam, lParam);
+    }
+
+    public void Dispose()
+    {
+        Hide();
+        if (_icon != 0) DestroyIcon(_icon);
+        DestroyWindow(_window);
+        UnregisterClassW(WindowClassName, _module);
+    }
+
+    private delegate nint WindowProc(nint window, uint message, nuint wParam, nint lParam);
+
+    private const int NIM_ADD = 0, NIM_MODIFY = 1, NIM_DELETE = 2;
+    private const int NIF_MESSAGE = 1, NIF_ICON = 2, NIF_TIP = 4;
+    private const uint WM_CONTEXTMENU = 0x007B, WM_LBUTTONUP = 0x0202, WM_RBUTTONUP = 0x0205;
+    private const uint MF_STRING = 0x0000, MF_GRAYED = 0x0001, MF_POPUP = 0x0010, MF_SEPARATOR = 0x0800;
+    private const uint TPM_RIGHTBUTTON = 0x0002, TPM_NONOTIFY = 0x0080, TPM_RETURNCMD = 0x0100;
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    private struct WNDCLASSEXW
+    {
+        public int cbSize;
+        public uint style;
+        public nint lpfnWndProc;
+        public int cbClsExtra;
+        public int cbWndExtra;
+        public nint hInstance;
+        public nint hIcon;
+        public nint hCursor;
+        public nint hbrBackground;
+        public string? lpszMenuName;
+        public string lpszClassName;
+        public nint hIconSm;
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    private struct NOTIFYICONDATAW
+    {
+        public int cbSize;
+        public nint hWnd;
+        public int uID;
+        public int uFlags;
+        public int uCallbackMessage;
+        public nint hIcon;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)] public string szTip;
+        public int dwState;
+        public int dwStateMask;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)] public string szInfo;
+        public int uVersion;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)] public string szInfoTitle;
+        public int dwInfoFlags;
+        public Guid guidItem;
+        public nint hBalloonIcon;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct POINT
+    {
+        public int X;
+        public int Y;
+    }
+
+    [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
+    private static extern bool Shell_NotifyIconW(int message, ref NOTIFYICONDATAW data);
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+    private static extern nint GetModuleHandleW(string? moduleName);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern uint RegisterWindowMessageW(string name);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern ushort RegisterClassExW(ref WNDCLASSEXW windowClass);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern bool UnregisterClassW(string className, nint instance);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern nint CreateWindowExW(uint exStyle, string className, string windowName, uint style,
+        int x, int y, int width, int height, nint parent, nint menu, nint instance, nint param);
+
+    [DllImport("user32.dll")]
+    private static extern bool DestroyWindow(nint window);
+
+    [DllImport("user32.dll")]
+    private static extern nint DefWindowProcW(nint window, uint message, nuint wParam, nint lParam);
+
+    [DllImport("user32.dll")]
+    private static extern bool PostMessageW(nint window, uint message, nuint wParam, nint lParam);
+
+    [DllImport("user32.dll")]
+    private static extern bool SetForegroundWindow(nint window);
+
+    [DllImport("user32.dll")]
+    private static extern bool GetCursorPos(out POINT point);
+
+    [DllImport("user32.dll")]
+    private static extern nint CreatePopupMenu();
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern bool AppendMenuW(nint menu, uint flags, nuint idOrSubmenu, string? text);
+
+    [DllImport("user32.dll")]
+    private static extern int TrackPopupMenuEx(nint menu, uint flags, int x, int y, nint window, nint parameters);
+
+    [DllImport("user32.dll")]
+    private static extern bool DestroyMenu(nint menu);
+
+    [DllImport("user32.dll")]
+    private static extern bool DestroyIcon(nint icon);
+}

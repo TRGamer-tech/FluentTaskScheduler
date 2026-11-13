@@ -798,8 +798,8 @@
   <data name="Settings.UpdateApplyFailed.Content" xml:space="preserve"><value>应用更新失败。请查看日志了解详细信息,或稍后重试。</value></data>
   <data name="Snooze.IncludeMicrosoftTasks" xml:space="preserve"><value>同时暂停 Microsoft 自身的计划任务(Defender、Windows 更新、维护等)</value></data>
   <data name="Snooze.IncludeMicrosoftTasksWarning" xml:space="preserve"><value>不建议这样做:禁用这些任务可能会在暂停结束前影响 Windows 安全扫描、更新和维护。</value></data>
-  <data name="Tray.CloseWindowFormat" xml:space="preserve"><value>✕  关闭 {0}</value></data>
-  <data name="Tray.ExitAll" xml:space="preserve"><value>全部退出</value></data>
+  <data name="Tray.CloseWindowFormat" xml:space="preserve"><value>关闭 {0}</value></data>
+  <data name="Tray.ExitAll" xml:space="preserve"><value>退出</value></data>
   <data name="Tray.NewWindow" xml:space="preserve"><value>新建窗口</value></data>
   <data name="Tray.NoHiddenWindows" xml:space="preserve"><value>(没有隐藏的窗口)</value></data>
   <data name="Trigger.Run" xml:space="preserve"><value>运行:</value></data>
@@ -933,6 +933,16 @@
   <data name="EventResult.327" xml:space="preserve"><value>已停止（使用电池）</value></data>
   <data name="EventResult.328" xml:space="preserve"><value>已停止（不再空闲）</value></data>
   <data name="EventResult.330" xml:space="preserve"><value>已停止（用户请求）</value></data>
+  <data name="Toast.TaskStarted.Title" xml:space="preserve"><value>任务已启动：{0}</value></data>
+  <data name="Toast.TaskStarted.Body" xml:space="preserve"><value>该任务已手动启动。</value></data>
+  <data name="Toast.TaskNotStarted.Title" xml:space="preserve"><value>无法启动任务：{0}</value></data>
+  <data name="Toast.Upcoming.Title" xml:space="preserve"><value>即将运行的任务：{0}</value></data>
+  <data name="Toast.Upcoming.Soon" xml:space="preserve"><value>将在一分钟内运行。</value></data>
+  <data name="Toast.Upcoming.Minutes" xml:space="preserve"><value>将在 {0} 分钟后运行。</value></data>
+  <data name="Toast.HiddenToTray.Title" xml:space="preserve"><value>FluentTaskScheduler 仍在运行</value></data>
+  <data name="Toast.HiddenToTray.Body" xml:space="preserve"><value>窗口已移到通知区域。选择那里的图标即可将其恢复。</value></data>
+  <data name="Tray.Open" xml:space="preserve"><value>打开 FluentTaskScheduler</value></data>
+  <data name="Tray.ShowWindowFormat" xml:space="preserve"><value>显示 {0}</value></data>
 </root>
 
 

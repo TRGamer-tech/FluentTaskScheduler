@@ -795,8 +795,8 @@ Restart now to apply the update?</value></data>
   <data name="Settings.UpdateApplyFailed.Content" xml:space="preserve"><value>Failed to apply the update. Check the log for details, or try again later.</value></data>
   <data name="Snooze.IncludeMicrosoftTasks" xml:space="preserve"><value>Also suspend Microsoft's own scheduled tasks (Defender, Windows Update, maintenance...)</value></data>
   <data name="Snooze.IncludeMicrosoftTasksWarning" xml:space="preserve"><value>Not recommended: disabling these can break Windows security scans, updates, and maintenance until the snooze ends.</value></data>
-  <data name="Tray.CloseWindowFormat" xml:space="preserve"><value>✕  Close {0}</value></data>
-  <data name="Tray.ExitAll" xml:space="preserve"><value>Exit All</value></data>
+  <data name="Tray.CloseWindowFormat" xml:space="preserve"><value>Close {0}</value></data>
+  <data name="Tray.ExitAll" xml:space="preserve"><value>Exit</value></data>
   <data name="Tray.NewWindow" xml:space="preserve"><value>New Window</value></data>
   <data name="Tray.NoHiddenWindows" xml:space="preserve"><value>(No hidden windows)</value></data>
   <data name="Trigger.Run" xml:space="preserve"><value>Run:</value></data>
@@ -930,5 +930,15 @@ Restart now to apply the update?</value></data>
   <data name="EventResult.327" xml:space="preserve"><value>Stopped (on battery)</value></data>
   <data name="EventResult.328" xml:space="preserve"><value>Stopped (no longer idle)</value></data>
   <data name="EventResult.330" xml:space="preserve"><value>Stopped (by user)</value></data>
+  <data name="Toast.TaskStarted.Title" xml:space="preserve"><value>Task started: {0}</value></data>
+  <data name="Toast.TaskStarted.Body" xml:space="preserve"><value>The task was started manually.</value></data>
+  <data name="Toast.TaskNotStarted.Title" xml:space="preserve"><value>Task could not be started: {0}</value></data>
+  <data name="Toast.Upcoming.Title" xml:space="preserve"><value>Upcoming task: {0}</value></data>
+  <data name="Toast.Upcoming.Soon" xml:space="preserve"><value>Scheduled to run in less than a minute.</value></data>
+  <data name="Toast.Upcoming.Minutes" xml:space="preserve"><value>Scheduled to run in {0} minutes.</value></data>
+  <data name="Toast.HiddenToTray.Title" xml:space="preserve"><value>FluentTaskScheduler is still running</value></data>
+  <data name="Toast.HiddenToTray.Body" xml:space="preserve"><value>The window was moved to the notification area. Select the icon there to bring it back.</value></data>
+  <data name="Tray.Open" xml:space="preserve"><value>Open FluentTaskScheduler</value></data>
+  <data name="Tray.ShowWindowFormat" xml:space="preserve"><value>Show {0}</value></data>
 </root>
 

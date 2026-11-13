@@ -66,6 +66,8 @@ public sealed class FakeTaskStore : ITaskStore
         paths.Where(Exists).Distinct(StringComparer.OrdinalIgnoreCase)
              .ToDictionary(path => path, StateOf, StringComparer.OrdinalIgnoreCase);
 
+    public int CountRunningTasks() => _running.Count;
+
     public TaskDraft Load(string path) => Get(path);
 
     public CompletionActions GetCompletionActions(string path) =>

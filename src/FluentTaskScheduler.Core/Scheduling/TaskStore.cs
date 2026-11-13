@@ -64,6 +64,12 @@ public sealed class TaskStore : ITaskStore
         return states;
     }
 
+    public int CountRunningTasks()
+    {
+        using var service = Open();
+        return service.GetRunningTasks(includeHidden: true).Select(instance => instance.Path).Distinct(StringComparer.OrdinalIgnoreCase).Count();
+    }
+
     public TaskDraft Load(string path)
     {
         using var service = Open();

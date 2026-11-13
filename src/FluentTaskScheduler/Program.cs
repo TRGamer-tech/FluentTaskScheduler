@@ -72,7 +72,9 @@ public static class Program
 
         try
         {
-            VelopackApp.Build().Run();
+            VelopackApp.Build()
+                .OnBeforeUninstallFastCallback(_ => Shell.ToastNotifier.RemoveRegistration())
+                .Run();
         }
         catch (Exception ex)
         {

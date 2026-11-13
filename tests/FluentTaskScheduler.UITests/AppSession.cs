@@ -25,14 +25,48 @@ public sealed class AppSession : IDisposable
     /// <summary>The folder this instance of the app keeps its settings and state in.</summary>
     public string DataDir { get; }
 
+    private readonly nint _windowHandle;
+
     private AppSession(Application app, UIA3Automation automation, Window window, string artifactsDir, string dataDir)
     {
         _app = app;
         _automation = automation;
         Window = window;
+        _windowHandle = window.Properties.NativeWindowHandle.Value;
         ArtifactsDir = artifactsDir;
         DataDir = dataDir;
     }
+
+    public UIA3Automation Automation => _automation;
+
+    /// <summary>False once the window is hidden, as it is while the app lives in the notification area only.</summary>
+    public bool IsWindowVisible => IsWindowVisibleNative(_windowHandle);
+
+    /// <summary>Starts the app a second time, the way a user who cannot find its window would, and waits for that instance to end.</summary>
+    public void StartAgain()
+    {
+        using var second = Process.Start(new ProcessStartInfo(ExePath) { UseShellExecute = false })!;
+        if (second.WaitForExit(TimeSpan.FromSeconds(30))) return;
+        second.Kill();
+        throw new InvalidOperationException("The second instance kept running instead of handing over to the first.");
+    }
+
+    /// <summary>The value of one setting as the app last saved it, or null if it has not been saved.</summary>
+    public string? SavedSetting(string name)
+    {
+        try
+        {
+            using var settings = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.Combine(DataDir, "settings.json")));
+            return settings.RootElement.TryGetProperty(name, out var value) ? value.ToString() : null;
+        }
+        catch (Exception ex) when (ex is IOException or System.Text.Json.JsonException)
+        {
+            return null; // being written right now
+        }
+    }
+
+    [System.Runtime.InteropServices.DllImport("user32.dll", EntryPoint = "IsWindowVisible")]
+    private static extern bool IsWindowVisibleNative(nint window);
 
     public static string ExePath =>
         Environment.GetEnvironmentVariable("FTS_APP_EXE")
@@ -134,7 +168,8 @@ public sealed class AppSession : IDisposable
         catch { return false; } // properties of elements that just went away throw
     }
 
-    private static IEnumerable<AutomationElement> Walk(AutomationElement root)
+    /// <summary>The element and everything below it, level by level.</summary>
+    public static IEnumerable<AutomationElement> Walk(AutomationElement root)
     {
         var queue = new Queue<AutomationElement>();
         queue.Enqueue(root);

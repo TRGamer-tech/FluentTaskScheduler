@@ -11,6 +11,9 @@ public interface ITaskStore
     /// <summary>The current state of each of the given tasks; a task that no longer exists is left out.</summary>
     IReadOnlyDictionary<string, TaskRowState> GetStates(IEnumerable<string> paths);
 
+    /// <summary>How many tasks are running at this moment, hidden ones included. A task with several instances counts once.</summary>
+    int CountRunningTasks();
+
     /// <summary>Reads a task for editing.</summary>
     /// <exception cref="TaskNotFoundException">There is no task at <paramref name="path"/>.</exception>
     TaskDraft Load(string path);
