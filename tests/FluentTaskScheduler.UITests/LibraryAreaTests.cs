@@ -77,7 +77,7 @@ public class LibraryTests
     public void TheLibrary_ListsTheTemplates_AndAfterSwitchingTheBuiltInScripts()
     {
         using var app = AppSession.Launch("library");
-        app.Require("NavScriptLibrary").Click();
+        app.Require("NavScriptLibrary").Press();
 
         Assert.True(app.FindByName("Nightly Temp File Cleanup") != null, "The temp cleanup template is not listed.");
         Assert.True(app.Require("Template.Defrag").IsEnabled, "The button that deploys a template is not available.");
@@ -85,7 +85,7 @@ public class LibraryTests
         Assert.Equal("Deploy template Nightly Temp File Cleanup", app.Require("Template.TempCleanup").Name);
         app.Snapshot("templates");
 
-        app.Require("LibraryScriptsTab").Click();
+        app.Require("LibraryScriptsTab").Press();
 
         Assert.True(app.FindByName("System File Checker") != null, "The built-in scripts are not listed.");
         Assert.True(app.Require("Script.SystemFileChecker").IsEnabled, "The button that creates a task from a script is not available.");
