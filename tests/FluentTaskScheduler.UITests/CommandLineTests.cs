@@ -34,8 +34,9 @@ public class CommandLineTests
         Assert.Equal(0, Run("--disable", tasks.PathOf("Switched")).ExitCode);
         Assert.Equal("false", tasks.Value("Switched", "Settings", "Enabled"));
 
+        // Task Scheduler leaves the element out of an enabled task, enabled being the default.
         Assert.Equal(0, Run("--enable", tasks.PathOf("Switched")).ExitCode);
-        Assert.Equal("true", tasks.Value("Switched", "Settings", "Enabled"));
+        Assert.NotEqual("false", tasks.Value("Switched", "Settings", "Enabled"));
     }
 
     [Fact]
@@ -86,8 +87,10 @@ public class CommandLineTests
         string title = "FtsCli_" + Guid.NewGuid().ToString("N")[..8];
 
         // conhost.exe gives the command a classic console window, whatever the default terminal is.
+        // It has to be started through the shell: handed this process's redirected output, it
+        // would open no window and write there instead.
         using var console = Process.Start(new ProcessStartInfo(
-            "conhost.exe", $"cmd.exe /c \"title {title} & \"{AppSession.ExePath}\" --help & pause\"") { UseShellExecute = false })!;
+            "conhost.exe", $"cmd.exe /c \"title {title} & \"{AppSession.ExePath}\" --help & pause\"") { UseShellExecute = true })!;
         try
         {
             using var automation = new UIA3Automation();
