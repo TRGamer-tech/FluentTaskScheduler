@@ -83,12 +83,12 @@
                             AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.Trigger.Remove')}">
                         <FontIcon Glyph="&#xE74D;" FontSize="14"/>
                     </Button>
-                    <Button Command="{x:Bind ViewModel.MoveTriggerUpCommand}"
+                    <Button x:Name="EditorMoveTriggerUp" Command="{x:Bind ViewModel.MoveTriggerUpCommand}"
                             ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.MoveUp')}"
                             AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.MoveUp')}">
                         <FontIcon Glyph="&#xE70E;" FontSize="14"/>
                     </Button>
-                    <Button Command="{x:Bind ViewModel.MoveTriggerDownCommand}"
+                    <Button x:Name="EditorMoveTriggerDown" Command="{x:Bind ViewModel.MoveTriggerDownCommand}"
                             ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.MoveDown')}"
                             AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.MoveDown')}">
                         <FontIcon Glyph="&#xE70D;" FontSize="14"/>
@@ -124,9 +124,9 @@
                         <FontIcon Glyph="&#xE710;" FontSize="14"/>
                         <Button.Flyout>
                             <MenuFlyout>
-                                <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Dialog.Action.RunProg')}" Command="{x:Bind ViewModel.AddActionCommand}"/>
-                                <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Dialog.Action.Email')}" Command="{x:Bind ViewModel.AddEmailActionCommand}"/>
-                                <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Dialog.Action.Notif')}" Command="{x:Bind ViewModel.AddMessageActionCommand}"/>
+                                <MenuFlyoutItem x:Name="EditorAddProgramAction" Text="{x:Bind l:Loc.Get('Dialog.Action.RunProg')}" Command="{x:Bind ViewModel.AddActionCommand}"/>
+                                <MenuFlyoutItem x:Name="EditorAddEmailAction" Text="{x:Bind l:Loc.Get('Dialog.Action.Email')}" Command="{x:Bind ViewModel.AddEmailActionCommand}"/>
+                                <MenuFlyoutItem x:Name="EditorAddMessageAction" Text="{x:Bind l:Loc.Get('Dialog.Action.Notif')}" Command="{x:Bind ViewModel.AddMessageActionCommand}"/>
                             </MenuFlyout>
                         </Button.Flyout>
                     </Button>
@@ -135,12 +135,12 @@
                             AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.Action.Remove')}">
                         <FontIcon Glyph="&#xE74D;" FontSize="14"/>
                     </Button>
-                    <Button Command="{x:Bind ViewModel.MoveActionUpCommand}"
+                    <Button x:Name="EditorMoveActionUp" Command="{x:Bind ViewModel.MoveActionUpCommand}"
                             ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.MoveUp')}"
                             AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.MoveUp')}">
                         <FontIcon Glyph="&#xE70E;" FontSize="14"/>
                     </Button>
-                    <Button Command="{x:Bind ViewModel.MoveActionDownCommand}"
+                    <Button x:Name="EditorMoveActionDown" Command="{x:Bind ViewModel.MoveActionDownCommand}"
                             ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.MoveDown')}"
                             AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.MoveDown')}">
                         <FontIcon Glyph="&#xE70D;" FontSize="14"/>
@@ -156,7 +156,7 @@
                     <TextBox x:Name="EditorProgram" Header="{x:Bind l:Loc.Get('Dialog.ProgramScript')}"
                              PlaceholderText="{x:Bind l:Loc.Get('Dialog.Ph.Command')}" IsSpellCheckEnabled="False"
                              Text="{x:Bind ViewModel.SelectedAction.Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Button Grid.Column="1" VerticalAlignment="Bottom" Content="{x:Bind l:Loc.Get('Dialog.Browse')}"
+                    <Button x:Name="EditorBrowse" Grid.Column="1" VerticalAlignment="Bottom" Content="{x:Bind l:Loc.Get('Dialog.Browse')}"
                             Command="{x:Bind ViewModel.BrowseForProgramCommand}"/>
                 </Grid>
                 <TextBox x:Name="EditorArguments" Header="{x:Bind l:Loc.Get('Dialog.Arguments')}"
@@ -179,13 +179,13 @@
                         <TextBlock Text="{x:Bind l:Loc.Get('ConditionIdleFor.Text')}" VerticalAlignment="Center"/>
                         <TextBox x:Name="EditorIdleDuration" Width="120" PlaceholderText="{x:Bind l:Loc.Get('Dialog.Ph.Idle')}"
                                  Text="{x:Bind ViewModel.IdleDuration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <CheckBox Content="{x:Bind l:Loc.Get('ConditionStopOnIdleEnd.Content')}" IsChecked="{x:Bind ViewModel.StopOnIdleEnd, Mode=TwoWay}"/>
+                        <CheckBox x:Name="EditorStopOnIdleEnd" Content="{x:Bind l:Loc.Get('ConditionStopOnIdleEnd.Content')}" IsChecked="{x:Bind ViewModel.StopOnIdleEnd, Mode=TwoWay}"/>
                     </StackPanel>
                     <CheckBox x:Name="EditorOnlyOnAc" Content="{x:Bind l:Loc.Get('ConditionAC.Content')}" IsChecked="{x:Bind ViewModel.RunOnlyOnAcPower, Mode=TwoWay}"/>
-                    <CheckBox Margin="28,0,0,0" Content="{x:Bind l:Loc.Get('ConditionStopBatterySwitch.Content')}" IsChecked="{x:Bind ViewModel.StopOnBattery, Mode=TwoWay}"/>
+                    <CheckBox x:Name="EditorStopOnBattery" Margin="28,0,0,0" Content="{x:Bind l:Loc.Get('ConditionStopBatterySwitch.Content')}" IsChecked="{x:Bind ViewModel.StopOnBattery, Mode=TwoWay}"/>
                     <CheckBox x:Name="EditorOnlyIfNetwork" Content="{x:Bind l:Loc.Get('ConditionNetwork.Content')}" IsChecked="{x:Bind ViewModel.RunOnlyIfNetwork, Mode=TwoWay}"/>
                     <StackPanel Spacing="8" Margin="28,0,0,0" Visibility="{x:Bind ViewModel.RunOnlyIfNetwork, Mode=OneWay}">
-                        <ComboBox MinWidth="260" Header="{x:Bind l:Loc.Get('ConditionSpecificNetwork.Text')}"
+                        <ComboBox x:Name="EditorNetwork" MinWidth="260" Header="{x:Bind l:Loc.Get('ConditionSpecificNetwork.Text')}"
                                   ItemsSource="{x:Bind ViewModel.NetworkOptions}"
                                   SelectedIndex="{x:Bind ViewModel.NetworkIndex, Mode=TwoWay}"/>
                         <InfoBar Severity="Informational" IsClosable="False"
@@ -262,7 +262,7 @@
             <Expander x:Name="EditorCompletionActions" Header="{x:Bind l:Loc.Get('Pipeline.SectionTitle')}"
                       HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
                 <StackPanel Spacing="8">
-                    <ToggleSwitch Header="{x:Bind l:Loc.Get('Pipeline.EnableSwitch')}"
+                    <ToggleSwitch x:Name="EditorCompletionActionsEnabled" Header="{x:Bind l:Loc.Get('Pipeline.EnableSwitch')}"
                                   IsOn="{x:Bind ViewModel.CompletionActions.Enabled, Mode=TwoWay}"/>
                     <TextBlock Text="{x:Bind l:Loc.Get('Pipeline.EnableSubtitle')}" TextWrapping="Wrap"
                                Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
@@ -276,7 +276,7 @@
                         <ComboBox x:Name="OnSuccessPicker" HorizontalAlignment="Stretch"
                                   PlaceholderText="{x:Bind l:Loc.Get('Pipeline.PickTask')}"
                                   ItemsSource="{x:Bind ViewModel.CompletionActions.OtherTasks}"/>
-                        <Button Grid.Column="1" Content="{x:Bind l:Loc.Get('Editor.CompletionActions.Add')}"
+                        <Button x:Name="OnSuccessAdd" Grid.Column="1" Content="{x:Bind l:Loc.Get('Editor.CompletionActions.Add')}"
                                 Command="{x:Bind ViewModel.CompletionActions.AddOnSuccessCommand}"
                                 CommandParameter="{x:Bind OnSuccessPicker.SelectedItem, Mode=OneWay}"/>
                     </Grid>
@@ -289,7 +289,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="{x:Bind}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                    <Button Grid.Column="1" Tag="{x:Bind}" Click="RemoveOnSuccess_Click"
+                                    <Button x:Name="OnSuccessRemove" Grid.Column="1" Tag="{x:Bind}" Click="RemoveOnSuccess_Click"
                                             AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.CompletionActions.Remove')}"
                                             ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.CompletionActions.Remove')}">
                                         <FontIcon Glyph="&#xE74D;" FontSize="12"/>
@@ -308,7 +308,7 @@
                         <ComboBox x:Name="OnFailurePicker" HorizontalAlignment="Stretch"
                                   PlaceholderText="{x:Bind l:Loc.Get('Pipeline.PickTask')}"
                                   ItemsSource="{x:Bind ViewModel.CompletionActions.OtherTasks}"/>
-                        <Button Grid.Column="1" Content="{x:Bind l:Loc.Get('Editor.CompletionActions.Add')}"
+                        <Button x:Name="OnFailureAdd" Grid.Column="1" Content="{x:Bind l:Loc.Get('Editor.CompletionActions.Add')}"
                                 Command="{x:Bind ViewModel.CompletionActions.AddOnFailureCommand}"
                                 CommandParameter="{x:Bind OnFailurePicker.SelectedItem, Mode=OneWay}"/>
                     </Grid>
@@ -321,7 +321,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="{x:Bind}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                    <Button Grid.Column="1" Tag="{x:Bind}" Click="RemoveOnFailure_Click"
+                                    <Button x:Name="OnFailureRemove" Grid.Column="1" Tag="{x:Bind}" Click="RemoveOnFailure_Click"
                                             AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.CompletionActions.Remove')}"
                                             ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.CompletionActions.Remove')}">
                                         <FontIcon Glyph="&#xE74D;" FontSize="12"/>
