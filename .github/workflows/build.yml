@@ -31,7 +31,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: test-results
           path: test-results/
@@ -68,7 +68,7 @@ jobs:
           -o publish
 
       - name: Upload app
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: FluentTaskScheduler-${{ matrix.rid }}
           path: publish/
@@ -92,7 +92,7 @@ jobs:
 
       - name: Upload UI screenshots
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: ui-artifacts-${{ matrix.rid }}
           path: ui-artifacts/

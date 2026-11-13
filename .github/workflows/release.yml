@@ -110,7 +110,7 @@ jobs:
           Get-ChildItem Dist | Format-Table Name, Length
 
       - name: Upload release files
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: Dist-${{ matrix.arch }}
           path: Dist/
@@ -123,7 +123,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Download release files
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: Dist-x64
           path: Dist
@@ -168,14 +168,14 @@ jobs:
       contents: write
     steps:
       - name: Download release files
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           pattern: Dist-*
           path: Dist
           merge-multiple: true
 
       - name: Create draft release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: Dist/*
           draft: true
