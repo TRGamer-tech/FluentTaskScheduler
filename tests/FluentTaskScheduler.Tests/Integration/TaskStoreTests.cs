@@ -108,6 +108,20 @@ public class TaskStoreTests
     }
 
     [SkippableFact]
+    public void AFolderDeletedWhileTheTasksAreListed_IsLeftOut()
+    {
+        Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
+        using var sandbox = new SchedulerSandbox();
+        TaskFolder gone = sandbox.Folder.CreateFolder("Gone");
+        sandbox.Folder.DeleteFolder("Gone");
+
+        var rows = new List<TaskRow>();
+        TaskStore.Collect(gone, rows);
+
+        Assert.Empty(rows);
+    }
+
+    [SkippableFact]
     public void Renaming_ReplacesTheTaskInsteadOfDuplicatingIt()
     {
         Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");

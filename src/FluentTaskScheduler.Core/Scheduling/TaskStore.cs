@@ -21,14 +21,16 @@ public sealed class TaskStore : ITaskStore
     /// <summary>
     /// Walks the folder tree by hand instead of using <c>TaskFolder.AllTasks</c>: that enumeration
     /// stops at the first folder or task it cannot read, and everything after it would be missing.
+    /// A folder that is deleted while the tree is walked is skipped the same way; Task Scheduler
+    /// reports it as a file or path that does not exist.
     /// </summary>
-    private static void Collect(TaskFolder folder, List<TaskRow> rows)
+    internal static void Collect(TaskFolder folder, List<TaskRow> rows)
     {
         try
         {
             foreach (var task in folder.Tasks) rows.Add(TaskRowReader.Read(task));
         }
-        catch (Exception ex) when (ex is COMException or UnauthorizedAccessException)
+        catch (Exception ex) when (ex is COMException or UnauthorizedAccessException or IOException)
         {
             Serilog.Log.Warning(ex, "The tasks in folder {Folder} could not be listed", folder.Path);
         }
@@ -96,10 +98,11 @@ public sealed class TaskStore : ITaskStore
                 ?.Elements().FirstOrDefault(element => element.Name.LocalName == "Description");
             return TaskMetadata.Split(description?.Value).CompletionActions;
         }
-        catch (Exception ex) when (ex is COMException or UnauthorizedAccessException or System.Xml.XmlException)
+        catch (Exception ex) when (ex is COMException or UnauthorizedAccessException or IOException or System.Xml.XmlException)
         {
-            // Not logged: this is asked for every run that ends on the computer, and a task
-            // whose description cannot be read is simply one without completion actions.
+            // Not logged: this is asked for every run that ends on the computer, and a task whose
+            // description cannot be read, or that was deleted just now, is simply one without
+            // completion actions.
             return CompletionActions.None;
         }
     }
