@@ -61,6 +61,22 @@ public class ScriptEditorTests
         Assert.Equal("Get-Date", app.Require("ScriptEditorText").AsTextBox().Text.Trim());
     }
 
+    [Fact]
+    public void AScriptNotSavedYet_StaysInTheEditor_WhenAnotherLanguageBuildsThePagesAnew()
+    {
+        using var app = AppSession.Launch("script-rebuild");
+        app.Require("NavScriptEditor").Press();
+        app.Require("ScriptEditorText").AsTextBox().Text = "Write-Output 'fts-unsaved'";
+
+        app.Require("NavSettings").Press();
+        app.Require("LanguageChoice", 30000).AsComboBox().Select(2); // the language of Windows, English, German, ...
+        Assert.True(app.Find(e => e.AutomationId == "PageTitle" && e.Name == "Einstellungen", 10000) != null, "The pages were not built anew in German.");
+
+        app.Require("NavScriptEditor").Press();
+        app.Snapshot("editor");
+        Assert.Equal("Write-Output 'fts-unsaved'", app.Require("ScriptEditorText").AsTextBox().Text.Trim());
+    }
+
     /// <summary>Presses a toolbar button once the text typed before has made it available.</summary>
     private static void PressWhenEnabled(AppSession app, string automationId)
     {

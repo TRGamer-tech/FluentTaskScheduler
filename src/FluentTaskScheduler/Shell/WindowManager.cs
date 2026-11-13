@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Notifications;
 using FluentTaskScheduler.Settings;
+using FluentTaskScheduler.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -143,6 +144,7 @@ public sealed class WindowManager(IServiceProvider services, ISettingsStore sett
     /// <summary>
     /// Builds every window's content anew, returning to the page that was showing. Needed for
     /// changes that existing elements do not pick up: the language, and resources read at load.
+    /// The script in the editor stays; scripts and quick actions that are running end.
     /// </summary>
     public void RebuildShells()
     {
@@ -155,9 +157,17 @@ public sealed class WindowManager(IServiceProvider services, ISettingsStore sett
 
     private void BuildShell(Entry entry, string page)
     {
-        entry.Scope?.Dispose();
+        IServiceScope? previous = entry.Scope;
         entry.Scope = services.CreateScope();
         entry.Scope.ServiceProvider.GetRequiredService<WindowContext>().Attach(entry.Window, entry.DialogQueue);
+
+        if (previous is not null)
+        {
+            // The script in the editor may not be saved yet; it must not go with the old view models.
+            entry.Scope.ServiceProvider.GetRequiredService<ScriptEditorViewModel>()
+                .ContinueFrom(previous.ServiceProvider.GetRequiredService<ScriptEditorViewModel>());
+            previous.Dispose();
+        }
 
         ShellPage shell = entry.Scope.ServiceProvider.GetRequiredService<ShellPage>();
         entry.Shell = shell;

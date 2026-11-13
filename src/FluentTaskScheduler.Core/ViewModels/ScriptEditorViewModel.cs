@@ -189,6 +189,16 @@ public sealed partial class ScriptEditorViewModel(
             await prompts.ShowErrorAsync(Loc.Get("Clipboard.Busy"));
     }
 
+    /// <summary>
+    /// Takes over the script of the editor this one replaces, together with what of it is not
+    /// saved yet. A window gets new pages and view models when, for one, its language changes.
+    /// </summary>
+    public void ContinueFrom(ScriptEditorViewModel previous)
+    {
+        Load(previous._scriptId, previous.Name, previous.Description, previous.Text);
+        _saved = previous._saved;
+    }
+
     /// <summary>Ends the script if one is running.</summary>
     public void Dispose()
     {

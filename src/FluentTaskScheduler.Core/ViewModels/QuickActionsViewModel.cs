@@ -180,7 +180,10 @@ public sealed partial class QuickActionsViewModel : IDisposable
     [RelayCommand]
     private void RestartAsAdministrator() => _lifetime.RestartElevated();
 
-    /// <summary>Ends the actions that are still running: nobody would see how they turn out.</summary>
+    /// <summary>
+    /// Ends the actions that are still running. The window is closing, or it is getting new pages
+    /// (in another language, for one), which know nothing of these runs.
+    /// </summary>
     public void Dispose()
     {
         foreach (QuickActionViewModel action in Actions) action.CancelCommand.Execute(null);

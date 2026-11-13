@@ -380,6 +380,25 @@ public sealed class ScriptEditorViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task AnEditorThatTakesOver_ContinuesWithTheScript_AndStillKnowsWhatIsNotSaved()
+    {
+        LibraryScript script = _store.Save(null, "Clock", "Tells the time.", "Get-Date");
+        await _editor.OpenAsync(script);
+        _editor.Text = "Get-Date -Format s";
+
+        ScriptEditorViewModel successor = NewEditor(new InlineUiThread());
+        successor.ContinueFrom(_editor);
+        _editor.Dispose();
+
+        Assert.Equal(("Clock", "Tells the time.", "Get-Date -Format s"), (successor.Name, successor.Description, successor.Text));
+        _prompts.Confirm = false;
+        Assert.False(await successor.NewAsync());
+
+        await successor.SaveCommand.ExecuteAsync(null);
+        Assert.Equal("Get-Date -Format s", _store.ReadText(Assert.Single(_store.GetScripts()).Id));
+    }
+
+    [Fact]
     public async Task AScriptWhoseFileIsGone_IsNotOpened_AndTheUserIsTold()
     {
         LibraryScript script = _store.Save(null, "Clock", "", "Get-Date");
