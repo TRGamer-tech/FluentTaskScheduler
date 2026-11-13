@@ -100,8 +100,6 @@
   <data name="DeleteButton.Content" xml:space="preserve"><value>Löschen</value></data>
   <data name="ExportButton.Content" xml:space="preserve"><value>Exportieren</value></data>
   <data name="EditButton.Content" xml:space="preserve"><value>Bearbeiten</value></data>
-
-  <!-- Settings Page Strings -->
   <data name="SettingsHeader.Text" xml:space="preserve"><value>Einstellungen</value></data>
   <data name="AppearanceHeader.Text" xml:space="preserve"><value>Erscheinungsbild</value></data>
   <data name="ThemeCombo.Header" xml:space="preserve"><value>App Design</value></data>
@@ -238,7 +236,6 @@ Jetzt App neustarten?</value></data>
   <data name="DashboardRunHistory.Text" xml:space="preserve"><value>Verlauf - Letzte 7 Tage</value></data>
   <data name="DashboardSuccess.Text" xml:space="preserve"><value>Erfolgreich</value></data>
   <data name="DashboardFailure.Text" xml:space="preserve"><value>Fehlgeschlagen</value></data>
-
   <data name="ScriptLibraryTitle.Text" xml:space="preserve"><value>Skriptbibliothek</value></data>
   <data name="ScriptLibraryCreateBtn.Content" xml:space="preserve"><value>Neues Skript</value></data>
   <data name="ScriptLibraryDeleteBtn.ToolTipService.ToolTip" xml:space="preserve"><value>Skript löschen</value></data>
@@ -255,7 +252,6 @@ Jetzt App neustarten?</value></data>
   <data name="ScriptLibraryArgsHeader.Header" xml:space="preserve"><value>Argumente</value></data>
   <data name="ScriptLibraryArgsPlaceholder.PlaceholderText" xml:space="preserve"><value>z. B. -File C:\scripts\cleanup.ps1</value></data>
   <data name="ScriptLibraryAdminContent.Content" xml:space="preserve"><value>Mit höchsten Privilegien ausführen</value></data>
-
   <data name="RepetitionSectionTitle.Text" xml:space="preserve"><value>Wiederholung</value></data>
   <data name="RepetitionIntervalText.Text" xml:space="preserve"><value>Aufgabe wiederholen alle</value></data>
   <data name="RepetitionNone.Content" xml:space="preserve"><value>(Keine Wiederholung)</value></data>
@@ -268,7 +264,6 @@ Jetzt App neustarten?</value></data>
   <data name="ConditionOnBattery.Content" xml:space="preserve"><value>Computer ist im Akkubetrieb</value></data>
   <data name="ConditionSpecificNetwork.Text" xml:space="preserve"><value>Spezifisches Netzwerk:</value></data>
   <data name="ConditionAnyNetwork.Content" xml:space="preserve"><value>Beliebiges Netzwerk</value></data>
-
   <data name="Settings.Notif.Task.Title" xml:space="preserve"><value>Aufgabenbenachrichtigungen</value></data>
   <data name="Settings.Notif.Task.Desc" xml:space="preserve"><value>Zeige eine Benachrichtigung, wenn eine Aufgabe startet oder fehlschlägt.</value></data>
   <data name="Settings.Notif.Reminders.Title" xml:space="preserve"><value>Erinnerungen für anstehende Aufgaben</value></data>
@@ -321,7 +316,6 @@ Jetzt App neustarten?</value></data>
   <data name="Dashboard.AllCategories" xml:space="preserve"><value>Alle Kategorien</value></data>
   <data name="Dashboard.Today" xml:space="preserve"><value>Heute</value></data>
   <data name="Dashboard.Unknown" xml:space="preserve"><value>Unbekannt</value></data>
-
   <data name="Dialog.TaskName" xml:space="preserve"><value>Aufgabenname</value></data>
   <data name="Dialog.Description" xml:space="preserve"><value>Beschreibung</value></data>
   <data name="Dialog.Author" xml:space="preserve"><value>Autor</value></data>
@@ -359,13 +353,11 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.RunAsCurrent" xml:space="preserve"><value>Als aktueller Benutzer ausführen</value></data>
   <data name="Dialog.RunAsSpecific" xml:space="preserve"><value>Als bestimmter Benutzer ausführen</value></data>
   <data name="Dialog.RunAsSystem" xml:space="preserve"><value>Als SYSTEM ausführen (Admin erforderlich)</value></data>
-
   <data name="Trigger.At" xml:space="preserve"><value>um</value></data>
   <data name="Trigger.OnIdle" xml:space="preserve"><value>Bei Leerlauf</value></data>
   <data name="Trigger.AtLogon" xml:space="preserve"><value>Bei Anmeldung</value></data>
   <data name="Trigger.AtStartup" xml:space="preserve"><value>Beim Systemstart</value></data>
   <data name="Trigger.SessionStateChange" xml:space="preserve"><value>Bei {0}</value></data>
-
   <data name="Dialog.Ph.TaskName" xml:space="preserve"><value>Aufgabenname eingeben</value></data>
   <data name="Dialog.Ph.Category" xml:space="preserve"><value>z.B. Arbeit</value></data>
   <data name="Dialog.Ph.Tags" xml:space="preserve"><value>z.B. dringend, synchronisieren (kommagetrennt)</value></data>
@@ -384,12 +376,10 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.Ph.EventLog" xml:space="preserve"><value>Application, System, Security usw.</value></data>
   <data name="Dialog.Ph.EventSource" xml:space="preserve"><value>z.B. VSS, Outlook (Optional)</value></data>
   <data name="Dialog.Ph.EventId" xml:space="preserve"><value>z.B. 1000 (Optional)</value></data>
-
   <data name="Dialog.Hint.Delay" xml:space="preserve"><value>(z.B. 30s, 1m, 1h)</value></data>
   <data name="Dialog.Hint.Idle" xml:space="preserve"><value>(z.B. 5m, 10m, 30m)</value></data>
   <data name="Dialog.Hint.Restart" xml:space="preserve"><value>(z.B. 30s, 1m, 5m)</value></data>
   <data name="Dialog.Hint.MonthDays" xml:space="preserve"><value>(kommagetrennt, 'Letzter' für den letzten Tag)</value></data>
-
   <data name="Dialog.RecurEvery" xml:space="preserve"><value>Wiederholen alle</value></data>
   <data name="Dialog.DaysSuffix" xml:space="preserve"><value>Tag(e)</value></data>
   <data name="Dialog.WeeksOn" xml:space="preserve"><value>Wochen am:</value></data>
@@ -398,7 +388,6 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.On" xml:space="preserve"><value>Am</value></data>
   <data name="Dialog.IdleWait" xml:space="preserve"><value>Warten, bis der Computer leerlaufend ist für:</value></data>
   <data name="Dialog.TriggerAt" xml:space="preserve"><value>um</value></data>
-
   <data name="Dialog.Day.Mon" xml:space="preserve"><value>Mo</value></data>
   <data name="Dialog.Day.Tue" xml:space="preserve"><value>Di</value></data>
   <data name="Dialog.Day.Wed" xml:space="preserve"><value>Mi</value></data>
@@ -406,7 +395,6 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.Day.Fri" xml:space="preserve"><value>Fr</value></data>
   <data name="Dialog.Day.Sat" xml:space="preserve"><value>Sa</value></data>
   <data name="Dialog.Day.Sun" xml:space="preserve"><value>So</value></data>
-
   <data name="Dialog.Month.Jan" xml:space="preserve"><value>Jan</value></data>
   <data name="Dialog.Month.Feb" xml:space="preserve"><value>Feb</value></data>
   <data name="Dialog.Month.Mar" xml:space="preserve"><value>Mär</value></data>
@@ -419,26 +407,22 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.Month.Oct" xml:space="preserve"><value>Okt</value></data>
   <data name="Dialog.Month.Nov" xml:space="preserve"><value>Nov</value></data>
   <data name="Dialog.Month.Dec" xml:space="preserve"><value>Dez</value></data>
-
   <data name="Dialog.Week.First" xml:space="preserve"><value>Erster</value></data>
   <data name="Dialog.Week.Second" xml:space="preserve"><value>Zweiter</value></data>
   <data name="Dialog.Week.Third" xml:space="preserve"><value>Dritter</value></data>
   <data name="Dialog.Week.Fourth" xml:space="preserve"><value>Vierter</value></data>
   <data name="Dialog.Week.Last" xml:space="preserve"><value>Letzter</value></data>
-
   <data name="Dialog.TriggerOn" xml:space="preserve"><value>Auslösen bei</value></data>
   <data name="Dialog.Sess.Lock" xml:space="preserve"><value>Arbeitsstation sperren</value></data>
   <data name="Dialog.Sess.Unlock" xml:space="preserve"><value>Arbeitsstation entsperren</value></data>
   <data name="Dialog.Sess.RdpConnect" xml:space="preserve"><value>Remote-Desktop-Verbindung</value></data>
   <data name="Dialog.Sess.RdpDisconnect" xml:space="preserve"><value>Remote-Desktop-Trennung</value></data>
   <data name="Dialog.Expire" xml:space="preserve"><value>Aufgabe ablaufen lassen am:</value></data>
-
   <data name="Dialog.Action.RunProg" xml:space="preserve"><value>Programm starten</value></data>
   <data name="Dialog.Action.Email" xml:space="preserve"><value>E-Mail senden</value></data>
   <data name="Dialog.Action.Notif" xml:space="preserve"><value>Benachrichtigung anzeigen</value></data>
   <data name="Dialog.Browse" xml:space="preserve"><value>Durchsuchen...</value></data>
   <data name="Dialog.RunPrefix" xml:space="preserve"><value>Ausführen:</value></data>
-
   <data name="Dialog.Time.5m" xml:space="preserve"><value>5 Minuten</value></data>
   <data name="Dialog.Time.10m" xml:space="preserve"><value>10 Minuten</value></data>
   <data name="Dialog.Time.15m" xml:space="preserve"><value>15 Minuten</value></data>
@@ -454,23 +438,19 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.Time.2d" xml:space="preserve"><value>2 Tage</value></data>
   <data name="Dialog.Time.3d" xml:space="preserve"><value>3 Tage</value></data>
   <data name="Dialog.Time.5d" xml:space="preserve"><value>5 Tage</value></data>
-
   <data name="Dialog.Pri.Realtime" xml:space="preserve"><value>Echtzeit</value></data>
   <data name="Dialog.Pri.High" xml:space="preserve"><value>Hoch</value></data>
   <data name="Dialog.Pri.AboveNormal" xml:space="preserve"><value>Höher als normal</value></data>
   <data name="Dialog.Pri.Normal" xml:space="preserve"><value>Normal</value></data>
   <data name="Dialog.Pri.BelowNormal" xml:space="preserve"><value>Niedriger als normal (Windows-Standard)</value></data>
   <data name="Dialog.Pri.Idle" xml:space="preserve"><value>Leerlauf</value></data>
-
   <data name="Dialog.NetAdmin.Title" xml:space="preserve"><value>Administrator erforderlich</value></data>
   <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>Die Auswahl eines spezifischen Netzwerks erfordert, dass die App als Administrator ausgeführt wird.</value></data>
   <data name="Dialog.SysWarn.Title" xml:space="preserve"><value>Administratorrechte erforderlich</value></data>
   <data name="Dialog.SysWarn.Msg" xml:space="preserve"><value>Um Aufgaben zu erstellen, die als SYSTEM ausgeführt werden, muss diese Anwendung mit Administratorrechten ausgeführt werden. Rechtsklick auf die App und 'Als Administrator ausführen' wählen.</value></data>
-
   <data name="Settings.Theme.Light" xml:space="preserve"><value>Hell</value></data>
   <data name="Settings.Theme.Dark" xml:space="preserve"><value>Dunkel</value></data>
   <data name="Settings.Theme.System" xml:space="preserve"><value>Systemstandard</value></data>
-
   <data name="Settings.Lead.1m" xml:space="preserve"><value>1 Minute vorher</value></data>
   <data name="Settings.Lead.5m" xml:space="preserve"><value>5 Minuten vorher</value></data>
   <data name="Settings.Lead.10m" xml:space="preserve"><value>10 Minuten vorher</value></data>
@@ -529,7 +509,7 @@ Jetzt App neustarten?</value></data>
   <data name="Snooze.Dialog.Title" xml:space="preserve"><value>Alle Aufgaben pausieren</value></data>
   <data name="Snooze.Dialog.Confirm" xml:space="preserve"><value>Pausieren</value></data>
   <data name="Snooze.Dialog.ActiveTitle" xml:space="preserve"><value>Globale Pause ist aktiv</value></data>
-  <data name="Snooze.Dialog.Intro" xml:space="preserve"><value>Während der Pause startet FluentTaskScheduler keine Aufgabe - auch keine verketteten Pipeline-Läufe.</value></data>
+  <data name="Snooze.Dialog.Intro" xml:space="preserve"><value>Solange alle Aufgaben pausiert sind, startet FluentTaskScheduler keine davon, auch nicht über Abschlussaktionen.</value></data>
   <data name="Snooze.SuspendTriggers" xml:space="preserve"><value>Geplante Auslöser ebenfalls deaktivieren</value></data>
   <data name="Snooze.SuspendTriggersHint" xml:space="preserve"><value>Deaktiviert jede aktivierte Aufgabe über die Aufgabenplanungs-API und aktiviert genau diese Aufgaben wieder, wenn die Pause endet. Geschützte Systemaufgaben werden übersprungen.</value></data>
   <data name="Snooze.Banner.Suspended" xml:space="preserve"><value>Geplante Auslöser sind deaktiviert und manuelle Starts werden blockiert. Aufgaben werden reaktiviert, wenn die Pause endet.</value></data>
@@ -547,7 +527,7 @@ Jetzt App neustarten?</value></data>
   <data name="Pipeline.Dialog.Title" xml:space="preserve"><value>Abschlussaktionen (Aufgaben-Pipeline)</value></data>
   <data name="Pipeline.Info.Title" xml:space="preserve"><value>So funktioniert die Verkettung</value></data>
   <data name="Pipeline.Info.Message" xml:space="preserve"><value>Wenn diese Aufgabe abgeschlossen ist, liest FluentTaskScheduler den Exitcode der Aktion aus dem Ereignisprotokoll der Windows-Aufgabenplanung. Exitcode 0 startet die Erfolgsaufgaben, jeder andere Code startet die Fehleraufgaben. Die App muss laufen, damit verkettete Aufgaben gestartet werden, und Ketten werden übersprungen, solange die globale Pause aktiv ist.</value></data>
-  <data name="Pipeline.EnableSwitch" xml:space="preserve"><value>Nachgelagerte Aufgaben starten, wenn diese Aufgabe abgeschlossen ist</value></data>
+  <data name="Pipeline.EnableSwitch" xml:space="preserve"><value>Andere Aufgaben starten, wenn diese Aufgabe abgeschlossen ist</value></data>
   <data name="Pipeline.OnSuccess" xml:space="preserve"><value>Bei Erfolg (Exitcode 0)</value></data>
   <data name="Pipeline.OnFailure" xml:space="preserve"><value>Bei Fehler (jeder andere Exitcode)</value></data>
   <data name="Pipeline.Add" xml:space="preserve"><value>Hinzufügen</value></data>
@@ -562,9 +542,8 @@ Jetzt App neustarten?</value></data>
   <data name="Pipeline.Warning.BothLists" xml:space="preserve"><value>„{0}“ läuft jetzt sowohl bei Erfolg als auch bei Fehler - sie wird nach jedem Abschluss gestartet.</value></data>
   <data name="Pipeline.Warning.NoTargets" xml:space="preserve"><value>Füge mindestens eine nachgelagerte Aufgabe hinzu oder schalte den Schalter aus.</value></data>
   <data name="Pipeline.Error.Open" xml:space="preserve"><value>Abschlussaktionen konnten nicht geöffnet werden: </value></data>
-  <data name="Pipeline.Toast.Title" xml:space="preserve"><value>Pipeline: {0} gestartet</value></data>
-  <data name="Pipeline.Toast.OnSuccess" xml:space="preserve"><value>Ausgelöst, weil „{0}“ erfolgreich abgeschlossen wurde.</value></data>
-  <data name="Pipeline.Toast.OnFailure" xml:space="preserve"><value>Ausgelöst, weil „{0}“ fehlgeschlagen ist.</value></data>
+  <data name="Pipeline.Toast.OnSuccess" xml:space="preserve"><value>Von einer Abschlussaktion gestartet, weil „{0}“ erfolgreich war.</value></data>
+  <data name="Pipeline.Toast.OnFailure" xml:space="preserve"><value>Von einer Abschlussaktion gestartet, weil „{0}“ fehlgeschlagen ist.</value></data>
   <data name="Dashboard.HealthCaption" xml:space="preserve"><value>Anteil der erfolgreichen unter den Läufen, die in den letzten 7 Tagen geendet haben. Gestoppte Läufe zählen nicht mit.</value></data>
   <data name="Dashboard.Throughput" xml:space="preserve"><value>Ausführungen</value></data>
   <data name="Dashboard.Runs24h" xml:space="preserve"><value>in den letzten 24 Std.</value></data>
@@ -626,8 +605,8 @@ Jetzt App neustarten?</value></data>
   <data name="Templates.RecycleBin.Note" xml:space="preserve"><value>Gelöschte Elemente werden nach dem Leeren des Papierkorbs unwiederbringlich.</value></data>
   <data name="Dialog.Common.On" xml:space="preserve"><value>Ein</value></data>
   <data name="Dialog.Common.Off" xml:space="preserve"><value>Aus</value></data>
-  <data name="Settings.Sys.Pipelines.Title" xml:space="preserve"><value>Aufgaben-Pipelines</value></data>
-  <data name="Settings.Sys.Pipelines.Desc" xml:space="preserve"><value>Überwacht das Ereignisprotokoll der Aufgabenplanung und startet die unter den Abschlussaktionen einer Aufgabe konfigurierten nachgelagerten Aufgaben.</value></data>
+  <data name="Settings.Sys.Pipelines.Title" xml:space="preserve"><value>Abschlussaktionen</value></data>
+  <data name="Settings.Sys.Pipelines.Desc" xml:space="preserve"><value>Die Aufgaben starten, die in den Abschlussaktionen einer Aufgabe stehen, wenn diese erfolgreich war oder fehlgeschlagen ist. Das funktioniert, solange die App läuft und Windows den Aufgabenverlauf aufzeichnet.</value></data>
   <data name="Main.Nav.Library" xml:space="preserve"><value>Bibliothek</value></data>
   <data name="Main.Header.Library" xml:space="preserve"><value>Bibliothek</value></data>
   <data name="Main.Status.All" xml:space="preserve"><value>Alle Status</value></data>
@@ -640,11 +619,11 @@ Jetzt App neustarten?</value></data>
   <data name="Library.Subtitle" xml:space="preserve"><value>Stelle eine fertige geplante Aufgabe bereit oder verwende einen gespeicherten Befehl erneut als Aktion für eine neue Aufgabe. Es wird erst etwas erstellt, wenn du den Aufgaben-Editor speicherst.</value></data>
   <data name="Library.Section.Templates" xml:space="preserve"><value>Aufgabenvorlagen</value></data>
   <data name="Library.Section.Scripts" xml:space="preserve"><value>Skripte</value></data>
-  <data name="Pipeline.EnableSubtitle" xml:space="preserve"><value>Schalte dies aus, um die Konfiguration zu behalten, ohne danach zu handeln.</value></data>
+  <data name="Pipeline.EnableSubtitle" xml:space="preserve"><value>Abschlussaktionen funktionieren, solange die App läuft und Windows den Aufgabenverlauf aufzeichnet. Schalte dies aus, um die Einträge zu behalten, ohne dass Aufgaben gestartet werden.</value></data>
   <data name="Pipeline.SuccessHeader" xml:space="preserve"><value>Bei Erfolg</value></data>
-  <data name="Pipeline.SuccessHint" xml:space="preserve"><value>Wird gestartet, wenn die Aktion mit Code 0 beendet wird.</value></data>
+  <data name="Pipeline.SuccessHint" xml:space="preserve"><value>Diese Aufgaben starten, wenn eine Ausführung erfolgreich ist, also jede Aktion mit Exitcode 0 endet.</value></data>
   <data name="Pipeline.FailureHeader" xml:space="preserve"><value>Bei Fehler</value></data>
-  <data name="Pipeline.FailureHint" xml:space="preserve"><value>Wird bei jedem von Null verschiedenen Exitcode gestartet oder wenn die Aktion nicht starten konnte.</value></data>
+  <data name="Pipeline.FailureHint" xml:space="preserve"><value>Diese Aufgaben starten, wenn eine Ausführung fehlschlägt, nicht starten kann, das Zeitlimit überschreitet oder beendet wird.</value></data>
   <data name="EventLevel.Critical" xml:space="preserve"><value>Kritisch</value></data>
   <data name="EventLevel.Error" xml:space="preserve"><value>Fehler</value></data>
   <data name="EventLevel.Warning" xml:space="preserve"><value>Warnung</value></data>
@@ -728,8 +707,6 @@ Jetzt App neustarten?</value></data>
   <data name="Library.Search.Placeholder" xml:space="preserve"><value>Suchen...</value></data>
   <data name="Library.Search.NoTemplates" xml:space="preserve"><value>Keine Vorlagen entsprechen deiner Suche.</value></data>
   <data name="Library.Search.NoScripts" xml:space="preserve"><value>Keine Skripte entsprechen deiner Suche.</value></data>
-
-  <!-- Added while closing localization gaps found during the S3 audit pass (3.2) -->
   <data name="App.WindowTitleSuffixFormat" xml:space="preserve"><value>Fenster {0}</value></data>
   <data name="Dashboard.ProcessActive" xml:space="preserve"><value>Prozess aktiv (PID {0})</value></data>
   <data name="Dashboard.ProcessNotFound" xml:space="preserve"><value>Prozess nicht gefunden</value></data>
@@ -1050,7 +1027,7 @@ Jetzt App neustarten?</value></data>
   <data name="Tour.History.Title" xml:space="preserve"><value>Sieh nach, was passiert ist</value></data>
   <data name="Tour.History.Body" xml:space="preserve"><value>Wähle eine Aufgabe aus, um zu sehen, wann sie lief, ob sie erfolgreich war und ob sie gerade läuft. Das Dashboard fasst das für alle deine Aufgaben zusammen.</value></data>
   <data name="Tour.Automation.Title" xml:space="preserve"><value>Aufgaben verketten und pausieren</value></data>
-  <data name="Tour.Automation.Body" xml:space="preserve"><value>Abschlussaktionen starten andere Aufgaben, wenn eine Aufgabe erfolgreich war oder fehlgeschlagen ist. Brauchst du eine Pause? Pausiere eine Aufgabe oder alle: für eine feste Zeit, bis zum nächsten Neustart oder bis du sie fortsetzt. Beides funktioniert, solange die App läuft, auch im Infobereich.</value></data>
+  <data name="Tour.Automation.Body" xml:space="preserve"><value>Abschlussaktionen starten andere Aufgaben, wenn eine Aufgabe erfolgreich war oder fehlgeschlagen ist. Brauchst du eine Pause? Pausiere eine Aufgabe oder alle: für eine feste Zeit, bis du neu startest oder dich abmeldest, oder bis du sie fortsetzt. Beides funktioniert, solange die App läuft, auch wenn sie nur im Infobereich ist; Abschlussaktionen setzen ausserdem voraus, dass Windows den Aufgabenverlauf aufzeichnet.</value></data>
   <data name="Tour.Library.Title" xml:space="preserve"><value>Mit einer Vorlage beginnen</value></data>
   <data name="Tour.Library.Body" xml:space="preserve"><value>Die Bibliothek enthält fertige Aufgaben für gängige Zwecke und bewahrt deine eigenen Skripte auf. Schnellaktionen erledigen alltägliche Wartung mit einem Klick.</value></data>
   <data name="Tour.Admin.Title" xml:space="preserve"><value>Aufgaben, die Administratorrechte brauchen</value></data>

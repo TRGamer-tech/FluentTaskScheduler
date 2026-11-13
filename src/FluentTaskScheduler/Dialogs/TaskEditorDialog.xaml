@@ -280,6 +280,8 @@
                                    Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
 
                         <TextBlock Text="{x:Bind l:Loc.Get('Pipeline.SuccessHeader')}" Style="{StaticResource SectionTitleStyle}"/>
+                        <TextBlock Text="{x:Bind l:Loc.Get('Pipeline.SuccessHint')}" TextWrapping="Wrap"
+                                   Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         <Grid ColumnSpacing="8">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -312,6 +314,8 @@
                         </ListView>
 
                         <TextBlock Text="{x:Bind l:Loc.Get('Pipeline.FailureHeader')}" Style="{StaticResource SectionTitleStyle}"/>
+                        <TextBlock Text="{x:Bind l:Loc.Get('Pipeline.FailureHint')}" TextWrapping="Wrap"
+                                   Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         <Grid ColumnSpacing="8">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>

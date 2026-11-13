@@ -100,8 +100,6 @@
   <data name="DeleteButton.Content" xml:space="preserve"><value>Delete</value></data>
   <data name="ExportButton.Content" xml:space="preserve"><value>Export</value></data>
   <data name="EditButton.Content" xml:space="preserve"><value>Edit</value></data>
-
-  <!-- Settings Page Strings -->
   <data name="SettingsHeader.Text" xml:space="preserve"><value>Settings</value></data>
   <data name="AppearanceHeader.Text" xml:space="preserve"><value>Appearance</value></data>
   <data name="ThemeCombo.Header" xml:space="preserve"><value>App Theme</value></data>
@@ -238,7 +236,6 @@ Restart now to apply the update?</value></data>
   <data name="DashboardRunHistory.Text" xml:space="preserve"><value>Run history - Last 7 days</value></data>
   <data name="DashboardSuccess.Text" xml:space="preserve"><value>Success</value></data>
   <data name="DashboardFailure.Text" xml:space="preserve"><value>Failure</value></data>
-
   <data name="ScriptLibraryTitle.Text" xml:space="preserve"><value>Script Library</value></data>
   <data name="ScriptLibraryCreateBtn.Content" xml:space="preserve"><value>New Script</value></data>
   <data name="ScriptLibraryDeleteBtn.ToolTipService.ToolTip" xml:space="preserve"><value>Delete script</value></data>
@@ -255,7 +252,6 @@ Restart now to apply the update?</value></data>
   <data name="ScriptLibraryArgsHeader.Header" xml:space="preserve"><value>Arguments</value></data>
   <data name="ScriptLibraryArgsPlaceholder.PlaceholderText" xml:space="preserve"><value>e.g., -File C:\scripts\cleanup.ps1</value></data>
   <data name="ScriptLibraryAdminContent.Content" xml:space="preserve"><value>Run with highest privileges</value></data>
-
   <data name="RepetitionSectionTitle.Text" xml:space="preserve"><value>Repetition</value></data>
   <data name="RepetitionIntervalText.Text" xml:space="preserve"><value>Repeat task every</value></data>
   <data name="RepetitionNone.Content" xml:space="preserve"><value>(No repetition)</value></data>
@@ -268,7 +264,6 @@ Restart now to apply the update?</value></data>
   <data name="ConditionOnBattery.Content" xml:space="preserve"><value>Computer is on battery power</value></data>
   <data name="ConditionSpecificNetwork.Text" xml:space="preserve"><value>Specific network:</value></data>
   <data name="ConditionAnyNetwork.Content" xml:space="preserve"><value>Any network</value></data>
-
   <data name="Settings.Notif.Task.Title" xml:space="preserve"><value>Task Notifications</value></data>
   <data name="Settings.Notif.Task.Desc" xml:space="preserve"><value>Show a toast when a task starts or fails.</value></data>
   <data name="Settings.Notif.Reminders.Title" xml:space="preserve"><value>Upcoming Task Reminders</value></data>
@@ -320,7 +315,6 @@ Restart now to apply the update?</value></data>
   <data name="Dashboard.AllCategories" xml:space="preserve"><value>All Categories</value></data>
   <data name="Dashboard.Today" xml:space="preserve"><value>Today</value></data>
   <data name="Dashboard.Unknown" xml:space="preserve"><value>Unknown</value></data>
-
   <data name="Dialog.TaskName" xml:space="preserve"><value>Task Name</value></data>
   <data name="Dialog.Description" xml:space="preserve"><value>Description</value></data>
   <data name="Dialog.Author" xml:space="preserve"><value>Author</value></data>
@@ -358,13 +352,11 @@ Restart now to apply the update?</value></data>
   <data name="Dialog.RunAsCurrent" xml:space="preserve"><value>Run as current user</value></data>
   <data name="Dialog.RunAsSpecific" xml:space="preserve"><value>Run as specific user</value></data>
   <data name="Dialog.RunAsSystem" xml:space="preserve"><value>Run as SYSTEM (requires admin)</value></data>
-
   <data name="Trigger.At" xml:space="preserve"><value>at</value></data>
   <data name="Trigger.OnIdle" xml:space="preserve"><value>On Idle</value></data>
   <data name="Trigger.AtLogon" xml:space="preserve"><value>At Logon</value></data>
   <data name="Trigger.AtStartup" xml:space="preserve"><value>At Startup</value></data>
   <data name="Trigger.SessionStateChange" xml:space="preserve"><value>At {0}</value></data>
-
   <data name="Dialog.Ph.TaskName" xml:space="preserve"><value>Enter task name</value></data>
   <data name="Dialog.Ph.Category" xml:space="preserve"><value>e.g. Work</value></data>
   <data name="Dialog.Ph.Tags" xml:space="preserve"><value>e.g. urgent, sync (comma separated)</value></data>
@@ -383,12 +375,10 @@ Restart now to apply the update?</value></data>
   <data name="Dialog.Ph.EventLog" xml:space="preserve"><value>Application, System, Security, etc.</value></data>
   <data name="Dialog.Ph.EventSource" xml:space="preserve"><value>e.g., VSS, Outlook (Optional)</value></data>
   <data name="Dialog.Ph.EventId" xml:space="preserve"><value>e.g., 1000 (Optional)</value></data>
-
   <data name="Dialog.Hint.Delay" xml:space="preserve"><value>(e.g. 30s, 1m, 1h)</value></data>
   <data name="Dialog.Hint.Idle" xml:space="preserve"><value>(e.g. 5m, 10m, 30m)</value></data>
   <data name="Dialog.Hint.Restart" xml:space="preserve"><value>(e.g. 30s, 1m, 5m)</value></data>
   <data name="Dialog.Hint.MonthDays" xml:space="preserve"><value>(comma separated, use 'Last' for last day)</value></data>
-
   <data name="Dialog.RecurEvery" xml:space="preserve"><value>Recur every</value></data>
   <data name="Dialog.DaysSuffix" xml:space="preserve"><value>day(s)</value></data>
   <data name="Dialog.WeeksOn" xml:space="preserve"><value>weeks on:</value></data>
@@ -397,7 +387,6 @@ Restart now to apply the update?</value></data>
   <data name="Dialog.On" xml:space="preserve"><value>On</value></data>
   <data name="Dialog.IdleWait" xml:space="preserve"><value>Wait for the computer to be idle for:</value></data>
   <data name="Dialog.TriggerAt" xml:space="preserve"><value>at</value></data>
-
   <data name="Dialog.Day.Mon" xml:space="preserve"><value>Mon</value></data>
   <data name="Dialog.Day.Tue" xml:space="preserve"><value>Tue</value></data>
   <data name="Dialog.Day.Wed" xml:space="preserve"><value>Wed</value></data>
@@ -405,7 +394,6 @@ Restart now to apply the update?</value></data>
   <data name="Dialog.Day.Fri" xml:space="preserve"><value>Fri</value></data>
   <data name="Dialog.Day.Sat" xml:space="preserve"><value>Sat</value></data>
   <data name="Dialog.Day.Sun" xml:space="preserve"><value>Sun</value></data>
-
   <data name="Dialog.Month.Jan" xml:space="preserve"><value>Jan</value></data>
   <data name="Dialog.Month.Feb" xml:space="preserve"><value>Feb</value></data>
   <data name="Dialog.Month.Mar" xml:space="preserve"><value>Mar</value></data>
@@ -418,26 +406,22 @@ Restart now to apply the update?</value></data>
   <data name="Dialog.Month.Oct" xml:space="preserve"><value>Oct</value></data>
   <data name="Dialog.Month.Nov" xml:space="preserve"><value>Nov</value></data>
   <data name="Dialog.Month.Dec" xml:space="preserve"><value>Dec</value></data>
-
   <data name="Dialog.Week.First" xml:space="preserve"><value>First</value></data>
   <data name="Dialog.Week.Second" xml:space="preserve"><value>Second</value></data>
   <data name="Dialog.Week.Third" xml:space="preserve"><value>Third</value></data>
   <data name="Dialog.Week.Fourth" xml:space="preserve"><value>Fourth</value></data>
   <data name="Dialog.Week.Last" xml:space="preserve"><value>Last</value></data>
-
   <data name="Dialog.TriggerOn" xml:space="preserve"><value>Trigger on</value></data>
   <data name="Dialog.Sess.Lock" xml:space="preserve"><value>Workstation Lock</value></data>
   <data name="Dialog.Sess.Unlock" xml:space="preserve"><value>Workstation Unlock</value></data>
   <data name="Dialog.Sess.RdpConnect" xml:space="preserve"><value>Remote Desktop Connect</value></data>
   <data name="Dialog.Sess.RdpDisconnect" xml:space="preserve"><value>Remote Desktop Disconnect</value></data>
   <data name="Dialog.Expire" xml:space="preserve"><value>Expire task on:</value></data>
-
   <data name="Dialog.Action.RunProg" xml:space="preserve"><value>Run Program</value></data>
   <data name="Dialog.Action.Email" xml:space="preserve"><value>Send Email</value></data>
   <data name="Dialog.Action.Notif" xml:space="preserve"><value>Show Notification</value></data>
   <data name="Dialog.Browse" xml:space="preserve"><value>Browse...</value></data>
   <data name="Dialog.RunPrefix" xml:space="preserve"><value>Run:</value></data>
-
   <data name="Dialog.Time.5m" xml:space="preserve"><value>5 minutes</value></data>
   <data name="Dialog.Time.10m" xml:space="preserve"><value>10 minutes</value></data>
   <data name="Dialog.Time.15m" xml:space="preserve"><value>15 minutes</value></data>
@@ -453,23 +437,19 @@ Restart now to apply the update?</value></data>
   <data name="Dialog.Time.2d" xml:space="preserve"><value>2 days</value></data>
   <data name="Dialog.Time.3d" xml:space="preserve"><value>3 days</value></data>
   <data name="Dialog.Time.5d" xml:space="preserve"><value>5 days</value></data>
-
   <data name="Dialog.Pri.Realtime" xml:space="preserve"><value>Realtime</value></data>
   <data name="Dialog.Pri.High" xml:space="preserve"><value>High</value></data>
   <data name="Dialog.Pri.AboveNormal" xml:space="preserve"><value>Above normal</value></data>
   <data name="Dialog.Pri.Normal" xml:space="preserve"><value>Normal</value></data>
   <data name="Dialog.Pri.BelowNormal" xml:space="preserve"><value>Below normal (Windows default)</value></data>
   <data name="Dialog.Pri.Idle" xml:space="preserve"><value>Idle</value></data>
-
   <data name="Dialog.NetAdmin.Title" xml:space="preserve"><value>Administrator required</value></data>
   <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>Specific network selection requires the app to run as administrator.</value></data>
   <data name="Dialog.SysWarn.Title" xml:space="preserve"><value>Administrator Privileges Required</value></data>
   <data name="Dialog.SysWarn.Msg" xml:space="preserve"><value>To create tasks that run as SYSTEM, this application must be running with administrator privileges. Right-click the app and select "Run as administrator".</value></data>
-
   <data name="Settings.Theme.Light" xml:space="preserve"><value>Light</value></data>
   <data name="Settings.Theme.Dark" xml:space="preserve"><value>Dark</value></data>
   <data name="Settings.Theme.System" xml:space="preserve"><value>System Default</value></data>
-
   <data name="Settings.Lead.1m" xml:space="preserve"><value>1 minute before</value></data>
   <data name="Settings.Lead.5m" xml:space="preserve"><value>5 minutes before</value></data>
   <data name="Settings.Lead.10m" xml:space="preserve"><value>10 minutes before</value></data>
@@ -528,7 +508,7 @@ Restart now to apply the update?</value></data>
   <data name="Snooze.Dialog.Title" xml:space="preserve"><value>Snooze All Tasks</value></data>
   <data name="Snooze.Dialog.Confirm" xml:space="preserve"><value>Snooze</value></data>
   <data name="Snooze.Dialog.ActiveTitle" xml:space="preserve"><value>Global Snooze is active</value></data>
-  <data name="Snooze.Dialog.Intro" xml:space="preserve"><value>While snoozed, FluentTaskScheduler refuses to start any task - including chained pipeline runs.</value></data>
+  <data name="Snooze.Dialog.Intro" xml:space="preserve"><value>While all tasks are snoozed, FluentTaskScheduler starts none of them, not even through completion actions.</value></data>
   <data name="Snooze.SuspendTriggers" xml:space="preserve"><value>Also suspend scheduled triggers</value></data>
   <data name="Snooze.SuspendTriggersHint" xml:space="preserve"><value>Disables every enabled task through the Task Scheduler API and re-enables exactly those tasks when the snooze ends. Protected system tasks are skipped.</value></data>
   <data name="Snooze.Banner.Suspended" xml:space="preserve"><value>Scheduled triggers are suspended and manual runs are blocked. Tasks are re-enabled when the snooze ends.</value></data>
@@ -546,7 +526,7 @@ Restart now to apply the update?</value></data>
   <data name="Pipeline.Dialog.Title" xml:space="preserve"><value>Completion Actions (Task Pipeline)</value></data>
   <data name="Pipeline.Info.Title" xml:space="preserve"><value>How chaining works</value></data>
   <data name="Pipeline.Info.Message" xml:space="preserve"><value>When this task finishes, FluentTaskScheduler reads the action's exit code from the Windows Task Scheduler event log. Exit code 0 starts the success tasks; any other code starts the failure tasks. The app must be running for chained tasks to be started, and chains are skipped while Global Snooze is active.</value></data>
-  <data name="Pipeline.EnableSwitch" xml:space="preserve"><value>Run downstream tasks when this task completes</value></data>
+  <data name="Pipeline.EnableSwitch" xml:space="preserve"><value>Start other tasks when this task finishes</value></data>
   <data name="Pipeline.OnSuccess" xml:space="preserve"><value>On success (exit code 0)</value></data>
   <data name="Pipeline.OnFailure" xml:space="preserve"><value>On failure (any other exit code)</value></data>
   <data name="Pipeline.Add" xml:space="preserve"><value>Add</value></data>
@@ -561,9 +541,8 @@ Restart now to apply the update?</value></data>
   <data name="Pipeline.Warning.BothLists" xml:space="preserve"><value>'{0}' now runs on both success and failure - it will start after every completion.</value></data>
   <data name="Pipeline.Warning.NoTargets" xml:space="preserve"><value>Add at least one downstream task, or turn the switch off.</value></data>
   <data name="Pipeline.Error.Open" xml:space="preserve"><value>Could not open completion actions: </value></data>
-  <data name="Pipeline.Toast.Title" xml:space="preserve"><value>Pipeline: {0} started</value></data>
-  <data name="Pipeline.Toast.OnSuccess" xml:space="preserve"><value>Triggered because '{0}' completed successfully.</value></data>
-  <data name="Pipeline.Toast.OnFailure" xml:space="preserve"><value>Triggered because '{0}' failed.</value></data>
+  <data name="Pipeline.Toast.OnSuccess" xml:space="preserve"><value>Started by a completion action because '{0}' succeeded.</value></data>
+  <data name="Pipeline.Toast.OnFailure" xml:space="preserve"><value>Started by a completion action because '{0}' failed.</value></data>
   <data name="Dashboard.HealthCaption" xml:space="preserve"><value>Of the runs that ended in the last 7 days, the share that succeeded. Stopped runs are not counted.</value></data>
   <data name="Dashboard.Throughput" xml:space="preserve"><value>Executions</value></data>
   <data name="Dashboard.Runs24h" xml:space="preserve"><value>in the last 24h</value></data>
@@ -625,8 +604,8 @@ Restart now to apply the update?</value></data>
   <data name="Templates.RecycleBin.Note" xml:space="preserve"><value>Deleted items become unrecoverable once the bin is emptied.</value></data>
   <data name="Dialog.Common.On" xml:space="preserve"><value>On</value></data>
   <data name="Dialog.Common.Off" xml:space="preserve"><value>Off</value></data>
-  <data name="Settings.Sys.Pipelines.Title" xml:space="preserve"><value>Task Pipelines</value></data>
-  <data name="Settings.Sys.Pipelines.Desc" xml:space="preserve"><value>Watch the Task Scheduler event log and start the downstream tasks configured under a task's Completion Actions.</value></data>
+  <data name="Settings.Sys.Pipelines.Title" xml:space="preserve"><value>Completion Actions</value></data>
+  <data name="Settings.Sys.Pipelines.Desc" xml:space="preserve"><value>Start the tasks named in a task's completion actions when it succeeds or fails. This works while the app is running and Windows records task history.</value></data>
   <data name="Main.Nav.Library" xml:space="preserve"><value>Library</value></data>
   <data name="Main.Header.Library" xml:space="preserve"><value>Library</value></data>
   <data name="Main.Status.All" xml:space="preserve"><value>All statuses</value></data>
@@ -639,11 +618,11 @@ Restart now to apply the update?</value></data>
   <data name="Library.Subtitle" xml:space="preserve"><value>Deploy a ready-made scheduled task, or reuse a saved command as the action for a new task. Nothing is created until you save the task editor.</value></data>
   <data name="Library.Section.Templates" xml:space="preserve"><value>Task Templates</value></data>
   <data name="Library.Section.Scripts" xml:space="preserve"><value>Scripts</value></data>
-  <data name="Pipeline.EnableSubtitle" xml:space="preserve"><value>Turn this off to keep the configuration without acting on it.</value></data>
+  <data name="Pipeline.EnableSubtitle" xml:space="preserve"><value>Completion actions work while the app is running and Windows records task history. Turn this off to keep the list without acting on it.</value></data>
   <data name="Pipeline.SuccessHeader" xml:space="preserve"><value>On success</value></data>
-  <data name="Pipeline.SuccessHint" xml:space="preserve"><value>Started when the action exits with code 0.</value></data>
+  <data name="Pipeline.SuccessHint" xml:space="preserve"><value>Started when a run succeeds: every action exits with code 0.</value></data>
   <data name="Pipeline.FailureHeader" xml:space="preserve"><value>On failure</value></data>
-  <data name="Pipeline.FailureHint" xml:space="preserve"><value>Started on any non-zero exit code, or if the action could not launch.</value></data>
+  <data name="Pipeline.FailureHint" xml:space="preserve"><value>Started when a run fails, cannot start, times out or is stopped.</value></data>
   <data name="Settings.About.VersionFormat" xml:space="preserve"><value>Version {0}</value></data>
   <data name="EventLevel.Critical" xml:space="preserve"><value>Critical</value></data>
   <data name="EventLevel.Error" xml:space="preserve"><value>Error</value></data>
@@ -728,8 +707,6 @@ Restart now to apply the update?</value></data>
   <data name="Library.Search.Placeholder" xml:space="preserve"><value>Search...</value></data>
   <data name="Library.Search.NoTemplates" xml:space="preserve"><value>No templates match your search.</value></data>
   <data name="Library.Search.NoScripts" xml:space="preserve"><value>No scripts match your search.</value></data>
-
-  <!-- Added while closing localization gaps found during the S3 audit pass (3.2) -->
   <data name="App.WindowTitleSuffixFormat" xml:space="preserve"><value>Window {0}</value></data>
   <data name="Dashboard.ProcessActive" xml:space="preserve"><value>Process active (PID {0})</value></data>
   <data name="Dashboard.ProcessNotFound" xml:space="preserve"><value>Process not found</value></data>
@@ -1050,7 +1027,7 @@ Restart now to apply the update?</value></data>
   <data name="Tour.History.Title" xml:space="preserve"><value>See what happened</value></data>
   <data name="Tour.History.Body" xml:space="preserve"><value>Select a task to see when it ran, whether it succeeded, and whether it is running right now. The Dashboard sums this up for all your tasks.</value></data>
   <data name="Tour.Automation.Title" xml:space="preserve"><value>Chain tasks and pause them</value></data>
-  <data name="Tour.Automation.Body" xml:space="preserve"><value>Completion actions start other tasks when a task succeeds or fails. Need a break? Snooze one task or all of them: for a set time, until the next restart, or until you resume them. Both work while the app is running, which it also does in the system tray.</value></data>
+  <data name="Tour.Automation.Body" xml:space="preserve"><value>Completion actions start other tasks when a task succeeds or fails. Need a break? Snooze one task or all of them: for a set time, until you restart or sign out, or until you resume them. Both work while the app is running, even when it is only in the system tray; completion actions also need Windows to record task history.</value></data>
   <data name="Tour.Library.Title" xml:space="preserve"><value>Start from a template</value></data>
   <data name="Tour.Library.Body" xml:space="preserve"><value>The Library has ready-made tasks for common jobs and keeps your own scripts. Quick Actions run everyday maintenance with one click.</value></data>
   <data name="Tour.Admin.Title" xml:space="preserve"><value>Tasks that need administrator rights</value></data>

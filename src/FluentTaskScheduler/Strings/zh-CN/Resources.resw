@@ -101,7 +101,6 @@
   <data name="DeleteButton.Content" xml:space="preserve"><value>删除</value></data>
   <data name="ExportButton.Content" xml:space="preserve"><value>导出</value></data>
   <data name="EditButton.Content" xml:space="preserve"><value>编辑</value></data>
-
   <data name="SettingsHeader.Text" xml:space="preserve"><value>设置</value></data>
   <data name="AppearanceHeader.Text" xml:space="preserve"><value>外观</value></data>
   <data name="ThemeCombo.Header" xml:space="preserve"><value>应用主题</value></data>
@@ -118,7 +117,6 @@
   <data name="AboutHeader.Text" xml:space="preserve"><value>关于</value></data>
   <data name="AboutTitle.Text" xml:space="preserve"><value>Fluent Task Scheduler</value></data>
   <data name="AboutBuilt.Text" xml:space="preserve"><value>基于 WinUI 3 构建</value></data>
-
   <data name="App.WindowTitle" xml:space="preserve"><value>FluentTaskScheduler</value></data>
   <data name="Dialog.Common.OK" xml:space="preserve"><value>确定</value></data>
   <data name="Dialog.Common.Close" xml:space="preserve"><value>关闭</value></data>
@@ -145,7 +143,6 @@
   <data name="Dialog.UpdateAvailable.ContentFormat" xml:space="preserve"><value>版本 {0} 已下载并可安装。
 是否立即重启以应用更新？</value></data>
   <data name="Dialog.UpdateAvailable.RestartNow" xml:space="preserve"><value>立即重启</value></data>
-
   <data name="Main.Nav.Dashboard" xml:space="preserve"><value>仪表盘</value></data>
   <data name="Main.Nav.ScriptLibrary" xml:space="preserve"><value>脚本库</value></data>
   <data name="Main.Nav.NewTask" xml:space="preserve"><value>新建任务</value></data>
@@ -181,7 +178,6 @@
   <data name="Main.AdminDragWarning.Title" xml:space="preserve"><value>拖放受限</value></data>
   <data name="Main.AdminDragWarning.Message" xml:space="preserve"><value>应用以管理员身份运行时，Windows 不支持拖放操作。</value></data>
   <data name="Main.Network.Any" xml:space="preserve"><value>任意网络</value></data>
-
   <data name="Settings.Nav.Appearance" xml:space="preserve"><value>外观</value></data>
   <data name="Settings.Nav.Notifications" xml:space="preserve"><value>通知</value></data>
   <data name="Settings.Nav.System" xml:space="preserve"><value>系统</value></data>
@@ -241,7 +237,6 @@
   <data name="DashboardRunHistory.Text" xml:space="preserve"><value>运行历史 — 最近 7 天</value></data>
   <data name="DashboardSuccess.Text" xml:space="preserve"><value>成功</value></data>
   <data name="DashboardFailure.Text" xml:space="preserve"><value>失败</value></data>
-
   <data name="ScriptLibraryTitle.Text" xml:space="preserve"><value>脚本库</value></data>
   <data name="ScriptLibraryCreateBtn.Content" xml:space="preserve"><value>新建脚本</value></data>
   <data name="ScriptLibraryDeleteBtn.ToolTipService.ToolTip" xml:space="preserve"><value>删除脚本</value></data>
@@ -258,7 +253,6 @@
   <data name="ScriptLibraryArgsHeader.Header" xml:space="preserve"><value>参数</value></data>
   <data name="ScriptLibraryArgsPlaceholder.PlaceholderText" xml:space="preserve"><value>例如：-File C:\scripts\cleanup.ps1</value></data>
   <data name="ScriptLibraryAdminContent.Content" xml:space="preserve"><value>以最高权限运行</value></data>
-
   <data name="RepetitionSectionTitle.Text" xml:space="preserve"><value>重复</value></data>
   <data name="RepetitionIntervalText.Text" xml:space="preserve"><value>任务重复间隔</value></data>
   <data name="RepetitionNone.Content" xml:space="preserve"><value>(无重复)</value></data>
@@ -271,7 +265,6 @@
   <data name="ConditionOnBattery.Content" xml:space="preserve"><value>计算机由电池供电</value></data>
   <data name="ConditionSpecificNetwork.Text" xml:space="preserve"><value>指定网络：</value></data>
   <data name="ConditionAnyNetwork.Content" xml:space="preserve"><value>任意网络</value></data>
-
   <data name="Settings.Notif.Task.Title" xml:space="preserve"><value>任务通知</value></data>
   <data name="Settings.Notif.Task.Desc" xml:space="preserve"><value>当任务启动或失败时显示提示。</value></data>
   <data name="Settings.Notif.Reminders.Title" xml:space="preserve"><value>即将执行的任务提醒</value></data>
@@ -324,7 +317,6 @@
   <data name="Dashboard.AllCategories" xml:space="preserve"><value>全部分类</value></data>
   <data name="Dashboard.Today" xml:space="preserve"><value>今天</value></data>
   <data name="Dashboard.Unknown" xml:space="preserve"><value>未知</value></data>
-
   <data name="Dialog.TaskName" xml:space="preserve"><value>任务名称</value></data>
   <data name="Dialog.Description" xml:space="preserve"><value>描述</value></data>
   <data name="Dialog.Author" xml:space="preserve"><value>作者</value></data>
@@ -362,13 +354,11 @@
   <data name="Dialog.RunAsCurrent" xml:space="preserve"><value>以当前用户身份运行</value></data>
   <data name="Dialog.RunAsSpecific" xml:space="preserve"><value>以指定用户身份运行</value></data>
   <data name="Dialog.RunAsSystem" xml:space="preserve"><value>以 SYSTEM 身份运行（需要管理员权限）</value></data>
-
   <data name="Trigger.At" xml:space="preserve"><value>在</value></data>
   <data name="Trigger.OnIdle" xml:space="preserve"><value>空闲时</value></data>
   <data name="Trigger.AtLogon" xml:space="preserve"><value>登录时</value></data>
   <data name="Trigger.AtStartup" xml:space="preserve"><value>启动时</value></data>
   <data name="Trigger.SessionStateChange" xml:space="preserve"><value>在 {0} 时</value></data>
-
   <data name="Dialog.Ph.TaskName" xml:space="preserve"><value>输入任务名称</value></data>
   <data name="Dialog.Ph.Category" xml:space="preserve"><value>例如：工作</value></data>
   <data name="Dialog.Ph.Tags" xml:space="preserve"><value>例如：紧急, 同步 (逗号分隔)</value></data>
@@ -387,12 +377,10 @@
   <data name="Dialog.Ph.EventLog" xml:space="preserve"><value>Application, System, Security 等</value></data>
   <data name="Dialog.Ph.EventSource" xml:space="preserve"><value>例如：VSS, Outlook (可选)</value></data>
   <data name="Dialog.Ph.EventId" xml:space="preserve"><value>例如：1000 (可选)</value></data>
-
   <data name="Dialog.Hint.Delay" xml:space="preserve"><value>(例如：30s, 1m, 1h)</value></data>
   <data name="Dialog.Hint.Idle" xml:space="preserve"><value>(例如：5m, 10m, 30m)</value></data>
   <data name="Dialog.Hint.Restart" xml:space="preserve"><value>(例如：30s, 1m, 5m)</value></data>
   <data name="Dialog.Hint.MonthDays" xml:space="preserve"><value>(逗号分隔，使用 'Last' 表示最后一天)</value></data>
-
   <data name="Dialog.RecurEvery" xml:space="preserve"><value>每隔</value></data>
   <data name="Dialog.DaysSuffix" xml:space="preserve"><value>天重复</value></data>
   <data name="Dialog.WeeksOn" xml:space="preserve"><value>周的以下日期：</value></data>
@@ -401,7 +389,6 @@
   <data name="Dialog.On" xml:space="preserve"><value>在</value></data>
   <data name="Dialog.IdleWait" xml:space="preserve"><value>等待计算机空闲达：</value></data>
   <data name="Dialog.TriggerAt" xml:space="preserve"><value>于</value></data>
-
   <data name="Dialog.Day.Mon" xml:space="preserve"><value>周一</value></data>
   <data name="Dialog.Day.Tue" xml:space="preserve"><value>周二</value></data>
   <data name="Dialog.Day.Wed" xml:space="preserve"><value>周三</value></data>
@@ -409,7 +396,6 @@
   <data name="Dialog.Day.Fri" xml:space="preserve"><value>周五</value></data>
   <data name="Dialog.Day.Sat" xml:space="preserve"><value>周六</value></data>
   <data name="Dialog.Day.Sun" xml:space="preserve"><value>周日</value></data>
-
   <data name="Dialog.Month.Jan" xml:space="preserve"><value>一月</value></data>
   <data name="Dialog.Month.Feb" xml:space="preserve"><value>二月</value></data>
   <data name="Dialog.Month.Mar" xml:space="preserve"><value>三月</value></data>
@@ -422,26 +408,22 @@
   <data name="Dialog.Month.Oct" xml:space="preserve"><value>十月</value></data>
   <data name="Dialog.Month.Nov" xml:space="preserve"><value>十一月</value></data>
   <data name="Dialog.Month.Dec" xml:space="preserve"><value>十二月</value></data>
-
   <data name="Dialog.Week.First" xml:space="preserve"><value>第一个</value></data>
   <data name="Dialog.Week.Second" xml:space="preserve"><value>第二个</value></data>
   <data name="Dialog.Week.Third" xml:space="preserve"><value>第三个</value></data>
   <data name="Dialog.Week.Fourth" xml:space="preserve"><value>第四个</value></data>
   <data name="Dialog.Week.Last" xml:space="preserve"><value>最后一个</value></data>
-
   <data name="Dialog.TriggerOn" xml:space="preserve"><value>触发于</value></data>
   <data name="Dialog.Sess.Lock" xml:space="preserve"><value>工作站锁定</value></data>
   <data name="Dialog.Sess.Unlock" xml:space="preserve"><value>工作站解锁</value></data>
   <data name="Dialog.Sess.RdpConnect" xml:space="preserve"><value>远程桌面连接</value></data>
   <data name="Dialog.Sess.RdpDisconnect" xml:space="preserve"><value>远程桌面断开</value></data>
   <data name="Dialog.Expire" xml:space="preserve"><value>任务过期时间：</value></data>
-
   <data name="Dialog.Action.RunProg" xml:space="preserve"><value>启动程序</value></data>
   <data name="Dialog.Action.Email" xml:space="preserve"><value>发送电子邮件</value></data>
   <data name="Dialog.Action.Notif" xml:space="preserve"><value>显示通知</value></data>
   <data name="Dialog.Browse" xml:space="preserve"><value>浏览...</value></data>
   <data name="Dialog.RunPrefix" xml:space="preserve"><value>运行：</value></data>
-
   <data name="Dialog.Time.5m" xml:space="preserve"><value>5 分钟</value></data>
   <data name="Dialog.Time.10m" xml:space="preserve"><value>10 分钟</value></data>
   <data name="Dialog.Time.15m" xml:space="preserve"><value>15 分钟</value></data>
@@ -457,23 +439,19 @@
   <data name="Dialog.Time.2d" xml:space="preserve"><value>2 天</value></data>
   <data name="Dialog.Time.3d" xml:space="preserve"><value>3 天</value></data>
   <data name="Dialog.Time.5d" xml:space="preserve"><value>5 天</value></data>
-
   <data name="Dialog.Pri.Realtime" xml:space="preserve"><value>实时</value></data>
   <data name="Dialog.Pri.High" xml:space="preserve"><value>高</value></data>
   <data name="Dialog.Pri.AboveNormal" xml:space="preserve"><value>高于正常</value></data>
   <data name="Dialog.Pri.Normal" xml:space="preserve"><value>正常</value></data>
   <data name="Dialog.Pri.BelowNormal" xml:space="preserve"><value>低于正常（Windows 默认）</value></data>
   <data name="Dialog.Pri.Idle" xml:space="preserve"><value>空闲</value></data>
-
   <data name="Dialog.NetAdmin.Title" xml:space="preserve"><value>需要管理员权限</value></data>
   <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>选择特定网络需要以管理员身份运行应用程序。</value></data>
   <data name="Dialog.SysWarn.Title" xml:space="preserve"><value>需要管理员权限</value></data>
   <data name="Dialog.SysWarn.Msg" xml:space="preserve"><value>要创建以 SYSTEM 身份运行的任务，必须以管理员权限运行此应用程序。请右键单击该应用并选择“以管理员身份运行”。</value></data>
-
   <data name="Settings.Theme.Light" xml:space="preserve"><value>浅色</value></data>
   <data name="Settings.Theme.Dark" xml:space="preserve"><value>深色</value></data>
   <data name="Settings.Theme.System" xml:space="preserve"><value>系统默认</value></data>
-
   <data name="Settings.Lead.1m" xml:space="preserve"><value>提前 1 分钟</value></data>
   <data name="Settings.Lead.5m" xml:space="preserve"><value>提前 5 分钟</value></data>
   <data name="Settings.Lead.10m" xml:space="preserve"><value>提前 10 分钟</value></data>
@@ -532,7 +510,7 @@
   <data name="Snooze.Dialog.Title" xml:space="preserve"><value>暂停所有任务</value></data>
   <data name="Snooze.Dialog.Confirm" xml:space="preserve"><value>暂停</value></data>
   <data name="Snooze.Dialog.ActiveTitle" xml:space="preserve"><value>全局暂停已启用</value></data>
-  <data name="Snooze.Dialog.Intro" xml:space="preserve"><value>暂停期间，FluentTaskScheduler 不会启动任何任务，包括已链式配置的流水线任务。</value></data>
+  <data name="Snooze.Dialog.Intro" xml:space="preserve"><value>暂停所有任务期间，FluentTaskScheduler 不会启动其中任何任务，也不会通过完成后操作启动。</value></data>
   <data name="Snooze.SuspendTriggers" xml:space="preserve"><value>同时暂停计划触发器</value></data>
   <data name="Snooze.SuspendTriggersHint" xml:space="preserve"><value>通过任务计划程序 API 禁用所有已启用的任务，并在暂停结束时仅重新启用这些任务。受保护的系统任务将被跳过。</value></data>
   <data name="Snooze.Banner.Suspended" xml:space="preserve"><value>计划触发器已暂停，手动运行也会被阻止。暂停结束后任务将重新启用。</value></data>
@@ -550,7 +528,7 @@
   <data name="Pipeline.Dialog.Title" xml:space="preserve"><value>完成后操作（任务流水线）</value></data>
   <data name="Pipeline.Info.Title" xml:space="preserve"><value>链式任务的工作原理</value></data>
   <data name="Pipeline.Info.Message" xml:space="preserve"><value>此任务完成后，FluentTaskScheduler 会从 Windows 任务计划程序事件日志中读取操作的退出代码。退出代码为 0 时启动成功任务，其他任何代码都会启动失败任务。应用必须处于运行状态才能启动链式任务，且在全局暂停期间会跳过链式任务。</value></data>
-  <data name="Pipeline.EnableSwitch" xml:space="preserve"><value>此任务完成后启动后续任务</value></data>
+  <data name="Pipeline.EnableSwitch" xml:space="preserve"><value>此任务结束后启动其他任务</value></data>
   <data name="Pipeline.OnSuccess" xml:space="preserve"><value>成功时（退出代码 0）</value></data>
   <data name="Pipeline.OnFailure" xml:space="preserve"><value>失败时（任何其他退出代码）</value></data>
   <data name="Pipeline.Add" xml:space="preserve"><value>添加</value></data>
@@ -565,9 +543,8 @@
   <data name="Pipeline.Warning.BothLists" xml:space="preserve"><value>“{0}”现在会在成功和失败时都运行 —— 每次完成后都会启动。</value></data>
   <data name="Pipeline.Warning.NoTargets" xml:space="preserve"><value>请至少添加一个后续任务，或关闭此开关。</value></data>
   <data name="Pipeline.Error.Open" xml:space="preserve"><value>无法打开完成后操作：</value></data>
-  <data name="Pipeline.Toast.Title" xml:space="preserve"><value>流水线：已启动 {0}</value></data>
-  <data name="Pipeline.Toast.OnSuccess" xml:space="preserve"><value>因“{0}”成功完成而被触发。</value></data>
-  <data name="Pipeline.Toast.OnFailure" xml:space="preserve"><value>因“{0}”失败而被触发。</value></data>
+  <data name="Pipeline.Toast.OnSuccess" xml:space="preserve"><value>由于“{0}”成功，已由完成后操作启动。</value></data>
+  <data name="Pipeline.Toast.OnFailure" xml:space="preserve"><value>由于“{0}”失败，已由完成后操作启动。</value></data>
   <data name="Dashboard.HealthCaption" xml:space="preserve"><value>过去 7 天内结束的运行中成功运行的占比。已停止的运行不计入。</value></data>
   <data name="Dashboard.Throughput" xml:space="preserve"><value>执行次数</value></data>
   <data name="Dashboard.Runs24h" xml:space="preserve"><value>最近 24 小时</value></data>
@@ -629,8 +606,8 @@
   <data name="Templates.RecycleBin.Note" xml:space="preserve"><value>回收站清空后，已删除的项目将无法恢复。</value></data>
   <data name="Dialog.Common.On" xml:space="preserve"><value>开</value></data>
   <data name="Dialog.Common.Off" xml:space="preserve"><value>关</value></data>
-  <data name="Settings.Sys.Pipelines.Title" xml:space="preserve"><value>任务流水线</value></data>
-  <data name="Settings.Sys.Pipelines.Desc" xml:space="preserve"><value>监视任务计划程序事件日志，并启动在任务的完成后操作中配置的后续任务。</value></data>
+  <data name="Settings.Sys.Pipelines.Title" xml:space="preserve"><value>完成后操作</value></data>
+  <data name="Settings.Sys.Pipelines.Desc" xml:space="preserve"><value>任务成功或失败时，启动其完成后操作中指定的任务。仅在应用运行且 Windows 记录任务历史时有效。</value></data>
   <data name="Main.Nav.Library" xml:space="preserve"><value>库</value></data>
   <data name="Main.Header.Library" xml:space="preserve"><value>库</value></data>
   <data name="Main.Status.All" xml:space="preserve"><value>全部状态</value></data>
@@ -643,11 +620,11 @@
   <data name="Library.Subtitle" xml:space="preserve"><value>部署一个现成的计划任务，或将已保存的命令复用为新任务的操作。在任务编辑器中保存前不会创建任何内容。</value></data>
   <data name="Library.Section.Templates" xml:space="preserve"><value>任务模板</value></data>
   <data name="Library.Section.Scripts" xml:space="preserve"><value>脚本</value></data>
-  <data name="Pipeline.EnableSubtitle" xml:space="preserve"><value>关闭后将保留配置但不会执行。</value></data>
+  <data name="Pipeline.EnableSubtitle" xml:space="preserve"><value>完成后操作仅在应用运行且 Windows 记录任务历史时有效。关闭后将保留列表，但不会启动任务。</value></data>
   <data name="Pipeline.SuccessHeader" xml:space="preserve"><value>成功时</value></data>
-  <data name="Pipeline.SuccessHint" xml:space="preserve"><value>当操作以退出代码 0 结束时启动。</value></data>
+  <data name="Pipeline.SuccessHint" xml:space="preserve"><value>运行成功（所有操作均以退出代码 0 结束）时启动。</value></data>
   <data name="Pipeline.FailureHeader" xml:space="preserve"><value>失败时</value></data>
-  <data name="Pipeline.FailureHint" xml:space="preserve"><value>当退出代码非 0，或操作无法启动时执行。</value></data>
+  <data name="Pipeline.FailureHint" xml:space="preserve"><value>运行失败、无法启动、超时或被停止时启动。</value></data>
   <data name="EventLevel.Critical" xml:space="preserve"><value>严重</value></data>
   <data name="EventLevel.Error" xml:space="preserve"><value>错误</value></data>
   <data name="EventLevel.Warning" xml:space="preserve"><value>警告</value></data>
@@ -731,8 +708,6 @@
   <data name="Library.Search.Placeholder" xml:space="preserve"><value>搜索...</value></data>
   <data name="Library.Search.NoTemplates" xml:space="preserve"><value>没有与搜索匹配的模板。</value></data>
   <data name="Library.Search.NoScripts" xml:space="preserve"><value>没有与搜索匹配的脚本。</value></data>
-
-  <!-- Added while closing localization gaps found during the S3 audit pass (3.2) -->
   <data name="App.WindowTitleSuffixFormat" xml:space="preserve"><value>窗口 {0}</value></data>
   <data name="Dashboard.ProcessActive" xml:space="preserve"><value>进程运行中 (PID {0})</value></data>
   <data name="Dashboard.ProcessNotFound" xml:space="preserve"><value>未找到进程</value></data>
@@ -1053,7 +1028,7 @@
   <data name="Tour.History.Title" xml:space="preserve"><value>查看运行情况</value></data>
   <data name="Tour.History.Body" xml:space="preserve"><value>选择一个任务，即可查看它何时运行、是否成功以及当前是否正在运行。仪表盘会汇总所有任务的情况。</value></data>
   <data name="Tour.Automation.Title" xml:space="preserve"><value>链接任务与暂停任务</value></data>
-  <data name="Tour.Automation.Body" xml:space="preserve"><value>完成后操作可以在任务成功或失败时启动其他任务。需要休息一下？可以暂停单个任务或所有任务：固定时长、直到下次重启，或直到你手动恢复。这两项功能在应用运行期间有效，应用也可以在系统托盘中运行。</value></data>
+  <data name="Tour.Automation.Body" xml:space="preserve"><value>完成后操作可以在任务成功或失败时启动其他任务。需要休息一下？可以暂停单个任务或所有任务：固定时长、直到你重启或注销，或直到你手动恢复。这两项功能在应用运行期间有效，即使应用只在系统托盘中运行也是如此；完成后操作还需要 Windows 记录任务历史。</value></data>
   <data name="Tour.Library.Title" xml:space="preserve"><value>从模板开始</value></data>
   <data name="Tour.Library.Body" xml:space="preserve"><value>库中提供了适用于常见用途的现成任务，也可以保存你自己的脚本。快速操作只需单击一次即可完成日常维护。</value></data>
   <data name="Tour.Admin.Title" xml:space="preserve"><value>需要管理员权限的任务</value></data>

@@ -100,8 +100,6 @@
   <data name="DeleteButton.Content" xml:space="preserve"><value>削除</value></data>
   <data name="ExportButton.Content" xml:space="preserve"><value>エクスポート</value></data>
   <data name="EditButton.Content" xml:space="preserve"><value>編集</value></data>
-
-  <!-- Settings Page Strings -->
   <data name="SettingsHeader.Text" xml:space="preserve"><value>設定</value></data>
   <data name="AppearanceHeader.Text" xml:space="preserve"><value>外観</value></data>
   <data name="ThemeCombo.Header" xml:space="preserve"><value>アプリのテーマ</value></data>
@@ -238,7 +236,6 @@
   <data name="DashboardRunHistory.Text" xml:space="preserve"><value>実行履歴 - 過去7日間</value></data>
   <data name="DashboardSuccess.Text" xml:space="preserve"><value>成功</value></data>
   <data name="DashboardFailure.Text" xml:space="preserve"><value>失敗</value></data>
-
   <data name="ScriptLibraryTitle.Text" xml:space="preserve"><value>スクリプトライブラリ</value></data>
   <data name="ScriptLibraryCreateBtn.Content" xml:space="preserve"><value>新しいスクリプト</value></data>
   <data name="ScriptLibraryDeleteBtn.ToolTipService.ToolTip" xml:space="preserve"><value>スクリプトを削除</value></data>
@@ -255,7 +252,6 @@
   <data name="ScriptLibraryArgsHeader.Header" xml:space="preserve"><value>引数</value></data>
   <data name="ScriptLibraryArgsPlaceholder.PlaceholderText" xml:space="preserve"><value>例: -File C:\scripts\cleanup.ps1</value></data>
   <data name="ScriptLibraryAdminContent.Content" xml:space="preserve"><value>最高の権限で実行する</value></data>
-
   <data name="RepetitionSectionTitle.Text" xml:space="preserve"><value>繰り返し</value></data>
   <data name="RepetitionIntervalText.Text" xml:space="preserve"><value>タスクを繰り返す間隔</value></data>
   <data name="RepetitionNone.Content" xml:space="preserve"><value>(繰り返しなし)</value></data>
@@ -268,7 +264,6 @@
   <data name="ConditionOnBattery.Content" xml:space="preserve"><value>コンピューターがバッテリー電源を使用しているとき</value></data>
   <data name="ConditionSpecificNetwork.Text" xml:space="preserve"><value>特定のネットワーク:</value></data>
   <data name="ConditionAnyNetwork.Content" xml:space="preserve"><value>任意のネットワーク</value></data>
-
   <data name="Settings.Notif.Task.Title" xml:space="preserve"><value>タスク通知</value></data>
   <data name="Settings.Notif.Task.Desc" xml:space="preserve"><value>タスクの開始または失敗時にトースト通知を表示します。</value></data>
   <data name="Settings.Notif.Reminders.Title" xml:space="preserve"><value>タスク実行前のリマインダー</value></data>
@@ -321,7 +316,6 @@
   <data name="Dashboard.AllCategories" xml:space="preserve"><value>すべてのカテゴリ</value></data>
   <data name="Dashboard.Today" xml:space="preserve"><value>今日</value></data>
   <data name="Dashboard.Unknown" xml:space="preserve"><value>不明</value></data>
-
   <data name="Dialog.TaskName" xml:space="preserve"><value>タスク名</value></data>
   <data name="Dialog.Description" xml:space="preserve"><value>説明</value></data>
   <data name="Dialog.Author" xml:space="preserve"><value>作成者</value></data>
@@ -359,13 +353,11 @@
   <data name="Dialog.RunAsCurrent" xml:space="preserve"><value>現在のユーザーとして実行</value></data>
   <data name="Dialog.RunAsSpecific" xml:space="preserve"><value>特定のユーザーとして実行</value></data>
   <data name="Dialog.RunAsSystem" xml:space="preserve"><value>SYSTEM として実行 (管理者権限が必要)</value></data>
-
   <data name="Trigger.At" xml:space="preserve"><value>開始時間</value></data>
   <data name="Trigger.OnIdle" xml:space="preserve"><value>アイドル時</value></data>
   <data name="Trigger.AtLogon" xml:space="preserve"><value>ログオン時</value></data>
   <data name="Trigger.AtStartup" xml:space="preserve"><value>スタートアップ時</value></data>
   <data name="Trigger.SessionStateChange" xml:space="preserve"><value>{0} 時</value></data>
-
   <data name="Dialog.Ph.TaskName" xml:space="preserve"><value>タスク名を入力</value></data>
   <data name="Dialog.Ph.Category" xml:space="preserve"><value>例: 仕事</value></data>
   <data name="Dialog.Ph.Tags" xml:space="preserve"><value>例: 重要, 同期 (コンマ区切り)</value></data>
@@ -384,12 +376,10 @@
   <data name="Dialog.Ph.EventLog" xml:space="preserve"><value>Application, System, Security など</value></data>
   <data name="Dialog.Ph.EventSource" xml:space="preserve"><value>例: VSS, Outlook (任意)</value></data>
   <data name="Dialog.Ph.EventId" xml:space="preserve"><value>例: 1000 (任意)</value></data>
-
   <data name="Dialog.Hint.Delay" xml:space="preserve"><value>(例: 30s, 1m, 1h)</value></data>
   <data name="Dialog.Hint.Idle" xml:space="preserve"><value>(例: 5m, 10m, 30m)</value></data>
   <data name="Dialog.Hint.Restart" xml:space="preserve"><value>(例: 30s, 1m, 5m)</value></data>
   <data name="Dialog.Hint.MonthDays" xml:space="preserve"><value>(コンマ区切り, 最終日は 'Last')</value></data>
-
   <data name="Dialog.RecurEvery" xml:space="preserve"><value>間隔:</value></data>
   <data name="Dialog.DaysSuffix" xml:space="preserve"><value>日ごと</value></data>
   <data name="Dialog.WeeksOn" xml:space="preserve"><value>週間後の曜日:</value></data>
@@ -398,7 +388,6 @@
   <data name="Dialog.On" xml:space="preserve"><value>日</value></data>
   <data name="Dialog.IdleWait" xml:space="preserve"><value>コンピューターがアイドル状態になるまで待機する時間:</value></data>
   <data name="Dialog.TriggerAt" xml:space="preserve"><value>開始:</value></data>
-
   <data name="Dialog.Day.Mon" xml:space="preserve"><value>月</value></data>
   <data name="Dialog.Day.Tue" xml:space="preserve"><value>火</value></data>
   <data name="Dialog.Day.Wed" xml:space="preserve"><value>水</value></data>
@@ -406,7 +395,6 @@
   <data name="Dialog.Day.Fri" xml:space="preserve"><value>金</value></data>
   <data name="Dialog.Day.Sat" xml:space="preserve"><value>土</value></data>
   <data name="Dialog.Day.Sun" xml:space="preserve"><value>日</value></data>
-
   <data name="Dialog.Month.Jan" xml:space="preserve"><value>1月</value></data>
   <data name="Dialog.Month.Feb" xml:space="preserve"><value>2月</value></data>
   <data name="Dialog.Month.Mar" xml:space="preserve"><value>3月</value></data>
@@ -419,26 +407,22 @@
   <data name="Dialog.Month.Oct" xml:space="preserve"><value>10月</value></data>
   <data name="Dialog.Month.Nov" xml:space="preserve"><value>11月</value></data>
   <data name="Dialog.Month.Dec" xml:space="preserve"><value>12月</value></data>
-
   <data name="Dialog.Week.First" xml:space="preserve"><value>第1</value></data>
   <data name="Dialog.Week.Second" xml:space="preserve"><value>第2</value></data>
   <data name="Dialog.Week.Third" xml:space="preserve"><value>第3</value></data>
   <data name="Dialog.Week.Fourth" xml:space="preserve"><value>第4</value></data>
   <data name="Dialog.Week.Last" xml:space="preserve"><value>最終</value></data>
-
   <data name="Dialog.TriggerOn" xml:space="preserve"><value>トリガー条件</value></data>
   <data name="Dialog.Sess.Lock" xml:space="preserve"><value>ワークステーションのロック</value></data>
   <data name="Dialog.Sess.Unlock" xml:space="preserve"><value>ワークステーションのアンロック</value></data>
   <data name="Dialog.Sess.RdpConnect" xml:space="preserve"><value>リモートデスクトップ接続</value></data>
   <data name="Dialog.Sess.RdpDisconnect" xml:space="preserve"><value>リモートデスクトップ切断</value></data>
   <data name="Dialog.Expire" xml:space="preserve"><value>有効期限:</value></data>
-
   <data name="Dialog.Action.RunProg" xml:space="preserve"><value>プログラムの開始</value></data>
   <data name="Dialog.Action.Email" xml:space="preserve"><value>電子メールの送信</value></data>
   <data name="Dialog.Action.Notif" xml:space="preserve"><value>メッセージの表示</value></data>
   <data name="Dialog.Browse" xml:space="preserve"><value>参照...</value></data>
   <data name="Dialog.RunPrefix" xml:space="preserve"><value>実行:</value></data>
-
   <data name="Dialog.Time.5m" xml:space="preserve"><value>5分</value></data>
   <data name="Dialog.Time.10m" xml:space="preserve"><value>10分</value></data>
   <data name="Dialog.Time.15m" xml:space="preserve"><value>15分</value></data>
@@ -454,23 +438,19 @@
   <data name="Dialog.Time.2d" xml:space="preserve"><value>2日</value></data>
   <data name="Dialog.Time.3d" xml:space="preserve"><value>3日</value></data>
   <data name="Dialog.Time.5d" xml:space="preserve"><value>5日</value></data>
-
   <data name="Dialog.Pri.Realtime" xml:space="preserve"><value>リアルタイム</value></data>
   <data name="Dialog.Pri.High" xml:space="preserve"><value>高</value></data>
   <data name="Dialog.Pri.AboveNormal" xml:space="preserve"><value>通常以上</value></data>
   <data name="Dialog.Pri.Normal" xml:space="preserve"><value>通常</value></data>
   <data name="Dialog.Pri.BelowNormal" xml:space="preserve"><value>通常以下 (Windows の既定)</value></data>
   <data name="Dialog.Pri.Idle" xml:space="preserve"><value>アイドル</value></data>
-
   <data name="Dialog.NetAdmin.Title" xml:space="preserve"><value>管理者権限が必要です</value></data>
   <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>特定のネットワークの選択には、アプリを管理者として実行する必要があります。</value></data>
   <data name="Dialog.SysWarn.Title" xml:space="preserve"><value>管理者権限が必要です</value></data>
   <data name="Dialog.SysWarn.Msg" xml:space="preserve"><value>SYSTEM として実行するタスクを作成するには、このアプリケーションを管理者権限で実行する必要があります。アプリを右クリックして「管理者として実行」を選択してください。</value></data>
-
   <data name="Settings.Theme.Light" xml:space="preserve"><value>ライト</value></data>
   <data name="Settings.Theme.Dark" xml:space="preserve"><value>ダーク</value></data>
   <data name="Settings.Theme.System" xml:space="preserve"><value>システム設定に従う</value></data>
-
   <data name="Settings.Lead.1m" xml:space="preserve"><value>1分前</value></data>
   <data name="Settings.Lead.5m" xml:space="preserve"><value>5分前</value></data>
   <data name="Settings.Lead.10m" xml:space="preserve"><value>10分前</value></data>
@@ -529,7 +509,7 @@
   <data name="Snooze.Dialog.Title" xml:space="preserve"><value>すべてのタスクをスヌーズ</value></data>
   <data name="Snooze.Dialog.Confirm" xml:space="preserve"><value>スヌーズ</value></data>
   <data name="Snooze.Dialog.ActiveTitle" xml:space="preserve"><value>グローバルスヌーズが有効です</value></data>
-  <data name="Snooze.Dialog.Intro" xml:space="preserve"><value>スヌーズ中は、連結されたパイプラインの実行を含め、FluentTaskScheduler はタスクを一切開始しません。</value></data>
+  <data name="Snooze.Dialog.Intro" xml:space="preserve"><value>すべてのタスクをスヌーズしている間、FluentTaskScheduler はどのタスクも開始しません。完了時アクションによる開始も行いません。</value></data>
   <data name="Snooze.SuspendTriggers" xml:space="preserve"><value>スケジュールされたトリガーも一時停止する</value></data>
   <data name="Snooze.SuspendTriggersHint" xml:space="preserve"><value>タスクスケジューラの API を通じて有効なすべてのタスクを無効化し、スヌーズが終了すると該当するタスクだけを再度有効化します。保護されたシステムタスクはスキップされます。</value></data>
   <data name="Snooze.Banner.Suspended" xml:space="preserve"><value>スケジュールされたトリガーは一時停止され、手動実行はブロックされます。スヌーズが終了するとタスクは再度有効化されます。</value></data>
@@ -547,7 +527,7 @@
   <data name="Pipeline.Dialog.Title" xml:space="preserve"><value>完了時アクション（タスクパイプライン）</value></data>
   <data name="Pipeline.Info.Title" xml:space="preserve"><value>連結の仕組み</value></data>
   <data name="Pipeline.Info.Message" xml:space="preserve"><value>このタスクが完了すると、FluentTaskScheduler は Windows タスクスケジューラのイベントログからアクションの終了コードを読み取ります。終了コード 0 の場合は成功時タスクを、それ以外のコードの場合は失敗時タスクを開始します。連結されたタスクを開始するにはアプリが実行中である必要があり、グローバルスヌーズが有効な間は連結がスキップされます。</value></data>
-  <data name="Pipeline.EnableSwitch" xml:space="preserve"><value>このタスクが完了したら後続タスクを開始する</value></data>
+  <data name="Pipeline.EnableSwitch" xml:space="preserve"><value>このタスクが終了したら他のタスクを開始する</value></data>
   <data name="Pipeline.OnSuccess" xml:space="preserve"><value>成功時（終了コード 0）</value></data>
   <data name="Pipeline.OnFailure" xml:space="preserve"><value>失敗時（0 以外の終了コード）</value></data>
   <data name="Pipeline.Add" xml:space="preserve"><value>追加</value></data>
@@ -562,9 +542,8 @@
   <data name="Pipeline.Warning.BothLists" xml:space="preserve"><value>「{0}」は成功時・失敗時の両方で実行されるようになりました。完了のたびに開始されます。</value></data>
   <data name="Pipeline.Warning.NoTargets" xml:space="preserve"><value>後続タスクを1つ以上追加するか、スイッチをオフにしてください。</value></data>
   <data name="Pipeline.Error.Open" xml:space="preserve"><value>完了時アクションを開けませんでした: </value></data>
-  <data name="Pipeline.Toast.Title" xml:space="preserve"><value>パイプライン: {0} を開始しました</value></data>
-  <data name="Pipeline.Toast.OnSuccess" xml:space="preserve"><value>「{0}」が正常に完了したためトリガーされました。</value></data>
-  <data name="Pipeline.Toast.OnFailure" xml:space="preserve"><value>「{0}」が失敗したためトリガーされました。</value></data>
+  <data name="Pipeline.Toast.OnSuccess" xml:space="preserve"><value>「{0}」が成功したため、完了時アクションによって開始されました。</value></data>
+  <data name="Pipeline.Toast.OnFailure" xml:space="preserve"><value>「{0}」が失敗したため、完了時アクションによって開始されました。</value></data>
   <data name="Dashboard.HealthCaption" xml:space="preserve"><value>過去7日間に終了した実行のうち、成功した実行の割合。停止した実行は含みません。</value></data>
   <data name="Dashboard.Throughput" xml:space="preserve"><value>実行回数</value></data>
   <data name="Dashboard.Runs24h" xml:space="preserve"><value>過去24時間</value></data>
@@ -626,8 +605,8 @@
   <data name="Templates.RecycleBin.Note" xml:space="preserve"><value>ごみ箱を空にすると、削除された項目は復元できなくなります。</value></data>
   <data name="Dialog.Common.On" xml:space="preserve"><value>オン</value></data>
   <data name="Dialog.Common.Off" xml:space="preserve"><value>オフ</value></data>
-  <data name="Settings.Sys.Pipelines.Title" xml:space="preserve"><value>タスクパイプライン</value></data>
-  <data name="Settings.Sys.Pipelines.Desc" xml:space="preserve"><value>タスクスケジューラのイベントログを監視し、タスクの完了時アクションで設定された後続タスクを開始します。</value></data>
+  <data name="Settings.Sys.Pipelines.Title" xml:space="preserve"><value>完了時アクション</value></data>
+  <data name="Settings.Sys.Pipelines.Desc" xml:space="preserve"><value>タスクが成功または失敗したときに、そのタスクの完了時アクションで指定したタスクを開始します。アプリの実行中で、Windows がタスクの履歴を記録している場合に動作します。</value></data>
   <data name="Main.Nav.Library" xml:space="preserve"><value>ライブラリ</value></data>
   <data name="Main.Header.Library" xml:space="preserve"><value>ライブラリ</value></data>
   <data name="Main.Status.All" xml:space="preserve"><value>すべての状態</value></data>
@@ -640,11 +619,11 @@
   <data name="Library.Subtitle" xml:space="preserve"><value>用意されたスケジュール済みタスクを展開するか、保存済みのコマンドを新しいタスクのアクションとして再利用します。タスクエディターで保存するまで何も作成されません。</value></data>
   <data name="Library.Section.Templates" xml:space="preserve"><value>タスクテンプレート</value></data>
   <data name="Library.Section.Scripts" xml:space="preserve"><value>スクリプト</value></data>
-  <data name="Pipeline.EnableSubtitle" xml:space="preserve"><value>オフにすると、設定内容は保持されたまま動作しなくなります。</value></data>
+  <data name="Pipeline.EnableSubtitle" xml:space="preserve"><value>完了時アクションは、アプリの実行中で、Windows がタスクの履歴を記録している場合に動作します。オフにすると、一覧はそのまま保持され、タスクは開始されなくなります。</value></data>
   <data name="Pipeline.SuccessHeader" xml:space="preserve"><value>成功時</value></data>
-  <data name="Pipeline.SuccessHint" xml:space="preserve"><value>アクションが終了コード 0 で終了したときに開始されます。</value></data>
+  <data name="Pipeline.SuccessHint" xml:space="preserve"><value>実行が成功したとき (すべての操作が終了コード 0 で終了したとき) に開始されます。</value></data>
   <data name="Pipeline.FailureHeader" xml:space="preserve"><value>失敗時</value></data>
-  <data name="Pipeline.FailureHint" xml:space="preserve"><value>0 以外の終了コードのとき、またはアクションを起動できなかったときに開始されます。</value></data>
+  <data name="Pipeline.FailureHint" xml:space="preserve"><value>実行が失敗した、開始できなかった、時間切れになった、または停止されたときに開始されます。</value></data>
   <data name="EventLevel.Critical" xml:space="preserve"><value>重大</value></data>
   <data name="EventLevel.Error" xml:space="preserve"><value>エラー</value></data>
   <data name="EventLevel.Warning" xml:space="preserve"><value>警告</value></data>
@@ -728,8 +707,6 @@
   <data name="Library.Search.Placeholder" xml:space="preserve"><value>検索...</value></data>
   <data name="Library.Search.NoTemplates" xml:space="preserve"><value>検索条件に一致するテンプレートがありません。</value></data>
   <data name="Library.Search.NoScripts" xml:space="preserve"><value>検索条件に一致するスクリプトがありません。</value></data>
-
-  <!-- Added while closing localization gaps found during the S3 audit pass (3.2) -->
   <data name="App.WindowTitleSuffixFormat" xml:space="preserve"><value>ウィンドウ {0}</value></data>
   <data name="Dashboard.ProcessActive" xml:space="preserve"><value>プロセス実行中 (PID {0})</value></data>
   <data name="Dashboard.ProcessNotFound" xml:space="preserve"><value>プロセスが見つかりません</value></data>
@@ -1050,7 +1027,7 @@
   <data name="Tour.History.Title" xml:space="preserve"><value>実行結果を確認する</value></data>
   <data name="Tour.History.Body" xml:space="preserve"><value>タスクを選択すると、いつ実行されたか、成功したかどうか、現在実行中かどうかを確認できます。ダッシュボードでは、すべてのタスクの状況をまとめて確認できます。</value></data>
   <data name="Tour.Automation.Title" xml:space="preserve"><value>タスクの連結と一時停止</value></data>
-  <data name="Tour.Automation.Body" xml:space="preserve"><value>完了時アクションを設定すると、タスクが成功または失敗したときに他のタスクを開始できます。少し休みたいときは、1 つのタスクまたはすべてのタスクをスヌーズできます。一定時間、次の再起動まで、または再開するまでのいずれかを選べます。どちらもアプリの実行中に動作します。アプリはシステムトレイでも実行されます。</value></data>
+  <data name="Tour.Automation.Body" xml:space="preserve"><value>完了時アクションを設定すると、タスクが成功または失敗したときに他のタスクを開始できます。少し休みたいときは、1 つのタスクまたはすべてのタスクをスヌーズできます。一定時間、再起動またはサインアウトまで、または再開するまでのいずれかを選べます。どちらもアプリの実行中に動作し、アプリがシステムトレイにあるだけの状態でも動作します。完了時アクションには、Windows がタスクの履歴を記録していることも必要です。</value></data>
   <data name="Tour.Library.Title" xml:space="preserve"><value>テンプレートから始める</value></data>
   <data name="Tour.Library.Body" xml:space="preserve"><value>ライブラリには、よく使う作業向けの用意済みタスクがあり、自分のスクリプトも保存できます。クイックアクションでは、日常的なメンテナンスをワンクリックで実行できます。</value></data>
   <data name="Tour.Admin.Title" xml:space="preserve"><value>管理者権限が必要なタスク</value></data>

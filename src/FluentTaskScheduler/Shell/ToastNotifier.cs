@@ -34,7 +34,7 @@ internal sealed class ToastNotifier(ISettingsStore settings) : INotifier
     public void SnoozeEnded() => Show(Loc.Get("Snooze.Toast.Ended.Title"), Loc.Get("Snooze.Toast.Ended.Body"));
 
     public void CompletionActionStarted(string finishedTask, string startedTask, bool afterSuccess) =>
-        Show(Loc.Format("Pipeline.Toast.Title", startedTask),
+        Show(Loc.Format("Toast.TaskStarted.Title", startedTask),
              Loc.Format(afterSuccess ? "Pipeline.Toast.OnSuccess" : "Pipeline.Toast.OnFailure", finishedTask));
 
     public void TaskRunsSoon(string taskName, int minutes) =>
