@@ -349,10 +349,9 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.Priority" xml:space="preserve"><value>Aufgabenpriorität:</value></data>
   <data name="Dialog.RestartUpTo" xml:space="preserve"><value>Neustart versuchen bis zu:</value></data>
   <data name="Dialog.RestartTimes" xml:space="preserve"><value>Mal</value></data>
-  <data name="Dialog.UserContext" xml:space="preserve"><value>Benutzerkontext</value></data>
   <data name="Dialog.RunAsCurrent" xml:space="preserve"><value>Als aktueller Benutzer ausführen</value></data>
   <data name="Dialog.RunAsSpecific" xml:space="preserve"><value>Als bestimmter Benutzer ausführen</value></data>
-  <data name="Dialog.RunAsSystem" xml:space="preserve"><value>Als SYSTEM ausführen (Admin erforderlich)</value></data>
+  <data name="Dialog.RunAsSystem" xml:space="preserve"><value>Als SYSTEM ausführen (Administratorrechte erforderlich)</value></data>
   <data name="Trigger.At" xml:space="preserve"><value>um</value></data>
   <data name="Trigger.OnIdle" xml:space="preserve"><value>Bei Leerlauf</value></data>
   <data name="Trigger.AtLogon" xml:space="preserve"><value>Bei Anmeldung</value></data>
@@ -444,8 +443,8 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.Pri.Normal" xml:space="preserve"><value>Normal</value></data>
   <data name="Dialog.Pri.BelowNormal" xml:space="preserve"><value>Niedriger als normal (Windows-Standard)</value></data>
   <data name="Dialog.Pri.Idle" xml:space="preserve"><value>Leerlauf</value></data>
-  <data name="Dialog.NetAdmin.Title" xml:space="preserve"><value>Administrator erforderlich</value></data>
-  <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>Die Auswahl eines spezifischen Netzwerks erfordert, dass die App als Administrator ausgeführt wird.</value></data>
+  <data name="Dialog.NetAdmin.Title" xml:space="preserve"><value>Administratorrechte erforderlich</value></data>
+  <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>Windows zeigt die bekannten Netzwerke nur Administratoren. Starte die App als Administrator neu, um eines davon zu wählen.</value></data>
   <data name="Dialog.SysWarn.Title" xml:space="preserve"><value>Administratorrechte erforderlich</value></data>
   <data name="Dialog.SysWarn.Msg" xml:space="preserve"><value>Um Aufgaben zu erstellen, die als SYSTEM ausgeführt werden, muss diese Anwendung mit Administratorrechten ausgeführt werden. Rechtsklick auf die App und 'Als Administrator ausführen' wählen.</value></data>
   <data name="Settings.Theme.Light" xml:space="preserve"><value>Hell</value></data>
@@ -570,7 +569,7 @@ Jetzt App neustarten?</value></data>
   <data name="Templates.Title" xml:space="preserve"><value>Aufgabenvorlagen-Bibliothek</value></data>
   <data name="Templates.Subtitle" xml:space="preserve"><value>Einsatzbereite Vorlagen für gängige Automatisierungsaufgaben. Das Bereitstellen einer Vorlage öffnet den Aufgaben-Editor vorausgefüllt mit Befehl, Argumenten und einem empfohlenen Zeitplan.</value></data>
   <data name="Templates.Info.Title" xml:space="preserve"><value>Es wird erst etwas erstellt, wenn du speicherst</value></data>
-  <data name="Templates.Info.Message" xml:space="preserve"><value>Überprüfe Befehl, Argumente und Auslöser im Editor, bevor du speicherst - einige Vorlagen löschen Dateien oder ändern den Systemzustand, manche benötigen Administratorrechte.</value></data>
+  <data name="Templates.Info.Message" xml:space="preserve"><value>Überprüfe Befehl, Argumente und Trigger im Editor, bevor du speicherst: Einige Vorlagen löschen Dateien oder ändern Systemeinstellungen, manche benötigen Administratorrechte.</value></data>
   <data name="Templates.Deploy" xml:space="preserve"><value>Vorlage bereitstellen...</value></data>
   <data name="Templates.Error.Deploy" xml:space="preserve"><value>Diese Vorlage konnte nicht geöffnet werden: </value></data>
   <data name="Templates.Group.Maintenance" xml:space="preserve"><value>Systemwartung</value></data>
@@ -841,7 +840,7 @@ Jetzt App neustarten?</value></data>
   <data name="Editor.Account.Keep" xml:space="preserve"><value>Weiter als {0} ausführen</value></data>
   <data name="Editor.Account.Password" xml:space="preserve"><value>Kennwort</value></data>
   <data name="Editor.Account.PasswordHint" xml:space="preserve"><value>Windows speichert für diese Aufgabe ein Kennwort und fragt es bei jeder Änderung erneut ab.</value></data>
-  <data name="Editor.NeedsElevation" xml:space="preserve"><value>Zum Speichern sind Administratorrechte nötig. Starte die App zuerst als Administrator neu.</value></data>
+  <data name="Editor.NeedsElevation" xml:space="preserve"><value>Dafür sind Administratorrechte nötig. Starte die App zuerst als Administrator neu.</value></data>
   <data name="Editor.AllFiles" xml:space="preserve"><value>Alle Dateien</value></data>
   <data name="Editor.CompletionActions.Add" xml:space="preserve"><value>Hinzufügen</value></data>
   <data name="Editor.CompletionActions.Remove" xml:space="preserve"><value>Entfernen</value></data>
@@ -954,7 +953,6 @@ Jetzt App neustarten?</value></data>
   <data name="SystemEvent.Logoff" xml:space="preserve"><value>Ein Benutzer hat sich abgemeldet</value></data>
   <data name="Elevation.Required" xml:space="preserve"><value>Erfordert Administratorrechte</value></data>
   <data name="QuickActions.NotElevated" xml:space="preserve"><value>Die App läuft ohne Administratorrechte, daher sind einige Aktionen nicht verfügbar.</value></data>
-  <data name="QuickActions.RestartElevated" xml:space="preserve"><value>Als Administrator neu starten</value></data>
   <data name="QuickActions.Status.ExitCode" xml:space="preserve"><value>Fehlgeschlagen (Exitcode {0})</value></data>
   <data name="QuickActions.Status.Cancelled" xml:space="preserve"><value>Abgebrochen</value></data>
   <data name="QuickActions.ClearTemp.Confirm" xml:space="preserve"><value>Alles in deinem Temp-Ordner löschen? Dateien, die in Verwendung sind, werden übersprungen.</value></data>
@@ -1102,4 +1100,5 @@ Jetzt App neustarten?</value></data>
   <data name="Clipboard.Busy" xml:space="preserve"><value>Es wurde nichts kopiert: Ein anderes Programm verwendet gerade die Zwischenablage. Versuche es gleich noch einmal.</value></data>
   <data name="QuickActions.RunFormat" xml:space="preserve"><value>„{0}“ ausführen</value></data>
   <data name="QuickActions.CancelFormat" xml:space="preserve"><value>„{0}“ abbrechen</value></data>
+  <data name="Import.Account.System" xml:space="preserve"><value>SYSTEM (Administratorrechte erforderlich)</value></data>
 </root>

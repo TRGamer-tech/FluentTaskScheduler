@@ -348,10 +348,9 @@ Restart now to apply the update?</value></data>
   <data name="Dialog.Priority" xml:space="preserve"><value>Task Priority:</value></data>
   <data name="Dialog.RestartUpTo" xml:space="preserve"><value>Attempt to restart up to:</value></data>
   <data name="Dialog.RestartTimes" xml:space="preserve"><value>times</value></data>
-  <data name="Dialog.UserContext" xml:space="preserve"><value>User Context</value></data>
   <data name="Dialog.RunAsCurrent" xml:space="preserve"><value>Run as current user</value></data>
   <data name="Dialog.RunAsSpecific" xml:space="preserve"><value>Run as specific user</value></data>
-  <data name="Dialog.RunAsSystem" xml:space="preserve"><value>Run as SYSTEM (requires admin)</value></data>
+  <data name="Dialog.RunAsSystem" xml:space="preserve"><value>Run as SYSTEM (needs administrator rights)</value></data>
   <data name="Trigger.At" xml:space="preserve"><value>at</value></data>
   <data name="Trigger.OnIdle" xml:space="preserve"><value>On Idle</value></data>
   <data name="Trigger.AtLogon" xml:space="preserve"><value>At Logon</value></data>
@@ -443,8 +442,8 @@ Restart now to apply the update?</value></data>
   <data name="Dialog.Pri.Normal" xml:space="preserve"><value>Normal</value></data>
   <data name="Dialog.Pri.BelowNormal" xml:space="preserve"><value>Below normal (Windows default)</value></data>
   <data name="Dialog.Pri.Idle" xml:space="preserve"><value>Idle</value></data>
-  <data name="Dialog.NetAdmin.Title" xml:space="preserve"><value>Administrator required</value></data>
-  <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>Specific network selection requires the app to run as administrator.</value></data>
+  <data name="Dialog.NetAdmin.Title" xml:space="preserve"><value>Administrator rights needed</value></data>
+  <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>Windows lists the known networks only to an administrator. Restart the app as administrator to choose one.</value></data>
   <data name="Dialog.SysWarn.Title" xml:space="preserve"><value>Administrator Privileges Required</value></data>
   <data name="Dialog.SysWarn.Msg" xml:space="preserve"><value>To create tasks that run as SYSTEM, this application must be running with administrator privileges. Right-click the app and select "Run as administrator".</value></data>
   <data name="Settings.Theme.Light" xml:space="preserve"><value>Light</value></data>
@@ -569,7 +568,7 @@ Restart now to apply the update?</value></data>
   <data name="Templates.Title" xml:space="preserve"><value>Task Template Library</value></data>
   <data name="Templates.Subtitle" xml:space="preserve"><value>Production-ready presets for common automation jobs. Deploying a template opens the task editor pre-filled with the command, arguments and a recommended schedule.</value></data>
   <data name="Templates.Info.Title" xml:space="preserve"><value>Nothing is created until you save</value></data>
-  <data name="Templates.Info.Message" xml:space="preserve"><value>Review the command, arguments and trigger in the editor before saving - several templates delete files or change system state, and some need administrator privileges.</value></data>
+  <data name="Templates.Info.Message" xml:space="preserve"><value>Review the command, arguments and trigger in the editor before saving: several templates delete files or change system settings, and some need administrator rights.</value></data>
   <data name="Templates.Deploy" xml:space="preserve"><value>Deploy Template...</value></data>
   <data name="Templates.Error.Deploy" xml:space="preserve"><value>Could not open this template: </value></data>
   <data name="Templates.Group.Maintenance" xml:space="preserve"><value>System Maintenance</value></data>
@@ -841,7 +840,7 @@ Restart now to apply the update?</value></data>
   <data name="Editor.Account.Keep" xml:space="preserve"><value>Keep running as {0}</value></data>
   <data name="Editor.Account.Password" xml:space="preserve"><value>Password</value></data>
   <data name="Editor.Account.PasswordHint" xml:space="preserve"><value>Windows stores a password for this task and asks for it again whenever the task is changed.</value></data>
-  <data name="Editor.NeedsElevation" xml:space="preserve"><value>Saving this needs administrator rights. Restart the app as administrator first.</value></data>
+  <data name="Editor.NeedsElevation" xml:space="preserve"><value>This needs administrator rights. Restart the app as administrator first.</value></data>
   <data name="Editor.AllFiles" xml:space="preserve"><value>All files</value></data>
   <data name="Editor.CompletionActions.Add" xml:space="preserve"><value>Add</value></data>
   <data name="Editor.CompletionActions.Remove" xml:space="preserve"><value>Remove</value></data>
@@ -954,7 +953,6 @@ Restart now to apply the update?</value></data>
   <data name="SystemEvent.Logoff" xml:space="preserve"><value>A user logged off</value></data>
   <data name="Elevation.Required" xml:space="preserve"><value>Requires administrator rights</value></data>
   <data name="QuickActions.NotElevated" xml:space="preserve"><value>The app is running without administrator rights, so some actions are unavailable.</value></data>
-  <data name="QuickActions.RestartElevated" xml:space="preserve"><value>Restart as Administrator</value></data>
   <data name="QuickActions.Status.ExitCode" xml:space="preserve"><value>Failed (exit code {0})</value></data>
   <data name="QuickActions.Status.Cancelled" xml:space="preserve"><value>Stopped</value></data>
   <data name="QuickActions.ClearTemp.Confirm" xml:space="preserve"><value>Delete everything in your temp folder? Files that are in use are skipped.</value></data>
@@ -1102,5 +1100,6 @@ Restart now to apply the update?</value></data>
   <data name="Clipboard.Busy" xml:space="preserve"><value>Nothing was copied: another program is using the clipboard. Try again in a moment.</value></data>
   <data name="QuickActions.RunFormat" xml:space="preserve"><value>Run {0}</value></data>
   <data name="QuickActions.CancelFormat" xml:space="preserve"><value>Cancel {0}</value></data>
+  <data name="Import.Account.System" xml:space="preserve"><value>SYSTEM (needs administrator rights)</value></data>
 </root>
 

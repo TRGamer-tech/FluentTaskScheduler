@@ -350,7 +350,6 @@
   <data name="Dialog.Priority" xml:space="preserve"><value>任务优先级：</value></data>
   <data name="Dialog.RestartUpTo" xml:space="preserve"><value>尝试重启最多：</value></data>
   <data name="Dialog.RestartTimes" xml:space="preserve"><value>次</value></data>
-  <data name="Dialog.UserContext" xml:space="preserve"><value>用户上下文</value></data>
   <data name="Dialog.RunAsCurrent" xml:space="preserve"><value>以当前用户身份运行</value></data>
   <data name="Dialog.RunAsSpecific" xml:space="preserve"><value>以指定用户身份运行</value></data>
   <data name="Dialog.RunAsSystem" xml:space="preserve"><value>以 SYSTEM 身份运行（需要管理员权限）</value></data>
@@ -446,7 +445,7 @@
   <data name="Dialog.Pri.BelowNormal" xml:space="preserve"><value>低于正常（Windows 默认）</value></data>
   <data name="Dialog.Pri.Idle" xml:space="preserve"><value>空闲</value></data>
   <data name="Dialog.NetAdmin.Title" xml:space="preserve"><value>需要管理员权限</value></data>
-  <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>选择特定网络需要以管理员身份运行应用程序。</value></data>
+  <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>Windows 仅向管理员列出已知网络。要选择网络，请以管理员身份重新启动应用。</value></data>
   <data name="Dialog.SysWarn.Title" xml:space="preserve"><value>需要管理员权限</value></data>
   <data name="Dialog.SysWarn.Msg" xml:space="preserve"><value>要创建以 SYSTEM 身份运行的任务，必须以管理员权限运行此应用程序。请右键单击该应用并选择“以管理员身份运行”。</value></data>
   <data name="Settings.Theme.Light" xml:space="preserve"><value>浅色</value></data>
@@ -571,7 +570,7 @@
   <data name="Templates.Title" xml:space="preserve"><value>任务模板库</value></data>
   <data name="Templates.Subtitle" xml:space="preserve"><value>适用于常见自动化工作的现成预设。部署模板会打开任务编辑器，并预先填入命令、参数和推荐的计划。</value></data>
   <data name="Templates.Info.Title" xml:space="preserve"><value>保存前不会创建任何内容</value></data>
-  <data name="Templates.Info.Message" xml:space="preserve"><value>保存前请在编辑器中检查命令、参数和触发器：部分模板会删除文件或更改系统状态，某些还需要管理员权限。</value></data>
+  <data name="Templates.Info.Message" xml:space="preserve"><value>保存前请在编辑器中检查命令、参数和触发器：部分模板会删除文件或更改系统设置，某些还需要管理员权限。</value></data>
   <data name="Templates.Deploy" xml:space="preserve"><value>部署模板...</value></data>
   <data name="Templates.Error.Deploy" xml:space="preserve"><value>无法打开此模板：</value></data>
   <data name="Templates.Group.Maintenance" xml:space="preserve"><value>系统维护</value></data>
@@ -842,7 +841,7 @@
   <data name="Editor.Account.Keep" xml:space="preserve"><value>继续以 {0} 身份运行</value></data>
   <data name="Editor.Account.Password" xml:space="preserve"><value>密码</value></data>
   <data name="Editor.Account.PasswordHint" xml:space="preserve"><value>Windows 为此任务保存了密码，每次更改任务时都会要求重新输入。</value></data>
-  <data name="Editor.NeedsElevation" xml:space="preserve"><value>保存此设置需要管理员权限。请先以管理员身份重新启动应用。</value></data>
+  <data name="Editor.NeedsElevation" xml:space="preserve"><value>此操作需要管理员权限。请先以管理员身份重新启动应用。</value></data>
   <data name="Editor.AllFiles" xml:space="preserve"><value>所有文件</value></data>
   <data name="Editor.CompletionActions.Add" xml:space="preserve"><value>添加</value></data>
   <data name="Editor.CompletionActions.Remove" xml:space="preserve"><value>删除</value></data>
@@ -955,7 +954,6 @@
   <data name="SystemEvent.Logoff" xml:space="preserve"><value>用户已注销</value></data>
   <data name="Elevation.Required" xml:space="preserve"><value>需要管理员权限</value></data>
   <data name="QuickActions.NotElevated" xml:space="preserve"><value>应用正在以非管理员权限运行，因此部分操作不可用。</value></data>
-  <data name="QuickActions.RestartElevated" xml:space="preserve"><value>以管理员身份重新启动</value></data>
   <data name="QuickActions.Status.ExitCode" xml:space="preserve"><value>失败（退出代码 {0}）</value></data>
   <data name="QuickActions.Status.Cancelled" xml:space="preserve"><value>已停止</value></data>
   <data name="QuickActions.ClearTemp.Confirm" xml:space="preserve"><value>要删除临时文件夹中的所有内容吗？正在使用的文件将被跳过。</value></data>
@@ -1103,6 +1101,7 @@
   <data name="Clipboard.Busy" xml:space="preserve"><value>未能复制：另一个程序正在使用剪贴板。请稍后重试。</value></data>
   <data name="QuickActions.RunFormat" xml:space="preserve"><value>运行“{0}”</value></data>
   <data name="QuickActions.CancelFormat" xml:space="preserve"><value>取消“{0}”</value></data>
+  <data name="Import.Account.System" xml:space="preserve"><value>SYSTEM（需要管理员权限）</value></data>
 </root>
 
 

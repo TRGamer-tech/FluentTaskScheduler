@@ -252,7 +252,7 @@
                 </Expander>
 
                 <!-- Account -->
-                <Expander x:Name="EditorAccount" Header="{x:Bind l:Loc.Get('Dialog.UserContext')}"
+                <Expander x:Name="EditorAccount" Header="{x:Bind l:Loc.Get('Editor.Section.Account')}"
                           HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
                     <StackPanel Spacing="8">
                         <RadioButtons x:Name="EditorAccountOptions" ItemsSource="{x:Bind ViewModel.AccountOptions}"

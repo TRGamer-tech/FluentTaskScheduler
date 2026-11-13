@@ -36,7 +36,7 @@ public sealed partial class ImportTaskViewModel : ObservableObject
         [
             Loc.Format("Import.Account.Keep", AccountName),
             Loc.Format("Import.Account.Me", Environment.UserName),
-            Loc.Get("Dialog.RunAsSystem")
+            Loc.Get("Import.Account.System")
         ];
         // An account that does not exist here cannot run anything; the importing user is the sensible default.
         _accountIndex = info.AccountExistsHere ? AsExported : AsCurrentUser;

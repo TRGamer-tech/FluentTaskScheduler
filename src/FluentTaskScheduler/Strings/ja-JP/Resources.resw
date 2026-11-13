@@ -349,7 +349,6 @@
   <data name="Dialog.Priority" xml:space="preserve"><value>タスクの優先度:</value></data>
   <data name="Dialog.RestartUpTo" xml:space="preserve"><value>再起動の試行回数:</value></data>
   <data name="Dialog.RestartTimes" xml:space="preserve"><value>回</value></data>
-  <data name="Dialog.UserContext" xml:space="preserve"><value>ユーザーコンテキスト</value></data>
   <data name="Dialog.RunAsCurrent" xml:space="preserve"><value>現在のユーザーとして実行</value></data>
   <data name="Dialog.RunAsSpecific" xml:space="preserve"><value>特定のユーザーとして実行</value></data>
   <data name="Dialog.RunAsSystem" xml:space="preserve"><value>SYSTEM として実行 (管理者権限が必要)</value></data>
@@ -445,7 +444,7 @@
   <data name="Dialog.Pri.BelowNormal" xml:space="preserve"><value>通常以下 (Windows の既定)</value></data>
   <data name="Dialog.Pri.Idle" xml:space="preserve"><value>アイドル</value></data>
   <data name="Dialog.NetAdmin.Title" xml:space="preserve"><value>管理者権限が必要です</value></data>
-  <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>特定のネットワークの選択には、アプリを管理者として実行する必要があります。</value></data>
+  <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>Windows は既知のネットワークを管理者にのみ表示します。ネットワークを選択するには、アプリを管理者として再起動してください。</value></data>
   <data name="Dialog.SysWarn.Title" xml:space="preserve"><value>管理者権限が必要です</value></data>
   <data name="Dialog.SysWarn.Msg" xml:space="preserve"><value>SYSTEM として実行するタスクを作成するには、このアプリケーションを管理者権限で実行する必要があります。アプリを右クリックして「管理者として実行」を選択してください。</value></data>
   <data name="Settings.Theme.Light" xml:space="preserve"><value>ライト</value></data>
@@ -570,7 +569,7 @@
   <data name="Templates.Title" xml:space="preserve"><value>タスクテンプレートライブラリ</value></data>
   <data name="Templates.Subtitle" xml:space="preserve"><value>一般的な自動化作業向けの、すぐに使えるプリセットです。テンプレートを展開すると、コマンド・引数・推奨スケジュールが入力された状態でタスクエディターが開きます。</value></data>
   <data name="Templates.Info.Title" xml:space="preserve"><value>保存するまで何も作成されません</value></data>
-  <data name="Templates.Info.Message" xml:space="preserve"><value>保存する前にエディターでコマンド・引数・トリガーを確認してください。一部のテンプレートはファイルを削除したりシステム状態を変更したりします。管理者権限が必要なものもあります。</value></data>
+  <data name="Templates.Info.Message" xml:space="preserve"><value>保存する前に、エディターでコマンド、引数、トリガーを確認してください。一部のテンプレートはファイルを削除したりシステム設定を変更したりします。管理者権限が必要なものもあります。</value></data>
   <data name="Templates.Deploy" xml:space="preserve"><value>テンプレートを展開...</value></data>
   <data name="Templates.Error.Deploy" xml:space="preserve"><value>このテンプレートを開けませんでした: </value></data>
   <data name="Templates.Group.Maintenance" xml:space="preserve"><value>システムメンテナンス</value></data>
@@ -841,7 +840,7 @@
   <data name="Editor.Account.Keep" xml:space="preserve"><value>引き続き {0} として実行</value></data>
   <data name="Editor.Account.Password" xml:space="preserve"><value>パスワード</value></data>
   <data name="Editor.Account.PasswordHint" xml:space="preserve"><value>このタスクにはパスワードが保存されており、タスクを変更するたびに Windows が再入力を求めます。</value></data>
-  <data name="Editor.NeedsElevation" xml:space="preserve"><value>この設定を保存するには管理者権限が必要です。先にアプリを管理者として再起動してください。</value></data>
+  <data name="Editor.NeedsElevation" xml:space="preserve"><value>この操作には管理者権限が必要です。先にアプリを管理者として再起動してください。</value></data>
   <data name="Editor.AllFiles" xml:space="preserve"><value>すべてのファイル</value></data>
   <data name="Editor.CompletionActions.Add" xml:space="preserve"><value>追加</value></data>
   <data name="Editor.CompletionActions.Remove" xml:space="preserve"><value>削除</value></data>
@@ -954,7 +953,6 @@
   <data name="SystemEvent.Logoff" xml:space="preserve"><value>ユーザーがログオフしました</value></data>
   <data name="Elevation.Required" xml:space="preserve"><value>管理者権限が必要です</value></data>
   <data name="QuickActions.NotElevated" xml:space="preserve"><value>アプリが管理者権限なしで実行されているため、一部のアクションは利用できません。</value></data>
-  <data name="QuickActions.RestartElevated" xml:space="preserve"><value>管理者として再起動</value></data>
   <data name="QuickActions.Status.ExitCode" xml:space="preserve"><value>失敗 (終了コード {0})</value></data>
   <data name="QuickActions.Status.Cancelled" xml:space="preserve"><value>中止しました</value></data>
   <data name="QuickActions.ClearTemp.Confirm" xml:space="preserve"><value>一時フォルダー内のすべてのファイルを削除しますか？使用中のファイルはスキップされます。</value></data>
@@ -1102,4 +1100,5 @@
   <data name="Clipboard.Busy" xml:space="preserve"><value>コピーできませんでした。別のプログラムがクリップボードを使用しています。しばらくしてから、もう一度お試しください。</value></data>
   <data name="QuickActions.RunFormat" xml:space="preserve"><value>「{0}」を実行</value></data>
   <data name="QuickActions.CancelFormat" xml:space="preserve"><value>「{0}」をキャンセル</value></data>
+  <data name="Import.Account.System" xml:space="preserve"><value>SYSTEM (管理者権限が必要)</value></data>
 </root>

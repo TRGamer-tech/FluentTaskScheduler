@@ -17,7 +17,7 @@
                      Severity="Informational"
                      Message="{x:Bind l:Loc.Get('QuickActions.NotElevated')}">
                 <InfoBar.ActionButton>
-                    <Button Content="{x:Bind l:Loc.Get('QuickActions.RestartElevated')}"
+                    <Button Content="{x:Bind l:Loc.Get('Tasks.NotElevated.Restart')}"
                             Command="{x:Bind ViewModel.RestartAsAdministratorCommand}"
                             AutomationProperties.AutomationId="QuickActionsRestartElevated"/>
                 </InfoBar.ActionButton>
