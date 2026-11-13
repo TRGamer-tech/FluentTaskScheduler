@@ -321,6 +321,23 @@ public sealed class ScriptEditorViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task AScriptThatCannotBeSaved_IsReported_AndStaysUnsaved()
+    {
+        // The scripts folder cannot be made where a file of its name stands.
+        File.WriteAllText(_folder.Paths.ScriptsFolder, "a file where the folder should be");
+        _editor.Name = "Clock";
+        _editor.Text = "Get-Date";
+
+        await _editor.SaveCommand.ExecuteAsync(null);
+
+        Assert.Equal(["Error: ScriptEditor.Error.Save"], _prompts.Shown);
+        Assert.Empty(_store.GetScripts());
+        Assert.Empty(_editor.Output);
+        _prompts.Confirm = false;
+        Assert.False(await _editor.NewAsync());
+    }
+
+    [Fact]
     public async Task OpeningAScript_PutsItsNameDescriptionAndTextIntoTheEditor_AndSavingChangesThatScript()
     {
         LibraryScript script = _store.Save(null, "Clock", "Tells the time.", "Get-Date");
@@ -429,15 +446,20 @@ public sealed class ScriptEditorViewModelTests : IDisposable
     }
 
     [Fact]
-    public async Task Disposing_EndsARunningScript()
+    public async Task Disposing_EndsARunningScript_AndNothingMoreReachesTheOutput()
     {
-        _editor.Text = "Start-Sleep 600";
-        Task run = _editor.RunCommand.ExecuteAsync(null);
+        var ui = new BusyUiThread();
+        ScriptEditorViewModel editor = NewEditor(ui);
+        editor.Text = "Start-Sleep 600";
+        Task run = editor.RunCommand.ExecuteAsync(null);
+        _runner.Last.Writes("still going");
 
-        _editor.Dispose();
+        editor.Dispose();
         await run;
+        ui.RunPosted();
 
         Assert.True(_runner.Last.WasStopped);
         Assert.False(File.Exists(RunCopy));
+        Assert.Empty(editor.Output);
     }
 }

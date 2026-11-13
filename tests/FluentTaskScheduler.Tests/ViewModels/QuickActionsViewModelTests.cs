@@ -11,10 +11,11 @@ public sealed class QuickActionsViewModelTests
     private readonly FakeProcessRunner _runner = new();
     private readonly ScriptedPrompts _prompts = new();
 
-    private QuickActionsViewModel NewPage(bool elevated, FakeAppLifetime? lifetime = null) =>
-        new(_runner, lifetime ?? new FakeAppLifetime { IsElevated = elevated }, new InlineUiThread(), _prompts);
+    private QuickActionsViewModel NewPage(bool elevated, FakeAppLifetime? lifetime = null, IUiThread? ui = null) =>
+        new(_runner, lifetime ?? new FakeAppLifetime { IsElevated = elevated }, ui ?? new InlineUiThread(), _prompts);
 
-    private QuickActionViewModel Action(string id, bool elevated = true) => NewPage(elevated).Actions.Single(action => action.Id == id);
+    private QuickActionViewModel Action(string id, bool elevated = true, IUiThread? ui = null) =>
+        NewPage(elevated, ui: ui).Actions.Single(action => action.Id == id);
 
     [Fact]
     public void WithoutAdministratorRights_ActionsThatNeedThemCannotRun_AndARestartIsOffered()
@@ -87,6 +88,37 @@ public sealed class QuickActionsViewModelTests
         Assert.Equal(
             "Beginning verification phase of system scan.\nVerification 100% complete.\nWindows Resource Protection did not find any integrity violations.",
             action.Detail);
+    }
+
+    [Fact]
+    public async Task LinesThatArriveWhileTheUiThreadIsBusy_AreShownInOneGo_ByTheNewestOfThem()
+    {
+        var ui = new BusyUiThread();
+        QuickActionViewModel action = Action("FlushDNS", ui: ui);
+        Task run = action.RunCommand.ExecuteAsync(null);
+
+        _runner.Last.Writes("a").Writes("b").Writes("c");
+        Assert.Equal(1, ui.PostedCount);
+
+        ui.RunPosted();
+        Assert.Equal("c", action.Detail);
+
+        _runner.Last.Exits();
+        await run;
+    }
+
+    [Fact]
+    public async Task ALineThatReachesTheUiThreadOnlyAfterTheProgramEnded_LeavesTheFindingsAsTheyAre()
+    {
+        var ui = new BusyUiThread();
+        QuickActionViewModel action = Action("FlushDNS", ui: ui);
+        Task run = action.RunCommand.ExecuteAsync(null);
+
+        _runner.Last.Writes("a").Writes("b").Exits();
+        await run;
+        ui.RunPosted();
+
+        Assert.Equal((QuickActionState.Succeeded, "a\nb"), (action.State, action.Detail));
     }
 
     [Fact]
