@@ -54,8 +54,10 @@ public sealed class StartupFlow(
 
     private async Task OfferUpdateAsync()
     {
+        // Every window waits for the same check, and the first one that is still there when the
+        // check is done makes the offer: a window closed or built anew meanwhile leaves it to the others.
         if (await updates.CheckAfterStartAsync() is { Status: UpdateStatus.Ready } check && !_windowGone)
-            await updates.OfferRestartAsync(prompts, check.Version);
+            await updates.OfferRestartAsync(prompts, check);
     }
 
     private bool HasUnseenRelease => app.IsNewerThan(settings.Current.LastSeenVersion);

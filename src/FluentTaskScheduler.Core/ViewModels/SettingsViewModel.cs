@@ -316,7 +316,7 @@ public sealed partial class SettingsViewModel : ObservableObject, IDisposable
             UpdateStatus.Unavailable => Loc.Get("Settings.About.Update.Unavailable"),
             _ => Loc.Format("Settings.UpdateError.ContentFormat", check.Error)
         };
-        if (check.Status == UpdateStatus.Ready) await _updates.OfferRestartAsync(_prompts, check.Version);
+        if (check.Status == UpdateStatus.Ready) await _updates.OfferRestartAsync(_prompts, check);
     }
 
     [RelayCommand]

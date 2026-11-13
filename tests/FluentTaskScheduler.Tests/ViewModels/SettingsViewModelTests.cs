@@ -13,8 +13,10 @@ public sealed class SettingsViewModelTests : IDisposable
     private readonly SettingsStore _settings;
     private readonly FakeStartWithWindows _startup = new();
     private readonly AppLogging _logging;
+    private readonly AppInfo _app = new(new Version(2, 0, 0));
     private readonly FakeUpdater _updater = new();
     private readonly FakeAppLifetime _lifetime = new();
+    private readonly UpdateService _updates;
     private readonly FakeReleaseNotes _notes = new();
     private readonly RecordingWelcomeDialogs _dialogs = new();
     private readonly ScriptedFilePicker _files = new();
@@ -27,6 +29,7 @@ public sealed class SettingsViewModelTests : IDisposable
     {
         _settings = new SettingsStore(_folder.Paths);
         _logging = new AppLogging(_folder.Paths);
+        _updates = new UpdateService(_updater, _lifetime);
         _page = NewPage();
         _page.PropertyChanged += (_, e) => _changed.Add(e.PropertyName);
     }
@@ -40,8 +43,7 @@ public sealed class SettingsViewModelTests : IDisposable
     }
 
     private SettingsViewModel NewPage() => new(
-        _settings, _startup, _logging, _folder.Paths, new AppInfo(new Version(2, 0, 0)), new UpdateService(_updater, _lifetime),
-        _notes, _dialogs, _files, _prompts, _launcher, new InlineUiThread());
+        _settings, _startup, _logging, _folder.Paths, _app, _updates, _notes, _dialogs, _files, _prompts, _launcher, new InlineUiThread());
 
     private static readonly string[] SwitchNames =
     [
@@ -487,6 +489,25 @@ public sealed class SettingsViewModelTests : IDisposable
         await running;
 
         Assert.True(_page.CheckForUpdatesCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task CheckingForUpdates_WhileTheCheckAfterStartRuns_AsksAboutTheUpdateOnce()
+    {
+        _settings.Update(s => s with { HasCompletedOnboarding = true, LastSeenVersion = "2.0.0" });
+        _updater.Available = "2.1.0";
+        _prompts.Confirm = false;
+        var download = new TaskCompletionSource();
+        _updater.Hold = download;
+
+        Task afterStart = new StartupFlow(_settings, _app, _notes, _updates, _dialogs, _prompts).RunAsync();
+        Task byHand = _page.CheckForUpdatesCommand.ExecuteAsync(null);
+        download.SetResult();
+        await Task.WhenAll(afterStart, byHand);
+
+        Assert.StartsWith("Dialog.UpdateAvailable.Title", Assert.Single(_prompts.Shown));
+        Assert.Equal("Settings.About.Update.ReadyFormat", _page.UpdateMessage);
+        Assert.Equal(1, _updater.Checks);
     }
 
     [Fact]

@@ -213,4 +213,24 @@ public sealed class StartupFlowTests : IDisposable
 
         Assert.Empty(_prompts.Shown);
     }
+
+    [Fact]
+    public async Task AnUpdateReadyAfterTheWindowWasBuiltAnew_IsOfferedInTheNewContent()
+    {
+        HasUsedTheAppBefore("2.0.0");
+        _updater.Available = "2.1.0";
+        var download = new TaskCompletionSource();
+        _updater.Hold = download;
+        StartupFlow before = NewFlow();
+        Task first = before.RunAsync();
+
+        // Choosing another language builds the window's content anew, and the new content has a flow of its own.
+        before.Dispose();
+        Task second = NewFlow().RunAsync();
+        download.SetResult();
+        await Task.WhenAll(first, second);
+
+        Assert.StartsWith("Dialog.UpdateAvailable.Title", Assert.Single(_prompts.Shown));
+        Assert.Equal(1, _updater.Checks);
+    }
 }

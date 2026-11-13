@@ -50,7 +50,11 @@ public sealed class UpdateService(IUpdater updater, IAppLifetime lifetime)
 {
     private readonly object _gate = new();
     private Task<UpdateCheck>? _check;
-    private bool _checkedAfterStart;
+    private Task<UpdateCheck>? _checkAfterStart;
+
+    // Told apart by reference: everyone who waited for one check gets the same result, while a
+    // later check that finds the same release again is a question of its own.
+    private readonly HashSet<UpdateCheck> _offered = new(ReferenceEqualityComparer.Instance);
 
     /// <summary>
     /// Looks for a newer release and downloads it. A call made while a check is under way gets the
@@ -66,26 +70,30 @@ public sealed class UpdateService(IUpdater updater, IAppLifetime lifetime)
     }
 
     /// <summary>
-    /// The check that is made once, when the app has started. Its result goes to the first caller
-    /// only, so that what it finds is brought up once however many windows are opened; every
-    /// later caller gets null.
+    /// The check that is made once, when the app has started. Every caller gets the result of
+    /// that one check, however many windows are opened and whenever.
     /// </summary>
-    public async Task<UpdateCheck?> CheckAfterStartAsync()
+    public Task<UpdateCheck> CheckAfterStartAsync()
+    {
+        lock (_gate) return _checkAfterStart ??= CheckAsync();
+    }
+
+    /// <summary>
+    /// Asks whether to restart now so that the update <paramref name="check"/> downloaded gets
+    /// installed, and does it if the user agrees. What one check found is offered once, however
+    /// many got that check: the windows waiting for the check after start, or a check that was
+    /// asked for while another was under way.
+    /// </summary>
+    public async Task OfferRestartAsync(IPrompts prompts, UpdateCheck check)
     {
         lock (_gate)
         {
-            if (_checkedAfterStart) return null;
-            _checkedAfterStart = true;
+            if (!_offered.Add(check)) return;
         }
-        return await CheckAsync();
-    }
 
-    /// <summary>Asks whether to restart now so that the downloaded <paramref name="version"/> gets installed, and does it if the user agrees.</summary>
-    public async Task OfferRestartAsync(IPrompts prompts, string version)
-    {
         bool restart = await prompts.ConfirmAsync(
             Loc.Get("Dialog.UpdateAvailable.Title"),
-            Loc.Format("Dialog.UpdateAvailable.ContentFormat", version),
+            Loc.Format("Dialog.UpdateAvailable.ContentFormat", check.Version),
             Loc.Get("Dialog.UpdateAvailable.RestartNow"));
         if (!restart) return;
 
@@ -95,7 +103,7 @@ public sealed class UpdateService(IUpdater updater, IAppLifetime lifetime)
         }
         catch (Exception ex)
         {
-            Serilog.Log.Error(ex, "The installer for update {Version} could not be started", version);
+            Serilog.Log.Error(ex, "The installer for update {Version} could not be started", check.Version);
             await prompts.ShowErrorAsync(Loc.Get("Settings.UpdateApplyFailed.Content"));
             return;
         }

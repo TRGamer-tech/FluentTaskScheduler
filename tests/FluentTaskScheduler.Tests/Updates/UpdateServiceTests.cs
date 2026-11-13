@@ -11,6 +11,8 @@ public class UpdateServiceTests
 
     private UpdateService NewService() => new(_updater, _app);
 
+    private static UpdateCheck Ready => new(UpdateStatus.Ready, "2.0.0");
+
     [Fact]
     public async Task WithNothingNewer_TheAppIsUpToDate()
     {
@@ -66,23 +68,56 @@ public class UpdateServiceTests
     }
 
     [Fact]
-    public async Task TheCheckAfterStart_GoesToTheFirstCallerOnly()
+    public async Task TheCheckAfterStart_IsMadeOnce_AndEveryCallerGetsItsResult()
     {
         UpdateService service = NewService();
         _updater.Available = "2.0.0";
 
-        UpdateCheck? first = await service.CheckAfterStartAsync();
-        UpdateCheck? second = await service.CheckAfterStartAsync();
+        UpdateCheck first = await service.CheckAfterStartAsync();
+        UpdateCheck second = await service.CheckAfterStartAsync();
 
         Assert.Equal(new UpdateCheck(UpdateStatus.Ready, "2.0.0"), first);
-        Assert.Null(second);
+        Assert.Equal(first, second);
         Assert.Equal(1, _updater.Checks);
+    }
+
+    [Fact]
+    public async Task WhatOneCheckFound_IsOfferedOnce_HoweverManyGotThatCheck()
+    {
+        UpdateService service = NewService();
+        _updater.Available = "2.0.0";
+        var download = new TaskCompletionSource();
+        _updater.Hold = download;
+
+        Task<UpdateCheck> afterStart = service.CheckAfterStartAsync();
+        Task<UpdateCheck> byHand = service.CheckAsync();
+        download.SetResult();
+        await service.OfferRestartAsync(_prompts, await afterStart);
+        await service.OfferRestartAsync(_prompts, await byHand);
+        await service.OfferRestartAsync(_prompts, await service.CheckAfterStartAsync());
+
+        Assert.Single(_prompts.Shown);
+        Assert.Equal(1, _updater.InstallerStarts);
+    }
+
+    [Fact]
+    public async Task ANewCheck_OffersAgainWhatAnEarlierOneFound()
+    {
+        UpdateService service = NewService();
+        _updater.Available = "2.0.0";
+        _prompts.Confirm = false;
+
+        await service.OfferRestartAsync(_prompts, await service.CheckAfterStartAsync());
+        await service.OfferRestartAsync(_prompts, await service.CheckAsync());
+
+        Assert.Equal(2, _prompts.Shown.Count);
+        Assert.Equal(2, _updater.Checks);
     }
 
     [Fact]
     public async Task AgreeingToRestart_StartsTheInstaller_ThenExitsTheAppTheRegularWay()
     {
-        await NewService().OfferRestartAsync(_prompts, "2.0.0");
+        await NewService().OfferRestartAsync(_prompts, Ready);
 
         Assert.Equal(["Dialog.UpdateAvailable.Title: Dialog.UpdateAvailable.ContentFormat [Dialog.UpdateAvailable.RestartNow]"], _prompts.Shown);
         Assert.Equal(1, _updater.InstallerStarts);
@@ -94,7 +129,7 @@ public class UpdateServiceTests
     {
         _prompts.Confirm = false;
 
-        await NewService().OfferRestartAsync(_prompts, "2.0.0");
+        await NewService().OfferRestartAsync(_prompts, Ready);
 
         Assert.Equal(0, _updater.InstallerStarts);
         Assert.False(_app.ExitRequested);
@@ -105,7 +140,7 @@ public class UpdateServiceTests
     {
         _updater.Failure = new Exception("Update.exe process exited too soon (1).");
 
-        await NewService().OfferRestartAsync(_prompts, "2.0.0");
+        await NewService().OfferRestartAsync(_prompts, Ready);
 
         Assert.Equal("Error: Settings.UpdateApplyFailed.Content", _prompts.Shown.Last());
         Assert.False(_app.ExitRequested);
