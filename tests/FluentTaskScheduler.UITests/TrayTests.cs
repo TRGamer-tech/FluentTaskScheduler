@@ -55,12 +55,63 @@ public class TrayTests
         app.Window.Close();
         Assert.True(Eventually(() => !app.IsWindowVisible), "Closing did not hide the window.");
 
-        AutomationElement icon = FindIcon(app) ?? throw new InvalidOperationException("The app has no icon in the notification area. Found there: " + NotificationAreaNames(app));
-        AutomationElement exit = MenuItemOf(icon, app, "Exit") ?? throw new InvalidOperationException("The icon's menu has no Exit entry.");
-        exit.Press();
+        ChooseFromIconsMenu(app, "Exit");
 
         Assert.True(Eventually(() => app.HasExited), "Exit in the icon's menu did not end the app.");
     }
+
+    /// <summary>
+    /// The snooze keeps the default of not suspending triggers, so it disables none of the
+    /// machine's tasks. Notifications are off: one could lie over the icon or its menu.
+    /// </summary>
+    [Fact]
+    public void SnoozingAllTasksFromTheIconsMenu_ShowsInItsTooltip_AndResumingThereEndsIt()
+    {
+        using var app = AppSession.Launch("tray-snooze", Settings + """ "ShowNotifications":false,"HasSeenTrayHint":true}""");
+        app.Window.Close();
+        Assert.True(Eventually(() => !app.IsWindowVisible), "Closing did not hide the window.");
+
+        ChooseFromIconsMenu(app, "Snooze All Tasks...", "30 Minutes");
+        Assert.True(Eventually(() => IconName(app).Contains("Global Snooze Active")),
+            $"The icon's tooltip does not say that all tasks are snoozed: '{IconName(app)}'");
+
+        ChooseFromIconsMenu(app, "Resume All Tasks");
+        Assert.True(Eventually(() => IconName(app) is { Length: > 0 } name && !name.Contains("Global Snooze Active")),
+            $"The icon's tooltip still says that all tasks are snoozed: '{IconName(app)}'");
+
+        app.StartAgain();
+        Assert.True(Eventually(() => app.IsWindowVisible), "Starting the app again did not bring the window back.");
+        app.Require("SearchBox", 20000);
+        Assert.True(app.Find("SnoozeBannerResume", 2000) is null, "The window still says that all tasks are snoozed.");
+    }
+
+    /// <summary>Opens the icon's menu and chooses the entry at the end of <paramref name="path"/>, opening the submenus named before it.</summary>
+    private static void ChooseFromIconsMenu(AppSession app, params string[] path)
+    {
+        AutomationElement icon = FindIcon(app) ?? throw new InvalidOperationException("The app has no icon in the notification area. Found there: " + NotificationAreaNames(app));
+        AutomationElement item = OpenIconsMenuAt(icon, app, path[0]) ?? throw new InvalidOperationException($"The icon's menu has no '{path[0]}' entry.");
+        foreach (string name in path.Skip(1))
+        {
+            item.Patterns.ExpandCollapse.Pattern.Expand();
+            item = Retry.WhileNull(() => MenuItem(app, name), TimeSpan.FromSeconds(10)).Result
+                   ?? throw new InvalidOperationException($"The icon's menu has no '{name}' entry.");
+        }
+        item.Press();
+    }
+
+    // Now and then the ARM64 build machine loses a right-click on the icon, so it is tried again.
+    private static AutomationElement? OpenIconsMenuAt(AutomationElement icon, AppSession app, string name)
+    {
+        for (int attempt = 0; attempt < 3; attempt++)
+        {
+            icon.RightClick();
+            if (Retry.WhileNull(() => MenuItem(app, name), TimeSpan.FromSeconds(5)).Result is { } item) return item;
+        }
+        return null;
+    }
+
+    /// <summary>What the icon is called, which is its tooltip; empty while it cannot be found.</summary>
+    private static string IconName(AppSession app) => FindIcon(app) is { } icon ? NameOf(icon) : "";
 
     // The icon is a button named after its tooltip. Windows puts a new icon behind the arrow
     // that shows the hidden ones.
@@ -75,17 +126,6 @@ public class TrayTests
         if (arrow is null) return null;
         arrow.Click();
         return Retry.WhileNull(Search, TimeSpan.FromSeconds(10)).Result;
-    }
-
-    // Now and then the ARM64 build machine loses a right-click on the icon, so it is tried again.
-    private static AutomationElement? MenuItemOf(AutomationElement icon, AppSession app, string name)
-    {
-        for (int attempt = 0; attempt < 3; attempt++)
-        {
-            icon.RightClick();
-            if (Retry.WhileNull(() => MenuItem(app, name), TimeSpan.FromSeconds(5)).Result is { } item) return item;
-        }
-        return null;
     }
 
     private static AutomationElement? MenuItem(AppSession app, string name) =>
