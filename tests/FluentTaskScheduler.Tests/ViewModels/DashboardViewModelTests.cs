@@ -335,8 +335,10 @@ public sealed class DashboardViewModelTests : IDisposable
         Assert.Equal(["Dashboard.AllCategories", "Reports"], _dashboard.Categories);
     }
 
+    // On one thread, as on the UI thread: otherwise the two refreshes can work their figures out
+    // at the same time on two threads, and the older can be shown last.
     [Fact]
-    public async Task ASlowReadOfAllTasks_CannotOverwriteWhatALaterReadFound()
+    public void ASlowReadOfAllTasks_CannotOverwriteWhatALaterReadFound() => OneThread.Run(async () =>
     {
         await _dashboard.ShowAsync();
 
@@ -367,7 +369,7 @@ public sealed class DashboardViewModelTests : IDisposable
         await Task.WhenAll(slow, later);
 
         Assert.Equal(5, Figures.TotalTasks);
-    }
+    });
 
     [Fact]
     public async Task OffScreen_RunsAreTakenNoteOf_ButNothingIsRead_AndBackOnScreenOnlyTheTasksAre()
