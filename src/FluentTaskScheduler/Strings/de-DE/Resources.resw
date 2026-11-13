@@ -1014,4 +1014,5 @@ Jetzt App neustarten?</value></data>
   <data name="Shortcuts.Delete" xml:space="preserve"><value>Ausgewählte Aufgaben löschen</value></data>
   <data name="Shortcuts.Refresh" xml:space="preserve"><value>Aufgabenliste neu laden</value></data>
   <data name="Shortcuts.Help" xml:space="preserve"><value>Diese Übersicht anzeigen</value></data>
+  <data name="Task.Snooze.UntilRestart" xml:space="preserve"><value>Schlummert bis zum Neustart oder zur Abmeldung</value></data>
 </root>

@@ -1017,6 +1017,7 @@
   <data name="Shortcuts.Delete" xml:space="preserve"><value>删除所选任务</value></data>
   <data name="Shortcuts.Refresh" xml:space="preserve"><value>重新加载任务列表</value></data>
   <data name="Shortcuts.Help" xml:space="preserve"><value>显示此概览</value></data>
+  <data name="Task.Snooze.UntilRestart" xml:space="preserve"><value>已暂停至重启或注销</value></data>
 </root>
 
 

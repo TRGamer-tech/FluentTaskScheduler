@@ -188,6 +188,32 @@ public class TaskStoreTests
     }
 
     [SkippableFact]
+    public void ATaskDisabledWhileItRuns_IsReadAsDisabled()
+    {
+        Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
+        using var sandbox = new SchedulerSandbox();
+        var draft = NewDraft("Sleeper") with
+        {
+            Actions = new[] { new ActionDraft { Path = "cmd.exe", Arguments = "/c ping -n 30 127.0.0.1 > nul" } }
+        };
+        string path = _store.Save(draft, sandbox.FolderPath);
+        Assert.True(_store.GetTask(path)?.IsEnabled);
+
+        _store.Run(path);
+        Assert.True(WaitFor(() => _store.GetStates(new[] { path })[path] == TaskRowState.Running), "The task did not start.");
+        _store.SetEnabled(path, false);
+
+        // The state is of no help while the task runs, which is why snoozing goes by IsEnabled.
+        var row = _store.GetTask(path);
+        _out.WriteLine($"State of a running task after it was disabled: {row?.State}");
+        Assert.False(row?.IsEnabled);
+
+        _store.Stop(path);
+        _store.SetEnabled(path, true);
+        Assert.True(_store.GetTask(path)?.IsEnabled);
+    }
+
+    [SkippableFact]
     public void AMissingTask_IsReportedAsSuch()
     {
         Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");

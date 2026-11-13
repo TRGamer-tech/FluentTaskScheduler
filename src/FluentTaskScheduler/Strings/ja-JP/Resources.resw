@@ -1014,4 +1014,5 @@
   <data name="Shortcuts.Delete" xml:space="preserve"><value>選択したタスクを削除</value></data>
   <data name="Shortcuts.Refresh" xml:space="preserve"><value>タスク一覧を再読み込み</value></data>
   <data name="Shortcuts.Help" xml:space="preserve"><value>この一覧を表示</value></data>
+  <data name="Task.Snooze.UntilRestart" xml:space="preserve"><value>再起動またはサインアウトまでスヌーズ中</value></data>
 </root>

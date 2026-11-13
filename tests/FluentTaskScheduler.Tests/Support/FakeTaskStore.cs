@@ -62,11 +62,18 @@ public sealed class FakeTaskStore : ITaskStore
         return rows;
     }
 
+    /// <summary>When set, reading a single task fails with this.</summary>
+    public Exception? ReadingFails { get; set; }
+
     // The row carries the path as the task was registered, however the caller spelled it.
-    public TaskRow? GetTask(string path) =>
-        _tasks.FirstOrDefault(task => string.Equals(task.Key, path, StringComparison.OrdinalIgnoreCase)) is { Key: not null } found
+    public TaskRow? GetTask(string path)
+    {
+        if (ReadingFails is { } failure) throw failure;
+
+        return _tasks.FirstOrDefault(task => string.Equals(task.Key, path, StringComparison.OrdinalIgnoreCase)) is { Key: not null } found
             ? RowOf(found.Key, found.Value)
             : null;
+    }
 
     private TaskRow RowOf(string path, TaskDraft draft) => new(path)
     {
