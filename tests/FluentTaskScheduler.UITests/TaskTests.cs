@@ -229,10 +229,7 @@ public sealed class TaskTests : IDisposable
         using var app = AppSession.Launch("import");
         try
         {
-            // A real click, not a press through UI Automation: the classic file dialog holds on to
-            // whoever opened it until it is closed, and a held-up automation call leaves the app
-            // unable to answer the next one.
-            app.ToolbarButton("ImportButton").Click();
+            app.ToolbarButton("ImportButton").PressWithKeyboard();
             app.ChooseFile(file);
 
             app.Require("ImportName", 20000);
