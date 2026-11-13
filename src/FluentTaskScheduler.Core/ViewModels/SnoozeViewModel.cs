@@ -28,6 +28,15 @@ public sealed partial class SnoozeViewModel : ObservableObject, IDisposable
     private SnoozeState _state;
     private bool _disposed;
 
+    /// <summary>
+    /// The tasks the user was told about and closed the bar on, for as long as they are left
+    /// disabled. One that is enabled again is forgotten: being left disabled once more is news.
+    /// </summary>
+    private readonly HashSet<string> _dismissedRestores = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>The unreadable record the user was told about and closed the bar on.</summary>
+    private string? _dismissedUnreadableFile;
+
     public SnoozeViewModel(ISnoozeService snooze, ISettingsStore settings, IPrompts prompts, IUiThread ui, TimeProvider time)
     {
         _snooze = snooze;
@@ -54,7 +63,11 @@ public sealed partial class SnoozeViewModel : ObservableObject, IDisposable
     /// <summary>True while tasks are being disabled or enabled again. A task list read meanwhile may be out of date.</summary>
     public bool IsBusy => _state.IsBusy;
 
-    public bool HasPendingRestores => _state.PendingRestores.Count > 0;
+    /// <summary>
+    /// True while tasks that a snooze left disabled are to be pointed out: until the user closes the
+    /// bar about them, and again once another task is left disabled.
+    /// </summary>
+    public bool ShowsPendingRestores => _state.PendingRestores.Any(restore => !_dismissedRestores.Contains(restore.TaskPath));
 
     /// <summary>The tasks a snooze left disabled because they could not be enabled again, and why, if Windows refused.</summary>
     public string PendingRestoresText
@@ -72,7 +85,8 @@ public sealed partial class SnoozeViewModel : ObservableObject, IDisposable
         }
     }
 
-    public bool HasUnreadableStateFile => _state.UnreadableStateFile is not null;
+    /// <summary>True while the record of earlier snoozes could not be read, until the user closes the bar about it.</summary>
+    public bool ShowsUnreadableStateFile => _state.UnreadableStateFile is { } file && file != _dismissedUnreadableFile;
 
     public string UnreadableStateText => _state.UnreadableStateFile is { } file ? Loc.Format("Snooze.Unreadable.MessageFormat", file) : "";
 
@@ -102,6 +116,20 @@ public sealed partial class SnoozeViewModel : ObservableObject, IDisposable
 
     [RelayCommand]
     private Task RetryRestoresAsync() => _snooze.RetryRestoresAsync();
+
+    /// <summary>The user closed the bar about the tasks left disabled; it stays closed until another task is left disabled.</summary>
+    public void DismissPendingRestores()
+    {
+        _dismissedRestores.UnionWith(_state.PendingRestores.Select(restore => restore.TaskPath));
+        OnPropertyChanged(nameof(ShowsPendingRestores));
+    }
+
+    /// <summary>The user closed the bar about the unreadable record of earlier snoozes.</summary>
+    public void DismissUnreadableStateFile()
+    {
+        _dismissedUnreadableFile = _state.UnreadableStateFile;
+        OnPropertyChanged(nameof(ShowsUnreadableStateFile));
+    }
 
     /// <summary>For the dialog that snoozes all tasks until a moment of the user's choosing, with the options of that snooze.</summary>
     public SnoozeUntilViewModel PickMoment() =>
@@ -134,6 +162,7 @@ public sealed partial class SnoozeViewModel : ObservableObject, IDisposable
     {
         if (_disposed) return;
         _state = _snooze.State;
+        _dismissedRestores.IntersectWith(_state.PendingRestores.Select(restore => restore.TaskPath));
 
         // No name: all properties have changed.
         OnPropertyChanged(string.Empty);

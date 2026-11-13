@@ -175,6 +175,11 @@ public sealed partial class TasksPage : Page
 
     private async void SnoozeCustom_Click(object sender, RoutedEventArgs e) => await ShowSnoozeDialogAsync();
 
+    // The view model has to know: its next change, a refused run being enough, would open the bar again.
+    private void SnoozeRestoreBar_CloseButtonClick(InfoBar sender, object args) => Snooze.DismissPendingRestores();
+
+    private void SnoozeUnreadableBar_CloseButtonClick(InfoBar sender, object args) => Snooze.DismissUnreadableStateFile();
+
     private async void Shortcuts_Click(object sender, RoutedEventArgs e)
     {
         if (_dialogOpen) return;

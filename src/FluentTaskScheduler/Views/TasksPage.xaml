@@ -69,18 +69,20 @@
                 </InfoBar.ActionButton>
             </InfoBar>
             <InfoBar x:Name="SnoozeRestoreBar" Severity="Warning" IsClosable="True"
-                     IsOpen="{x:Bind Snooze.HasPendingRestores, Mode=OneWay}" Visibility="{x:Bind Snooze.HasPendingRestores, Mode=OneWay}"
+                     IsOpen="{x:Bind Snooze.ShowsPendingRestores, Mode=OneWay}" Visibility="{x:Bind Snooze.ShowsPendingRestores, Mode=OneWay}"
                      Title="{x:Bind l:Loc.Get('Snooze.Restore.Title')}"
-                     Message="{x:Bind Snooze.PendingRestoresText, Mode=OneWay}">
+                     Message="{x:Bind Snooze.PendingRestoresText, Mode=OneWay}"
+                     CloseButtonClick="SnoozeRestoreBar_CloseButtonClick">
                 <InfoBar.ActionButton>
                     <Button x:Name="SnoozeRetryButton" Content="{x:Bind l:Loc.Get('Snooze.Restore.Retry')}"
                             Command="{x:Bind Snooze.RetryRestoresCommand}"/>
                 </InfoBar.ActionButton>
             </InfoBar>
             <InfoBar x:Name="SnoozeUnreadableBar" Severity="Warning" IsClosable="True"
-                     IsOpen="{x:Bind Snooze.HasUnreadableStateFile, Mode=OneWay}" Visibility="{x:Bind Snooze.HasUnreadableStateFile, Mode=OneWay}"
+                     IsOpen="{x:Bind Snooze.ShowsUnreadableStateFile, Mode=OneWay}" Visibility="{x:Bind Snooze.ShowsUnreadableStateFile, Mode=OneWay}"
                      Title="{x:Bind l:Loc.Get('Snooze.Unreadable.Title')}"
-                     Message="{x:Bind Snooze.UnreadableStateText, Mode=OneWay}"/>
+                     Message="{x:Bind Snooze.UnreadableStateText, Mode=OneWay}"
+                     CloseButtonClick="SnoozeUnreadableBar_CloseButtonClick"/>
         </StackPanel>
 
         <!-- Search and filter on the left, commands on the right; the command bar moves what does not fit into its menu. -->

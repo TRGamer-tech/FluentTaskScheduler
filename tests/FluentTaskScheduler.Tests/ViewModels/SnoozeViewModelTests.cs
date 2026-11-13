@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using FluentTaskScheduler.Localization;
+using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Settings;
 using FluentTaskScheduler.Snoozing;
 using FluentTaskScheduler.Tests.Snoozing;
@@ -147,14 +148,48 @@ public sealed class SnoozeViewModelTests : IDisposable
     [Fact]
     public async Task TasksASnoozeCouldNotEnableAgain_AreNamed_AndTriedAgainOnRequest()
     {
-        Assert.False(_snooze.HasPendingRestores);
+        Assert.False(_snooze.ShowsPendingRestores);
 
         _service.Publish(new SnoozeState { PendingRestores = [new PendingRestore(@"\Backup", RestoreFailure.Error, "The task image is corrupt.")] });
         await _snooze.RetryRestoresCommand.ExecuteAsync(null);
 
-        Assert.True(_snooze.HasPendingRestores);
+        Assert.True(_snooze.ShowsPendingRestores);
         Assert.Equal(@"Still disabled: \Backup", _snooze.PendingRestoresText);
         Assert.Equal(["RetryRestores"], _service.Calls);
+    }
+
+    [Fact]
+    public void TheClosedBarAboutTasksLeftDisabled_StaysClosed_UntilAnotherTaskIsLeftDisabled()
+    {
+        var backup = new PendingRestore(@"\Backup", RestoreFailure.AccessDenied, "Access is denied.");
+        _service.Publish(new SnoozeState { PendingRestores = [backup] });
+        var changed = new List<string?>();
+        _snooze.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+
+        _snooze.DismissPendingRestores();
+
+        Assert.False(_snooze.ShowsPendingRestores);
+        Assert.Contains(nameof(SnoozeViewModel.ShowsPendingRestores), changed);
+
+        // A refused run changes the snooze, but not which tasks are left disabled.
+        _service.Publish(new SnoozeState { PendingRestores = [backup], SuppressedRuns = [new SuppressedRun(Now, @"\Weekly", RunOrigin.Manual)] });
+        Assert.False(_snooze.ShowsPendingRestores);
+
+        _service.Publish(new SnoozeState { PendingRestores = [backup, new PendingRestore(@"\Weekly", RestoreFailure.Error, "The task image is corrupt.")] });
+        Assert.True(_snooze.ShowsPendingRestores);
+    }
+
+    [Fact]
+    public void ATaskThatIsLeftDisabledAgain_AfterItWasEnabled_OpensTheClosedBarAgain()
+    {
+        var backup = new PendingRestore(@"\Backup", RestoreFailure.AccessDenied, "Access is denied.");
+        _service.Publish(new SnoozeState { PendingRestores = [backup] });
+        _snooze.DismissPendingRestores();
+
+        _service.Publish(new SnoozeState());
+        _service.Publish(new SnoozeState { PendingRestores = [backup] });
+
+        Assert.True(_snooze.ShowsPendingRestores);
     }
 
     [Fact]
@@ -173,12 +208,27 @@ public sealed class SnoozeViewModelTests : IDisposable
     [Fact]
     public void ARecordOfEarlierSnoozesThatCouldNotBeRead_IsReported_WithWhereItWasKept()
     {
-        Assert.False(_snooze.HasUnreadableStateFile);
+        Assert.False(_snooze.ShowsUnreadableStateFile);
 
         _service.Publish(new SnoozeState { UnreadableStateFile = @"C:\Data\snooze.unreadable-20310506-141700.json" });
 
-        Assert.True(_snooze.HasUnreadableStateFile);
+        Assert.True(_snooze.ShowsUnreadableStateFile);
         Assert.Equal(@"Kept as C:\Data\snooze.unreadable-20310506-141700.json", _snooze.UnreadableStateText);
+    }
+
+    [Fact]
+    public void TheClosedBarAboutAnUnreadableRecord_StaysClosed()
+    {
+        var unreadable = new SnoozeState { UnreadableStateFile = @"C:\Data\snooze.unreadable-20310506-141700.json" };
+        _service.Publish(unreadable);
+        var changed = new List<string?>();
+        _snooze.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+
+        _snooze.DismissUnreadableStateFile();
+        _service.Publish(unreadable with { Global = new GlobalSnooze(SnoozeWindow.UntilRestart, SuspendsTriggers: false, []) });
+
+        Assert.False(_snooze.ShowsUnreadableStateFile);
+        Assert.Contains(nameof(SnoozeViewModel.ShowsUnreadableStateFile), changed);
     }
 
     [Fact]
