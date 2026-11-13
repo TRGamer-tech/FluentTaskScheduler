@@ -63,8 +63,8 @@
   <data name="TriggerTitle.Text" xml:space="preserve"><value>トリガー</value></data>
   <data name="ConditionsTitle.Text" xml:space="preserve"><value>条件</value></data>
   <data name="ConditionIdle.Content" xml:space="preserve"><value>コンピューターがアイドル状態のとき</value></data>
-  <data name="ConditionAC.Content" xml:space="preserve"><value>AC電源を使用しているときのみ</value></data>
-  <data name="ConditionNetwork.Content" xml:space="preserve"><value>ネットワーク接続が利用可能なときのみ</value></data>
+  <data name="ConditionAC.Content" xml:space="preserve"><value>AC 電源を使用しているとき</value></data>
+  <data name="ConditionNetwork.Content" xml:space="preserve"><value>ネットワーク接続が利用可能なとき</value></data>
   <data name="ConditionWake.Content" xml:space="preserve"><value>タスクを実行するためにスリープを解除する</value></data>
   <data name="SettingsTitle.Text" xml:space="preserve"><value>設定</value></data>
   <data name="RunIfMissed.Content" xml:space="preserve"><value>スケジュールされた時刻を過ぎた場合、できるだけ早く実行する</value></data>
@@ -81,7 +81,7 @@
   <data name="Dialog.Common.Save" xml:space="preserve"><value>保存</value></data>
   <data name="Dialog.Error.Title" xml:space="preserve"><value>エラー</value></data>
   <data name="Dialog.ConfirmDelete.Title" xml:space="preserve"><value>削除の確認</value></data>
-  <data name="Dialog.DeleteTask.ContentFormat" xml:space="preserve"><value>'{0}' を削除してもよろしいですか？</value></data>
+  <data name="Dialog.DeleteTask.ContentFormat" xml:space="preserve"><value>「{0}」を削除してもよろしいですか？</value></data>
   <data name="Dialog.BatchDelete.ContentFormat" xml:space="preserve"><value>{0} 件のタスクを削除しますか？</value></data>
   <data name="Dialog.ImportTask.Title" xml:space="preserve"><value>タスクのインポート</value></data>
   <data name="Dialog.ImportTask.SelectFolder" xml:space="preserve"><value>インポート先のフォルダーを選択してください:</value></data>
@@ -141,7 +141,7 @@
   <data name="Settings.Appearance.Theme.Title" xml:space="preserve"><value>アプリのテーマ</value></data>
   <data name="Settings.Appearance.Theme.Description" xml:space="preserve"><value>ライトまたはダークを選択するか、Windows の設定を使用します。</value></data>
   <data name="Settings.Appearance.Mica.Title" xml:space="preserve"><value>Mica 効果</value></data>
-  <data name="Settings.Appearance.Mica.Description" xml:space="preserve"><value>Mica 半透明の背景素材を適用します。</value></data>
+  <data name="Settings.Appearance.Mica.Description" xml:space="preserve"><value>半透明の背景素材 Mica を適用します。</value></data>
   <data name="Settings.Appearance.Oled.Title" xml:space="preserve"><value>OLED モード</value></data>
   <data name="Settings.Appearance.Oled.Description" xml:space="preserve"><value>OLED ディスプレイで電力を節約するため、背景を純粋な黒にします。ダークテーマが必要です。</value></data>
   <data name="DashboardFilterCategory.Text" xml:space="preserve"><value>カテゴリでフィルター</value></data>
@@ -178,10 +178,10 @@
   <data name="Settings.Sys.Smooth.Title" xml:space="preserve"><value>スムーズスクロール</value></data>
   <data name="Settings.Sys.Smooth.Desc" xml:space="preserve"><value>アプリ全体で慣性ベースのスクロールを有効にします。</value></data>
   <data name="Settings.Sys.Hidden.Title" xml:space="preserve"><value>非表示のタスクを表示</value></data>
-  <data name="Settings.Sys.Hidden.Desc" xml:space="preserve"><value>Windows タスクスケジューラで非表示に設定されているタスクを表示します。</value></data>
+  <data name="Settings.Sys.Hidden.Desc" xml:space="preserve"><value>Windows タスク スケジューラで非表示に設定されているタスクを表示します。</value></data>
   <data name="Settings.Adv.Confirm.Title" xml:space="preserve"><value>削除前に確認</value></data>
   <data name="Settings.Adv.Confirm.Desc" xml:space="preserve"><value>タスクを削除する前に確認ダイアログを表示します。</value></data>
-  <data name="Settings.Adv.Logging.Title" xml:space="preserve"><value>アプリケーションログ</value></data>
+  <data name="Settings.Adv.Logging.Title" xml:space="preserve"><value>アプリのログ記録</value></data>
   <data name="Settings.Adv.Logging.Desc" xml:space="preserve"><value>トラブルシューティングのため、アプリの動作と発生したエラーをログファイルに記録します。クラッシュは常に記録されます。</value></data>
   <data name="Settings.Adv.SepLogs.Title" xml:space="preserve"><value>ログファイルを分ける</value></data>
   <data name="Settings.Adv.SepLogs.Desc" xml:space="preserve"><value>エラーをメインログではなく専用のファイルに記録します。</value></data>
@@ -226,7 +226,7 @@
   <data name="Dialog.Arguments" xml:space="preserve"><value>引数 (任意)</value></data>
   <data name="Dialog.WorkingDir" xml:space="preserve"><value>開始 (任意)</value></data>
   <data name="Dialog.PsTip" xml:space="preserve"><value>ヒント: PowerShell スクリプトの場合は、プログラムに 'powershell.exe'、引数に '-ExecutionPolicy Bypass -File "C:\path\to\script.ps1"' を使用します</value></data>
-  <data name="Dialog.HighPriv" xml:space="preserve"><value>最上位の権限で実行する</value></data>
+  <data name="Dialog.HighPriv" xml:space="preserve"><value>最上位の特権で実行する</value></data>
   <data name="Dialog.Hidden" xml:space="preserve"><value>非表示のタスク</value></data>
   <data name="Dialog.DeleteExpired" xml:space="preserve"><value>スケジュールされた実行がもうない場合はタスクを削除する</value></data>
   <data name="Dialog.HardTerminate" xml:space="preserve"><value>タスクの強制終了を許可する</value></data>
@@ -244,21 +244,21 @@
   <data name="Trigger.OnIdle" xml:space="preserve"><value>アイドル時</value></data>
   <data name="Trigger.AtLogon" xml:space="preserve"><value>ログオン時</value></data>
   <data name="Trigger.AtStartup" xml:space="preserve"><value>スタートアップ時</value></data>
-  <data name="Trigger.SessionStateChange" xml:space="preserve"><value>{0} 時</value></data>
+  <data name="Trigger.SessionStateChange" xml:space="preserve"><value>{0}時</value></data>
   <data name="Dialog.Ph.TaskName" xml:space="preserve"><value>タスク名を入力</value></data>
   <data name="Dialog.Ph.Category" xml:space="preserve"><value>例: 仕事</value></data>
   <data name="Dialog.Ph.Tags" xml:space="preserve"><value>例: 重要, 同期 (コンマ区切り)</value></data>
   <data name="Dialog.Ph.Command" xml:space="preserve"><value>例: notepad.exe または C:\Scripts\myscript.ps1</value></data>
   <data name="Dialog.Ph.Args" xml:space="preserve"><value>例: /c echo hello または -File script.ps1</value></data>
   <data name="Dialog.Ph.WorkDir" xml:space="preserve"><value>例: C:\Scripts</value></data>
-  <data name="Dialog.Ph.Idle" xml:space="preserve"><value>例: 10分</value></data>
+  <data name="Dialog.Ph.Idle" xml:space="preserve"><value>例: 10m</value></data>
   <data name="Dialog.Ph.Username" xml:space="preserve"><value>DOMAIN\Username または username@domain.com</value></data>
   <data name="Dialog.UsernameHeader" xml:space="preserve"><value>ユーザー名</value></data>
   <data name="Dialog.EventLog" xml:space="preserve"><value>ログ</value></data>
   <data name="Dialog.EventSource" xml:space="preserve"><value>ソース</value></data>
   <data name="Dialog.EventId" xml:space="preserve"><value>イベント ID</value></data>
-  <data name="Dialog.Ph.EventLog" xml:space="preserve"><value>Application, System, Security など</value></data>
-  <data name="Dialog.Ph.EventSource" xml:space="preserve"><value>例: VSS, Outlook (任意)</value></data>
+  <data name="Dialog.Ph.EventLog" xml:space="preserve"><value>例: Application、System、Security</value></data>
+  <data name="Dialog.Ph.EventSource" xml:space="preserve"><value>例: VSS、Outlook (任意)</value></data>
   <data name="Dialog.Ph.EventId" xml:space="preserve"><value>例: 1000 (任意)</value></data>
   <data name="Dialog.RecurEvery" xml:space="preserve"><value>間隔:</value></data>
   <data name="Dialog.Day.Mon" xml:space="preserve"><value>月</value></data>
@@ -286,7 +286,7 @@
   <data name="Dialog.Week.Fourth" xml:space="preserve"><value>第4</value></data>
   <data name="Dialog.Week.Last" xml:space="preserve"><value>最終</value></data>
   <data name="Dialog.Sess.Lock" xml:space="preserve"><value>ワークステーションのロック</value></data>
-  <data name="Dialog.Sess.Unlock" xml:space="preserve"><value>ワークステーションのアンロック</value></data>
+  <data name="Dialog.Sess.Unlock" xml:space="preserve"><value>ワークステーションのロック解除</value></data>
   <data name="Dialog.Action.RunProg" xml:space="preserve"><value>プログラムの開始</value></data>
   <data name="Dialog.Action.Email" xml:space="preserve"><value>電子メールの送信</value></data>
   <data name="Dialog.Action.Notif" xml:space="preserve"><value>メッセージの表示</value></data>
@@ -302,19 +302,19 @@
   <data name="Settings.Theme.Light" xml:space="preserve"><value>ライト</value></data>
   <data name="Settings.Theme.Dark" xml:space="preserve"><value>ダーク</value></data>
   <data name="Settings.Theme.System" xml:space="preserve"><value>Windows の設定を使用</value></data>
-  <data name="Settings.Lead.1m" xml:space="preserve"><value>1分前</value></data>
+  <data name="Settings.Lead.1m" xml:space="preserve"><value>1 分前</value></data>
   <data name="QuickActions.Description.Text" xml:space="preserve"><value>ワンクリックで一般的なシステムメンテナンスのタスクを実行します。</value></data>
-  <data name="QuickActions.FlushDNS.Title" xml:space="preserve"><value>DNSキャッシュのクリア</value></data>
-  <data name="QuickActions.FlushDNS.Desc" xml:space="preserve"><value>DNSリゾルバーキャッシュを消去します。</value></data>
+  <data name="QuickActions.FlushDNS.Title" xml:space="preserve"><value>DNS キャッシュのクリア</value></data>
+  <data name="QuickActions.FlushDNS.Desc" xml:space="preserve"><value>DNS リゾルバー キャッシュを消去します。</value></data>
   <data name="QuickActions.ClearTemp.Title" xml:space="preserve"><value>一時ファイルのクリーンアップ</value></data>
   <data name="QuickActions.ClearTemp.Desc" xml:space="preserve"><value>一時フォルダー内の使用中でないものをすべて削除します。</value></data>
   <data name="QuickActions.RestartExplorer.Title" xml:space="preserve"><value>エクスプローラーの再起動</value></data>
-  <data name="QuickActions.RestartExplorer.Desc" xml:space="preserve"><value>Windowsエクスプローラーのプロセスを再起動します。</value></data>
-  <data name="QuickActions.IPReleaseRenew.Title" xml:space="preserve"><value>IPアドレスの更新</value></data>
+  <data name="QuickActions.RestartExplorer.Desc" xml:space="preserve"><value>Windows エクスプローラーのプロセスを再起動します。</value></data>
+  <data name="QuickActions.IPReleaseRenew.Title" xml:space="preserve"><value>IP アドレスの更新</value></data>
   <data name="QuickActions.IPReleaseRenew.Desc" xml:space="preserve"><value>すべてのネットワークアダプターについて、DHCP サーバーに IP アドレスのリースの更新を要求します。</value></data>
-  <data name="QuickActions.SfcScannow.Title" xml:space="preserve"><value>システムファイルチェッカー (SFC)</value></data>
-  <data name="QuickActions.SfcScannow.Desc" xml:space="preserve"><value>破損したシステムファイルをスキャンして修復します。しばらく時間がかかることがあります。</value></data>
-  <data name="QuickActions.DismHealth.Title" xml:space="preserve"><value>DISMヘルスチェック</value></data>
+  <data name="QuickActions.SfcScannow.Title" xml:space="preserve"><value>システム ファイル チェッカー (SFC)</value></data>
+  <data name="QuickActions.SfcScannow.Desc" xml:space="preserve"><value>破損したシステム ファイルをスキャンして修復します。しばらく時間がかかることがあります。</value></data>
+  <data name="QuickActions.DismHealth.Title" xml:space="preserve"><value>DISM ヘルスチェック</value></data>
   <data name="QuickActions.DismHealth.Desc" xml:space="preserve"><value>コンポーネントストアが破損としてマークされていないかを確認します。</value></data>
   <data name="QuickActions.RunBtn" xml:space="preserve"><value>実行</value></data>
   <data name="QuickActions.Status.Running" xml:space="preserve"><value>実行中...</value></data>
@@ -327,11 +327,11 @@
   <data name="ScriptEditor_SaveBtn.Label" xml:space="preserve"><value>ライブラリに保存</value></data>
   <data name="ScriptEditor_ClearBtn.Label" xml:space="preserve"><value>コンソールをクリア</value></data>
   <data name="ScriptEditor_OutputHeader.Text" xml:space="preserve"><value>出力コンソール</value></data>
-  <data name="ScriptEditor_CodeEditor.PlaceholderText" xml:space="preserve"><value>ここにPowerShellスクリプトを入力してください...</value></data>
-  <data name="ScriptEditor_CodeEditor.Header" xml:space="preserve"><value>PowerShellスクリプト</value></data>
-  <data name="ScriptEditor.Status.Starting" xml:space="preserve"><value>[PowerShellを起動中...]</value></data>
+  <data name="ScriptEditor_CodeEditor.PlaceholderText" xml:space="preserve"><value>ここに PowerShell スクリプトを入力してください...</value></data>
+  <data name="ScriptEditor_CodeEditor.Header" xml:space="preserve"><value>PowerShell スクリプト</value></data>
+  <data name="ScriptEditor.Status.Starting" xml:space="preserve"><value>[PowerShell を起動中...]</value></data>
   <data name="ScriptEditor.Status.Stopped" xml:space="preserve"><value>[ユーザーによって停止されました]</value></data>
-  <data name="ScriptEditor.Status.Saved" xml:space="preserve"><value>['{0}'としてライブラリに保存されました]</value></data>
+  <data name="ScriptEditor.Status.Saved" xml:space="preserve"><value>[「{0}」としてライブラリに保存しました]</value></data>
   <data name="Dialog.Crash.Title" xml:space="preserve"><value>問題が発生しました</value></data>
   <data name="Dialog.Crash.Copy" xml:space="preserve"><value>クリップボードにコピー</value></data>
   <data name="Main.Header.QuickActions" xml:space="preserve"><value>クイックアクション</value></data>
@@ -339,16 +339,16 @@
   <data name="Snooze.Status.UntilReboot" xml:space="preserve"><value>再起動またはサインアウトまですべてのタスクをスヌーズ中</value></data>
   <data name="Snooze.Menu.SnoozeAll" xml:space="preserve"><value>すべてのタスクをスヌーズ...</value></data>
   <data name="Snooze.Menu.Resume" xml:space="preserve"><value>すべてのタスクを再開</value></data>
-  <data name="Snooze.Duration.30m" xml:space="preserve"><value>30分</value></data>
-  <data name="Snooze.Duration.1h" xml:space="preserve"><value>1時間</value></data>
-  <data name="Snooze.Duration.3h" xml:space="preserve"><value>3時間</value></data>
+  <data name="Snooze.Duration.30m" xml:space="preserve"><value>30 分</value></data>
+  <data name="Snooze.Duration.1h" xml:space="preserve"><value>1 時間</value></data>
+  <data name="Snooze.Duration.3h" xml:space="preserve"><value>3 時間</value></data>
   <data name="Snooze.Duration.Reboot" xml:space="preserve"><value>再起動またはサインアウトまで</value></data>
   <data name="Snooze.Duration.Custom" xml:space="preserve"><value>カスタム時間...</value></data>
   <data name="Snooze.Dialog.Title" xml:space="preserve"><value>すべてのタスクをスヌーズ</value></data>
   <data name="Snooze.Dialog.Confirm" xml:space="preserve"><value>スヌーズ</value></data>
   <data name="Snooze.Dialog.Intro" xml:space="preserve"><value>すべてのタスクをスヌーズしている間、FluentTaskScheduler はどのタスクも開始しません。完了時アクションによる開始も行いません。</value></data>
   <data name="Snooze.SuspendTriggers" xml:space="preserve"><value>スケジュールされたトリガーも一時停止する</value></data>
-  <data name="Snooze.SuspendTriggersHint" xml:space="preserve"><value>タスクスケジューラの API を通じて有効なすべてのタスクを無効化し、スヌーズが終了すると該当するタスクだけを再度有効化します。保護されたシステムタスクはスキップされます。</value></data>
+  <data name="Snooze.SuspendTriggersHint" xml:space="preserve"><value>タスク スケジューラの API を通じて有効なすべてのタスクを無効化し、スヌーズが終了すると該当するタスクだけを再度有効化します。保護されたシステムタスクはスキップされます。</value></data>
   <data name="Snooze.Banner.Suspended" xml:space="preserve"><value>スケジュールされたトリガーは一時停止され、手動実行はブロックされます。スヌーズが終了するとタスクは再度有効化されます。</value></data>
   <data name="Snooze.Banner.ManualOnly" xml:space="preserve"><value>このアプリから開始された実行はブロックされますが、Windows はスケジュールどおりにタスクを開始します。これも止めるには、スヌーズするときに「スケジュールされたトリガーも一時停止する」を選択してください。</value></data>
   <data name="Snooze.Error.BatchBlocked" xml:space="preserve"><value>スヌーズ中のため、{0} 件のタスクが開始されませんでした。</value></data>
@@ -379,11 +379,11 @@
   <data name="Templates.Group.Developer" xml:space="preserve"><value>開発者ツール</value></data>
   <data name="Templates.Group.Power" xml:space="preserve"><value>電源とユーティリティ</value></data>
   <data name="Templates.TempCleanup.Name" xml:space="preserve"><value>夜間の一時ファイルクリーンアップ</value></data>
-  <data name="Templates.TempCleanup.Desc" xml:space="preserve"><value>ユーザーの一時フォルダーから7日以上経過したファイルを削除します。使用中のファイルはスキップされます。</value></data>
+  <data name="Templates.TempCleanup.Desc" xml:space="preserve"><value>ユーザーの一時フォルダーから 7 日以上経過したファイルを削除します。使用中のファイルはスキップされます。</value></data>
   <data name="Templates.TempCleanup.Note" xml:space="preserve"><value>ファイルを完全に削除します。保存する前に経過日数のしきい値を確認してください。</value></data>
   <data name="Templates.UpdateHealth.Name" xml:space="preserve"><value>Windows Update ヘルスチェック</value></data>
   <data name="Templates.UpdateHealth.Desc" xml:space="preserve"><value>保留中の Windows Update の件数と最後にインストールされた更新の日付を、ドキュメントフォルダー内のログファイルに記録します。</value></data>
-  <data name="Templates.Defrag.Name" xml:space="preserve"><value>ディスク最適化（デフラグ・TRIM）</value></data>
+  <data name="Templates.Defrag.Name" xml:space="preserve"><value>ドライブの最適化 (デフラグ・TRIM)</value></data>
   <data name="Templates.Defrag.Desc" xml:space="preserve"><value>C: ドライブで Windows 標準の最適化を実行します。SSD には TRIM/再TRIM が、HDD にはデフラグが行われます。</value></data>
   <data name="Templates.Defrag.Note" xml:space="preserve"><value>PC がアイドル状態かつ AC 電源接続時のみ実行されます。Windows が別のドライブにある場合は「C:」を変更してください。</value></data>
   <data name="Templates.GitFetch.Name" xml:space="preserve"><value>Git リポジトリの取得</value></data>
@@ -393,16 +393,16 @@
   <data name="Templates.DockerPrune.Desc" xml:space="preserve"><value>停止中のコンテナー、未使用のネットワーク、不要なイメージ、ビルドキャッシュを削除してディスク容量を確保します。</value></data>
   <data name="Templates.DockerPrune.Note" xml:space="preserve"><value>Docker Desktop の実行が必要です。未使用の Docker データを完全に削除します。</value></data>
   <data name="Templates.LogRotation.Name" xml:space="preserve"><value>毎日のログローテーション</value></data>
-  <data name="Templates.LogRotation.Desc" xml:space="preserve"><value>今日より前に最後に書き込まれた *.log ファイルを日付付きの ZIP アーカイブに移動し、30日以上経過したアーカイブを削除します。</value></data>
+  <data name="Templates.LogRotation.Desc" xml:space="preserve"><value>今日より前に最後に書き込まれた *.log ファイルを日付付きの ZIP アーカイブに移動し、30 日以上経過したアーカイブを削除します。</value></data>
   <data name="Templates.LogRotation.Note" xml:space="preserve"><value>保存する前に「C:\Logs」を自分のログフォルダーに変更してください。</value></data>
   <data name="Templates.IdleShutdown.Name" xml:space="preserve"><value>夜間アイドル時の自動シャットダウン</value></data>
-  <data name="Templates.IdleShutdown.Desc" xml:space="preserve"><value>夜間、PC がアイドル状態になった後にのみシャットダウンします。60秒間の警告表示中にキャンセルできます。</value></data>
+  <data name="Templates.IdleShutdown.Desc" xml:space="preserve"><value>夜間、PC がアイドル状態になった後にのみシャットダウンします。60 秒間の警告表示中にキャンセルできます。</value></data>
   <data name="Templates.IdleShutdown.Note" xml:space="preserve"><value>コンピューターがシャットダウンします。開いているアプリの未保存の作業は失われる可能性があります。</value></data>
   <data name="Templates.BatterySaver.Name" xml:space="preserve"><value>サインイン時に省電力プランへ切り替え</value></data>
   <data name="Templates.BatterySaver.Desc" xml:space="preserve"><value>サインインするたびに Windows を省電力プランに切り替えます。別のプランを選ぶまで、このプランが有効なままです。</value></data>
   <data name="Templates.BatterySaver.Note" xml:space="preserve"><value>モダンスタンバイ対応のデバイスには「バランス」プランしかないため、そこではタスクが失敗します。</value></data>
   <data name="Templates.RecycleBin.Name" xml:space="preserve"><value>ごみ箱を毎週空にする</value></data>
-  <data name="Templates.RecycleBin.Desc" xml:space="preserve"><value>確認プロンプトなしで、現在のユーザーのごみ箱を週に1回空にします。</value></data>
+  <data name="Templates.RecycleBin.Desc" xml:space="preserve"><value>確認プロンプトなしで、現在のユーザーのごみ箱を週に 1 回空にします。</value></data>
   <data name="Templates.RecycleBin.Note" xml:space="preserve"><value>ごみ箱を空にすると、削除された項目は復元できなくなります。</value></data>
   <data name="Dialog.Common.On" xml:space="preserve"><value>オン</value></data>
   <data name="Dialog.Common.Off" xml:space="preserve"><value>オフ</value></data>
@@ -432,21 +432,21 @@
   <data name="EventResult.100" xml:space="preserve"><value>タスク開始</value></data>
   <data name="EventResult.102" xml:space="preserve"><value>タスク完了</value></data>
   <data name="EventResult.106" xml:space="preserve"><value>タスク登録</value></data>
-  <data name="EventResult.107" xml:space="preserve"><value>タスクトリガー</value></data>
+  <data name="EventResult.107" xml:space="preserve"><value>トリガー発生</value></data>
   <data name="EventResult.110" xml:space="preserve"><value>ユーザーが開始</value></data>
   <data name="EventResult.111" xml:space="preserve"><value>タスク終了</value></data>
-  <data name="EventResult.129" xml:space="preserve"><value>プロセスを作成</value></data>
-  <data name="EventResult.200" xml:space="preserve"><value>アクション開始</value></data>
-  <data name="EventResult.201" xml:space="preserve"><value>アクション完了</value></data>
-  <data name="EventResult.203" xml:space="preserve"><value>アクション起動失敗</value></data>
-  <data name="EventResult.322" xml:space="preserve"><value>起動スキップ（既に実行中）</value></data>
+  <data name="EventResult.129" xml:space="preserve"><value>プロセス作成</value></data>
+  <data name="EventResult.200" xml:space="preserve"><value>操作開始</value></data>
+  <data name="EventResult.201" xml:space="preserve"><value>操作完了</value></data>
+  <data name="EventResult.203" xml:space="preserve"><value>操作の起動失敗</value></data>
+  <data name="EventResult.322" xml:space="preserve"><value>起動スキップ (既に実行中)</value></data>
   <data name="EventResult.Unknown" xml:space="preserve"><value>イベント {0}</value></data>
   <data name="Templates.RestorePoint.Name" xml:space="preserve"><value>毎週のシステム復元ポイント</value></data>
-  <data name="Templates.RestorePoint.Desc" xml:space="preserve"><value>週に1回、名前付きのシステム復元ポイントを作成し、常に最近のロールバック先を確保します。</value></data>
+  <data name="Templates.RestorePoint.Desc" xml:space="preserve"><value>週に 1 回、名前付きのシステム復元ポイントを作成し、常に最近のロールバック先を確保します。</value></data>
   <data name="Templates.RestorePoint.Note" xml:space="preserve"><value>システムドライブでシステムの保護が有効になっている必要があります。</value></data>
-  <data name="Templates.SystemScan.Name" xml:space="preserve"><value>システムファイルの整合性スキャン</value></data>
-  <data name="Templates.SystemScan.Desc" xml:space="preserve"><value>DISM によるコンポーネントストアの修復に続けてシステムファイルチェッカーを実行し、両方の終了コードをドキュメントフォルダー内のログに記録します。</value></data>
-  <data name="Templates.SystemScan.Note" xml:space="preserve"><value>15分以上かかる場合があります。</value></data>
+  <data name="Templates.SystemScan.Name" xml:space="preserve"><value>システム ファイルの整合性スキャン</value></data>
+  <data name="Templates.SystemScan.Desc" xml:space="preserve"><value>DISM によるコンポーネントストアの修復に続けてシステム ファイル チェッカーを実行し、両方の終了コードをドキュメントフォルダー内のログに記録します。</value></data>
+  <data name="Templates.SystemScan.Note" xml:space="preserve"><value>15 分以上かかる場合があります。</value></data>
   <data name="Templates.DnsFlush.Name" xml:space="preserve"><value>サインイン時に DNS キャッシュをクリア</value></data>
   <data name="Templates.DnsFlush.Desc" xml:space="preserve"><value>サインイン時に DNS リゾルバーキャッシュをクリアします。ネットワークや VPN を頻繁に切り替える場合に便利です。</value></data>
   <data name="Templates.NodePrune.Name" xml:space="preserve"><value>npm・pnpm キャッシュのクリーンアップ</value></data>
@@ -456,12 +456,12 @@
   <data name="Templates.ProjectBackup.Desc" xml:space="preserve"><value>robocopy を使ってプロジェクトフォルダーをバックアップ先にミラーリングします。ビルド出力と依存関係フォルダーは除外されます。</value></data>
   <data name="Templates.ProjectBackup.Note" xml:space="preserve"><value>/MIR はコピー元に存在しなくなったコピー先のファイルを削除します。まず両方のパスを確認してください。</value></data>
   <data name="Templates.DevServerRestart.Name" xml:space="preserve"><value>Windows サービスを毎晩再起動</value></data>
-  <data name="Templates.DevServerRestart.Desc" xml:space="preserve"><value>長時間稼働するサービス（ビルドエージェント、データベース、ローカルサーバーなど）を再起動してリークを解消します。保存前にサービス名を変更してください。</value></data>
+  <data name="Templates.DevServerRestart.Desc" xml:space="preserve"><value>長時間稼働するサービス (ビルドエージェント、データベース、ローカルサーバーなど) を再起動してリークを解消します。保存前にサービス名を変更してください。</value></data>
   <data name="Templates.DevServerRestart.Note" xml:space="preserve"><value>「YourServiceName」をサービスの名前に置き換えてください。</value></data>
   <data name="Templates.DisplayOff.Name" xml:space="preserve"><value>ロック時にディスプレイをオフにする</value></data>
   <data name="Templates.DisplayOff.Desc" xml:space="preserve"><value>電源タイムアウトを待たずに、ワークステーションをロックした時点でモニターをオフにします。</value></data>
   <data name="Templates.WeeklyReboot.Name" xml:space="preserve"><value>アイドル時の毎週再起動</value></data>
-  <data name="Templates.WeeklyReboot.Desc" xml:space="preserve"><value>保留中の更新を適用するため、週に1回、夜間かつアイドル時のみコンピューターを再起動します。</value></data>
+  <data name="Templates.WeeklyReboot.Desc" xml:space="preserve"><value>保留中の更新を適用するため、週に 1 回、夜間かつアイドル時のみコンピューターを再起動します。</value></data>
   <data name="Templates.WeeklyReboot.Note" xml:space="preserve"><value>コンピューターが再起動します。開いているアプリの未保存の作業は失われる可能性があります。</value></data>
   <data name="EventResult.118" xml:space="preserve"><value>トリガー発生 (スタートアップ時)</value></data>
   <data name="EventResult.119" xml:space="preserve"><value>トリガー発生 (ログオン時)</value></data>
@@ -469,17 +469,17 @@
   <data name="EventResult.141" xml:space="preserve"><value>タスク削除</value></data>
   <data name="EventResult.142" xml:space="preserve"><value>タスク無効化</value></data>
   <data name="EventResult.153" xml:space="preserve"><value>スケジュール未実行</value></data>
-  <data name="EventResult.202" xml:space="preserve"><value>アクション失敗</value></data>
-  <data name="EventResult.329" xml:space="preserve"><value>停止（時間制限）</value></data>
-  <data name="EventResult.332" xml:space="preserve"><value>スキップ（条件未達）</value></data>
+  <data name="EventResult.202" xml:space="preserve"><value>操作失敗</value></data>
+  <data name="EventResult.329" xml:space="preserve"><value>停止 (時間制限)</value></data>
+  <data name="EventResult.332" xml:space="preserve"><value>スキップ (条件不成立)</value></data>
   <data name="Library.Search.Placeholder" xml:space="preserve"><value>検索...</value></data>
   <data name="Library.Search.NoTemplates" xml:space="preserve"><value>検索条件に一致するテンプレートがありません。</value></data>
   <data name="Library.Search.NoScripts" xml:space="preserve"><value>検索条件に一致するスクリプトがありません。</value></data>
   <data name="App.WindowTitleSuffixFormat" xml:space="preserve"><value>ウィンドウ {0}</value></data>
   <data name="Dialog.Error.EmptyName" xml:space="preserve"><value>タスク名を空にすることはできません。</value></data>
-  <data name="Dialog.Error.InvalidIdleDuration" xml:space="preserve"><value>"{0}" はアイドル時間の期間として認識できません。10m、1h のように入力してください。</value></data>
-  <data name="Dialog.Error.InvalidRestartInterval" xml:space="preserve"><value>"{0}" は再起動の間隔として認識できません。1m、30m のように入力してください。</value></data>
-  <data name="Dialog.Error.InvalidStopAfter" xml:space="preserve"><value>"{0}" は最長実行時間として認識できません。90m、12h、3d のように入力してください。</value></data>
+  <data name="Dialog.Error.InvalidIdleDuration" xml:space="preserve"><value>「{0}」はアイドル時間として認識できません。10m、1h のように入力してください。</value></data>
+  <data name="Dialog.Error.InvalidRestartInterval" xml:space="preserve"><value>「{0}」は再起動の間隔として認識できません。1m、30m のように入力してください。</value></data>
+  <data name="Dialog.Error.InvalidStopAfter" xml:space="preserve"><value>「{0}」は最長実行時間として認識できません。90m、12h、3d のように入力してください。</value></data>
   <data name="Dialog.Error.SaveTaskFailedPrefix" xml:space="preserve"><value>タスクの保存に失敗しました: </value></data>
   <data name="Dialog.GetStarted" xml:space="preserve"><value>開始する</value></data>
   <data name="Dialog.Next" xml:space="preserve"><value>次へ</value></data>
@@ -499,7 +499,7 @@
   <data name="ScriptLibrary.DeleteTemplate.Content" xml:space="preserve"><value>「{0}」を削除しますか？</value></data>
   <data name="ScriptLibrary.DeleteTemplate.Title" xml:space="preserve"><value>スクリプトの削除</value></data>
   <data name="Settings.UpdateApplyFailed.Content" xml:space="preserve"><value>アップデートをインストールできませんでした。詳細はログを確認するか、後でもう一度お試しください。</value></data>
-  <data name="Snooze.IncludeMicrosoftTasks" xml:space="preserve"><value>Microsoft 独自の予約タスクも一時停止する (Defender、Windows Update、メンテナンスなど)</value></data>
+  <data name="Snooze.IncludeMicrosoftTasks" xml:space="preserve"><value>Microsoft 独自のスケジュールされたタスクも一時停止する (Defender、Windows Update、メンテナンスなど)</value></data>
   <data name="Snooze.IncludeMicrosoftTasksWarning" xml:space="preserve"><value>推奨されません。これらを無効にすると、スヌーズが終了するまで Windows のセキュリティ スキャン、更新、メンテナンスが妨げられる可能性があります。</value></data>
   <data name="Tray.CloseWindowFormat" xml:space="preserve"><value>{0} を閉じる</value></data>
   <data name="Tray.ExitAll" xml:space="preserve"><value>終了</value></data>
@@ -612,9 +612,9 @@
   <data name="Tasks.LoadError.Title" xml:space="preserve"><value>タスクを読み込めませんでした</value></data>
   <data name="Tasks.Empty" xml:space="preserve"><value>表示するタスクはありません。</value></data>
   <data name="Tasks.NextRunFormat" xml:space="preserve"><value>次回の実行: {0}</value></data>
-  <data name="Tasks.Error.Denied" xml:space="preserve"><value>'{0}': Windows によってアクセスが拒否されました。</value></data>
-  <data name="Tasks.Error.DeniedNotElevated" xml:space="preserve"><value>'{0}': この操作には管理者権限が必要です。アプリを管理者として再起動してから、もう一度お試しください。</value></data>
-  <data name="Tasks.Error.Gone" xml:space="preserve"><value>'{0}' は既に存在しません。</value></data>
+  <data name="Tasks.Error.Denied" xml:space="preserve"><value>「{0}」: Windows によってアクセスが拒否されました。</value></data>
+  <data name="Tasks.Error.DeniedNotElevated" xml:space="preserve"><value>「{0}」: この操作には管理者権限が必要です。アプリを管理者として再起動してから、もう一度お試しください。</value></data>
+  <data name="Tasks.Error.Gone" xml:space="preserve"><value>「{0}」はもう存在しません。</value></data>
   <data name="Tasks.Snoozed.Title" xml:space="preserve"><value>タスクはスヌーズ中です</value></data>
   <data name="Tasks.File.TaskXml" xml:space="preserve"><value>タスク XML</value></data>
   <data name="Tasks.Badge.Unreadable" xml:space="preserve"><value>読み取り不可</value></data>
@@ -627,11 +627,11 @@
   <data name="Import.Account.Missing" xml:space="preserve"><value>ファイルに記録されたアカウント {0} は、このコンピューターに存在しません。</value></data>
   <data name="Import.Error.NotATask" xml:space="preserve"><value>「{0}」をエクスポートされたタスクとして読み取れませんでした。{1}</value></data>
   <data name="EventResult.101" xml:space="preserve"><value>起動失敗</value></data>
-  <data name="EventResult.323" xml:space="preserve"><value>停止（新しいインスタンス）</value></data>
+  <data name="EventResult.323" xml:space="preserve"><value>停止 (新しいインスタンス)</value></data>
   <data name="EventResult.324" xml:space="preserve"><value>起動待機</value></data>
-  <data name="EventResult.327" xml:space="preserve"><value>停止（バッテリー駆動）</value></data>
-  <data name="EventResult.328" xml:space="preserve"><value>停止（アイドル終了）</value></data>
-  <data name="EventResult.330" xml:space="preserve"><value>停止（ユーザー操作）</value></data>
+  <data name="EventResult.327" xml:space="preserve"><value>停止 (バッテリー駆動)</value></data>
+  <data name="EventResult.328" xml:space="preserve"><value>停止 (アイドル終了)</value></data>
+  <data name="EventResult.330" xml:space="preserve"><value>停止 (ユーザー操作)</value></data>
   <data name="Toast.TaskStarted.Title" xml:space="preserve"><value>タスクを開始しました: {0}</value></data>
   <data name="Toast.TaskStarted.Body" xml:space="preserve"><value>タスクは手動で開始されました。</value></data>
   <data name="Toast.TaskNotStarted.Title" xml:space="preserve"><value>タスクを開始できませんでした: {0}</value></data>
@@ -717,7 +717,7 @@
   <data name="Shortcuts.Help" xml:space="preserve"><value>この一覧を表示</value></data>
   <data name="Task.Snooze.UntilRestart" xml:space="preserve"><value>再起動またはサインアウトまでスヌーズ中</value></data>
   <data name="Settings.Appearance.Language.Windows" xml:space="preserve"><value>Windows の言語を使用</value></data>
-  <data name="Settings.Lead.MinutesFormat" xml:space="preserve"><value>{0}分前</value></data>
+  <data name="Settings.Lead.MinutesFormat" xml:space="preserve"><value>{0} 分前</value></data>
   <data name="Settings.Sys.Startup.Failed" xml:space="preserve"><value>Windows が変更を受け付けませんでした。スタートアップの設定は組織によって管理されている可能性があります。</value></data>
   <data name="Settings.Sys.MinimizeToTray.Title" xml:space="preserve"><value>最小化したときもトレイに格納</value></data>
   <data name="Settings.Sys.MinimizeToTray.Desc" xml:space="preserve"><value>ウィンドウを最小化したときもシステムトレイに隠します。</value></data>
@@ -755,7 +755,7 @@
   <data name="Settings.About.Issue.Desc" xml:space="preserve"><value>不具合の報告や改善の提案ができます。</value></data>
   <data name="Tour.Back" xml:space="preserve"><value>戻る</value></data>
   <data name="Tour.Welcome.Title" xml:space="preserve"><value>スケジュールされたタスクをひとつの場所で</value></data>
-  <data name="Tour.Welcome.Body" xml:space="preserve"><value>FluentTaskScheduler は、Windows タスクスケジューラをモダンな画面で操作するためのアプリです。ここに表示されるタスクはすべて通常の Windows タスクで、アプリを閉じていてもスケジュールどおりに実行されます。</value></data>
+  <data name="Tour.Welcome.Body" xml:space="preserve"><value>FluentTaskScheduler は、Windows タスク スケジューラをモダンな画面で操作するためのアプリです。ここに表示されるタスクはすべて通常の Windows タスクで、アプリを閉じていてもスケジュールどおりに実行されます。</value></data>
   <data name="Tour.Create.Title" xml:space="preserve"><value>最初のタスクを作成する</value></data>
   <data name="Tour.Create.Body" xml:space="preserve"><value>「新規タスク」を選ぶと、プログラム、スクリプト、コマンドを自動的に実行できます。毎日、サインイン時、イベント発生時など、さまざまなタイミングを選べます。関連するタスクはフォルダーにまとめられます。</value></data>
   <data name="Tour.History.Title" xml:space="preserve"><value>実行結果を確認する</value></data>
@@ -795,7 +795,7 @@
   <data name="Main.Status.Ready" xml:space="preserve"><value>準備完了</value></data>
   <data name="Main.Status.Queued" xml:space="preserve"><value>キューに登録済み</value></data>
   <data name="Main.Status.Unknown" xml:space="preserve"><value>状態不明</value></data>
-  <data name="Snooze.Error.TaskScheduler" xml:space="preserve"><value>タスクスケジューラがエラーを返したため、何もスヌーズされていません。{0}</value></data>
+  <data name="Snooze.Error.TaskScheduler" xml:space="preserve"><value>タスク スケジューラがエラーを返したため、何もスヌーズされていません。{0}</value></data>
   <data name="Shortcuts.Key.Ctrl" xml:space="preserve"><value>Ctrl</value></data>
   <data name="Shortcuts.Key.Del" xml:space="preserve"><value>Del</value></data>
   <data name="Settings.Names.RemoveFormat" xml:space="preserve"><value>「{0}」を削除</value></data>
