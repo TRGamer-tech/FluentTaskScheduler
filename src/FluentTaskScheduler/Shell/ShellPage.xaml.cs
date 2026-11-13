@@ -16,8 +16,7 @@ public sealed partial class ShellPage : Page, IShellNavigator
 {
     /// <param name="Page">The page type; resolved from the window's service scope.</param>
     /// <param name="TitleKey">Resource name of the heading shown above the page.</param>
-    /// <param name="CreatedByFrame">True for pages that still take their dependencies from the old service locator and rely on Frame navigation events.</param>
-    private sealed record Destination(Type Page, string TitleKey, bool CreatedByFrame = false);
+    private sealed record Destination(Type Page, string TitleKey);
 
     public const string StartPage = "Tasks";
 
@@ -119,8 +118,7 @@ public sealed partial class ShellPage : Page, IShellNavigator
         if (tag == CurrentPage) return;
 
         Destination destination = Destinations[tag];
-        if (destination.CreatedByFrame) PageHost.Navigate(destination.Page);
-        else PageHost.Content = BuildPage(destination.Page, tag);
+        PageHost.Content = BuildPage(destination.Page, tag);
         CurrentPage = tag;
         NavView.Header = Loc.Get(destination.TitleKey);
     }

@@ -71,7 +71,6 @@ public partial class App : Application, IAppLifetime, IDisposable
         // Before anything saves the settings: the snooze state of version 1.9 lived in the settings
         // file, and the first save in the new format drops what the snooze service has not taken over.
         var snooze = _services.GetRequiredService<SnoozeService>();
-        StartLegacyServices();
 
         _services.GetRequiredService<AppAppearance>().Start();
 
