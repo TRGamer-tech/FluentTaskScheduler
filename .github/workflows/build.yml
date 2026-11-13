@@ -25,7 +25,15 @@ jobs:
           -c Release
           -p:Platform=x64
           --logger "trx;LogFileName=test-results.trx"
+          --logger "console;verbosity=normal"
           --blame
+
+      - name: Show which test crashed the host
+        if: failure()
+        shell: pwsh
+        run: >
+          Get-ChildItem FluentTaskScheduler.Tests/TestResults -Recurse -Filter 'Sequence_*.xml' |
+          ForEach-Object { Get-Content $_.FullName -Tail 12 }
 
       - name: Upload test results
         if: always()
