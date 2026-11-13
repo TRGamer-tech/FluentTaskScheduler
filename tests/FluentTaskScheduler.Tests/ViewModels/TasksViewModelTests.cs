@@ -1,8 +1,10 @@
 using System.Text;
 using FluentTaskScheduler.History;
+using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Settings;
 using FluentTaskScheduler.Snoozing;
+using FluentTaskScheduler.Tests.Snoozing;
 using FluentTaskScheduler.Tests.Support;
 using FluentTaskScheduler.ViewModels;
 using Microsoft.Extensions.Time.Testing;
@@ -1024,5 +1026,59 @@ public sealed class TasksViewModelTests : IDisposable
         _tasks.RestartElevatedCommand.Execute(null);
 
         Assert.True(_app.RestartElevatedRequested);
+    }
+}
+
+/// <summary>What the task list says when a move is turned down, with the names filled in. The
+/// texts are installed in <see cref="Loc"/>, so these tests run apart from the others.</summary>
+[Collection(LocalizedTextCollection.Name)]
+public sealed class TaskMoveMessageTests : IDisposable
+{
+    private readonly TempFolder _folder = new();
+    private readonly FakeTaskStore _store = new();
+    private readonly ScriptedPrompts _prompts = new();
+    private readonly FakeAppLifetime _app = new() { IsElevated = true };
+    private readonly FakeTimeProvider _time = new();
+    private readonly FakeTaskFolders _taskFolders;
+    private readonly FakeSnoozeService _snoozeService = new();
+    private readonly SettingsStore _settings;
+    private readonly TasksViewModel _tasks;
+
+    public TaskMoveMessageTests()
+    {
+        Loc.Use(key => key switch
+        {
+            "Tasks.Error.NameTakenInFolder" => "{0}: {1} has one",
+            "Folders.Library" => "Library",
+            _ => null
+        });
+        _settings = new SettingsStore(_folder.Paths, _time);
+        _taskFolders = new FakeTaskFolders(_store, @"\Reports");
+        _tasks = new TasksViewModel(_store, new TaskRunner(_store, new FakeSnoozeGate(), new RecordingNotifier()), _settings, _prompts,
+            new ScriptedFilePicker(), _app, new InlineUiThread(), _time,
+            new TaskEditorFactory(_store, _settings, _app, new ScriptedFilePicker(), new FakeNetworkProfiles(), _time, _snoozeService),
+            _taskFolders, new FakeTaskEventStream(), _snoozeService);
+        _store.Add(@"\Reports\Backup");
+    }
+
+    public void Dispose()
+    {
+        _tasks.Dispose();
+        _settings.Dispose();
+        _folder.Dispose();
+        Loc.Use(static _ => null);
+    }
+
+    [Theory]
+    [InlineData(@"\Reports", @"\Reports\Old\Backup", @"\Reports\Old")]
+    [InlineData(@"", @"\Backup", "Library")]
+    public async Task AMoveOntoATakenName_NamesTheFolder_TheTopOneByItsName(string target, string taken, string named)
+    {
+        await _tasks.ReloadAsync();
+        _taskFolders.Fails = new TaskExistsException(taken);
+
+        await _tasks.MoveToFolderAsync(_tasks.Find(@"\Reports\Backup")!, target);
+
+        Assert.Equal([$"Error: Backup: {named} has one"], _prompts.Shown);
     }
 }
