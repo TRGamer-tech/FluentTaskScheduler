@@ -70,26 +70,33 @@ public class ShellTests
     {
         using var app = AppSession.Launch("pane");
 
-        app.Resize(1700, 900);
+        // The pane changes its mode at widths of 641 and 1008 effective pixels, while UI Automation
+        // sizes and measures in physical ones: at a display scale of 150%, 900 physical pixels are
+        // 600 effective ones.
+        double scale = GetDpiForWindow(app.Window.Properties.NativeWindowHandle.Value) / 96.0;
+        void ResizeTo(int width) => app.Resize((int)(width * scale), (int)(800 * scale));
+        int WidthOfAnEntry() => (int)(app.Require("NavDashboard").BoundingRectangle.Width / scale);
+
+        ResizeTo(1100);
         app.Snapshot("wide");
-        int wide = WidthOf(app, "NavDashboard");
+        int wide = WidthOfAnEntry();
 
-        app.Resize(900, 800);
+        ResizeTo(800);
         app.Snapshot("medium");
-        int medium = WidthOf(app, "NavDashboard");
+        int medium = WidthOfAnEntry();
 
-        app.Resize(560, 800);
+        ResizeTo(560);
         app.Snapshot("narrow");
         var narrowItem = app.Find("NavDashboard", 1500);
         bool hiddenWhenNarrow = narrowItem == null || narrowItem.IsOffscreen;
 
-        app.Log($"NavDashboard width: wide {wide}, medium {medium}; hidden when narrow: {hiddenWhenNarrow}");
-        Assert.True(wide > 200, $"At 1700 px the pane should show labels, but its items are {wide} px wide.");
-        Assert.True(medium is > 0 and < 80, $"At 900 px the pane should show icons only, but its items are {medium} px wide.");
-        Assert.True(hiddenWhenNarrow, "At 560 px the pane should be closed.");
+        app.Log($"Display scale {scale:P0}; NavDashboard width in effective pixels: wide {wide}, medium {medium}; hidden when narrow: {hiddenWhenNarrow}");
+        Assert.True(wide > 200, $"At 1100 effective pixels the pane should show labels, but its entries are {wide} wide.");
+        Assert.True(medium is > 0 and < 80, $"At 800 effective pixels the pane should show icons only, but its entries are {medium} wide.");
+        Assert.True(hiddenWhenNarrow, "At 560 effective pixels the pane should be closed.");
 
-        app.Resize(1700, 900);
-        Assert.True(WidthOf(app, "NavDashboard") > 200, "The pane should open again when the window is wide again.");
+        ResizeTo(1100);
+        Assert.True(WidthOfAnEntry() > 200, "The pane should open again when the window is wide again.");
     }
 
     [Fact]
@@ -159,8 +166,8 @@ public class ShellTests
         Assert.True(AppSession.Eventually(() => ClipboardText() == savedLine, 5), "The copied text left the clipboard with the app.");
     }
 
-    private static int WidthOf(AppSession app, string automationId) =>
-        (int)app.Require(automationId).BoundingRectangle.Width;
+    [DllImport("user32.dll")]
+    private static extern uint GetDpiForWindow(nint window);
 
     /// <summary>The text on the clipboard; null when there is none, or another program has the clipboard open.</summary>
     private static string? ClipboardText()
