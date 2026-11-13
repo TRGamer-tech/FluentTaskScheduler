@@ -74,6 +74,19 @@ public class TaskFoldersTests
     }
 
     [SkippableFact]
+    public void ChangingOnlyTheCaseOfItsName_RenamesTheFolder()
+    {
+        Skip.IfNot(SchedulerSandbox.IsElevated, NeedsElevation);
+        using var sandbox = new SchedulerSandbox();
+        sandbox.Folder.CreateFolder("jobs").RegisterTaskDefinition("One", SampleTasks.Simple(sandbox.Service));
+
+        _folders.MoveFolder(sandbox.FolderPath + @"\jobs", sandbox.FolderPath + @"\Jobs");
+
+        Assert.Equal([sandbox.FolderPath + @"\Jobs"], _folders.GetFolders().Where(path => path.StartsWith(sandbox.FolderPath + @"\", StringComparison.Ordinal)));
+        Assert.True(_store.Exists(sandbox.FolderPath + @"\Jobs\One"));
+    }
+
+    [SkippableFact]
     public void AFolderCannotBeMovedIntoItself_OrOntoAnExistingOne()
     {
         Skip.IfNot(SchedulerSandbox.IsElevated, NeedsElevation);

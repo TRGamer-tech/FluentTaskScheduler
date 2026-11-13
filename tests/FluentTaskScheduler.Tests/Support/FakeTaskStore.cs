@@ -111,7 +111,7 @@ public sealed class FakeTaskStore : ITaskStore
 
         Change("Save", originalPath ?? path, mustExist: originalPath is not null);
         LastPassword = password;
-        if (originalPath is not null && !string.Equals(originalPath, path, StringComparison.OrdinalIgnoreCase))
+        if (originalPath is not null && originalPath != path)
         {
             _tasks.Remove(originalPath);
             _running.Remove(originalPath);

@@ -128,16 +128,28 @@ public sealed class TaskStore : ITaskStore
         }
 
         TaskFolder folder = original?.Folder ?? TaskPaths.GetOrCreateFolder(service, folderPath);
-        bool renamed = original is not null && !string.Equals(original.Name, draft.Name, StringComparison.OrdinalIgnoreCase);
+        ScheduledTask Register(string name, TaskCreation creation) =>
+            TaskRegistration.Register(folder, name, definition, userId, password, logonType, creation);
 
         // Only a task saved under its own name replaces what is registered there. A new task, or
         // one given a new name, must not take the place of a task that already has that name.
-        var creation = original is null || renamed ? TaskCreation.Create : TaskCreation.CreateOrUpdate;
-        TaskRegistration.Register(folder, draft.Name, definition, userId, password, logonType, creation);
+        if (original is null) return Register(draft.Name, TaskCreation.Create).Path;
+        if (original.Name == draft.Name) return Register(draft.Name, TaskCreation.CreateOrUpdate).Path;
 
-        if (renamed) DeleteAfterRename(folder, original!.Name, draft.Name);
+        // Task Scheduler takes a name that differs only in case for the task that has it, so such
+        // a rename goes by way of a name of its own.
+        string oldName = original.Name;
+        if (string.Equals(oldName, draft.Name, StringComparison.OrdinalIgnoreCase))
+        {
+            string interim = $"{draft.Name} ({Guid.NewGuid().ToString("N")[..8]})";
+            Register(interim, TaskCreation.Create);
+            DeleteAfterRename(folder, oldName, interim);
+            oldName = interim;
+        }
 
-        return TaskPaths.Combine(folder.Path, draft.Name);
+        ScheduledTask renamed = Register(draft.Name, TaskCreation.Create);
+        DeleteAfterRename(folder, oldName, draft.Name);
+        return renamed.Path;
     }
 
     /// <summary>

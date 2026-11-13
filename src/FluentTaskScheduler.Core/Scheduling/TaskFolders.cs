@@ -86,7 +86,17 @@ public sealed class TaskFolders : ITaskFolders
     public void MoveFolder(string path, string newPath)
     {
         if (IsRoot(path)) throw new InvalidOperationException("The root folder cannot be moved.");
-        if (string.Equals(path, newPath, StringComparison.OrdinalIgnoreCase)) return;
+        if (path == newPath) return;
+
+        // Task Scheduler takes a name that differs only in case for the folder that has it, so
+        // such a rename goes by way of a name of its own.
+        if (string.Equals(path, newPath, StringComparison.OrdinalIgnoreCase))
+        {
+            string interim = $"{newPath} ({Guid.NewGuid().ToString("N")[..8]})";
+            MoveFolder(path, interim);
+            MoveFolder(interim, newPath);
+            return;
+        }
         if (TaskPaths.IsWithin(newPath, path)) throw new InvalidOperationException("A folder cannot be moved into itself.");
 
         using var service = new TaskService();

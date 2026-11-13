@@ -123,6 +123,21 @@ public class TaskStoreTests
     }
 
     [SkippableFact]
+    public void ChangingOnlyTheCaseOfItsName_RenamesTheTask()
+    {
+        Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
+        using var sandbox = new SchedulerSandbox();
+        string oldPath = _store.Save(NewDraft("backup"), sandbox.FolderPath);
+
+        string newPath = _store.Save(_store.Load(oldPath) with { Name = "Backup" }, sandbox.FolderPath, oldPath);
+
+        Assert.Equal(sandbox.PathOf("Backup"), newPath);
+        var row = Assert.Single(_store.GetTasks(), r => r.FolderPath == sandbox.FolderPath);
+        Assert.Equal("Backup", row.Name);
+        Assert.Equal("Created by a test", row.Description);
+    }
+
+    [SkippableFact]
     public void ANewTask_NeverReplacesATaskOfTheSameName()
     {
         Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
