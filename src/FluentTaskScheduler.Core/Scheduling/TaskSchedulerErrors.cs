@@ -7,9 +7,8 @@ internal static class TaskSchedulerErrors
     internal const int E_ACCESSDENIED = unchecked((int)0x80070005);
 
     /// <summary>
-    /// Checks the HRESULT (walking inner exceptions too) instead of matching the exception
-    /// message text — the old code only recognized English and German "access denied" strings,
-    /// so the check silently failed on any other OS display language (see 3.9).
+    /// Checks the HRESULT, inner exceptions included, rather than the message, which is written
+    /// in the display language of Windows.
     /// </summary>
     internal static bool IsAccessDenied(Exception? ex)
     {
