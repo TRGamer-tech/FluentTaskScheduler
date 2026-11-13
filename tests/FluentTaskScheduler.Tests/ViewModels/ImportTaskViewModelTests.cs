@@ -32,6 +32,30 @@ public class ImportTaskViewModelTests
     }
 
     [Fact]
+    public void WhatTheTaskRunsAndWhen_IsShownBeforeItIsImported()
+    {
+        var daily = new TriggerDraft { Type = TriggerType.Daily, SourceIndex = 0, Start = new DateTime(2031, 5, 6, 7, 8, 0) };
+        var import = Import(Info(TaskAccount.System) with
+        {
+            Triggers = [daily, new TriggerDraft { Type = TriggerType.Unsupported, SourceIndex = 1, UnsupportedSummary = "Registration" }],
+            Actions = [new ActionDraft { SourceIndex = 0, Path = "cmd.exe", Arguments = "/c del *" }, new ActionDraft { SourceIndex = 1, UnsupportedSummary = "ShowMessage" }]
+        });
+
+        Assert.Equal(["cmd.exe /c del *", "Action.Unsupported (ShowMessage)"], import.Actions);
+        Assert.Equal([TriggerText.Describe(daily), "Dialog.Trigger.__Unsupported (Registration)"], import.Triggers);
+        Assert.False(import.HasNoTriggers);
+    }
+
+    [Fact]
+    public void ATaskWithoutTriggers_IsShownAsOneThatOnlyRunsWhenStartedByHand()
+    {
+        var import = Import(Info(TaskAccount.CurrentUser) with { Actions = [new ActionDraft { SourceIndex = 0, Path = "cmd.exe" }] });
+
+        Assert.Empty(import.Triggers);
+        Assert.True(import.HasNoTriggers);
+    }
+
+    [Fact]
     public async Task ATaskWhoseAccountDoesNotExistHere_IsImportedForTheCurrentUserByDefault()
     {
         var import = Import(Info(Foreign, exists: false, highest: true));

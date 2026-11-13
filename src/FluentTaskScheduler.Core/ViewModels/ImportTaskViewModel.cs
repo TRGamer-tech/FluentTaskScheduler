@@ -6,7 +6,8 @@ namespace FluentTaskScheduler.ViewModels;
 
 /// <summary>
 /// What the user decides when importing a task from a file: where it goes, what it is called and,
-/// for a task that comes from another account or machine, who it runs as here.
+/// for a task that comes from another account or machine, who it runs as here. What the task runs,
+/// and when, is shown first, so that nothing is registered unseen.
 /// </summary>
 public sealed partial class ImportTaskViewModel : ObservableObject
 {
@@ -28,6 +29,8 @@ public sealed partial class ImportTaskViewModel : ObservableObject
         _name = suggestedName;
         Folders = folders.Count > 0 ? folders : [TaskPaths.Root];
         _folderIndex = Math.Max(Folders.ToList().FindIndex(folder => string.Equals(folder, currentFolder, StringComparison.OrdinalIgnoreCase)), 0);
+        Actions = info.Actions.Select(ActionText.Describe).ToList();
+        Triggers = info.Triggers.Select(TriggerText.Describe).ToList();
 
         AccountOptions =
         [
@@ -44,6 +47,15 @@ public sealed partial class ImportTaskViewModel : ObservableObject
 
     public IReadOnlyList<string> Folders { get; }
     [ObservableProperty] private int _folderIndex;
+
+    /// <summary>What the task runs, one line per action.</summary>
+    public IReadOnlyList<string> Actions { get; }
+
+    /// <summary>When the task runs, one line per trigger.</summary>
+    public IReadOnlyList<string> Triggers { get; }
+
+    /// <summary>True for a task that only runs when it is started by hand.</summary>
+    public bool HasNoTriggers => Triggers.Count == 0;
 
     /// <summary>The account the task was exported with, as its name or, if that cannot be resolved here, its identifier.</summary>
     public string AccountName => _info.Account.Kind switch

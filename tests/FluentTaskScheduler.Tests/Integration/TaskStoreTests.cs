@@ -244,6 +244,8 @@ public class TaskStoreTests
         Assert.True(info.AccountExistsHere);
         Assert.True(info.HighestPrivileges);
         Assert.False(info.StoresPassword);
+        Assert.Equal(task.Definition.Triggers.Count, info.Triggers.Count);
+        Assert.Equal(["/c exit 0", "/c exit 1"], info.Actions.Select(action => action.Arguments));
         Assert.Empty(XmlDiff.Diff(xml, _store.Export(copy), "Date", "URI"));
     }
 

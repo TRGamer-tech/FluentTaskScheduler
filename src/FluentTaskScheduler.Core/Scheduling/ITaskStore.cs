@@ -54,7 +54,7 @@ public interface ITaskStore
     /// <summary>The task as XML, in the format Task Scheduler itself exports and imports.</summary>
     string Export(string path);
 
-    /// <summary>What an exported task says about the account it runs as.</summary>
+    /// <summary>What an exported task says about the account it runs as, when it runs and what it runs.</summary>
     TaskImportInfo Inspect(string xml);
 
     /// <summary>Registers an exported task. It never replaces a task that is already there.</summary>
@@ -63,12 +63,16 @@ public interface ITaskStore
     string Import(string xml, TaskImportOptions options);
 }
 
-/// <summary>The account settings found in an exported task.</summary>
+/// <summary>What an exported task brings along: the account it runs as, its triggers and its actions.</summary>
 /// <param name="Account">The account the task was exported with.</param>
 /// <param name="AccountExistsHere">False when that account cannot be found on this computer, as for a task exported elsewhere.</param>
 /// <param name="HighestPrivileges">Whether the task asks to run elevated.</param>
 /// <param name="StoresPassword">Whether the task needs its account's password to be registered.</param>
-public sealed record TaskImportInfo(TaskAccount Account, bool AccountExistsHere, bool HighestPrivileges, bool StoresPassword);
+public sealed record TaskImportInfo(TaskAccount Account, bool AccountExistsHere, bool HighestPrivileges, bool StoresPassword)
+{
+    public ValueList<TriggerDraft> Triggers { get; init; } = [];
+    public ValueList<ActionDraft> Actions { get; init; } = [];
+}
 
 /// <summary>How to register an exported task.</summary>
 /// <param name="FolderPath">Folder to put the task in.</param>

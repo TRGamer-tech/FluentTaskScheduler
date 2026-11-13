@@ -235,7 +235,11 @@ public sealed class TaskStore : ITaskStore
             task.Account,
             AccountExistsHere: id.Length == 0 || TaskAccounts.Exists(id),
             task.HighestPrivileges,
-            task.StoresPassword);
+            task.StoresPassword)
+        {
+            Triggers = task.Triggers,
+            Actions = task.Actions
+        };
     }
 
     public string Import(string xml, TaskImportOptions options)
