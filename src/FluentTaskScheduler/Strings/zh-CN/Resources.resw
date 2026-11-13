@@ -142,7 +142,7 @@
   <data name="Settings.Appearance.Theme.Title" xml:space="preserve"><value>应用主题</value></data>
   <data name="Settings.Appearance.Theme.Description" xml:space="preserve"><value>选择浅色或深色，或使用 Windows 的设置。</value></data>
   <data name="Settings.Appearance.Mica.Title" xml:space="preserve"><value>云母效果</value></data>
-  <data name="Settings.Appearance.Mica.Description" xml:space="preserve"><value>应用云母半透明背景材质。</value></data>
+  <data name="Settings.Appearance.Mica.Description" xml:space="preserve"><value>使用云母半透明背景材质。</value></data>
   <data name="Settings.Appearance.Oled.Title" xml:space="preserve"><value>OLED 模式</value></data>
   <data name="Settings.Appearance.Oled.Description" xml:space="preserve"><value>纯黑背景，以便在 OLED 显示器上省电。需要深色主题。</value></data>
   <data name="DashboardFilterCategory.Text" xml:space="preserve"><value>按分类筛选</value></data>
@@ -151,7 +151,7 @@
   <data name="DashboardHealthScore.Text" xml:space="preserve"><value>健康评分</value></data>
   <data name="DashboardCurrentlyRunning.Text" xml:space="preserve"><value>当前运行中</value></data>
   <data name="DashboardNoRunningTasks.Text" xml:space="preserve"><value>当前没有正在运行的任务</value></data>
-  <data name="DashboardUpcomingSchedule.Text" xml:space="preserve"><value>即将运行计划</value></data>
+  <data name="DashboardUpcomingSchedule.Text" xml:space="preserve"><value>即将运行的计划</value></data>
   <data name="ScriptLibraryCreateBtn.Content" xml:space="preserve"><value>新建脚本</value></data>
   <data name="ScriptLibraryDeleteBtn.ToolTipService.ToolTip" xml:space="preserve"><value>删除脚本</value></data>
   <data name="ScriptLibraryUseTemplateBtn.Content" xml:space="preserve"><value>从脚本创建任务...</value></data>
@@ -168,7 +168,7 @@
   <data name="ConditionSpecificNetwork.Text" xml:space="preserve"><value>指定网络：</value></data>
   <data name="Settings.Notif.Task.Title" xml:space="preserve"><value>任务通知</value></data>
   <data name="Settings.Notif.Task.Desc" xml:space="preserve"><value>在应用启动任务、完成后操作无法启动任务、暂停阻止了运行，以及所有任务的暂停开始或结束时显示通知。关闭此项也会关闭提醒。</value></data>
-  <data name="Settings.Notif.Reminders.Title" xml:space="preserve"><value>即将执行的任务提醒</value></data>
+  <data name="Settings.Notif.Reminders.Title" xml:space="preserve"><value>即将运行的任务提醒</value></data>
   <data name="Settings.Notif.Reminders.Desc" xml:space="preserve"><value>在你的任务即将运行前显示通知。隐藏任务和 Windows 自身的任务除外。</value></data>
   <data name="Settings.Notif.Timing.Title" xml:space="preserve"><value>提醒时间</value></data>
   <data name="Settings.Notif.Timing.Desc" xml:space="preserve"><value>提前多久发送提醒。</value></data>
@@ -221,8 +221,8 @@
   <data name="Dialog.Trigger.Weekly" xml:space="preserve"><value>每周</value></data>
   <data name="Dialog.Trigger.Monthly" xml:space="preserve"><value>每月</value></data>
   <data name="Dialog.Trigger.Session" xml:space="preserve"><value>会话更改时（锁定、解锁、连接、断开连接）</value></data>
-  <data name="Dialog.RandomDelay" xml:space="preserve"><value>延迟任务最多（随机延迟）：</value></data>
-  <data name="Dialog.StopAfter" xml:space="preserve"><value>如果运行时间超过则停止任务：</value></data>
+  <data name="Dialog.RandomDelay" xml:space="preserve"><value>延迟任务的最长时间（随机延迟）：</value></data>
+  <data name="Dialog.StopAfter" xml:space="preserve"><value>如果任务运行时间超过以下时间，停止任务：</value></data>
   <data name="Dialog.ProgramScript" xml:space="preserve"><value>程序 / 脚本</value></data>
   <data name="Dialog.Arguments" xml:space="preserve"><value>参数（可选）</value></data>
   <data name="Dialog.WorkingDir" xml:space="preserve"><value>运行位置（可选）</value></data>
@@ -245,10 +245,10 @@
   <data name="Trigger.OnIdle" xml:space="preserve"><value>空闲时</value></data>
   <data name="Trigger.AtLogon" xml:space="preserve"><value>登录时</value></data>
   <data name="Trigger.AtStartup" xml:space="preserve"><value>启动时</value></data>
-  <data name="Trigger.SessionStateChange" xml:space="preserve"><value>在 {0} 时</value></data>
+  <data name="Trigger.SessionStateChange" xml:space="preserve"><value>在{0}时</value></data>
   <data name="Dialog.Ph.TaskName" xml:space="preserve"><value>输入任务名称</value></data>
   <data name="Dialog.Ph.Category" xml:space="preserve"><value>例如：工作</value></data>
-  <data name="Dialog.Ph.Tags" xml:space="preserve"><value>例如：紧急, 同步 (逗号分隔)</value></data>
+  <data name="Dialog.Ph.Tags" xml:space="preserve"><value>例如：紧急, 同步（逗号分隔）</value></data>
   <data name="Dialog.Ph.Command" xml:space="preserve"><value>例如：notepad.exe 或 C:\Scripts\myscript.ps1</value></data>
   <data name="Dialog.Ph.Args" xml:space="preserve"><value>例如：/c echo hello 或 -File script.ps1</value></data>
   <data name="Dialog.Ph.WorkDir" xml:space="preserve"><value>例如：C:\Scripts</value></data>
@@ -258,9 +258,9 @@
   <data name="Dialog.EventLog" xml:space="preserve"><value>日志</value></data>
   <data name="Dialog.EventSource" xml:space="preserve"><value>源</value></data>
   <data name="Dialog.EventId" xml:space="preserve"><value>事件 ID</value></data>
-  <data name="Dialog.Ph.EventLog" xml:space="preserve"><value>Application, System, Security 等</value></data>
-  <data name="Dialog.Ph.EventSource" xml:space="preserve"><value>例如：VSS, Outlook (可选)</value></data>
-  <data name="Dialog.Ph.EventId" xml:space="preserve"><value>例如：1000 (可选)</value></data>
+  <data name="Dialog.Ph.EventLog" xml:space="preserve"><value>例如：Application、System、Security</value></data>
+  <data name="Dialog.Ph.EventSource" xml:space="preserve"><value>例如：VSS、Outlook（可选）</value></data>
+  <data name="Dialog.Ph.EventId" xml:space="preserve"><value>例如：1000（可选）</value></data>
   <data name="Dialog.RecurEvery" xml:space="preserve"><value>每隔</value></data>
   <data name="Dialog.Day.Mon" xml:space="preserve"><value>周一</value></data>
   <data name="Dialog.Day.Tue" xml:space="preserve"><value>周二</value></data>
@@ -328,11 +328,11 @@
   <data name="ScriptEditor_SaveBtn.Label" xml:space="preserve"><value>保存到库</value></data>
   <data name="ScriptEditor_ClearBtn.Label" xml:space="preserve"><value>清除控制台</value></data>
   <data name="ScriptEditor_OutputHeader.Text" xml:space="preserve"><value>输出控制台</value></data>
-  <data name="ScriptEditor_CodeEditor.PlaceholderText" xml:space="preserve"><value>在此处编写您的 PowerShell 脚本...</value></data>
+  <data name="ScriptEditor_CodeEditor.PlaceholderText" xml:space="preserve"><value>在此处编写你的 PowerShell 脚本...</value></data>
   <data name="ScriptEditor_CodeEditor.Header" xml:space="preserve"><value>PowerShell 脚本</value></data>
   <data name="ScriptEditor.Status.Starting" xml:space="preserve"><value>[正在启动 PowerShell...]</value></data>
   <data name="ScriptEditor.Status.Stopped" xml:space="preserve"><value>[用户已停止]</value></data>
-  <data name="ScriptEditor.Status.Saved" xml:space="preserve"><value>[已保存到库为 “{0}”]</value></data>
+  <data name="ScriptEditor.Status.Saved" xml:space="preserve"><value>[已以“{0}”为名保存到库]</value></data>
   <data name="Dialog.Crash.Title" xml:space="preserve"><value>出现问题</value></data>
   <data name="Dialog.Crash.Copy" xml:space="preserve"><value>复制到剪贴板</value></data>
   <data name="Main.Header.QuickActions" xml:space="preserve"><value>快速操作</value></data>
@@ -387,8 +387,8 @@
   <data name="Templates.Defrag.Name" xml:space="preserve"><value>磁盘优化（碎片整理、TRIM）</value></data>
   <data name="Templates.Defrag.Desc" xml:space="preserve"><value>在 C: 驱动器上运行 Windows 内置优化程序。SSD 将执行 TRIM/重新 TRIM，HDD 将进行碎片整理。</value></data>
   <data name="Templates.Defrag.Note" xml:space="preserve"><value>仅在电脑空闲且接通交流电源时运行。如果 Windows 安装在其他驱动器，请修改“C:”。</value></data>
-  <data name="Templates.GitFetch.Name" xml:space="preserve"><value>Git 仓库拉取</value></data>
-  <data name="Templates.GitFetch.Desc" xml:space="preserve"><value>对指定文件夹下找到的每个 Git 仓库执行带清理的全部远程拉取。保存前请编辑路径。</value></data>
+  <data name="Templates.GitFetch.Name" xml:space="preserve"><value>Git 仓库抓取</value></data>
+  <data name="Templates.GitFetch.Desc" xml:space="preserve"><value>抓取所选文件夹下每个 Git 仓库的所有远程仓库，并清理远程已删除的分支。保存前请编辑路径。</value></data>
   <data name="Templates.GitFetch.Note" xml:space="preserve"><value>请将“C:\Repos”改为你自己的仓库根目录，并确保 git 已加入 PATH。</value></data>
   <data name="Templates.DockerPrune.Name" xml:space="preserve"><value>Docker 系统清理</value></data>
   <data name="Templates.DockerPrune.Desc" xml:space="preserve"><value>删除已停止的容器、未使用的网络、悬空镜像和构建缓存，以回收磁盘空间。</value></data>
@@ -425,7 +425,7 @@
   <data name="Pipeline.SuccessHint" xml:space="preserve"><value>运行成功（所有操作均以退出代码 0 结束）时启动。</value></data>
   <data name="Pipeline.FailureHeader" xml:space="preserve"><value>失败时</value></data>
   <data name="Pipeline.FailureHint" xml:space="preserve"><value>运行失败、无法启动、超时或被停止时启动。</value></data>
-  <data name="EventLevel.Critical" xml:space="preserve"><value>严重</value></data>
+  <data name="EventLevel.Critical" xml:space="preserve"><value>关键</value></data>
   <data name="EventLevel.Error" xml:space="preserve"><value>错误</value></data>
   <data name="EventLevel.Warning" xml:space="preserve"><value>警告</value></data>
   <data name="EventLevel.Information" xml:space="preserve"><value>信息</value></data>
@@ -455,7 +455,7 @@
   <data name="Templates.NodePrune.Note" xml:space="preserve"><value>需要 PATH 中包含 Node.js。</value></data>
   <data name="Templates.ProjectBackup.Name" xml:space="preserve"><value>夜间项目文件夹备份</value></data>
   <data name="Templates.ProjectBackup.Desc" xml:space="preserve"><value>使用 robocopy 将项目文件夹镜像到备份位置，跳过构建输出和依赖文件夹。</value></data>
-  <data name="Templates.ProjectBackup.Note" xml:space="preserve"><value>/MIR 会删除目标中源已不存在的文件。请先检查两侧路径。</value></data>
+  <data name="Templates.ProjectBackup.Note" xml:space="preserve"><value>/MIR 会删除目标位置中源位置已不存在的文件。请先检查这两个路径。</value></data>
   <data name="Templates.DevServerRestart.Name" xml:space="preserve"><value>每晚重启一个 Windows 服务</value></data>
   <data name="Templates.DevServerRestart.Desc" xml:space="preserve"><value>重启长时间运行的服务（构建代理、数据库、本地服务器等）以清除内存泄漏。保存前请更改服务名称。</value></data>
   <data name="Templates.DevServerRestart.Note" xml:space="preserve"><value>请将“YourServiceName”替换为服务的名称。</value></data>
@@ -481,7 +481,7 @@
   <data name="Dialog.Error.InvalidIdleDuration" xml:space="preserve"><value>“{0}”不是有效的空闲时长。请按 10m 或 1h 的形式填写。</value></data>
   <data name="Dialog.Error.InvalidRestartInterval" xml:space="preserve"><value>“{0}”不是有效的重新启动间隔。请按 1m 或 30m 的形式填写。</value></data>
   <data name="Dialog.Error.InvalidStopAfter" xml:space="preserve"><value>“{0}”不是有效的最长运行时间。请按 90m、12h 或 3d 的形式填写。</value></data>
-  <data name="Dialog.Error.SaveTaskFailedPrefix" xml:space="preserve"><value>保存任务失败: </value></data>
+  <data name="Dialog.Error.SaveTaskFailedPrefix" xml:space="preserve"><value>保存任务失败：</value></data>
   <data name="Dialog.GetStarted" xml:space="preserve"><value>开始使用</value></data>
   <data name="Dialog.Next" xml:space="preserve"><value>下一步</value></data>
   <data name="FolderMenu.Delete" xml:space="preserve"><value>删除</value></data>
@@ -495,13 +495,13 @@
   <data name="Main.Batch.SelectedCountFormat" xml:space="preserve"><value>已选择 {0} 项</value></data>
   <data name="Main.Batch.Stop" xml:space="preserve"><value>停止</value></data>
   <data name="Main.Badge.Chained" xml:space="preserve"><value>已链接</value></data>
-  <data name="Main.Badge.FilterByCategory" xml:space="preserve"><value>按此类别筛选</value></data>
+  <data name="Main.Badge.FilterByCategory" xml:space="preserve"><value>按此分类筛选</value></data>
   <data name="Main.Badge.Hidden" xml:space="preserve"><value>已隐藏</value></data>
   <data name="ScriptLibrary.DeleteTemplate.Content" xml:space="preserve"><value>删除“{0}”？</value></data>
   <data name="ScriptLibrary.DeleteTemplate.Title" xml:space="preserve"><value>删除脚本</value></data>
   <data name="Settings.UpdateApplyFailed.Content" xml:space="preserve"><value>无法安装更新。请查看日志了解详细信息，或稍后重试。</value></data>
-  <data name="Snooze.IncludeMicrosoftTasks" xml:space="preserve"><value>同时暂停 Microsoft 自身的计划任务(Defender、Windows 更新、维护等)</value></data>
-  <data name="Snooze.IncludeMicrosoftTasksWarning" xml:space="preserve"><value>不建议这样做:禁用这些任务可能会在暂停结束前影响 Windows 安全扫描、更新和维护。</value></data>
+  <data name="Snooze.IncludeMicrosoftTasks" xml:space="preserve"><value>同时暂停 Microsoft 自身的计划任务（Defender、Windows 更新、维护等）</value></data>
+  <data name="Snooze.IncludeMicrosoftTasksWarning" xml:space="preserve"><value>不建议这样做：禁用这些任务可能会在暂停结束前影响 Windows 安全扫描、更新和维护。</value></data>
   <data name="Tray.CloseWindowFormat" xml:space="preserve"><value>关闭 {0}</value></data>
   <data name="Tray.ExitAll" xml:space="preserve"><value>退出</value></data>
   <data name="Tray.NewWindow" xml:space="preserve"><value>新建窗口</value></data>
@@ -514,17 +514,17 @@
   <data name="Dialog.Trigger.__Unsupported" xml:space="preserve"><value>不支持的触发器</value></data>
   <data name="Main.FoldersHeader" xml:space="preserve"><value>文件夹</value></data>
   <data name="Main.Nav.ScriptEditor" xml:space="preserve"><value>脚本编辑器</value></data>
-  <data name="Scripts.BatteryReport.Description" xml:space="preserve"><value>在您的用户文件夹中生成电池运行状况报告。</value></data>
+  <data name="Scripts.BatteryReport.Description" xml:space="preserve"><value>在你的用户文件夹中生成电池运行状况报告。</value></data>
   <data name="Scripts.BatteryReport.Name" xml:space="preserve"><value>电池报告</value></data>
   <data name="Scripts.CheckDisk.Description" xml:space="preserve"><value>扫描 C: 驱动器的错误但不修复（使用中运行也安全）。</value></data>
   <data name="Scripts.CheckDisk.Name" xml:space="preserve"><value>检查磁盘（仅扫描）</value></data>
   <data name="Scripts.ClearTempFolder.Description" xml:space="preserve"><value>删除当前用户 Temp 文件夹中所有未被占用的内容以释放空间。</value></data>
   <data name="Scripts.ClearTempFolder.Name" xml:space="preserve"><value>清空临时文件夹</value></data>
-  <data name="Scripts.DiskCleanup.Description" xml:space="preserve"><value>使用你运行一次“cleanmgr /sageset:1”保存的选项来运行磁盘清理。</value></data>
+  <data name="Scripts.DiskCleanup.Description" xml:space="preserve"><value>使用你通过运行“cleanmgr /sageset:1”保存的选项运行磁盘清理。</value></data>
   <data name="Scripts.DiskCleanup.Name" xml:space="preserve"><value>磁盘清理（系统）</value></data>
   <data name="Scripts.EmptyRecycleBin.Description" xml:space="preserve"><value>永久删除回收站中的所有项目。</value></data>
   <data name="Scripts.EmptyRecycleBin.Name" xml:space="preserve"><value>清空回收站</value></data>
-  <data name="Scripts.ExportIpConfig.Description" xml:space="preserve"><value>将完整的 IP 配置详细信息保存到您的用户文件夹。</value></data>
+  <data name="Scripts.ExportIpConfig.Description" xml:space="preserve"><value>将完整的 IP 配置详细信息保存到你的用户文件夹。</value></data>
   <data name="Scripts.ExportIpConfig.Name" xml:space="preserve"><value>导出 IP 配置</value></data>
   <data name="Scripts.FlushDns.Description" xml:space="preserve"><value>清除 DNS 解析器缓存。</value></data>
   <data name="Scripts.FlushDns.Name" xml:space="preserve"><value>刷新 DNS 缓存</value></data>
@@ -562,16 +562,16 @@
   <data name="Editor.Trigger.ExpiryDate" xml:space="preserve"><value>到期日期</value></data>
   <data name="Editor.Unit.Days" xml:space="preserve"><value>天</value></data>
   <data name="Editor.Unit.Weeks" xml:space="preserve"><value>周</value></data>
-  <data name="Editor.Trigger.Weekdays" xml:space="preserve"><value>在这些日子</value></data>
+  <data name="Editor.Trigger.Weekdays" xml:space="preserve"><value>在以下星期几</value></data>
   <data name="Editor.Trigger.ByDay" xml:space="preserve"><value>按每月的日期</value></data>
   <data name="Editor.Trigger.ByWeekday" xml:space="preserve"><value>按每月的星期</value></data>
   <data name="Editor.Trigger.LastDay" xml:space="preserve"><value>每月最后一天</value></data>
-  <data name="Editor.Trigger.Months" xml:space="preserve"><value>在这些月份</value></data>
-  <data name="Editor.Trigger.WeeksOfMonth" xml:space="preserve"><value>在这些周</value></data>
+  <data name="Editor.Trigger.Months" xml:space="preserve"><value>在以下月份</value></data>
+  <data name="Editor.Trigger.WeeksOfMonth" xml:space="preserve"><value>在以下几周</value></data>
   <data name="Editor.Trigger.SessionChange" xml:space="preserve"><value>时机</value></data>
   <data name="Editor.Trigger.CustomQuery" xml:space="preserve"><value>自定义查询 (XML)</value></data>
   <data name="Editor.Trigger.Unsupported" xml:space="preserve"><value>无法在此处编辑这种触发器。它将保持原样。</value></data>
-  <data name="Editor.Ph.Duration" xml:space="preserve"><value>例如 15m、1h 30m、2d</value></data>
+  <data name="Editor.Ph.Duration" xml:space="preserve"><value>例如：15m、1h 30m、2d</value></data>
   <data name="Editor.Ph.NoRepetition" xml:space="preserve"><value>留空：不重复</value></data>
   <data name="Editor.Ph.Indefinitely" xml:space="preserve"><value>留空：无限期</value></data>
   <data name="Editor.Ph.NoDelay" xml:space="preserve"><value>留空：不延迟</value></data>
@@ -705,7 +705,7 @@
   <data name="ScriptEditor.Discard.Confirm" xml:space="preserve"><value>放弃</value></data>
   <data name="Library.EditScript" xml:space="preserve"><value>编辑脚本</value></data>
   <data name="ScriptLibrary.DeleteScript.TasksWarning" xml:space="preserve"><value>由此脚本创建的任务会运行它的文件，文件被删除后这些任务将失败。</value></data>
-  <data name="Library.Scripts.ListSetAside" xml:space="preserve"><value>无法读取已保存脚本的列表。该列表已保留为 {0}，库已重新创建了一个新列表。</value></data>
+  <data name="Library.Scripts.ListSetAside" xml:space="preserve"><value>无法读取已保存脚本的列表。该列表已保留为 {0}，库已创建一个新列表。</value></data>
   <data name="Library.Scripts.LoadFailed" xml:space="preserve"><value>无法读取已保存的脚本：{0}</value></data>
   <data name="Library.Scripts.DeleteFailed" xml:space="preserve"><value>无法删除脚本：{0}</value></data>
   <data name="Templates.IdleShutdown.Comment" xml:space="preserve"><value>计划的关机。要取消，请运行：shutdown /a</value></data>
@@ -769,7 +769,7 @@
   <data name="Tour.Admin.Body" xml:space="preserve"><value>Windows 只向管理员显示部分任务，另一些任务只允许管理员更改。没有管理员权限时，应用无法列出前者，也无法更改后者。要处理所有任务，请以管理员身份启动应用。</value></data>
   <data name="Tour.Settings.Title" xml:space="preserve"><value>按你的喜好设置</value></data>
   <data name="Tour.Settings.Body" xml:space="preserve"><value>在设置中，你可以选择主题和语言、接收哪些通知、应用是否随 Windows 启动等等。应用启动时会检查更新。你可以随时在“设置”的“关于”中再次查看此导览。</value></data>
-  <data name="WhatsNew.TitleFormat" xml:space="preserve"><value>版本 {0} 的新增内容</value></data>
+  <data name="WhatsNew.TitleFormat" xml:space="preserve"><value>版本 {0} 的更新内容</value></data>
   <data name="WhatsNew.ViewRelease" xml:space="preserve"><value>在 GitHub 上查看此版本</value></data>
   <data name="Snooze.Error.NotRecorded" xml:space="preserve"><value>无法保存暂停，因此未做任何更改。{0}</value></data>
   <data name="Snooze.Restore.MessageFormat" xml:space="preserve"><value>暂停已结束，但以下任务未能重新启用：{0}</value></data>
@@ -777,10 +777,10 @@
   <data name="Snooze.Restore.AccessDenied" xml:space="preserve"><value>Windows 拒绝了访问。在应用以管理员身份运行时暂停的任务，只能以管理员权限重新启用。</value></data>
   <data name="Snooze.Unreadable.MessageFormat" xml:space="preserve"><value>之前的暂停所禁用的任务可能仍处于禁用状态，但不会在此列出。其记录无法读取，已保存为 {0}。</value></data>
   <data name="Snooze.Dialog.Until" xml:space="preserve"><value>暂停所有任务，直到：</value></data>
-  <data name="Task.Snooze.AlreadyDisabled" xml:space="preserve"><value>此任务已被禁用。暂停结束时会将其启用，因此保持原样。</value></data>
+  <data name="Task.Snooze.AlreadyDisabled" xml:space="preserve"><value>此任务已处于禁用状态。如果暂停它，暂停结束时会将其启用，因此未做更改。</value></data>
   <data name="Snooze.Restore.Title" xml:space="preserve"><value>部分任务仍处于禁用状态</value></data>
   <data name="Snooze.Restore.Retry" xml:space="preserve"><value>重试</value></data>
-  <data name="Snooze.Unreadable.Title" xml:space="preserve"><value>无法读取之前的暂停</value></data>
+  <data name="Snooze.Unreadable.Title" xml:space="preserve"><value>无法读取之前的暂停记录</value></data>
   <data name="Dashboard.Tasks.Note" xml:space="preserve"><value>已启用 {0} 个，正在运行 {1} 个</value></data>
   <data name="Dashboard.Health.Note" xml:space="preserve"><value>成功 {0} 次，失败 {1} 次</value></data>
   <data name="Dashboard.Runs.Note" xml:space="preserve"><value>最近 24 小时 {0} 次</value></data>
