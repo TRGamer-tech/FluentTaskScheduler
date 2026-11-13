@@ -28,6 +28,14 @@ public class SettingsTests
     private static string? ChoiceShownBy(AppSession app, string automationId) =>
         app.Require(automationId).AsComboBox().SelectedItem?.Name;
 
+    /// <summary>
+    /// The heading of the first section, which spans the cards below it: it ends where they end
+    /// and begins one pixel after them. A list on a card is no measure of the card's edge, as its
+    /// bounds reach 4 pixels past the box it draws.
+    /// </summary>
+    private static AutomationElement FirstSectionHeading(AppSession app) =>
+        app.FindByName("Appearance", ControlType.Text) ?? throw new InvalidOperationException("The heading 'Appearance' was not found.");
+
     private static void Expand(AppSession app, string automationId)
     {
         var expander = app.Require(automationId);
@@ -99,13 +107,13 @@ public class SettingsTests
     public void ASwitch_SitsAtTheRightEdgeOfItsCard_WithItsStateTextBeforeTheKnob()
     {
         using var app = OpenSettings("settings-layout");
-        var list = app.Require("ThemeChoice").BoundingRectangle;
         var toggle = app.Require("MicaSwitch");
         var bounds = toggle.BoundingRectangle;
         app.Snapshot("cards");
 
-        // A drop-down list's bounds reach 4 pixels past the box it draws; the two drawn edges line up.
-        Assert.True(Math.Abs(bounds.Right - list.Right) <= 6, $"The switch ends at {bounds.Right}, the list in the card above it at {list.Right}.");
+        // Inside the card's border of 1 and its padding of 16.
+        int cardEnd = FirstSectionHeading(app).BoundingRectangle.Right;
+        Assert.True(Math.Abs(bounds.Right - (cardEnd - 17)) <= 2, $"The switch ends at {bounds.Right} and its card at {cardEnd}: the switch is not at the card's right edge.");
 
         // The knob is 40 wide and belongs at the very right, with "On" or "Off" written to the left of it.
         // Not every version of the switch lets automation see that text; the screenshot shows it either way.
@@ -128,15 +136,12 @@ public class SettingsTests
         var page = app.Require("SettingsScroller").BoundingRectangle;
         Skip.If(page.Width < 1300, $"The screen leaves the page {page.Width} pixels, too few for cards of their maximum width with room on both sides.");
 
-        // The first card is told by what sits at its two ends: the heading above it begins where
-        // the card does, and the list in it ends where the card does, less the card's padding.
-        var heading = app.FindByName("Appearance", ControlType.Text);
-        Assert.NotNull(heading);
-        int left = heading.BoundingRectangle.Left - page.Left;
-        int right = page.Right - app.Require("ThemeChoice").BoundingRectangle.Right;
+        var cards = FirstSectionHeading(app).BoundingRectangle;
+        int left = cards.Left - page.Left;
+        int right = page.Right - cards.Right;
 
         Assert.True(left > 100 && right > 100, $"The cards have {left} to their left and {right} to their right in a page of {page.Width}: they are not held to a maximum width.");
-        Assert.True(Math.Abs(left - right) <= 24, $"The cards have {left} to their left and {right} to their right: they are not centred.");
+        Assert.True(Math.Abs(left - right) <= 4, $"The cards have {left} to their left and {right} to their right: they are not centred.");
     }
 
     [Fact]
