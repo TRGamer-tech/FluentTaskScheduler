@@ -36,8 +36,8 @@
                         ItemInvoked="NavView_ItemInvoked">
 
             <NavigationView.HeaderTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding}" Style="{StaticResource TitleTextBlockStyle}" AutomationProperties.AutomationId="PageTitle"/>
+                <DataTemplate x:DataType="x:String">
+                    <TextBlock Text="{x:Bind}" Style="{StaticResource TitleTextBlockStyle}" AutomationProperties.AutomationId="PageTitle"/>
                 </DataTemplate>
             </NavigationView.HeaderTemplate>
 
