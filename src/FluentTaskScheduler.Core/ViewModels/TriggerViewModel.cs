@@ -205,7 +205,7 @@ public sealed partial class TriggerViewModel : ObservableObject
             {
                 subscription = EventQueryXml;
             }
-            else if (EventLog != _sourceEventLog || EventSource != _sourceEventSource || EventId != _sourceEventId || _source.Type != TriggerType.Event)
+            else if (EventFieldsChanged || _source.Type != TriggerType.Event)
             {
                 if (!TryReadEventFields(out string log, out string source, out int? id, out problem)) return false;
                 subscription = log.Length == 0 ? "" : EventQuery.Build(log, source, id);
@@ -237,6 +237,17 @@ public sealed partial class TriggerViewModel : ObservableObject
             SessionChange = SessionChanges[SessionChangeIndex]
         };
         return true;
+    }
+
+    // Fields left as they were stand for the stored subscription, which is kept as Windows wrote it.
+    private bool EventFieldsChanged => EventLog != _sourceEventLog || EventSource != _sourceEventSource || EventId != _sourceEventId;
+
+    // The query starts out as what the fields say, so nothing typed there is lost, and an empty
+    // box starts out as a query that works (the log defaults to Application).
+    partial void OnCustomEventQueryChanged(bool value)
+    {
+        if (value && (EventFieldsChanged || EventQueryXml.Length == 0) && TryReadEventFields(out string log, out string source, out int? id, out _))
+            EventQueryXml = EventQuery.Build(log, source, id);
     }
 
     /// <summary>The log, source and event ID fields as an event query takes them.</summary>

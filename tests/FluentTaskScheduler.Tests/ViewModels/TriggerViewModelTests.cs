@@ -297,6 +297,46 @@ public class TriggerViewModelTests
     }
 
     [Fact]
+    public void TickingCustomQuery_StartsFromWhatTheFieldsSay()
+    {
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Event, SourceIndex = 0, EventSubscription = EventQuery.Build("Application", "VSS", 8224) });
+
+        trigger.EventLog = "System";
+        trigger.CustomEventQuery = true;
+
+        Assert.True(EventQuery.TryParse(trigger.EventQueryXml, out string log, out string source, out int? id));
+        Assert.Equal(("System", "VSS", 8224), (log, source, id));
+        Assert.True(trigger.TryBuild(out TriggerDraft built, out _));
+        Assert.Equal(trigger.EventQueryXml, built.EventSubscription);
+    }
+
+    [Fact]
+    public void TickingCustomQuery_WithTheFieldsUntouched_ShowsTheStoredQueryAsWindowsWroteIt()
+    {
+        const string written = "<QueryList><Query Id=\"0\" Path=\"System\"><Select Path=\"System\">*[System[Provider[@Name='disk'] and EventID=7]]</Select></Query></QueryList>";
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Event, SourceIndex = 0, EventSubscription = written });
+
+        trigger.CustomEventQuery = true;
+
+        Assert.Equal(written, trigger.EventQueryXml);
+    }
+
+    [Fact]
+    public void TickingCustomQuery_ForANewEventTrigger_StartsFromAQueryThatWorks()
+    {
+        var trigger = new TriggerViewModel(NewTask.Trigger(new DateTime(2031, 5, 6, 10, 20, 0)))
+        {
+            TypeIndex = TriggerViewModel.Types.ToList().IndexOf(TriggerType.Event)
+        };
+
+        trigger.CustomEventQuery = true;
+
+        Assert.True(trigger.TryBuild(out TriggerDraft built, out _));
+        Assert.True(EventQuery.TryParse(built.EventSubscription, out string log, out _, out _));
+        Assert.Equal("Application", log);
+    }
+
+    [Fact]
     public void TheSessionChange_CanBeAnyOfTheSix()
     {
         foreach (TaskSessionStateChangeType change in Enum.GetValues<TaskSessionStateChangeType>())
