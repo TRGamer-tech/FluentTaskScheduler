@@ -229,16 +229,10 @@ public sealed class TaskTests : IDisposable
         using var app = AppSession.Launch("import");
         try
         {
-            // On a thread of its own: the classic file dialog may hold on to whoever opened it until it is closed.
-            AutomationElement import = app.ToolbarButton("ImportButton");
-            var pressing = new Thread(() =>
-            {
-                // A call that a dialog held up can end in an error when the dialog closes. Whether
-                // the press worked shows in what the app does next.
-                try { import.Press(); }
-                catch (Exception) { }
-            }) { IsBackground = true };
-            pressing.Start();
+            // A real click, not a press through UI Automation: the classic file dialog holds on to
+            // whoever opened it until it is closed, and a held-up automation call leaves the app
+            // unable to answer the next one.
+            app.ToolbarButton("ImportButton").Click();
             app.ChooseFile(file);
 
             app.Require("ImportName", 20000);
@@ -254,7 +248,6 @@ public sealed class TaskTests : IDisposable
             Assert.Contains("ping", WindowsTasks.Root.Value(name, "Actions", "Exec", "Command"));
             app.Snapshot("imported");
             Assert.Null(app.OpenDialogText());
-            Assert.True(pressing.Join(TimeSpan.FromSeconds(30)), "Pressing Import never returned.");
         }
         finally
         {

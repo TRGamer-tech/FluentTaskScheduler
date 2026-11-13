@@ -206,15 +206,24 @@ public sealed class AppSession : IDisposable
         // The app runs elevated in these tests and then shows the classic dialog, in its own
         // process. It is looked up through Windows rather than through the app's window, which
         // does not answer while the dialog it opened is up.
-        nint handle = 0;
-        if (!Retry.WhileFalse(() => (handle = FindDialogWindow(_app.ProcessId)) != 0, TimeSpan.FromSeconds(20), TimeSpan.FromMilliseconds(250)).Success)
-            throw new InvalidOperationException("The app opened no file dialog.");
-        AutomationElement dialog = _automation.FromHandle(handle);
+        AutomationElement? dialog = null, fileName = null;
+        bool ready = Retry.WhileFalse(() =>
+        {
+            try
+            {
+                nint handle = FindDialogWindow(_app.ProcessId);
+                if (handle == 0) return false;
+                dialog = _automation.FromHandle(handle);
+                fileName = dialog.FindFirstDescendant(cf => cf.ByControlType(ControlType.Edit).And(cf.ByAutomationId("1148")));
+                return fileName != null;
+            }
+            catch (Exception)
+            {
+                return false; // the dialog's window exists before it can be talked to
+            }
+        }, TimeSpan.FromSeconds(30), TimeSpan.FromMilliseconds(500)).Success;
+        if (!ready || dialog is null || fileName is null) throw new InvalidOperationException("The app opened no file dialog with a box for the file name.");
 
-        AutomationElement fileName = Retry.WhileNull(
-                () => dialog.FindFirstDescendant(cf => cf.ByControlType(ControlType.Edit).And(cf.ByAutomationId("1148"))),
-                TimeSpan.FromSeconds(10)).Result
-            ?? throw new InvalidOperationException("The file dialog has no box for the file name.");
         fileName.AsTextBox().Text = path;
 
         AutomationElement open = dialog.FindFirstChild(cf => cf.ByAutomationId("1"))
