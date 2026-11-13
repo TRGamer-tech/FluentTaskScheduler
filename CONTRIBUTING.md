@@ -32,7 +32,11 @@ Please use the provided GitHub Issue templates. Fill them out completely. We can
 
 ## Publishing a Release with VeloPack
 
-This project uses [VeloPack](https://velopack.io/) for auto-updates. If you are a maintainer creating a release, here is the workflow:
+This project uses [VeloPack](https://velopack.io/) for auto-updates.
+
+**The normal way to release is to push a tag.** Pushing `V1.X.X` runs `.github/workflows/release.yml`, which builds both architectures, packs them with `vpk` and attaches everything to a **draft** GitHub Release. Review the draft, write the notes and publish it.
+
+The manual steps below do the same thing by hand and are only needed when the workflow is not an option:
 
 1. Install the VeloPack CLI (one-time):
 
@@ -88,6 +92,7 @@ This project uses [VeloPack](https://velopack.io/) for auto-updates. If you are 
 
    The `releases.win-*.json` files tell the app that an update exists. The `.nupkg` files are what it actually downloads to apply the update. Without both, auto-update silently does nothing.
 
+> **Do not paste a SHA-256 table into the release notes.** GitHub already shows the SHA-256 of every asset next to it, and that value always describes the file that is actually attached. A hand-copied table goes stale the moment an asset is rebuilt and re-uploaded, which is exactly how the V1.9.0 notes ended up advertising hashes that matched none of the downloads.
 
 ---
 
@@ -95,14 +100,15 @@ This project uses [VeloPack](https://velopack.io/) for auto-updates. If you are 
 
 Ready-made manifests live in the `packaging/` folder. After each GitHub Release you need to update the **version number** and **SHA-256 hashes** in these files, then follow the submission steps below.
 
-### Compute SHA-256 hashes (PowerShell)
+### Get the SHA-256 hashes
+
+Take the hashes from the **published release**, not from a local `Dist` folder. A local build is not necessarily the build that was uploaded, and package managers verify what users actually download:
 
 ```powershell
-(Get-FileHash "Dist\Setup-x64.msi"        -Algorithm SHA256).Hash
-(Get-FileHash "Dist\Setup-arm64.msi"      -Algorithm SHA256).Hash
-(Get-FileHash "Dist\Portable-x64.zip"     -Algorithm SHA256).Hash
-(Get-FileHash "Dist\Portable-arm64.zip"   -Algorithm SHA256).Hash
+gh release view V1.X.X --repo TRGamer-tech/FluentTaskScheduler --json assets --jq '.assets[] | "\(.digest)  \(.name)"'
 ```
+
+Each line reads `sha256:<hash>  <file name>`; the manifests want the hash without the `sha256:` prefix. The same values are shown next to each asset on the release page.
 
 ---
 
