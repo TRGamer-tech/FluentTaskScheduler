@@ -369,7 +369,7 @@ public sealed class TaskDetailsViewModelTests : IDisposable
 
         await _details.SnoozeCommand.ExecuteAsync(SnoozeChoice.OneHour);
 
-        Assert.Equal("Backup: The task image is corrupt or has been tampered with.", _details.SnoozeProblem);
+        Assert.Equal("Tasks.Error.OtherFormat", _details.SnoozeProblem);
     }
 
     [Fact]

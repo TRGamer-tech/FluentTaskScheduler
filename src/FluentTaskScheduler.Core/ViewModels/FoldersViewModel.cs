@@ -207,7 +207,7 @@ public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewMode
             default:
                 // Task Scheduler refuses with whatever COM error fits; the text is the best there is to show.
                 Serilog.Log.Error(ex, "A change of the folder {Name} failed", name);
-                return ex.Message;
+                return Loc.Format("Folders.Error.Failed", ex.Message);
         }
     }
 

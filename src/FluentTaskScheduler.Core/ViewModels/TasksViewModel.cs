@@ -729,7 +729,7 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
         TaskNotFoundException => Loc.Format("Tasks.Error.Gone", task.Name),
         TaskExistsException taken => Loc.Format("Tasks.Error.NameTakenInFolder", task.Name, TaskPaths.ParentOf(taken.Path)),
         TaskDuplicatedException twice => Loc.Format("Tasks.Error.Duplicated", twice.Path, twice.CopyPath),
-        _ => $"{task.Name}: {ex.Message}"
+        _ => Loc.Format("Tasks.Error.OtherFormat", task.Name, ex.Message)
     };
 
     private Task ReportAsync(List<string> failures) =>

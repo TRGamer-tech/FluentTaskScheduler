@@ -406,7 +406,7 @@ public sealed partial class TaskDetailsViewModel : ObservableObject, IDisposable
         catch (Exception ex) when (ex is COMException or InvalidOperationException)
         {
             // Any other answer of Task Scheduler, worded as the task list words it.
-            return $"{Row.Name}: {ex.Message}";
+            return Loc.Format("Tasks.Error.OtherFormat", Row.Name, ex.Message);
         }
     }
 

@@ -839,4 +839,6 @@
   <data name="QuickActions.CancelFormat" xml:space="preserve"><value>「{0}」をキャンセル</value></data>
   <data name="Import.Account.System" xml:space="preserve"><value>SYSTEM (管理者権限が必要)</value></data>
   <data name="Tour.Title" xml:space="preserve"><value>FluentTaskScheduler へようこそ</value></data>
+  <data name="Tasks.Error.OtherFormat" xml:space="preserve"><value>「{0}」: {1}</value></data>
+  <data name="Folders.Error.Failed" xml:space="preserve"><value>フォルダーを変更できませんでした: {0}</value></data>
 </root>
