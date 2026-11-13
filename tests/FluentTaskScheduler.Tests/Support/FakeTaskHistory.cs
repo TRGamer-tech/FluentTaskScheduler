@@ -11,7 +11,7 @@ public sealed class FakeTaskHistory : ITaskHistory
     public List<TaskEvent> Events { get; } = [];
     public List<SystemEvent> SystemEvents { get; } = [];
 
-    /// <summary>When true, reading task events fails the way an unreadable log does.</summary>
+    /// <summary>When true, reading task events and runs fails the way an unreadable log does.</summary>
     public bool Unreadable { get; set; }
 
     /// <summary>The period each call of <see cref="GetEvents"/> asked for.</summary>
@@ -33,8 +33,9 @@ public sealed class FakeTaskHistory : ITaskHistory
                      .OrderByDescending(e => e.Time).ThenByDescending(e => e.RecordId).Take(maxCount).ToList();
     }
 
-    public IReadOnlyList<TaskRun> GetRuns(DateTimeOffset since, CancellationToken cancellation = default) =>
-        TaskRun.FromEvents(Events.Where(e => e.Time >= since));
+    public IReadOnlyList<TaskRun> GetRuns(DateTimeOffset since, CancellationToken cancellation = default) => Unreadable
+        ? throw new HistoryUnavailableException("Microsoft-Windows-TaskScheduler/Operational", new UnauthorizedAccessException("Access is denied."))
+        : TaskRun.FromEvents(Events.Where(e => e.Time >= since));
 
     public IReadOnlyList<SystemEvent> GetSystemEvents(DateTimeOffset around, TimeSpan margin, CancellationToken cancellation = default) =>
         SystemEvents.Where(e => (e.Time - around).Duration() <= margin).OrderBy(e => e.Time).ToList();

@@ -585,7 +585,7 @@
   <data name="Dashboard.AvgDurationHint" xml:space="preserve"><value>基于全部已完成的运行（7 天）</value></data>
   <data name="Dashboard.LongestTask" xml:space="preserve"><value>最长运行</value></data>
   <data name="Dashboard.HeatmapTitle" xml:space="preserve"><value>执行热力图 —— 按小时分布</value></data>
-  <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>{0}:00 —— 过去 7 天内运行 {1} 次</value></data>
+  <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>{0}:00 - 过去 7 天内运行 {1} 次</value></data>
   <data name="Dashboard.PeakHour" xml:space="preserve"><value>最繁忙时段：</value></data>
   <data name="Dashboard.ExecutionStream" xml:space="preserve"><value>执行日志流</value></data>
   <data name="Dashboard.NoExecutionEntries" xml:space="preserve"><value>此筛选条件下没有记录的运行。</value></data>
@@ -1082,6 +1082,13 @@
   <data name="Snooze.Restore.Title" xml:space="preserve"><value>部分任务仍处于禁用状态</value></data>
   <data name="Snooze.Restore.Retry" xml:space="preserve"><value>重试</value></data>
   <data name="Snooze.Unreadable.Title" xml:space="preserve"><value>无法读取之前的暂停</value></data>
+  <data name="Dashboard.Tasks.Note" xml:space="preserve"><value>已启用 {0} 个，正在运行 {1} 个</value></data>
+  <data name="Dashboard.Health.Note" xml:space="preserve"><value>成功 {0} 次，失败 {1} 次</value></data>
+  <data name="Dashboard.Runs.Note" xml:space="preserve"><value>最近 24 小时 {0} 次</value></data>
+  <data name="Dashboard.Duration.Note" xml:space="preserve"><value>最长：{0}（{1}）</value></data>
+  <data name="Dashboard.Running.Since" xml:space="preserve"><value>自 {0} 起</value></data>
+  <data name="Dashboard.Refused.Manual" xml:space="preserve"><value>手动启动</value></data>
+  <data name="Dashboard.Refused.CompletionAction" xml:space="preserve"><value>完成后操作</value></data>
 </root>
 
 

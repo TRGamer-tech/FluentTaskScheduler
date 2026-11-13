@@ -1,0 +1,370 @@
+using System.Collections.Specialized;
+using FluentTaskScheduler.History;
+using FluentTaskScheduler.Scheduling;
+using FluentTaskScheduler.Settings;
+using FluentTaskScheduler.Snoozing;
+using FluentTaskScheduler.Tests.History;
+using FluentTaskScheduler.Tests.Support;
+using FluentTaskScheduler.ViewModels;
+using Microsoft.Extensions.Time.Testing;
+
+namespace FluentTaskScheduler.Tests.ViewModels;
+
+public sealed class DashboardViewModelTests : IDisposable
+{
+    // The recorded log of a Windows machine: 21 runs between 14:25 and 14:27 UTC, of which 7
+    // succeeded, 6 failed, 2 could not start, 1 timed out and 5 were stopped.
+    private static readonly DateTimeOffset Now = new(2026, 11, 13, 15, 0, 0, TimeSpan.Zero);
+    private static readonly string Succeeds = Evidence.Folder + @"\A_ExitZero";
+    private static readonly string Fails = Evidence.Folder + @"\B_ExitThree";
+
+    private readonly TempFolder _folder = new();
+    private readonly FakeTaskStore _store = new();
+    private readonly FakeTaskHistory _history = new();
+    private readonly FakeTaskEventStream _stream = new();
+    private readonly RecordingNavigator _navigator = new();
+    private readonly FakeTimeProvider _time = new(Now);
+    private readonly SettingsStore _settings;
+    private readonly SnoozeService _snooze;
+    private readonly DashboardViewModel _dashboard;
+
+    public DashboardViewModelTests()
+    {
+        _time.SetLocalTimeZone(TimeZoneInfo.CreateCustomTimeZone("Test", TimeSpan.FromHours(1), "Test", "Test"));
+        _store.Add(Succeeds, draft: new TaskDraft { Category = "Reports", Tags = ["nightly"] })
+              .Add(Fails, draft: new TaskDraft { Category = "Backups", Tags = ["nightly", "disk"] })
+              .Add(@"\Idle", enabled: false);
+        _history.Events.AddRange(Evidence.Log.Select(TaskEvent.From).OfType<TaskEvent>());
+        _settings = new SettingsStore(_folder.Paths, _time);
+        _snooze = new SnoozeService(_store, _settings, new RecordingNotifier(), new FakeWindowsSession(), _folder.Paths, _time);
+        _dashboard = NewDashboard(new InlineUiThread());
+    }
+
+    public void Dispose()
+    {
+        _dashboard.Dispose();
+        _snooze.Dispose();
+        _settings.Dispose();
+        _folder.Dispose();
+    }
+
+    private DashboardViewModel NewDashboard(IUiThread ui) => new(_store, _history, _stream, _snooze, _navigator, ui, _time);
+
+    private DashboardFigures Figures => _dashboard.Figures;
+
+    private async Task AfterTheRefreshDelayAsync()
+    {
+        _time.Advance(DashboardViewModel.RefreshDelay);
+        await _dashboard.PendingRefresh;
+    }
+
+    [Fact]
+    public async Task ComingOnScreen_CountsTheTasks_AndTheRunsOfTheLastSevenDays()
+    {
+        _store.Run(Fails);
+        Assert.False(_dashboard.HasFigures);
+
+        await _dashboard.ShowAsync();
+
+        Assert.Equal((3, 2, 1), (Figures.TotalTasks, Figures.EnabledTasks, Figures.RunningTasks));
+        Assert.Equal((7, 9), (Figures.SucceededRuns, Figures.FailedRuns));
+        Assert.Equal(44, Figures.HealthScore);
+        Assert.Equal((21, 21), (Figures.RunsInPeriod, Figures.RunsLastDay));
+        Assert.Equal(21, _dashboard.Log.Count);
+        Assert.Equal(Fails, Assert.Single(_dashboard.Running).TaskPath);
+        Assert.True(_dashboard.HasFigures);
+        Assert.False(_dashboard.IsLoading);
+        Assert.False(_dashboard.HasProblem);
+    }
+
+    [Fact]
+    public async Task TheHoursOfTheRuns_AreThoseOfTheUsersClock()
+    {
+        await _dashboard.ShowAsync();
+
+        // 14:25 UTC is 15:25 where the user is.
+        Assert.Equal(24, _dashboard.Hours.Count);
+        Assert.Equal((21, 1.0), (_dashboard.Hours[15].Runs, _dashboard.Hours[15].Shade));
+        Assert.Equal(0, _dashboard.Hours[14].Runs);
+        Assert.Equal("15:00", Figures.BusiestHour);
+    }
+
+    [Fact]
+    public async Task TheLog_CanBeNarrowedToWhatSucceeded_WhatWentWrong_OrWhatASnoozeRefused()
+    {
+        await _dashboard.ShowAsync();
+        _snooze.RecordSuppressedRun(Succeeds, RunOrigin.Manual);
+
+        _dashboard.Filter = LogFilter.Succeeded;
+        Assert.Equal(7, _dashboard.Log.Count);
+        Assert.All(_dashboard.Log, entry => Assert.Equal(LogOutcome.Succeeded, entry.Outcome));
+
+        _dashboard.Filter = LogFilter.Failed;
+        Assert.Equal(9, _dashboard.Log.Count);
+        Assert.All(_dashboard.Log, entry => Assert.Equal(LogOutcome.Failed, entry.Outcome));
+
+        _dashboard.Filter = LogFilter.Snoozed;
+        Assert.Equal(Succeeds, Assert.Single(_dashboard.Log).TaskPath);
+
+        // The counts stay those of all runs.
+        Assert.Equal((7, 9), (Figures.SucceededRuns, Figures.FailedRuns));
+    }
+
+    [Fact]
+    public async Task AStartASnoozeRefusesWhileTheDashboardIsOnScreen_IsLoggedAtOnce()
+    {
+        await _dashboard.ShowAsync();
+
+        _snooze.RecordSuppressedRun(Fails, RunOrigin.CompletionAction);
+
+        LogEntry newest = _dashboard.Log[0];
+        Assert.Equal((Fails, LogOutcome.Snoozed, "Dashboard.Refused.CompletionAction"), (newest.TaskPath, newest.Outcome, newest.Detail));
+        Assert.Equal(22, _dashboard.Log.Count);
+        Assert.Equal(21, Figures.RunsInPeriod);
+    }
+
+    [Fact]
+    public async Task ACategoryOrATag_NarrowsTheTasks_TheirRuns_AndTheStartsRefusedForThem()
+    {
+        await _dashboard.ShowAsync();
+        _snooze.RecordSuppressedRun(Fails, RunOrigin.Manual);
+        Assert.Equal(["Dashboard.AllCategories", "Backups", "Reports"], _dashboard.Categories);
+        Assert.Equal(["Dashboard.AllTags", "disk", "nightly"], _dashboard.Tags);
+
+        _dashboard.CategoryIndex = 2;
+        Assert.Equal((1, 1, 0), (Figures.TotalTasks, Figures.SucceededRuns, Figures.FailedRuns));
+        Assert.Equal(100, Figures.HealthScore);
+        Assert.DoesNotContain(_dashboard.Log, entry => entry.Outcome == LogOutcome.Snoozed);
+
+        _dashboard.CategoryIndex = 0;
+        _dashboard.TagIndex = 1;
+        Assert.Equal((1, 0, 1), (Figures.TotalTasks, Figures.SucceededRuns, Figures.FailedRuns));
+        Assert.Contains(_dashboard.Log, entry => entry.Outcome == LogOutcome.Snoozed);
+    }
+
+    [Fact]
+    public async Task AChoiceThatNoTaskHasAnyMore_FallsBackToAll_AndOneThatMovedStaysChosen()
+    {
+        await _dashboard.ShowAsync();
+        _dashboard.CategoryIndex = 2;
+        _dashboard.TagIndex = 2;
+
+        // "Reports" moves down the list; the tag "nightly" disappears.
+        _store.Add(@"\New", draft: new TaskDraft { Category = "Other" });
+        _store.Add(Succeeds, draft: new TaskDraft { Category = "Reports" });
+        _store.Add(Fails, draft: new TaskDraft { Category = "Backups", Tags = ["disk"] });
+        await _dashboard.LoadAsync();
+
+        Assert.Equal(["Dashboard.AllCategories", "Backups", "Other", "Reports"], _dashboard.Categories);
+        Assert.Equal(3, _dashboard.CategoryIndex);
+        Assert.Equal(["Dashboard.AllTags", "disk"], _dashboard.Tags);
+        Assert.Equal(0, _dashboard.TagIndex);
+        Assert.Equal(1, Figures.TotalTasks);
+    }
+
+    [Fact]
+    public async Task AListControlThatLosesItsSelection_MeansAll()
+    {
+        await _dashboard.ShowAsync();
+        _dashboard.CategoryIndex = 1;
+
+        _dashboard.CategoryIndex = -1;
+
+        Assert.Equal(0, _dashboard.CategoryIndex);
+        Assert.Equal(3, Figures.TotalTasks);
+    }
+
+    [Fact]
+    public async Task ARunThatEndsWhileTheDashboardIsOnScreen_IsCountedAtOnce_AndTheHistoryIsNotReadAgain()
+    {
+        await _dashboard.ShowAsync();
+        _history.Events.Clear();
+
+        _stream.Complete(FakeTaskEventStream.Finished(Succeeds, RunStatus.Succeeded, ended: Now));
+
+        Assert.Equal((8, 9), (Figures.SucceededRuns, Figures.FailedRuns));
+        Assert.Equal(Succeeds, _dashboard.Log[0].TaskPath);
+    }
+
+    [Fact]
+    public async Task ARunIsCountedOnce_HoweverOftenItIsHeardOf()
+    {
+        // A run that is going on when the history is read ...
+        var instance = Guid.NewGuid();
+        _history.Events.Add(new TaskEvent { Kind = TaskEventKind.RunStarted, EventId = 100, Time = Now.AddMinutes(-1), TaskPath = Fails, InstanceId = instance, RecordId = 500 });
+        await _dashboard.ShowAsync();
+        Assert.Equal(22, Figures.RunsInPeriod);
+
+        // ... is reported again as starting, and then as over.
+        _stream.Start(FakeTaskEventStream.Running(Fails, instance, started: Now.AddMinutes(-1)));
+        _stream.Complete(FakeTaskEventStream.Finished(Fails, RunStatus.Failed, instance, resultCode: 3, ended: Now));
+
+        Assert.Equal(22, Figures.RunsInPeriod);
+        Assert.Equal((7, 10), (Figures.SucceededRuns, Figures.FailedRuns));
+        Assert.Equal(22, _dashboard.Log.Count);
+    }
+
+    [Fact]
+    public async Task ANewRun_IsAddedToTheLog_WithoutTouchingTheEntriesThatStayTheSame()
+    {
+        await _dashboard.ShowAsync();
+        LogEntry newestBefore = _dashboard.Log[0];
+        var changes = new List<NotifyCollectionChangedAction>();
+        _dashboard.Log.CollectionChanged += (_, e) => changes.Add(e.Action);
+
+        _stream.Complete(FakeTaskEventStream.Finished(Succeeds, RunStatus.Succeeded, ended: Now));
+
+        Assert.Equal([NotifyCollectionChangedAction.Add], changes);
+        Assert.Equal(Succeeds, _dashboard.Log[0].TaskPath);
+        Assert.Same(newestBefore, _dashboard.Log[1]);
+    }
+
+    [Fact]
+    public async Task AfterReports_TheTasksAreReadAgain_OnceForAllThatCameTogether()
+    {
+        await _dashboard.ShowAsync();
+        Assert.Equal(1, _store.Listings);
+        _store.Add(@"\New");
+
+        _stream.Change(new TaskChange(@"\New", TaskChangeKind.Registered, Now));
+        _stream.Change(new TaskChange(@"\New", TaskChangeKind.Updated, Now));
+        _stream.Start(FakeTaskEventStream.Running(Succeeds));
+        Assert.Equal(3, Figures.TotalTasks);
+
+        await AfterTheRefreshDelayAsync();
+
+        Assert.Equal(4, Figures.TotalTasks);
+        Assert.Equal(2, _store.Listings);
+    }
+
+    [Fact]
+    public async Task OffScreen_RunsAreTakenNoteOf_ButNothingIsRead_AndBackOnScreenOnlyTheTasksAre()
+    {
+        await _dashboard.ShowAsync();
+        var later = Now.AddMinutes(1);
+        _stream.Change(new TaskChange(Fails, TaskChangeKind.Updated, later));
+        _dashboard.Hide();
+        _history.Events.Clear();
+
+        _stream.Complete(FakeTaskEventStream.Finished(Fails, RunStatus.CouldNotStart, ended: later));
+        await AfterTheRefreshDelayAsync();
+        Assert.Equal(1, _store.Listings);
+        Assert.Equal(9, Figures.FailedRuns);
+
+        await _dashboard.ShowAsync();
+
+        Assert.Equal(2, _store.Listings);
+        Assert.Equal((7, 10), (Figures.SucceededRuns, Figures.FailedRuns));
+    }
+
+    [Fact]
+    public async Task RunsThatEndedMoreThanSevenDaysAgo_NoLongerCount()
+    {
+        await _dashboard.ShowAsync();
+        _time.Advance(TimeSpan.FromDays(7));
+
+        _stream.Complete(FakeTaskEventStream.Finished(Succeeds, RunStatus.Succeeded, ended: _time.GetUtcNow()));
+
+        Assert.Equal((1, 0), (Figures.SucceededRuns, Figures.FailedRuns));
+        Assert.Equal(1, Figures.RunsInPeriod);
+        Assert.Single(_dashboard.Log);
+    }
+
+    [Fact]
+    public async Task WhenWindowsRecordsNoHistory_TheDashboardSaysSo_AndCanSwitchItOn()
+    {
+        _history.State = LogState.Disabled;
+        await _dashboard.ShowAsync();
+        Assert.True(_dashboard.IsLogOff);
+
+        await _dashboard.SwitchLogOnCommand.ExecuteAsync(null);
+
+        Assert.False(_dashboard.IsLogOff);
+        Assert.False(_dashboard.HasProblem);
+    }
+
+    [Theory]
+    [InlineData(EnableLogResult.AccessDenied, "Details.History.SwitchOnDenied")]
+    [InlineData(EnableLogResult.Failed, "Details.History.SwitchOnFailed")]
+    public async Task WhenHistoryCannotBeSwitchedOn_TheDashboardSaysWhy(EnableLogResult result, string expected)
+    {
+        _history.State = LogState.Disabled;
+        _history.EnableResult = result;
+        await _dashboard.ShowAsync();
+
+        await _dashboard.SwitchLogOnCommand.ExecuteAsync(null);
+
+        Assert.True(_dashboard.IsLogOff);
+        Assert.Equal(expected, _dashboard.Problem);
+    }
+
+    [Fact]
+    public async Task HistorySwitchedOnElsewhere_IsNoticedWhenTheDashboardComesBack()
+    {
+        _history.State = LogState.Disabled;
+        await _dashboard.ShowAsync();
+        _dashboard.Hide();
+
+        _history.State = LogState.Enabled;
+        await _dashboard.ShowAsync();
+
+        Assert.False(_dashboard.IsLogOff);
+    }
+
+    [Fact]
+    public async Task WhenTheHistoryCannotBeRead_TheTasksAreStillCounted_AndTheProblemIsShown()
+    {
+        _history.Unreadable = true;
+
+        await _dashboard.ShowAsync();
+
+        Assert.Equal(3, Figures.TotalTasks);
+        Assert.Null(Figures.HealthScore);
+        Assert.Equal("Details.History.Unavailable", _dashboard.Problem);
+    }
+
+    [Fact]
+    public async Task WhenTheTasksCannotBeRead_TheRunsAreStillCounted_AndTheProblemIsShownUntilTheyCanBeReadAgain()
+    {
+        _store.ListingFails = new InvalidOperationException("The Task Scheduler service is not available.");
+
+        await _dashboard.ShowAsync();
+
+        Assert.Equal("The Task Scheduler service is not available.", _dashboard.Problem);
+        Assert.Equal(7, Figures.SucceededRuns);
+
+        _store.ListingFails = null;
+        _stream.Change(new TaskChange(Fails, TaskChangeKind.Updated, Now));
+        await AfterTheRefreshDelayAsync();
+
+        Assert.False(_dashboard.HasProblem);
+        Assert.Equal(3, Figures.TotalTasks);
+    }
+
+    [Fact]
+    public void ALineOfAList_LeadsToItsTask()
+    {
+        _dashboard.ShowTask(Fails);
+
+        Assert.Equal([$"ShowTask {Fails}"], _navigator.Calls);
+    }
+
+    [Fact]
+    public async Task AClosedWindow_NoLongerListens_AndIgnoresWhatStillArrives()
+    {
+        var ui = new BusyUiThread();
+        using DashboardViewModel closing = NewDashboard(ui);
+        await closing.ShowAsync();
+        _stream.Complete(FakeTaskEventStream.Finished(Succeeds, RunStatus.Succeeded, ended: Now));
+
+        closing.Dispose();
+        ui.RunPosted();
+        _time.Advance(DashboardViewModel.RefreshDelay);
+        _snooze.RecordSuppressedRun(Succeeds, RunOrigin.Manual);
+
+        Assert.Equal(7, closing.Figures.SucceededRuns);
+        Assert.Equal(0, ui.PostedCount);
+        _dashboard.Dispose();
+        Assert.Equal(0, _stream.Subscribers);
+    }
+}

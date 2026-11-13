@@ -1079,4 +1079,11 @@ Jetzt App neustarten?</value></data>
   <data name="Snooze.Restore.Title" xml:space="preserve"><value>Einige Aufgaben sind noch deaktiviert</value></data>
   <data name="Snooze.Restore.Retry" xml:space="preserve"><value>Erneut versuchen</value></data>
   <data name="Snooze.Unreadable.Title" xml:space="preserve"><value>Frühere Pausen konnten nicht gelesen werden</value></data>
+  <data name="Dashboard.Tasks.Note" xml:space="preserve"><value>{0} aktiviert, {1} laufend</value></data>
+  <data name="Dashboard.Health.Note" xml:space="preserve"><value>{0} erfolgreich, {1} fehlgeschlagen</value></data>
+  <data name="Dashboard.Runs.Note" xml:space="preserve"><value>{0} in den letzten 24 Stunden</value></data>
+  <data name="Dashboard.Duration.Note" xml:space="preserve"><value>Am längsten: {0} ({1})</value></data>
+  <data name="Dashboard.Running.Since" xml:space="preserve"><value>Seit {0}</value></data>
+  <data name="Dashboard.Refused.Manual" xml:space="preserve"><value>Manueller Start</value></data>
+  <data name="Dashboard.Refused.CompletionAction" xml:space="preserve"><value>Abschlussaktion</value></data>
 </root>

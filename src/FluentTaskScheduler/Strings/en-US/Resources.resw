@@ -1079,5 +1079,12 @@ Restart now to apply the update?</value></data>
   <data name="Snooze.Restore.Title" xml:space="preserve"><value>Some tasks are still disabled</value></data>
   <data name="Snooze.Restore.Retry" xml:space="preserve"><value>Try again</value></data>
   <data name="Snooze.Unreadable.Title" xml:space="preserve"><value>Earlier snoozes could not be read</value></data>
+  <data name="Dashboard.Tasks.Note" xml:space="preserve"><value>{0} enabled, {1} running</value></data>
+  <data name="Dashboard.Health.Note" xml:space="preserve"><value>{0} succeeded, {1} failed</value></data>
+  <data name="Dashboard.Runs.Note" xml:space="preserve"><value>{0} in the last 24 hours</value></data>
+  <data name="Dashboard.Duration.Note" xml:space="preserve"><value>Longest: {0} ({1})</value></data>
+  <data name="Dashboard.Running.Since" xml:space="preserve"><value>Since {0}</value></data>
+  <data name="Dashboard.Refused.Manual" xml:space="preserve"><value>Manual start</value></data>
+  <data name="Dashboard.Refused.CompletionAction" xml:space="preserve"><value>Completion action</value></data>
 </root>
 
