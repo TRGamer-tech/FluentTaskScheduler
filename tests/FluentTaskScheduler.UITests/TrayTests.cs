@@ -130,14 +130,14 @@ public class TrayTests
 
     private static AutomationElement? MenuItem(AppSession app, string name) =>
         app.Automation.GetDesktop().FindAllChildren()
-            .Where(window => window.ControlType == ControlType.Menu || window.ClassName == "#32768")
+            .Where(window => window.ControlType == ControlType.Menu || window.Properties.ClassName.ValueOrDefault == "#32768")
             .SelectMany(AppSession.Walk)
             .FirstOrDefault(element => element.ControlType == ControlType.MenuItem && NameOf(element) == name);
 
     /// <summary>Everything in the taskbar and in the pop-ups of the shell, but not in ordinary app windows.</summary>
     private static IEnumerable<AutomationElement> ShellElements(AppSession app) =>
         app.Automation.GetDesktop().FindAllChildren()
-            .Where(window => window.ClassName is "Shell_TrayWnd" or "NotifyIconOverflowWindow" or "TopLevelWindowForOverflowXamlIsland" or "Xaml_WindowedPopupClass")
+            .Where(window => window.Properties.ClassName.ValueOrDefault is "Shell_TrayWnd" or "NotifyIconOverflowWindow" or "TopLevelWindowForOverflowXamlIsland" or "Xaml_WindowedPopupClass")
             .SelectMany(AppSession.Walk);
 
     private static string NotificationAreaNames(AppSession app) =>
