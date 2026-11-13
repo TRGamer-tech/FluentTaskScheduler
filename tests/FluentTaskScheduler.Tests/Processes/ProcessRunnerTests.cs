@@ -35,7 +35,13 @@ public sealed class ProcessRunnerTests
     /// <summary>The lines as they ended up, without the states they went through while they were being written.</summary>
     private IEnumerable<ProcessOutput> Lines => _output.Where(line => line.IsComplete);
 
-    /// <summary>Runs a command line of cmd in the UTF-8 console, by a cmd that starts there.</summary>
+    /// <summary>
+    /// Runs a command line of cmd in the UTF-8 console, by a cmd that starts there. The cmd that
+    /// switches the console reads the line first, inside the pair of quotes it is wrapped in,
+    /// which turns what the line quotes into unquoted text: cmd's special characters
+    /// (&amp; | &lt; &gt; ^) must stay out of the line's own quotes, or that cmd acts on them
+    /// itself, in the old code page.
+    /// </summary>
     private Task<int> Run(string commandLine, CancellationToken cancellation = default) =>
         Run(WindowsTools.InUtf8Console(Cmd, $"/d /v:off /s /c \"{commandLine}\""), cancellation);
 

@@ -20,9 +20,9 @@ public static class WindowsTools
     /// the language of Windows and cannot represent text in other scripts at all.
     /// </summary>
     /// <remarks>
-    /// cmd settles the code page for what its own commands (echo, del, ...) write when it starts,
-    /// so the cmd that switches the console goes on writing in the old one. For commands of cmd
-    /// itself, make cmd.exe the program: that cmd starts in the switched console.
+    /// It starts a program and not a command line: the cmd that runs chcp does not apply the new
+    /// code page to the rest of the command line it is running, so what its own commands on that
+    /// line (echo, del, ...) write stays in the old code page.
     /// </remarks>
     /// <param name="program">The full path of the program.</param>
     /// <param name="arguments">

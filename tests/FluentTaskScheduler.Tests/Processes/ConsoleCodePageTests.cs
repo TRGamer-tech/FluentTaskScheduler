@@ -29,7 +29,7 @@ public sealed class ConsoleCodePageTests : IDisposable
     public void Dispose() => _folder.Dispose();
 
     [SkippableFact]
-    public async Task ChcpSwitchesTheConsoleOfAProgramStartedWithoutAWindow_ButCmdKeepsTheCodePageItStartedWith()
+    public async Task ChcpSwitchesTheConsoleOfAProgramStartedWithoutAWindow_ButNotForEchoOnTheSameCommandLine()
     {
         Skip.IfNot(OperatingSystem.IsWindows(), "runs Windows programs");
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
