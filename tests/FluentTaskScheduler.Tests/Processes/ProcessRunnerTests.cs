@@ -1,7 +1,9 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text;
+using FluentTaskScheduler.Library;
 using FluentTaskScheduler.Processes;
+using FluentTaskScheduler.Tests.Support;
 
 namespace FluentTaskScheduler.Tests.Processes;
 
@@ -33,7 +35,10 @@ public sealed class ProcessRunnerTests
 
     /// <summary>Runs a command line of cmd in the UTF-8 console, by a cmd that starts there.</summary>
     private Task<int> Run(string commandLine, CancellationToken cancellation = default) =>
-        _runner.RunAsync(WindowsTools.InUtf8Console(Cmd, $"/d /v:off /s /c \"{commandLine}\""), _output.Enqueue, cancellation).WaitAsync(Patience);
+        Run(WindowsTools.InUtf8Console(Cmd, $"/d /v:off /s /c \"{commandLine}\""), cancellation);
+
+    private Task<int> Run(ProcessRequest request, CancellationToken cancellation = default) =>
+        _runner.RunAsync(request, _output.Enqueue, cancellation).WaitAsync(Patience);
 
     [SkippableFact]
     public async Task WhatAProgramWrites_ArrivesIntact_InLanguagesTheCodePageOfThisMachineCannotShow()
@@ -44,6 +49,38 @@ public sealed class ProcessRunnerTests
 
         Assert.Equal(0, exitCode);
         Assert.Equal([new ProcessOutput("Zürich 東京 Ελλάδα", IsError: false)], Lines);
+    }
+
+    [SkippableFact]
+    public async Task WhatAScriptAndTheProgramsItStartsWrite_ArrivesIntact_InLanguagesTheCodePageOfThisMachineCannotShow()
+    {
+        Skip.IfNot(OperatingSystem.IsWindows(), SkipReason);
+        using var folder = new TempFolder();
+        string script = folder.File("script.ps1");
+        ScriptFile.Write(script, "Write-Output 'Zürich 東京 Ελλάδα'\ncmd.exe /d /c echo Ελλάδα 東京 Zürich");
+
+        // As the script editor runs the copy of its text.
+        int exitCode = await Run(WindowsTools.InUtf8Console(WindowsTools.PowerShell, PowerShellCommand.ForFile(script)));
+
+        Assert.Equal(0, exitCode);
+        Assert.Contains(new ProcessOutput("Zürich 東京 Ελλάδα", IsError: false), Lines);
+        Assert.Contains(new ProcessOutput("Ελλάδα 東京 Zürich", IsError: false), Lines);
+    }
+
+    [SkippableFact]
+    public async Task WhatAConsoleToolWrites_ArrivesIntact_InLanguagesTheCodePageOfThisMachineCannotShow()
+    {
+        Skip.IfNot(OperatingSystem.IsWindows(), SkipReason);
+        using var folder = new TempFolder();
+        File.WriteAllText(folder.File("Zürich 東京 Ελλάδα.txt"), "");
+
+        // As a quick action starts its tool. where lists the files it finds by their full names.
+        int exitCode = await Run(WindowsTools.InUtf8Console(WindowsTools.InSystemFolder("where.exe"), $"/r \"{folder.Path}\" *"));
+
+        Assert.Equal(0, exitCode);
+        ProcessOutput line = Assert.Single(Lines);
+        Assert.False(line.IsError);
+        Assert.Equal("Zürich 東京 Ελλάδα.txt", Path.GetFileName(line.Text));
     }
 
     [SkippableFact]
@@ -153,9 +190,9 @@ public sealed class ProcessRunnerTests
     {
         Skip.IfNot(OperatingSystem.IsWindows(), SkipReason);
         // cmd /u writes the output of its own commands as UTF-16, as sfc.exe does with everything.
-        var request = new ProcessRequest(WindowsTools.InSystemFolder("cmd.exe"), "/u /c echo Zürich 東京") { OutputEncoding = Encoding.Unicode };
+        var request = new ProcessRequest(Cmd, "/u /c echo Zürich 東京") { OutputEncoding = Encoding.Unicode };
 
-        await _runner.RunAsync(request, _output.Enqueue, CancellationToken.None).WaitAsync(Patience);
+        await Run(request);
 
         Assert.Equal([new ProcessOutput("Zürich 東京", IsError: false)], Lines);
     }
