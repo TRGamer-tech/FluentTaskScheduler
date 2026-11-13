@@ -118,6 +118,39 @@ public sealed class TaskTests : IDisposable
         app.Snapshot("editor-reopened");
     }
 
+    /// <summary>
+    /// The list reuses its rows as it scrolls. A row's switch must never take that for the user
+    /// switching a task on or off.
+    /// </summary>
+    [Fact]
+    public void ScrollingThroughTheList_ChangesNoTask()
+    {
+        var before = WindowsTasks.EnabledStates();
+        using var app = AppSession.Launch("scroll");
+        OpenFolderlessList(app);
+        Assert.True(app.Find(element => element.ControlType == ControlType.ListItem, 30000) != null, "The list stayed empty.");
+
+        var scroll = app.Require("TaskList").Patterns.Scroll.Pattern;
+        Assert.True(scroll.VerticallyScrollable.Value, "The list does not scroll, so no row is ever reused.");
+        for (int page = 0; page < 300 && scroll.VerticalScrollPercent.Value < 100; page++)
+        {
+            scroll.Scroll(ScrollAmount.NoAmount, ScrollAmount.LargeIncrement);
+            Thread.Sleep(40);
+        }
+        app.Snapshot("bottom");
+        for (int page = 0; page < 300 && scroll.VerticalScrollPercent.Value > 0; page++)
+        {
+            scroll.Scroll(ScrollAmount.NoAmount, ScrollAmount.LargeDecrement);
+            Thread.Sleep(40);
+        }
+        Wait();
+
+        Assert.Null(app.OpenDialogText());
+        var after = WindowsTasks.EnabledStates();
+        string[] changed = before.Where(task => after.TryGetValue(task.Key, out bool enabled) && enabled != task.Value).Select(task => task.Key).ToArray();
+        Assert.True(changed.Length == 0, "Scrolling switched these tasks on or off: " + string.Join(", ", changed));
+    }
+
     [Fact]
     public void ATaskExportedForAnAccountUnknownHere_IsImportedForTheCurrentUser()
     {
@@ -146,6 +179,7 @@ public sealed class TaskTests : IDisposable
             Assert.DoesNotContain("1111111111", user);
             Assert.Contains("ping", WindowsTasks.Root.Value(name, "Actions", "Exec", "Command"));
             app.Snapshot("imported");
+            Assert.Null(app.OpenDialogText());
         }
         finally
         {

@@ -222,6 +222,8 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
         await ReportAsync(failures);
     }
 
+    private async void OnEnabledChangeRequested(TaskRow row, bool enabled) => await SetEnabledAsync(row, enabled);
+
     /// <summary>Enables or disables one task. If Windows refuses, the row goes back to what it was.</summary>
     public async Task SetEnabledAsync(TaskRow row, bool enabled)
     {
@@ -411,8 +413,15 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
         foreach (TaskRow row in fresh)
         {
             seen.Add(row.Path);
-            if (_all.TryGetValue(row.Path, out TaskRow? existing)) existing.UpdateFrom(row);
-            else _all[row.Path] = row;
+            if (_all.TryGetValue(row.Path, out TaskRow? existing))
+            {
+                existing.UpdateFrom(row);
+            }
+            else
+            {
+                _all[row.Path] = row;
+                row.EnabledChangeRequested += OnEnabledChangeRequested;
+            }
         }
         foreach (string gone in _all.Keys.Where(path => !seen.Contains(path)).ToList()) _all.Remove(gone);
 

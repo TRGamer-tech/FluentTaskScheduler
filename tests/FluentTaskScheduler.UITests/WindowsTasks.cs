@@ -87,17 +87,38 @@ public sealed class WindowsTasks : IDisposable
     }
 
     // schtasks has no command for folders; the scripting interface of Task Scheduler does.
-    private static void RemoveFolder(string folder)
+    private static void RemoveFolder(string folder) =>
+        RunScript($"$scheduler.GetFolder('\\').DeleteFolder('{folder.TrimStart('\\')}', 0)");
+
+    /// <summary>Every task on the machine, hidden ones included, with whether it is enabled.</summary>
+    public static IReadOnlyDictionary<string, bool> EnabledStates()
     {
-        string script = "$scheduler = New-Object -ComObject Schedule.Service; $scheduler.Connect(); " +
-                        $"$scheduler.GetFolder('\\').DeleteFolder('{folder.TrimStart('\\')}', 0)";
+        string listing = RunScript(
+            "function Walk($folder) { $folder.GetTasks(1) | ForEach-Object { '{0}|{1}' -f $_.Path, $_.Enabled }; " +
+            "$folder.GetFolders(0) | ForEach-Object { Walk $_ } }; Walk $scheduler.GetFolder('\\')");
+
+        var states = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        foreach (string line in listing.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            int separator = line.LastIndexOf('|');
+            if (separator > 0) states[line[..separator]] = bool.Parse(line[(separator + 1)..]);
+        }
+        return states;
+    }
+
+    /// <summary>Runs PowerShell with <c>$scheduler</c> connected to Task Scheduler's scripting interface.</summary>
+    private static string RunScript(string script)
+    {
         using var process = Process.Start(new ProcessStartInfo("powershell.exe")
         {
-            ArgumentList = { "-NoProfile", "-NonInteractive", "-Command", script },
+            ArgumentList = { "-NoProfile", "-NonInteractive", "-Command", "$scheduler = New-Object -ComObject Schedule.Service; $scheduler.Connect(); " + script },
+            RedirectStandardOutput = true,
             UseShellExecute = false,
             CreateNoWindow = true
-        });
-        process?.WaitForExit(30000);
+        })!;
+        string output = process.StandardOutput.ReadToEnd();
+        process.WaitForExit();
+        return output;
     }
 
     private static string Run(string arguments) =>

@@ -162,6 +162,18 @@ public sealed class AppSession : IDisposable
         return Require(automationId);
     }
 
+    /// <summary>
+    /// The text of a dialog the app is showing, or null if there is none. A dialog nobody asked
+    /// for is how the app reports that something went wrong.
+    /// </summary>
+    public string? OpenDialogText()
+    {
+        AutomationElement? dialog = Find(element => element.ControlType == ControlType.Window
+                                                    && element.Parent?.ControlType == ControlType.Pane
+                                                    && element.FindAllChildren().Any(child => child.Properties.AutomationId.ValueOrDefault == "ContentScrollViewer"), 1500);
+        return dialog is null ? null : string.Join(" | ", dialog.FindAllDescendants().Select(element => element.Name).Where(name => name.Length > 0));
+    }
+
     /// <summary>Saves a screenshot of the app window plus a dump of its automation tree.</summary>
     public void Snapshot(string name)
     {

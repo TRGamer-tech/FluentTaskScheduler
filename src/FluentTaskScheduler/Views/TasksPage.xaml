@@ -206,7 +206,7 @@
                         </StackPanel>
 
                         <ToggleSwitch Grid.Column="3" VerticalAlignment="Center" MinWidth="0"
-                                      IsOn="{x:Bind IsEnabled, Mode=OneWay}" Toggled="EnabledSwitch_Toggled"
+                                      IsOn="{x:Bind EnabledSwitch, Mode=TwoWay}"
                                       AutomationProperties.Name="{x:Bind l:Loc.Get('Dialog.Enabled')}"/>
                     </Grid>
                 </DataTemplate>

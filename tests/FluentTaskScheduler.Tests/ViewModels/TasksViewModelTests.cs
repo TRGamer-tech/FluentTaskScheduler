@@ -323,6 +323,52 @@ public sealed class TasksViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task TheSwitchInARow_ChangesThatTask_AndNoOther()
+    {
+        await _tasks.ReloadAsync();
+        TaskRow backup = Row(@"\Backup");
+
+        backup.EnabledSwitch = false;
+
+        await Eventually(() => !_store.IsEnabled(@"\Backup"));
+        Assert.False(backup.IsEnabled);
+        Assert.Equal(["SetEnabled \\Backup False"], _store.Calls.Where(call => call.StartsWith("SetEnabled")));
+    }
+
+    [Fact]
+    public async Task ASwitchWindowsRefuses_GoesBack()
+    {
+        await _tasks.ReloadAsync();
+        _store.Protected.Add(@"\Backup");
+        TaskRow backup = Row(@"\Backup");
+
+        backup.EnabledSwitch = false;
+
+        await Eventually(() => _prompts.Shown.Count == 1);
+        Assert.True(backup.IsEnabled);
+        Assert.True(backup.EnabledSwitch);
+    }
+
+    [Fact]
+    public async Task ARowThatAReloadUpdates_AsksForNothing()
+    {
+        await _tasks.ReloadAsync();
+        _store.SetEnabled(@"\Backup", false);
+        _store.Calls.Clear();
+
+        await _tasks.ReloadAsync();
+
+        Assert.False(Row(@"\Backup").EnabledSwitch);
+        Assert.DoesNotContain(_store.Calls, call => call.StartsWith("SetEnabled"));
+    }
+
+    private static async Task Eventually(Func<bool> condition)
+    {
+        for (int i = 0; i < 200 && !condition(); i++) await Task.Delay(10);
+        Assert.True(condition(), "It did not happen within two seconds.");
+    }
+
+    [Fact]
     public async Task SeveralTasks_CanBeEnabledAndDisabledTogether()
     {
         await _tasks.ReloadAsync();

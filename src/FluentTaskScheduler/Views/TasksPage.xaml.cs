@@ -143,13 +143,6 @@ public sealed partial class TasksPage : Page
         else TaskList.SelectedItems.Remove(row);
     }
 
-    private async void EnabledSwitch_Toggled(object sender, RoutedEventArgs e)
-    {
-        // The switch also reports "toggled" when the binding sets it; only a difference to the row is the user's doing.
-        var toggle = (ToggleSwitch)sender;
-        if (toggle.DataContext is TaskRow row && toggle.IsOn != row.IsEnabled) await ViewModel.SetEnabledAsync(row, toggle.IsOn);
-    }
-
     private void CategoryBadge_Tapped(object sender, TappedRoutedEventArgs e)
     {
         e.Handled = true;

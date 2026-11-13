@@ -20,7 +20,34 @@ public sealed partial class TaskRow : ObservableObject
     public string FolderPath { get; }
 
     [ObservableProperty] private TaskRowState _state = TaskRowState.Unknown;
-    [ObservableProperty] private bool _isEnabled;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(EnabledSwitch))]
+    private bool _isEnabled;
+
+    /// <summary>
+    /// For the switch in the task's row. It shows <see cref="IsEnabled"/>; setting it changes
+    /// nothing here but asks, through <see cref="EnabledChangeRequested"/>, for the task to be
+    /// enabled or disabled. If nobody does that, the switch goes back.
+    /// </summary>
+    /// <remarks>
+    /// A list reuses its rows for other tasks, and a switch that reported "toggled" while that
+    /// happens could be taken for the user's wish to change whichever task it shows next. Bound
+    /// both ways to this property, the switch can only ever speak for its own task.
+    /// </remarks>
+    public bool EnabledSwitch
+    {
+        get => IsEnabled;
+        set
+        {
+            if (value == IsEnabled) return;
+            EnabledChangeRequested?.Invoke(this, value);
+            if (value != IsEnabled) OnPropertyChanged();
+        }
+    }
+
+    /// <summary>The user asked for the task to be enabled (true) or disabled.</summary>
+    public event Action<TaskRow, bool>? EnabledChangeRequested;
 
     /// <summary>True from the moment the task is started here until it is seen to have finished, so the row can show progress without waiting for a refresh.</summary>
     [ObservableProperty] private bool _isRunning;
