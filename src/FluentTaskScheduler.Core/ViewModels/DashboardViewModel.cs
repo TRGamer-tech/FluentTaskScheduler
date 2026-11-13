@@ -34,6 +34,9 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 
     private IReadOnlyList<TaskRow> _tasks = [];
 
+    // When a read of all tasks last saw each task idle, with no instance of it running.
+    private readonly Dictionary<string, DateTimeOffset> _seenIdle = new(StringComparer.OrdinalIgnoreCase);
+
     // The runs of the history as it was last read, and what the stream reported since, by run. A
     // run that was going on when the history was read is in both; what was reported is the newer
     // word on it.
@@ -236,8 +239,22 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         // A window can stay open for weeks; what has left the period is of no use any more.
         DateTimeOffset since = _time.GetUtcNow() - DashboardFigures.Period;
         foreach (var (key, old) in _reported.ToList())
-            if (!DashboardFigures.EndsAfter(old, since)) _reported.Remove(key);
+            if (!DashboardFigures.EndsAfter(old, since) || EndedUnlogged(old)) _reported.Remove(key);
     }
+
+    /// <summary>
+    /// True for a run that has no end and is over all the same: its task was seen idle after it
+    /// began. Task Scheduler stopped logging while it ran, or the computer lost power. How it
+    /// ended is not known, and it is left out rather than taken as going on for good.
+    /// </summary>
+    /// <remarks>
+    /// Only a read of all tasks counts. The read of a task that a run's start set off can find
+    /// a short run over already, a moment before its end is reported.
+    /// </remarks>
+    private bool EndedUnlogged(TaskRun run) =>
+        run.Ended is null
+        && _seenIdle.TryGetValue(run.TaskPath, out DateTimeOffset idle)
+        && (run.Started ?? DateTimeOffset.MinValue) < idle;
 
     private void PlanRefresh()
     {
@@ -272,6 +289,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     /// <summary>Reads all tasks, and on the way whether Windows records history. Never throws.</summary>
     private async Task ReadAllTasksAsync()
     {
+        DateTimeOffset readAt = _time.GetUtcNow();
         IReadOnlyList<TaskRow> tasks;
         LogState state;
         try
@@ -288,6 +306,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 
         TasksProblem = null;
         _tasks = tasks;
+        foreach (TaskRow task in tasks)
+            if (task.State is TaskRowState.Ready or TaskRowState.Disabled) _seenIdle[task.Path] = readAt;
         IsLogOff = state == LogState.Disabled;
         ShowChoices();
     }
@@ -332,7 +352,9 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
             .Where(task => tag is null || task.Tags.Contains(tag, StringComparer.OrdinalIgnoreCase))
             .ToList();
 
-        IEnumerable<TaskRun> runs = _reported.Values.Concat(_recorded.Where(entry => !_reported.ContainsKey(entry.Key)).Select(entry => entry.Value));
+        IEnumerable<TaskRun> runs = _reported.Values
+            .Concat(_recorded.Where(entry => !_reported.ContainsKey(entry.Key)).Select(entry => entry.Value))
+            .Where(run => !EndedUnlogged(run));
         IEnumerable<SuppressedRun> refused = _snooze.State.SuppressedRuns;
 
         // Narrowed to a category or a tag, only what concerns those tasks counts. Otherwise all

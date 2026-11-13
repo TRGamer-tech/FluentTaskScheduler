@@ -261,6 +261,7 @@ public sealed class DashboardViewModelTests : IDisposable
         // A run that is going on when the history is read ...
         var instance = Guid.NewGuid();
         _history.Events.Add(new TaskEvent { Kind = TaskEventKind.RunStarted, EventId = 100, Time = Now.AddMinutes(-1), TaskPath = Fails, InstanceId = instance, RecordId = 500 });
+        _store.Run(Fails);
         await _dashboard.ShowAsync();
         Assert.Equal(22, Figures.RunsInPeriod);
 
@@ -399,6 +400,60 @@ public sealed class DashboardViewModelTests : IDisposable
         Assert.Equal((1, 0), (Figures.SucceededRuns, Figures.FailedRuns));
         Assert.Equal(1, Figures.RunsInPeriod);
         Assert.Single(_dashboard.Log);
+    }
+
+    [Fact]
+    public async Task ARunWhoseEndNeverReachedTheLog_IsOver_OnceItsTaskIsSeenIdle()
+    {
+        await _dashboard.ShowAsync();
+
+        // Task Scheduler stops logging while two tasks run: their starts are reported, their ends
+        // never are. One of the tasks is one this user cannot see.
+        const string unseen = @"\Microsoft\Windows\Defrag\ScheduledDefrag";
+        _stream.Start(FakeTaskEventStream.Running(Succeeds, started: Now));
+        _stream.Start(FakeTaskEventStream.Running(unseen, started: Now));
+        Assert.Equal((23, 23), (Figures.RunsInPeriod, Figures.RunsLastDay));
+
+        _dashboard.Hide();
+        _time.Advance(TimeSpan.FromDays(2));
+        await _dashboard.ShowAsync();
+
+        // Of the other run nothing more is known than before.
+        Assert.Equal((22, 1), (Figures.RunsInPeriod, Figures.RunsLastDay));
+        Assert.Equal(unseen, Assert.Single(_dashboard.Log, entry => entry.Outcome == LogOutcome.Running).TaskPath);
+    }
+
+    [Fact]
+    public async Task ARunCutShortByAPowerFailure_StaysOver_WhenItsTaskRunsAgain()
+    {
+        // The computer lost power two days ago while a task ran: the log has its start, nothing more.
+        _history.Events.Add(new TaskEvent { Kind = TaskEventKind.RunStarted, EventId = 100, Time = Now.AddDays(-2), TaskPath = Succeeds, InstanceId = Guid.NewGuid(), RecordId = 600 });
+        await _dashboard.ShowAsync();
+        Assert.Equal((21, 21), (Figures.RunsInPeriod, Figures.RunsLastDay));
+        Assert.DoesNotContain(_dashboard.Log, entry => entry.Outcome == LogOutcome.Running);
+
+        _time.Advance(TimeSpan.FromMinutes(1));
+        _store.Run(Succeeds);
+        _stream.Start(FakeTaskEventStream.Running(Succeeds, started: _time.GetUtcNow()));
+        _stream.Change(new TaskChange(Fails, TaskChangeKind.Updated, _time.GetUtcNow()));
+        await AfterTheRefreshDelayAsync();
+
+        Assert.Equal(22, Figures.RunsInPeriod);
+        Assert.Single(_dashboard.Log, entry => entry.Outcome == LogOutcome.Running);
+    }
+
+    [Fact]
+    public async Task AShortRun_IsNotTakenForOneWhoseEndWasLost_BeforeItsEndIsReported()
+    {
+        await _dashboard.ShowAsync();
+        _time.Advance(TimeSpan.FromMinutes(1));
+
+        // The run is over by the time its task is read again; its end is reported a moment later.
+        _stream.Start(FakeTaskEventStream.Running(Succeeds, started: _time.GetUtcNow()));
+        await AfterTheRefreshDelayAsync();
+
+        Assert.Equal((Succeeds, LogOutcome.Running), (_dashboard.Log[0].TaskPath, _dashboard.Log[0].Outcome));
+        Assert.Equal(22, Figures.RunsInPeriod);
     }
 
     [Fact]
