@@ -41,15 +41,33 @@ public sealed partial class TaskEditorDialog : ContentDialog
 
     // Entering an empty box lists all it can suggest; once the box holds something, the list waits
     // for typing. An AutoSuggestBox puts back the text last typed into it when Tab is pressed while
-    // its list shows, and a value the editor filled in was never typed: Tab would empty the box.
+    // its list shows, and what the editor filled in, the task's own values or a chosen tag, was not
+    // typed: Tab would take it away again.
     private void Category_GotFocus(object sender, RoutedEventArgs e)
     {
         if (ViewModel.Category.Length == 0) EditorCategory.ItemsSource = ViewModel.SuggestCategories();
     }
 
+    private void Tags_GotFocus(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel.Tags.Length == 0) EditorTags.ItemsSource = ViewModel.SuggestTags();
+    }
+
     private void Category_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
         if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput) sender.ItemsSource = ViewModel.SuggestCategories();
+    }
+
+    private void Tags_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+    {
+        if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput) sender.ItemsSource = ViewModel.SuggestTags();
+    }
+
+    // With UpdateTextOnSelect off, browsing or clicking the list leaves the text as typed instead of
+    // putting the bare tag in place of all the tags; the chosen tag replaces only the one being typed.
+    private void Tags_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+    {
+        if (args.ChosenSuggestion is string tag) ViewModel.ChooseTag(tag);
     }
 
     // Escape, too, puts back the text last typed into an AutoSuggestBox, and the box keeps the key

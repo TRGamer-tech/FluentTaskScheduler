@@ -220,18 +220,85 @@ public sealed class TaskEditorViewModelTests : IDisposable
     }
 
     [Fact]
-    public void TheCategoryBox_SuggestsTheSavedCategoriesThatContainWhatIsTyped_ButNotTheOneTypedInFull()
+    public void TheCategoryBox_SuggestsTheSavedCategoriesThatBeginWithWhatIsTyped_ButNotTheOneTypedInFull()
     {
-        _settings.Update(s => s with { SavedCategories = ["Work", "Homework", "Personal"] });
+        _settings.Update(s => s with { SavedCategories = ["Work", "Workshop", "Homework", "Personal"] });
         var editor = Edit(new TaskDraft());
 
-        Assert.Equal(["Work", "Homework", "Personal"], editor.SuggestCategories());
+        Assert.Equal(["Work", "Workshop", "Homework", "Personal"], editor.SuggestCategories());
 
         editor.Category = " wor";
-        Assert.Equal(["Work", "Homework"], editor.SuggestCategories());
+        Assert.Equal(["Work", "Workshop"], editor.SuggestCategories());
 
         editor.Category = "work";
-        Assert.Equal(["Homework"], editor.SuggestCategories());
+        Assert.Equal(["Workshop"], editor.SuggestCategories());
+    }
+
+    [Fact]
+    public void TheTagsBox_SuggestsTheSavedTagsThatBeginWithTheTagBeingTyped()
+    {
+        _settings.Update(s => s with { SavedTags = ["nightly", "disk", "Diagnostics", "audit", "docs"] });
+        var editor = Edit(new TaskDraft());
+
+        editor.Tags = "nightly, di";
+
+        Assert.Equal(["disk", "Diagnostics"], editor.SuggestTags());
+    }
+
+    [Fact]
+    public void BeforeATagIsBegun_TheTagsBoxSuggestsEverySavedTagItDoesNotHold()
+    {
+        _settings.Update(s => s with { SavedTags = ["nightly", "disk", "docs"] });
+        var editor = Edit(new TaskDraft());
+
+        Assert.Equal(["nightly", "disk", "docs"], editor.SuggestTags());
+
+        editor.Tags = "Nightly,";
+        Assert.Equal(["disk", "docs"], editor.SuggestTags());
+
+        editor.Tags = "Nightly, ";
+        Assert.Equal(["disk", "docs"], editor.SuggestTags());
+    }
+
+    [Theory]
+    [InlineData("DOCS, d", new[] { "disk", "disks" })]
+    [InlineData("docs, disk", new[] { "disks" })]
+    public void TagsTheBoxHoldsAlready_AreNotSuggested(string tags, string[] expected)
+    {
+        _settings.Update(s => s with { SavedTags = ["docs", "disk", "disks"] });
+        var editor = Edit(new TaskDraft());
+
+        editor.Tags = tags;
+
+        Assert.Equal(expected, editor.SuggestTags());
+    }
+
+    [Theory]
+    [InlineData("nightly, di", "nightly, disk, ")]
+    [InlineData("", "disk, ")]
+    [InlineData("d", "disk, ")]
+    [InlineData("nightly,", "nightly, disk, ")]
+    [InlineData("backup ,nightly,  di", "backup ,nightly, disk, ")]
+    public void AChosenTag_ReplacesTheTagBeingTyped_AndLeavesTheBoxReadyForTheNext(string typed, string expected)
+    {
+        var editor = Edit(new TaskDraft());
+        editor.Tags = typed;
+
+        editor.ChooseTag("disk");
+
+        Assert.Equal(expected, editor.Tags);
+    }
+
+    [Fact]
+    public void TagsChosenFromTheSuggestions_AreSavedWithoutAnEmptyOne()
+    {
+        var editor = Edit(Elaborate());
+        Assert.Equal("backup, night", editor.Tags);
+
+        editor.ChooseTag("nightly");
+
+        Assert.True(editor.TryBuild(out TaskDraft built, out _));
+        Assert.Equal(["backup", "nightly"], built.Tags);
     }
 
     [Fact]

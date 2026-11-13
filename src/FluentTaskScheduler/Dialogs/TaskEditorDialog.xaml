@@ -54,9 +54,11 @@
                                     Text="{x:Bind ViewModel.Category, Mode=TwoWay}"
                                     TextChanged="Category_TextChanged" GotFocus="Category_GotFocus"
                                     PreviewKeyDown="SuggestionBox_PreviewKeyDown"/>
-                    <TextBox x:Name="EditorTags" Grid.Column="2" Header="{x:Bind l:Loc.Get('Dialog.Tags')}"
-                             PlaceholderText="{x:Bind l:Loc.Get('Dialog.Ph.Tags')}"
-                             Text="{x:Bind ViewModel.Tags, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <AutoSuggestBox x:Name="EditorTags" Grid.Column="2" Header="{x:Bind l:Loc.Get('Dialog.Tags')}"
+                                    PlaceholderText="{x:Bind l:Loc.Get('Dialog.Ph.Tags')}"
+                                    Text="{x:Bind ViewModel.Tags, Mode=TwoWay}" UpdateTextOnSelect="False"
+                                    TextChanged="Tags_TextChanged" GotFocus="Tags_GotFocus" QuerySubmitted="Tags_QuerySubmitted"
+                                    PreviewKeyDown="SuggestionBox_PreviewKeyDown"/>
                 </Grid>
                 <ToggleSwitch x:Name="EditorEnabled" Header="{x:Bind l:Loc.Get('Dialog.Enabled')}"
                               IsOn="{x:Bind ViewModel.Enabled, Mode=TwoWay}"/>

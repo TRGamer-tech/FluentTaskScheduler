@@ -144,9 +144,11 @@ out with a daily trigger at the next full hour.
 - **Completion actions**: start other tasks when this one succeeds (exit code 0) or ends any other
   way. The app carries them out while it runs and Windows records task history. No task is started
   twice in one chain, and completion actions start a task at most 20 times in 10 minutes.
-- **Category and tags**, for searching the list and narrowing the dashboard. The category field
-  suggests the categories you used before and those listed in the settings. Category, tags and
-  completion actions are kept in the task's description, so they travel with an exported task.
+- **Category and tags**, for searching the list and narrowing the dashboard. Both fields suggest
+  the categories and tags you used before and those listed in the settings. Tags are separated by
+  commas, and a tag chosen from the suggestions comes with the comma for the next one. Category,
+  tags and completion actions are kept in the task's description, so they travel with an exported
+  task.
 
 Saving writes only what changed. What the editor does not show stays as it was. Triggers and actions
 of kinds the editor cannot change are listed and kept as they are.
