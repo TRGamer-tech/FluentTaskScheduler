@@ -357,7 +357,7 @@ public sealed class TaskTests : IDisposable
     }
 
     private static string ProblemsShown(AppSession app, string infoBar = "EditorProblems") =>
-        app.Find(infoBar, 500) is { } bar ? $"The dialog says: {string.Join(" | ", bar.FindAllDescendants().Select(e => e.Name).Where(n => n.Length > 0))}" : "";
+        app.Find(infoBar, 500) is { } bar ? $"The dialog says: {AppSession.TextIn(bar)}" : "";
 
     private static bool WaitFor(Func<bool> condition, int seconds = 20)
     {

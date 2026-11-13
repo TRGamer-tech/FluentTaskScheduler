@@ -68,7 +68,7 @@ public sealed class SnoozeTests : IDisposable
         element => element.ControlType == ControlType.ListItem && element.Name == name;
 
     private static string ProblemShown(AppSession app) =>
-        app.Find("DetailsSnoozeProblem", 500) is { } bar ? $"The details say: {string.Join(" | ", bar.FindAllDescendants().Select(e => e.Name).Where(n => n.Length > 0))}" : "";
+        app.Find("DetailsSnoozeProblem", 500) is { } bar ? $"The details say: {AppSession.TextIn(bar)}" : "";
 
     private static bool Eventually(Func<bool> condition) =>
         Retry.WhileFalse(condition, TimeSpan.FromSeconds(20), TimeSpan.FromMilliseconds(500)).Success;

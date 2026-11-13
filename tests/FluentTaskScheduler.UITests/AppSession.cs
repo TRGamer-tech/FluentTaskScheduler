@@ -311,8 +311,14 @@ public sealed class AppSession : IDisposable
         AutomationElement? dialog = Find(element => element.ControlType == ControlType.Window
                                                     && element.Parent?.ControlType == ControlType.Pane
                                                     && element.FindAllChildren().Any(child => child.Properties.AutomationId.ValueOrDefault == "ContentScrollViewer"), 1500);
-        return dialog is null ? null : string.Join(" | ", dialog.FindAllDescendants().Select(element => element.Name).Where(name => name.Length > 0));
+        return dialog is null ? null : TextIn(dialog);
     }
+
+    /// <summary>What the elements inside an element say, joined. Elements without a name are left out.</summary>
+    public static string TextIn(AutomationElement element) =>
+        string.Join(" | ", element.FindAllDescendants()
+            .Select(child => child.Properties.Name.ValueOrDefault)
+            .Where(name => !string.IsNullOrEmpty(name)));
 
     /// <summary>Saves a screenshot of the app window plus a dump of its automation tree.</summary>
     public void Snapshot(string name)
