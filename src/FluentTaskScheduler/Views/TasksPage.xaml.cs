@@ -85,7 +85,7 @@ public sealed partial class TasksPage : Page
         }
         if (editor.SavedPath is not { } path) return null;
 
-        await ViewModel.ReloadAsync();
+        await ViewModel.AfterSaveAsync(editor);
         if (ViewModel.Find(path) is { } row)
         {
             TaskList.SelectedItem = row;

@@ -325,11 +325,13 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
     public async Task MoveToFolderAsync(TaskRow? row, string folderPath)
     {
         var failures = new List<string>();
+        var moves = new List<TaskMove>();
         foreach (TaskRow task in Targets(row))
         {
             try
             {
                 string newPath = await Task.Run(() => _folders.MoveTask(task.Path, folderPath));
+                moves.Add(new TaskMove(task.Path, newPath));
                 // A snooze knows its task only by the path.
                 await _snooze.TaskMovedAsync(task.Path, newPath);
             }
@@ -338,8 +340,58 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
                 failures.Add(Describe(task, ex));
             }
         }
+        failures.AddRange(await FollowAsync(moves));
         await ReloadAsync();
         await ReportAsync(failures);
+    }
+
+    /// <summary>
+    /// Brings the list up to date after <paramref name="editor"/> saved its task. The completion
+    /// actions of other tasks follow a task that got a new name, and the user is told which of
+    /// them could not be changed. Call it once the editor has closed: a window shows one dialog at
+    /// a time, and the editor waits for its save.
+    /// </summary>
+    public async Task AfterSaveAsync(TaskEditorViewModel editor)
+    {
+        List<string> failures = editor.Renamed is { } rename ? await FollowAsync([rename]) : [];
+        await ReloadAsync();
+        await ReportAsync(failures);
+    }
+
+    /// <summary>
+    /// Completion actions name the tasks they start by path. After tasks got new paths, this
+    /// changes the tasks whose completion actions start one of them, so that they start it where
+    /// it is now.
+    /// </summary>
+    /// <param name="moves">Each task's path before and after, in the order the moves happened.</param>
+    /// <returns>What to tell the user about the tasks that could not be changed; nothing when all could.</returns>
+    internal async Task<List<string>> FollowAsync(IReadOnlyList<TaskMove> moves)
+    {
+        if (moves.Count == 0) return [];
+        // The folder tree is there on every page, also in a window whose task list has not been read yet.
+        if (_all.Count == 0) await ReloadAsync();
+
+        var failures = new List<string>();
+        foreach (TaskRow row in _all.Values.Where(row => CompletionActionReferences.Follow(row.CompletionActions, moves) != row.CompletionActions).ToList())
+        {
+            // The task itself may have moved, along with its folder.
+            string path = CompletionActionReferences.PathAfter(moves, row.Path);
+            try
+            {
+                if (!await Task.Run(() => CompletionActionReferences.Follow(_store, path, moves)))
+                    failures.Add(Loc.Format("Tasks.Error.OnlyWithPassword", row.Name));
+            }
+            catch (TaskNotFoundException)
+            {
+                // Deleted meanwhile; nothing is left that would start a task by its old path.
+            }
+            catch (Exception ex) when (IsTaskFailure(ex))
+            {
+                failures.Add(Describe(row, ex));
+            }
+        }
+        if (failures.Count > 0) failures.Insert(0, Loc.Get("Tasks.Error.CompletionActionsKept"));
+        return failures;
     }
 
     /// <summary>Saves the selected task as an XML file of the user's choosing.</summary>

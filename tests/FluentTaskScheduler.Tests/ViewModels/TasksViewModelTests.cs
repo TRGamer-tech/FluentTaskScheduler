@@ -476,6 +476,60 @@ public sealed class TasksViewModelTests : IDisposable
         Assert.Equal(["Error: Tasks.Error.Denied"], _prompts.Shown);
     }
 
+    private static TaskDraft Starting(params string[] onSuccess) => new()
+    {
+        Actions = [new ActionDraft { SourceIndex = 0, Path = "next.exe" }],
+        CompletionActions = new CompletionActions { Enabled = true, OnSuccess = [.. onSuccess] }
+    };
+
+    [Fact]
+    public async Task MovingTasksToAnotherFolder_TakesTheCompletionActionsThatStartThemAlong_AndChangesNoOtherTask()
+    {
+        _store.Add(@"\Chain", draft: Starting(@"\Backup", @"\cleanup"));
+        await _tasks.ReloadAsync();
+        _tasks.Select([Row(@"\Backup")]);
+
+        await _tasks.MoveToFolderAsync(null, @"\Reports\Old");
+
+        Assert.Equal([@"\Reports\Old\Backup", @"\cleanup"], _store.GetCompletionActions(@"\Chain").OnSuccess);
+        Assert.Equal([@"\Reports\Old\Backup", @"\cleanup"], Row(@"\Chain").CompletionActions.OnSuccess);
+        Assert.Equal([@"Save \Chain"], _store.Calls.Where(call => call.StartsWith("Save")));
+        Assert.Empty(_prompts.Shown);
+    }
+
+    [Fact]
+    public async Task RenamingATaskInTheEditor_TakesTheCompletionActionsThatStartItAlong_OnceTheEditorHasClosed()
+    {
+        _store.Add(@"\Reports\Daily", draft: Starting()).Add(@"\Chain", draft: Starting(@"\Reports\Daily"));
+        await _tasks.ReloadAsync();
+        TaskEditorViewModel editor = (await _tasks.EditAsync(Row(@"\Reports\Daily")))!;
+        editor.Name = "Nightly";
+
+        Assert.True(await editor.SaveAsync());
+        Assert.Equal([@"\Reports\Daily"], _store.GetCompletionActions(@"\Chain").OnSuccess);
+        await _tasks.AfterSaveAsync(editor);
+
+        Assert.Equal([@"\Reports\Nightly"], _store.GetCompletionActions(@"\Chain").OnSuccess);
+        Assert.NotNull(_tasks.Find(@"\Reports\Nightly"));
+        Assert.Empty(_prompts.Shown);
+    }
+
+    [Fact]
+    public async Task TasksThatStartAMovedTask_ButCannotBeChanged_AreNamedWithTheReason()
+    {
+        _store.Add(@"\Guarded", draft: Starting(@"\Backup"))
+              .Add(@"\WithPassword", draft: Starting(@"\Backup") with { StoresPassword = true })
+              .Protected.Add(@"\Guarded");
+        await _tasks.ReloadAsync();
+
+        await _tasks.MoveToFolderAsync(Row(@"\Backup"), @"\Reports");
+
+        string nl = Environment.NewLine;
+        Assert.Equal([$"Error: Tasks.Error.CompletionActionsKept{nl}Tasks.Error.Denied{nl}Tasks.Error.OnlyWithPassword"], _prompts.Shown);
+        Assert.Equal([@"\Backup"], _store.GetCompletionActions(@"\Guarded").OnSuccess);
+        Assert.Equal([@"\Backup"], _store.GetCompletionActions(@"\WithPassword").OnSuccess);
+    }
+
     [Theory]
     [InlineData("name taken", "Tasks.Error.NameTakenInFolder")]
     [InlineData("left twice", "Tasks.Error.Duplicated")]

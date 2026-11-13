@@ -129,6 +129,12 @@ public sealed partial class TaskEditorViewModel : ObservableObject
     /// <summary>Path of the task after a successful <see cref="SaveAsync"/>.</summary>
     public string? SavedPath { get; private set; }
 
+    /// <summary>
+    /// Set by a <see cref="SaveAsync"/> that gave the task a new name, and with it a new path,
+    /// which the completion actions of other tasks that start it have to follow.
+    /// </summary>
+    public TaskMove? Renamed { get; private set; }
+
     [ObservableProperty] private string _name;
     [ObservableProperty] private string _description;
     [ObservableProperty] private string _author;
@@ -344,7 +350,10 @@ public sealed partial class TaskEditorViewModel : ObservableObject
         SavedPath = savedPath;
         // A snooze knows its task only by the path, and a new name is a new path.
         if (_originalPath is not null && !string.Equals(_originalPath, savedPath, StringComparison.OrdinalIgnoreCase))
+        {
+            Renamed = new TaskMove(_originalPath, savedPath);
             await _snooze.TaskMovedAsync(_originalPath, savedPath);
+        }
 
         Problems = "";
         RememberCategoryAndTags(draft);

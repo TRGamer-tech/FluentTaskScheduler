@@ -131,6 +131,41 @@ public sealed class FoldersViewModelTests : IDisposable
         Assert.Equal([@"TaskMoved \Jobs\Backup -> \Work\Backup", @"TaskMoved \Jobs\Nightly\Sync -> \Work\Nightly\Sync"], _snooze.Calls);
     }
 
+    private static TaskDraft Starting(params string[] onSuccess) => new()
+    {
+        CompletionActions = new CompletionActions { Enabled = true, OnSuccess = [.. onSuccess] }
+    };
+
+    [Fact]
+    public async Task RenamingAFolder_TakesTheCompletionActionsThatStartItsTasksAlong_AlsoBetweenTasksInIt()
+    {
+        _store.Add(@"\Jobs\Backup", draft: Starting(@"\Jobs\Nightly\Sync"))
+              .Add(@"\Jobs\Nightly\Sync")
+              .Add(@"\Reports\Monthly", draft: Starting(@"\Jobs\Backup", @"\Reports\Weekly"))
+              .Add(@"\Reports\Weekly");
+        await _folders.ReloadAsync();
+        await _tasks.ReloadAsync();
+        _prompts.Text = "Work";
+
+        await _folders.RenameAsync(Node(@"\Jobs"));
+
+        Assert.Equal([@"\Work\Nightly\Sync"], _store.GetCompletionActions(@"\Work\Backup").OnSuccess);
+        Assert.Equal([@"\Work\Backup", @"\Reports\Weekly"], _store.GetCompletionActions(@"\Reports\Monthly").OnSuccess);
+        Assert.Equal([@"Save \Work\Backup", @"Save \Reports\Monthly"], _store.Calls.Where(call => call.StartsWith("Save")));
+    }
+
+    [Fact]
+    public async Task RenamingAFolder_BeforeTheTaskListWasRead_StillTakesTheCompletionActionsAlong()
+    {
+        _store.Add(@"\Jobs\Backup").Add(@"\Reports\Monthly", draft: Starting(@"\Jobs\Backup"));
+        await _folders.ReloadAsync();
+        _prompts.Text = "Work";
+
+        await _folders.RenameAsync(Node(@"\Jobs"));
+
+        Assert.Equal([@"\Work\Backup"], _store.GetCompletionActions(@"\Reports\Monthly").OnSuccess);
+    }
+
     [Fact]
     public async Task AFolderWindowsMovesOnlyInPart_ShowsWhereEachTaskIsNow_AndSaysWhatStayedBehind()
     {

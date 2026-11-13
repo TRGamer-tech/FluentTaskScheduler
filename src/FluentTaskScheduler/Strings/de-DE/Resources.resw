@@ -1119,4 +1119,6 @@ Jetzt App neustarten?</value></data>
   <data name="Tasks.Error.NameTakenInFolder" xml:space="preserve"><value>'{0}': Im Ordner „{1}“ gibt es schon eine Aufgabe mit diesem Namen.</value></data>
   <data name="Folders.Error.NameTaken" xml:space="preserve"><value>Hier gibt es schon einen anderen Ordner namens „{0}“. Wähle einen anderen Namen.</value></data>
   <data name="Folders.Error.PartlyMoved" xml:space="preserve"><value>Einige Aufgaben konnten nicht verschoben werden und bleiben in „{0}“. Die anderen wurden verschoben.</value></data>
+  <data name="Tasks.Error.CompletionActionsKept" xml:space="preserve"><value>Die Abschlussaktionen dieser Aufgaben starten Aufgaben noch unter ihrem früheren Pfad, weil diese Aufgaben nicht geändert werden konnten:</value></data>
+  <data name="Tasks.Error.OnlyWithPassword" xml:space="preserve"><value>'{0}': Diese Aufgabe lässt sich nur im Editor ändern, mit dem Kennwort ihres Kontos.</value></data>
 </root>

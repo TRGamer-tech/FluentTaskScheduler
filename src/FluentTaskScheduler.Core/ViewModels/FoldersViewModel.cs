@@ -148,8 +148,10 @@ public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewMode
             return;
         }
 
-        // Snoozes know their tasks only by their paths. A task that stayed behind keeps its snooze.
+        // Snoozes and completion actions know tasks only by their paths. A task that stayed behind
+        // keeps its snooze, and the tasks that start it need no change.
         foreach (TaskMove move in moved) await snooze.TaskMovedAsync(move.From, move.To);
+        problems.AddRange(await tasks.FollowAsync(moved));
         await AfterChangeAsync(folder.Path, newPath);
         if (problems.Count > 0) await prompts.ShowErrorAsync(string.Join(Environment.NewLine, problems));
     }

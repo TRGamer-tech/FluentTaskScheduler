@@ -1119,4 +1119,6 @@
   <data name="Tasks.Error.NameTakenInFolder" xml:space="preserve"><value>'{0}': フォルダー「{1}」には同じ名前のタスクが既にあります。</value></data>
   <data name="Folders.Error.NameTaken" xml:space="preserve"><value>ここには「{0}」という名前のフォルダーが既にあります。別の名前を選んでください。</value></data>
   <data name="Folders.Error.PartlyMoved" xml:space="preserve"><value>一部のタスクは移動できず、「{0}」に残っています。ほかのタスクは移動しました。</value></data>
+  <data name="Tasks.Error.CompletionActionsKept" xml:space="preserve"><value>次のタスクは変更できなかったため、完了時アクションでは引き続き以前のパスのタスクが開始されます:</value></data>
+  <data name="Tasks.Error.OnlyWithPassword" xml:space="preserve"><value>'{0}': このタスクは、アカウントのパスワードを入力してエディターでのみ変更できます。</value></data>
 </root>

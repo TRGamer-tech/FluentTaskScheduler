@@ -1119,5 +1119,7 @@ Restart now to apply the update?</value></data>
   <data name="Tasks.Error.NameTakenInFolder" xml:space="preserve"><value>'{0}': the folder '{1}' already has a task of that name.</value></data>
   <data name="Folders.Error.NameTaken" xml:space="preserve"><value>Another folder here is already called '{0}'. Choose a different name.</value></data>
   <data name="Folders.Error.PartlyMoved" xml:space="preserve"><value>Some tasks could not be moved and stay in '{0}'. The others were moved.</value></data>
+  <data name="Tasks.Error.CompletionActionsKept" xml:space="preserve"><value>The completion actions of these tasks still start tasks by the paths they had before, because these tasks could not be changed:</value></data>
+  <data name="Tasks.Error.OnlyWithPassword" xml:space="preserve"><value>'{0}': this task can only be changed in the editor, with the password of its account.</value></data>
 </root>
 
