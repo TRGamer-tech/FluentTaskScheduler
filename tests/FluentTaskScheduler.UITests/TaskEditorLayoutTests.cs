@@ -12,7 +12,7 @@ public sealed class TaskEditorLayoutTests
     public void InANarrowWindow_TheFormGivesWay_InsteadOfBeingCutOff()
     {
         // German has the longest texts.
-        using var app = AppSession.Launch("editor-narrow", """{"Language":"de-DE","HasCompletedOnboarding":true,"LastSeenVersion":"999.0.0"}""");
+        using var app = AppSession.Launch("editor-narrow", AppSession.FirstRunDone(("Language", "de-DE")));
         app.ToolbarButton("NewTaskButton").Press();
         app.Require("EditorName", 20000);
 

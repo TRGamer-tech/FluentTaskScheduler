@@ -6,6 +6,13 @@ namespace FluentTaskScheduler.UITests;
 
 public static class AutomationExtensions
 {
+    /// <summary>The element's name, or an empty one when it has none or has just gone away.</summary>
+    public static string NameOrEmpty(this AutomationElement element)
+    {
+        try { return element.Name ?? ""; }
+        catch { return ""; }
+    }
+
     /// <summary>
     /// Activates a button, menu item or navigation item the way a screen reader does, which works
     /// wherever the mouse pointer is. Use a real click only where the click itself is what is

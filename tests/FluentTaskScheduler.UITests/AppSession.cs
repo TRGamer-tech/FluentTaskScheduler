@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text;
+using System.Text.Json.Nodes;
 using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Capturing;
@@ -77,8 +78,8 @@ public sealed class AppSession : IDisposable
     /// settings of whoever runs it.
     /// </summary>
     /// <param name="scenario">Names the folder the screenshots go to.</param>
-    /// <param name="settingsJson">Content of settings.json to start with; the default skips the first-run dialogs.</param>
-    public static AppSession Launch(string scenario, string settingsJson = FirstRunDone)
+    /// <param name="settingsJson">Content of settings.json to start with; by default <see cref="FirstRunDone"/>, which skips the first-run dialogs.</param>
+    public static AppSession Launch(string scenario, string? settingsJson = null)
     {
         string artifacts = Path.Combine(
             Environment.GetEnvironmentVariable("FTS_UI_ARTIFACTS") ?? Path.Combine(AppContext.BaseDirectory, "artifacts"),
@@ -91,7 +92,7 @@ public sealed class AppSession : IDisposable
 
         string data = Path.Combine(Path.GetTempPath(), "FtsUiTests_" + Guid.NewGuid().ToString("N")[..8]);
         Directory.CreateDirectory(data);
-        File.WriteAllText(Path.Combine(data, "settings.json"), settingsJson);
+        File.WriteAllText(Path.Combine(data, "settings.json"), settingsJson ?? FirstRunDone());
 
         var app = Application.Launch(StartInfo(data));
         var automation = new UIA3Automation();
@@ -153,8 +154,23 @@ public sealed class AppSession : IDisposable
         throw new InvalidOperationException("The app's window is still covered by another window.");
     }
 
-    /// <summary>Settings of someone who has seen the welcome tour and the release notes, with an English UI.</summary>
-    public const string FirstRunDone = """{"Language":"en-US","HasCompletedOnboarding":true,"LastSeenVersion":"999.0.0"}""";
+    /// <summary>
+    /// Settings of someone who has seen the welcome tour and the release notes, with an English UI
+    /// unless <paramref name="changes"/> say otherwise.
+    /// </summary>
+    public static string FirstRunDone(params (string Name, JsonNode? Value)[] changes)
+    {
+        var settings = new JsonObject { ["Language"] = "en-US", ["HasCompletedOnboarding"] = true, ["LastSeenVersion"] = "999.0.0" };
+        foreach (var (name, value) in changes) settings[name] = value;
+        return settings.ToJsonString();
+    }
+
+    /// <summary>
+    /// Whether <paramref name="condition"/> comes true within <paramref name="seconds"/>. An element
+    /// it needs that is not there yet, or has just gone, counts as not yet.
+    /// </summary>
+    public static bool Eventually(Func<bool> condition, int seconds = 20) =>
+        Retry.WhileFalse(condition, TimeSpan.FromSeconds(seconds), TimeSpan.FromMilliseconds(250), ignoreException: true).Success;
 
     public bool HasExited => _app.HasExited;
 
@@ -208,6 +224,17 @@ public sealed class AppSession : IDisposable
         if (Find(automationId, 3000) is { IsOffscreen: false } button) return button;
         Require("MoreButton").Press();
         return Require(automationId);
+    }
+
+    /// <summary>Opens an expander, through itself or through its header, whichever of the two offers that.</summary>
+    public void Expand(string automationId)
+    {
+        var expander = Require(automationId);
+        var header = Find(element => element.Patterns.ExpandCollapse.IsSupported
+                                     && (element.AutomationId == automationId || element.Parent?.AutomationId == automationId))
+                     ?? expander;
+        header.Patterns.ExpandCollapse.Pattern.Expand();
+        Thread.Sleep(600); // it animates open
     }
 
     /// <summary>

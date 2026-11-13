@@ -201,7 +201,7 @@ public class CommandLineTests
     }
 
     private static AutomationElement? ConsoleWindow(UIA3Automation automation, string title) =>
-        automation.GetDesktop().FindAllChildren().FirstOrDefault(candidate => Name(candidate).Contains(title));
+        automation.GetDesktop().FindAllChildren().FirstOrDefault(candidate => candidate.NameOrEmpty().Contains(title));
 
     // The text area is a direct child in the classic console and sits deeper in Windows Terminal.
     private static string ConsoleText(UIA3Automation automation, string title)
@@ -219,12 +219,6 @@ public class CommandLineTests
             }
         }
         return "";
-    }
-
-    private static string Name(AutomationElement element)
-    {
-        try { return element.Name ?? ""; }
-        catch { return ""; } // a window that is just going away
     }
 
     private static (int ExitCode, string Output) Run(params string[] arguments) => RunExe(AppSession.ExePath, arguments);

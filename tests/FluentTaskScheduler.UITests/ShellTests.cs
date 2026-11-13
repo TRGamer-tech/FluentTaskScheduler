@@ -6,15 +6,15 @@ namespace FluentTaskScheduler.UITests;
 /// <summary>The window frame: navigation between pages, the pane, the app language.</summary>
 public class ShellTests
 {
-    public static TheoryData<string, string> Pages => new()
-    {
-        { "NavAllTasks", "Scheduled Tasks" },
-        { "NavDashboard", "Dashboard" },
-        { "NavQuickActions", "Quick Actions" },
-        { "NavScriptLibrary", "Library" },
-        { "NavScriptEditor", "Script Editor" },
-        { "NavSettings", "Settings" }
-    };
+    private static readonly (string Item, string Heading)[] Pages =
+    [
+        ("NavAllTasks", "Scheduled Tasks"),
+        ("NavDashboard", "Dashboard"),
+        ("NavQuickActions", "Quick Actions"),
+        ("NavScriptLibrary", "Library"),
+        ("NavScriptEditor", "Script Editor"),
+        ("NavSettings", "Settings")
+    ];
 
     [Fact]
     public void EveryPageOpens_UnderItsOwnHeading()
@@ -22,9 +22,8 @@ public class ShellTests
         using var app = AppSession.Launch("pages");
         app.Snapshot("start");
 
-        foreach (object[] page in Pages)
+        foreach (var (item, heading) in Pages)
         {
-            string item = (string)page[0], heading = (string)page[1];
             app.Require(item).Press();
 
             // A page may take a while to load its data on a slow machine; the heading follows the page.
@@ -90,7 +89,7 @@ public class ShellTests
     [Fact]
     public void TheChosenLanguage_IsUsed_WhateverWindowsIsSetTo()
     {
-        using var app = AppSession.Launch("german", """{"Language":"de-DE","HasCompletedOnboarding":true,"LastSeenVersion":"999.0.0"}""");
+        using var app = AppSession.Launch("german", AppSession.FirstRunDone(("Language", "de-DE")));
         app.Snapshot("start");
 
         Assert.Equal("Einstellungen", app.Require("NavSettings").Name);

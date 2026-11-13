@@ -36,19 +36,6 @@ public class SettingsTests
     private static AutomationElement FirstSectionHeading(AppSession app) =>
         app.FindByName("Appearance", ControlType.Text) ?? throw new InvalidOperationException("The heading 'Appearance' was not found.");
 
-    private static void Expand(AppSession app, string automationId)
-    {
-        var expander = app.Require(automationId);
-        var header = app.Find(element => element.Patterns.ExpandCollapse.IsSupported
-                                         && (element.AutomationId == automationId || element.Parent?.AutomationId == automationId))
-                     ?? expander;
-        header.Patterns.ExpandCollapse.Pattern.Expand();
-    }
-
-    // The app saves a moment after a change.
-    private static bool Eventually(Func<bool> condition) =>
-        Retry.WhileFalse(condition, TimeSpan.FromSeconds(15), TimeSpan.FromMilliseconds(200)).Success;
-
     [Fact]
     public void FlippingASwitch_IsSavedToTheSettingsFile()
     {
@@ -60,7 +47,8 @@ public class SettingsTests
         app.Snapshot("confirm-delete-off");
 
         Assert.Equal(ToggleState.Off, confirmDelete.ToggleState.Value);
-        Assert.True(Eventually(() => app.SavedSetting("ConfirmDelete") == "False"), "settings.json does not say that deleting is no longer confirmed.");
+        // The app saves a moment after a change.
+        Assert.True(AppSession.Eventually(() => app.SavedSetting("ConfirmDelete") == "False"), "settings.json does not say that deleting is no longer confirmed.");
     }
 
     [Fact]
@@ -68,14 +56,14 @@ public class SettingsTests
     {
         using var app = OpenSettings("settings-categories");
 
-        Expand(app, "CategoriesExpander");
+        app.Expand("CategoriesExpander");
         app.Require("NewNameBox").AsTextBox().Text = "Backups";
         app.Require("AddButton").Press();
         app.Snapshot("category-added");
 
         Assert.True(app.FindByName("Backups", ControlType.Text) != null, "The new category is not listed.");
         Assert.True(app.FindByName("Remove Backups", ControlType.Button) != null, "The button that removes the new category does not say which category it removes.");
-        Assert.True(Eventually(() => app.SavedSetting("SavedCategories")?.Contains("\"Backups\"") == true), "settings.json does not hold the new category.");
+        Assert.True(AppSession.Eventually(() => app.SavedSetting("SavedCategories")?.Contains("\"Backups\"") == true), "settings.json does not hold the new category.");
     }
 
     [Fact]
@@ -100,7 +88,7 @@ public class SettingsTests
         app.Snapshot("german");
         Assert.Equal("Einstellungen", app.Require("NavSettings").Name);
         Assert.Equal("Deutsch", ChoiceShownBy(app, "LanguageChoice"));
-        Assert.True(Eventually(() => app.SavedSetting("Language") == "de-DE"), "settings.json does not hold the chosen language.");
+        Assert.True(AppSession.Eventually(() => app.SavedSetting("Language") == "de-DE"), "settings.json does not hold the chosen language.");
         Assert.False(app.HasExited);
     }
 

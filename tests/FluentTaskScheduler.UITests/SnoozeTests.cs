@@ -39,7 +39,7 @@ public sealed class SnoozeTests : IDisposable
         (app.FindByName("OK", ControlType.Button) ?? throw new InvalidOperationException("The message has no OK button.")).Press();
 
         app.Require("SnoozeBannerResume").Press();
-        Assert.True(Eventually(() => app.Find("SnoozeBannerResume", 300) is null), "The banner stayed after Resume.");
+        Assert.True(AppSession.Eventually(() => app.Find("SnoozeBannerResume", 300) is null), "The banner stayed after Resume.");
     }
 
     [Fact]
@@ -54,14 +54,14 @@ public sealed class SnoozeTests : IDisposable
         app.Require("DetailsSnoozeButton", 20000).Press();
         app.Require("DetailsSnoozeHalfAnHourItem").Press();
 
-        Assert.True(Eventually(() => !_windows.IsEnabled("Paused one")), "The snoozed task is still enabled in Task Scheduler. " + ProblemShown(app));
+        Assert.True(AppSession.Eventually(() => !_windows.IsEnabled("Paused one")), "The snoozed task is still enabled in Task Scheduler. " + ProblemShown(app));
         Assert.True(app.Find("DetailsSnoozeStatus", 10000) is { IsOffscreen: false }, "The details do not say until when the task is snoozed.");
         app.Snapshot("task-snoozed");
 
         app.Require("DetailsResumeButton").Press();
 
-        Assert.True(Eventually(() => _windows.IsEnabled("Paused one")), "Resume did not enable the task again.");
-        Assert.True(Eventually(() => app.Find("DetailsSnoozeButton", 300) is not null), "The details do not offer to snooze the task again.");
+        Assert.True(AppSession.Eventually(() => _windows.IsEnabled("Paused one")), "Resume did not enable the task again.");
+        Assert.True(AppSession.Eventually(() => app.Find("DetailsSnoozeButton", 300) is not null), "The details do not offer to snooze the task again.");
     }
 
     private static Func<AutomationElement, bool> RowNamed(string name) =>
@@ -69,7 +69,4 @@ public sealed class SnoozeTests : IDisposable
 
     private static string ProblemShown(AppSession app) =>
         app.Find("DetailsSnoozeProblem", 500) is { } bar ? $"The details say: {AppSession.TextIn(bar)}" : "";
-
-    private static bool Eventually(Func<bool> condition) =>
-        Retry.WhileFalse(condition, TimeSpan.FromSeconds(20), TimeSpan.FromMilliseconds(500)).Success;
 }

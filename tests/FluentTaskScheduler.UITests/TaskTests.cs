@@ -59,7 +59,7 @@ public sealed class TaskTests : IDisposable
         string name = "Weekly report";
         try
         {
-            Assert.True(WaitFor(() => WindowsTasks.Root.Exists(name)), "The task was not created. " + ProblemsShown(app));
+            Assert.True(AppSession.Eventually(() => WindowsTasks.Root.Exists(name)), "The task was not created. " + ProblemsShown(app));
             app.Snapshot("saved");
 
             string trigger = WindowsTasks.Root.Element(name, "Triggers", "CalendarTrigger")?.ToString() ?? "";
@@ -88,7 +88,7 @@ public sealed class TaskTests : IDisposable
         app.Require("SearchBox").AsTextBox().Enter("Nightly");
         var row = app.Find(RowNamed("Nightly"), 20000) ?? throw new InvalidOperationException("The task is not in the list.");
         OpenEditor(app, row);
-        Expand(app, "EditorSettings");
+        app.Expand("EditorSettings");
         app.Snapshot("editor-settings");
         var limit = app.Require("EditorLimitRunTime").AsCheckBox();
         Assert.True(limit.IsChecked, "The editor does not show the task's run time limit.");
@@ -96,7 +96,7 @@ public sealed class TaskTests : IDisposable
         Assert.Equal("Normal", app.Require("EditorPriority").AsComboBox().SelectedItem?.Name);
         app.Require("PrimaryButton").AsButton().Invoke();
 
-        Assert.True(WaitFor(() => _windows.Value("Nightly", "Settings", "ExecutionTimeLimit") == "PT0S"),
+        Assert.True(AppSession.Eventually(() => _windows.Value("Nightly", "Settings", "ExecutionTimeLimit") == "PT0S"),
             "The run time limit was not switched off. " + ProblemsShown(app));
         Assert.Equal("S-1-5-18", _windows.Value("Nightly", "Principals", "Principal", "UserId"));
         Assert.Equal("HighestAvailable", _windows.Value("Nightly", "Principals", "Principal", "RunLevel"));
@@ -108,7 +108,7 @@ public sealed class TaskTests : IDisposable
         // Opened again, the limit stays off instead of coming back.
         row = app.Find(RowNamed("Nightly"), 20000)!;
         OpenEditor(app, row);
-        Expand(app, "EditorSettings");
+        app.Expand("EditorSettings");
         Assert.False(app.Require("EditorLimitRunTime").AsCheckBox().IsChecked, "The limit is shown as on again.");
         app.Snapshot("editor-reopened");
     }
@@ -125,7 +125,7 @@ public sealed class TaskTests : IDisposable
         OpenFolderlessList(app);
         Assert.True(app.Find(element => element.ControlType == ControlType.ListItem, 30000) != null, "The list stayed empty.");
         app.Require("SearchBox").AsTextBox().Enter("Arrives later");
-        Assert.True(WaitFor(() => app.Find(RowNamed("Arrives later"), 500) == null), "A task of that name is already there.");
+        Assert.True(AppSession.Eventually(() => app.Find(RowNamed("Arrives later"), 500) == null), "A task of that name is already there.");
 
         _windows.CreateDaily("Arrives later");
 
@@ -135,7 +135,7 @@ public sealed class TaskTests : IDisposable
 
         _windows.Delete("Arrives later");
 
-        Assert.True(WaitFor(() => app.Find(RowNamed("Arrives later"), 500) == null, seconds: 30), "The deleted task stayed in the list.");
+        Assert.True(AppSession.Eventually(() => app.Find(RowNamed("Arrives later"), 500) == null, seconds: 30), "The deleted task stayed in the list.");
     }
 
     [Fact]
@@ -168,16 +168,16 @@ public sealed class TaskTests : IDisposable
         if (app.Find("DetailsSwitchLogOnButton", 3000) is { } switchOn)
         {
             switchOn.Press();
-            Assert.True(WaitFor(() => app.Find("DetailsSwitchLogOnButton", 500) is null), "History could not be switched on. " + ProblemsShown(app, "DetailsProblem"));
+            Assert.True(AppSession.Eventually(() => app.Find("DetailsSwitchLogOnButton", 500) is null), "History could not be switched on. " + ProblemsShown(app, "DetailsProblem"));
         }
 
         app.Require("DetailsRunButton").Press();
-        Assert.True(WaitFor(() => app.Find("DetailsRunButton", 500) is null), "Run did not close the details.");
+        Assert.True(AppSession.Eventually(() => app.Find("DetailsRunButton", 500) is null), "Run did not close the details.");
 
         // The log is written a moment after the fact.
         Row().Click();
         app.Require("DetailsReloadButton", 20000);
-        Assert.True(WaitFor(() =>
+        Assert.True(AppSession.Eventually(() =>
         {
             app.Require("DetailsReloadButton").Press();
             Thread.Sleep(1500);
@@ -200,7 +200,7 @@ public sealed class TaskTests : IDisposable
         Assert.True(app.Find(element => element.ControlType == ControlType.ListItem, 30000) != null, "The list stayed empty.");
 
         var scroll = app.Require("TaskList").Patterns.Scroll.Pattern;
-        Assert.True(WaitFor(() => scroll.VerticallyScrollable.Value), "The list does not scroll, so no row is ever reused.");
+        Assert.True(AppSession.Eventually(() => scroll.VerticallyScrollable.Value), "The list does not scroll, so no row is ever reused.");
         for (int page = 0; page < 300 && scroll.VerticalScrollPercent.Value < 100; page++)
         {
             scroll.Scroll(ScrollAmount.NoAmount, ScrollAmount.LargeIncrement);
@@ -238,7 +238,7 @@ public sealed class TaskTests : IDisposable
             Assert.True(app.Find("ImportAccountMissing", 2000) is { IsOffscreen: false }, "The dialog does not say that the account is unknown here.");
             app.Require("PrimaryButton").AsButton().Invoke();
 
-            Assert.True(WaitFor(() => WindowsTasks.Root.Exists(name)), "The task was not imported. " + ProblemsShown(app, "ImportProblem"));
+            Assert.True(AppSession.Eventually(() => WindowsTasks.Root.Exists(name)), "The task was not imported. " + ProblemsShown(app, "ImportProblem"));
             string? user = WindowsTasks.Root.Value(name, "Principals", "Principal", "UserId");
             Assert.NotNull(user);
             Assert.DoesNotContain("1111111111", user);
@@ -273,7 +273,7 @@ public sealed class TaskTests : IDisposable
         delete.Patterns.Invoke.Pattern.Invoke();
         app.Require("PrimaryButton").AsButton().Invoke();
 
-        Assert.True(WaitFor(() => app.Find(element => element.ControlType == ControlType.TreeItem && element.Name == name, 500) == null),
+        Assert.True(AppSession.Eventually(() => app.Find(element => element.ControlType == ControlType.TreeItem && element.Name == name, 500) == null),
             "The folder is still in the tree after deleting it.");
     }
 
@@ -346,30 +346,8 @@ public sealed class TaskTests : IDisposable
         button.Patterns.Toggle.Pattern.Toggle();
     }
 
-    private static void Expand(AppSession app, string automationId)
-    {
-        var expander = app.Require(automationId);
-        var header = app.Find(element => element.Patterns.ExpandCollapse.IsSupported
-                                         && (element.AutomationId == automationId || element.Parent?.AutomationId == automationId))
-                     ?? expander;
-        header.Patterns.ExpandCollapse.Pattern.Expand();
-        Wait();
-    }
-
     private static string ProblemsShown(AppSession app, string infoBar = "EditorProblems") =>
         app.Find(infoBar, 500) is { } bar ? $"The dialog says: {AppSession.TextIn(bar)}" : "";
-
-    private static bool WaitFor(Func<bool> condition, int seconds = 20)
-    {
-        DateTime deadline = DateTime.UtcNow.AddSeconds(seconds);
-        while (DateTime.UtcNow < deadline)
-        {
-            try { if (condition()) return true; }
-            catch (InvalidOperationException) { }
-            Thread.Sleep(500);
-        }
-        return false;
-    }
 
     private static void Wait() => Thread.Sleep(600);
 }

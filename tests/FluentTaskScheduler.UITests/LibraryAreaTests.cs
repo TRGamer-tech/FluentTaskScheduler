@@ -98,7 +98,7 @@ public class LibraryTests
     public void InANarrowWindow_TheTabsKeepTheirWidth_AndTheSearchBoxGivesWay()
     {
         // The tabs are widest in Japanese.
-        using var app = AppSession.Launch("library-narrow", """{"Language":"ja-JP","HasCompletedOnboarding":true,"LastSeenVersion":"999.0.0"}""");
+        using var app = AppSession.Launch("library-narrow", AppSession.FirstRunDone(("Language", "ja-JP")));
         app.Require("NavScriptLibrary").Press();
         int fullWidth = app.Require("LibraryScriptsTab").BoundingRectangle.Width;
 
