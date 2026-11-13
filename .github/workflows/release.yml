@@ -1,16 +1,25 @@
 name: Release
 
-# Automates the "Publishing a Release with VeloPack" steps from CONTRIBUTING.md: publish +
-# `vpk pack` per architecture, assemble Dist/, and attach everything to a GitHub Release.
-# Triggered by pushing a tag like V1.9.1 (matching the tag format vpk/CONTRIBUTING.md already use).
+# Pushing a tag like V1.9.1 builds both architectures, packs them with Velopack and attaches the
+# result to a draft GitHub Release, to be reviewed and published by hand. A manual run packs
+# the version typed in and keeps the result as workflow artifacts only: nothing is published,
+# which makes it the way to try the packaging out.
 on:
   push:
     tags: ['V*']
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to release (e.g. 1.9.1) — required for manual runs'
+        description: Version to pack, e.g. 1.9.1. Nothing is published.
         required: true
+
+permissions:
+  contents: read
+
+env:
+  # The Velopack command line tool. Without a version the newest one would be installed, which
+  # is not necessarily one that understands the Velopack package the app references.
+  VPK_VERSION: 0.0.1444-gc245055
 
 jobs:
   package:
@@ -18,12 +27,10 @@ jobs:
       matrix:
         include:
           - platform: x64
-            rid: win-x64
-            channel: win-x64
+            arch: x64
             runner: windows-latest
           - platform: ARM64
-            rid: win-arm64
-            channel: win-arm64
+            arch: arm64
             runner: windows-11-arm
 
     runs-on: ${{ matrix.runner }}
@@ -37,16 +44,21 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
+      # The version comes from the tag (V1.9.1 gives 1.9.1) and goes into the build, so the app,
+      # the installer and the update feed all carry the same number.
       - name: Determine version
         id: version
         shell: pwsh
+        env:
+          REQUESTED: ${{ inputs.version }}
+          TAG: ${{ github.ref_name }}
         run: |
-          $version = "${{ inputs.version }}"
-          if (-not $version) { $version = "${{ github.ref_name }}".TrimStart('V') }
+          $version = if ($env:REQUESTED) { $env:REQUESTED } else { $env:TAG -replace '^[Vv]', '' }
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "'$version' is not a version like 1.9.1." }
           "version=$version" >> $env:GITHUB_OUTPUT
 
-      - name: Install VeloPack CLI
-        run: dotnet tool install -g vpk
+      - name: Install Velopack CLI
+        run: dotnet tool install -g vpk --version ${{ env.VPK_VERSION }}
 
       - name: Publish
         run: >
@@ -56,60 +68,73 @@ jobs:
           -p:Version=${{ steps.version.outputs.version }}
           -o publish
 
-      - name: vpk pack
+      - name: Pack
         run: >
           vpk pack
           -u FluentTaskScheduler
           -v ${{ steps.version.outputs.version }}
-          -c ${{ matrix.channel }}
-          -o Releases/${{ matrix.platform }}
+          -c win-${{ matrix.arch }}
+          -o Releases
           -p publish
           -e FluentTaskScheduler.exe
           --msi --instLocation Either
           --msiBanner Assets/MSI-Banner.bmp
           --msiLogo Assets/MSI-Logo.bmp
 
-      - name: Fix zero-dated Portable ZIP entries
+      # Package managers and the README link to these exact names, and release downloads are
+      # case-sensitive. The update feed (releases.*.json) and the update package keep the names
+      # Velopack gave them, because the app's updater looks for those.
+      - name: Collect release files
         shell: pwsh
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          CHANNEL: win-${{ matrix.arch }}
+          ARCH: ${{ matrix.arch }}
         run: |
+          $ErrorActionPreference = 'Stop'
+          Get-ChildItem Releases | Format-Table Name, Length
+
+          # Velopack dates every entry of the portable zip 1980-01-01.
           Add-Type -Assembly System.IO.Compression.FileSystem
+          $portable = "Releases/FluentTaskScheduler-$env:CHANNEL-Portable.zip"
+          $archive = [System.IO.Compression.ZipFile]::Open($portable, 'Update')
           $now = Get-Date
-          $zip = "Releases/${{ matrix.platform }}/FluentTaskScheduler-${{ matrix.rid }}-Portable.zip"
-          $archive = [System.IO.Compression.ZipFile]::Open($zip, 'Update')
           foreach ($entry in $archive.Entries) { $entry.LastWriteTime = $now }
           $archive.Dispose()
 
-      - name: Assemble Dist
-        shell: pwsh
-        run: |
-          New-Item -ItemType Directory -Force -Path Dist | Out-Null
-          $v = "${{ steps.version.outputs.version }}"
-          Copy-Item "Releases/${{ matrix.platform }}/FluentTaskScheduler-${{ matrix.rid }}-Portable.zip" "Dist/Portable-${{ matrix.platform }}.zip" -Force
-          Copy-Item "Releases/${{ matrix.platform }}/FluentTaskScheduler-${{ matrix.rid }}.msi" "Dist/Setup-${{ matrix.platform }}.msi" -Force
-          Copy-Item "Releases/${{ matrix.platform }}/releases.${{ matrix.channel }}.json" "Dist/" -Force
-          Copy-Item "Releases/${{ matrix.platform }}/FluentTaskScheduler-$v-full.nupkg" "Dist/" -Force
-          Get-Item "Releases/${{ matrix.platform }}/FluentTaskScheduler-$v-delta.nupkg" -ErrorAction SilentlyContinue | Copy-Item -Destination "Dist/" -Force
+          New-Item -ItemType Directory -Force Dist | Out-Null
+          Copy-Item $portable "Dist/Portable-$env:ARCH.zip"
+          Copy-Item "Releases/FluentTaskScheduler-$env:CHANNEL.msi" "Dist/Setup-$env:ARCH.msi"
+          Copy-Item "Releases/releases.$env:CHANNEL.json" Dist/
+          Copy-Item "Releases/FluentTaskScheduler-$env:VERSION-$env:CHANNEL-full.nupkg" Dist/
+          Get-ChildItem Dist | Format-Table Name, Length
 
-      - name: Upload Dist artifact
+      - name: Upload release files
         uses: actions/upload-artifact@v5
         with:
-          name: Dist-${{ matrix.platform }}
+          name: Dist-${{ matrix.arch }}
           path: Dist/
+          if-no-files-found: error
 
-  publish-release:
+  draft-release:
+    # Only a pushed tag makes a release.
+    if: github.event_name == 'push'
     needs: package
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - name: Download all Dist artifacts
+      - name: Download release files
         uses: actions/download-artifact@v6
         with:
           pattern: Dist-*
           path: Dist
           merge-multiple: true
 
-      - name: Create GitHub Release
+      - name: Create draft release
         uses: softprops/action-gh-release@v2
         with:
           files: Dist/*
           draft: true
           generate_release_notes: true
+          fail_on_unmatched_files: true
