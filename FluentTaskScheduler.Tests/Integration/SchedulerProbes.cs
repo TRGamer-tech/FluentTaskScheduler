@@ -21,67 +21,25 @@ namespace FluentTaskScheduler.Tests.Integration
     [Collection("StaticServices")]
     public class SchedulerProbes
     {
-        private readonly ITestOutputHelper _out;
-        public SchedulerProbes(ITestOutputHelper output) => _out = output;
+        private readonly Breadcrumbs _out;
+        public SchedulerProbes(ITestOutputHelper output) => _out = new Breadcrumbs(output);
+
+        /// <summary>Test output that is also appended to a file line by line, so it survives a crash of the test host.</summary>
+        private sealed class Breadcrumbs
+        {
+            private static readonly string File = System.IO.Path.Combine(
+                Environment.GetEnvironmentVariable("FTS_PROBE_LOG_DIR") ?? System.IO.Path.GetTempPath(), "probes.log");
+            private readonly ITestOutputHelper _output;
+            public Breadcrumbs(ITestOutputHelper output) => _output = output;
+
+            public void WriteLine(string message)
+            {
+                _output.WriteLine(message);
+                System.IO.File.AppendAllText(File, message + Environment.NewLine);
+            }
+        }
 
         private static readonly string[] IgnoredOnCompare = { "Date", "URI" };
-
-        /// <summary>A task that uses about every setting the editor does not model.</summary>
-        private static TaskDefinition BuildRichDefinition(TaskService ts)
-        {
-            var td = ts.NewTask();
-            td.RegistrationInfo.Author = "FTS Tests";
-            td.RegistrationInfo.Description = "Rich task";
-            td.RegistrationInfo.Documentation = "docs here";
-            td.RegistrationInfo.Source = "integration test";
-            td.RegistrationInfo.Version = new Version(3, 1);
-
-            td.Settings.Priority = (ProcessPriorityClass)5;
-            td.Settings.ExecutionTimeLimit = TimeSpan.Zero;
-            td.Settings.DeleteExpiredTaskAfter = TimeSpan.FromDays(90);
-            td.Settings.MultipleInstances = TaskInstancesPolicy.Queue;
-            td.Settings.AllowHardTerminate = false;
-            td.Settings.StartWhenAvailable = true;
-            td.Settings.WakeToRun = true;
-            td.Settings.Hidden = true;
-            td.Settings.Enabled = false;
-            td.Settings.DisallowStartIfOnBatteries = false;
-            td.Settings.StopIfGoingOnBatteries = false;
-            td.Settings.DisallowStartOnRemoteAppSession = true;
-            td.Settings.IdleSettings.IdleDuration = TimeSpan.FromMinutes(20);
-            td.Settings.IdleSettings.WaitTimeout = TimeSpan.FromHours(3);
-            td.Settings.IdleSettings.RestartOnIdle = true;
-            td.Settings.RestartInterval = TimeSpan.FromMinutes(5);
-            td.Settings.RestartCount = 4;
-
-            td.Triggers.Add(new WeeklyTrigger(DaysOfTheWeek.Monday | DaysOfTheWeek.Thursday, 2)
-            {
-                StartBoundary = new DateTime(2030, 1, 2, 3, 4, 5),
-                EndBoundary = new DateTime(2031, 1, 2, 3, 4, 5),
-                Enabled = false,
-                ExecutionTimeLimit = TimeSpan.FromMinutes(30),
-                RandomDelay = TimeSpan.FromMinutes(7),
-                Repetition = new RepetitionPattern(TimeSpan.FromMinutes(15), TimeSpan.FromHours(2), true)
-            });
-            td.Triggers.Add(new LogonTrigger { Delay = TimeSpan.FromSeconds(45) });
-            td.Triggers.Add(new BootTrigger { Delay = TimeSpan.FromMinutes(2) });
-            td.Triggers.Add(new EventTrigger
-            {
-                Subscription = "<QueryList><Query Id=\"0\" Path=\"System\"><Select Path=\"System\">*[System[Provider[@Name='disk'] and (Level=1 or Level=2) and (EventID=7 or EventID=11)]]</Select></Query></QueryList>",
-                Delay = TimeSpan.FromSeconds(30)
-            });
-            td.Triggers.Add(new MonthlyDOWTrigger(DaysOfTheWeek.Monday | DaysOfTheWeek.Friday, MonthsOfTheYear.January | MonthsOfTheYear.July, WhichWeek.FirstWeek | WhichWeek.ThirdWeek)
-            {
-                StartBoundary = new DateTime(2030, 2, 1, 8, 0, 0)
-            });
-            td.Triggers.Add(new SessionStateChangeTrigger(TaskSessionStateChangeType.ConsoleConnect));
-            td.Triggers.Add(new IdleTrigger());
-
-            td.Actions.Add(new ExecAction("cmd.exe", "/c exit 0", @"C:\Windows"));
-            td.Actions.Add(new ExecAction("cmd.exe", "/c exit 1"));
-            td.Principal.RunLevel = TaskRunLevel.Highest;
-            return td;
-        }
 
         [SkippableFact]
         public void Library_ReRegisteringAnExistingDefinition()
@@ -89,12 +47,9 @@ namespace FluentTaskScheduler.Tests.Integration
             Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
             using var sandbox = new SchedulerSandbox();
 
-            var td = BuildRichDefinition(sandbox.Service);
+            var td = SampleTasks.Rich(sandbox.Service);
             var task = sandbox.Folder.RegisterTaskDefinition("Rich", td, TaskCreation.CreateOrUpdate, "SYSTEM", null, TaskLogonType.ServiceAccount);
             string before = task.Xml;
-            _out.WriteLine("=== registered XML ===");
-            _out.WriteLine(before);
-
             var settings = task.Definition.Settings;
             _out.WriteLine($"Priority enum={settings.Priority} int={(int)settings.Priority}");
             _out.WriteLine($"ExecutionTimeLimit={settings.ExecutionTimeLimit} DeleteExpiredTaskAfter={settings.DeleteExpiredTaskAfter}");
@@ -146,15 +101,12 @@ namespace FluentTaskScheduler.Tests.Integration
             var crud = new TaskCrudService(connection, events);
 
             // A task as rich as the definition above, minus the pieces the editor refuses to open.
-            var td = BuildRichDefinition(sandbox.Service);
+            var td = SampleTasks.Rich(sandbox.Service);
             var system = sandbox.Folder.RegisterTaskDefinition("RichSystem", td, TaskCreation.CreateOrUpdate, "SYSTEM", null, TaskLogonType.ServiceAccount);
             RoundTrip(crud, sandbox, system);
 
-            // A plain task the way a user would create it for themselves.
-            var simple = sandbox.Service.NewTask();
-            simple.RegistrationInfo.Description = "Simple";
-            simple.Triggers.Add(new DailyTrigger { StartBoundary = new DateTime(2030, 1, 1, 6, 30, 0) });
-            simple.Actions.Add(new ExecAction("cmd.exe", "/c exit 0"));
+            // A plain task the way a user would create it for themselves, with the run time limit switched off.
+            var simple = SampleTasks.Simple(sandbox.Service);
             simple.Settings.ExecutionTimeLimit = TimeSpan.Zero;
             var mine = sandbox.Folder.RegisterTaskDefinition("SimpleMine", simple);
             RoundTrip(crud, sandbox, mine);
@@ -163,7 +115,16 @@ namespace FluentTaskScheduler.Tests.Integration
         private void RoundTrip(TaskCrudService crud, SchedulerSandbox sandbox, ScheduledTask task)
         {
             string before = task.Xml;
+            _out.WriteLine($"--- {task.Name}: describing each trigger with Trigger.ToString() ---");
+            foreach (var trigger in task.Definition.Triggers)
+            {
+                _out.WriteLine($"  about to describe {trigger.GetType().Name}");
+                try { _out.WriteLine($"  -> {trigger}"); }
+                catch (Exception ex) { _out.WriteLine($"  -> THROWS {ex.GetType().Name} {ex.Message}"); }
+            }
+            _out.WriteLine($"--- {task.Name}: GetTaskDetails ---");
             var model = crud.GetTaskDetails(task.Path);
+            _out.WriteLine($"--- {task.Name}: GetTaskDetails returned ---");
             if (model == null) { _out.WriteLine($"{task.Name}: GetTaskDetails returned null"); return; }
 
             _out.WriteLine($"--- {task.Name}: model as loaded ---");
@@ -174,7 +135,9 @@ namespace FluentTaskScheduler.Tests.Integration
 
             try
             {
+                _out.WriteLine($"--- {task.Name}: RegisterTask ---");
                 crud.RegisterTask(sandbox.FolderPath, model);
+                _out.WriteLine($"--- {task.Name}: RegisterTask returned ---");
                 Report($"{task.Name}: load into the model and save again unchanged", before, sandbox.Service.GetTask(task.Path).Xml);
             }
             catch (Exception ex) { _out.WriteLine($"{task.Name}: RegisterTask FAILED: {ex}"); }
@@ -280,7 +243,7 @@ namespace FluentTaskScheduler.Tests.Integration
         {
             Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
             using var sandbox = new SchedulerSandbox();
-            var task = sandbox.Folder.RegisterTaskDefinition("Rich", BuildRichDefinition(sandbox.Service), TaskCreation.CreateOrUpdate, "SYSTEM", null, TaskLogonType.ServiceAccount);
+            var task = sandbox.Folder.RegisterTaskDefinition("Rich", SampleTasks.Rich(sandbox.Service), TaskCreation.CreateOrUpdate, "SYSTEM", null, TaskLogonType.ServiceAccount);
 
             var original = (Thread.CurrentThread.CurrentCulture, Thread.CurrentThread.CurrentUICulture);
             try
@@ -292,6 +255,7 @@ namespace FluentTaskScheduler.Tests.Integration
                     Thread.CurrentThread.CurrentUICulture = culture;
                     foreach (var trigger in sandbox.Service.GetTask(task.Path).Definition.Triggers)
                     {
+                        _out.WriteLine($"{name}: about to describe {trigger.GetType().Name}");
                         try { _out.WriteLine($"{name} {trigger.GetType().Name}: {trigger}"); }
                         catch (Exception ex) { _out.WriteLine($"{name} {trigger.GetType().Name}: THROWS {ex.GetType().Name} {ex.Message}"); }
                     }
@@ -324,6 +288,7 @@ namespace FluentTaskScheduler.Tests.Integration
                     foreach (var task in ts.RootFolder.AllTasks)
                     {
                         total++;
+                        System.IO.File.AppendAllText(System.IO.Path.Combine(Environment.GetEnvironmentVariable("FTS_PROBE_LOG_DIR") ?? System.IO.Path.GetTempPath(), "probes-current-task.log"), $"{name} {task.Path}{Environment.NewLine}");
                         try { TaskModelMapper.MapTaskToModel(task); }
                         catch (Exception ex)
                         {

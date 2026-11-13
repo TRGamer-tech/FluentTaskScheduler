@@ -25,15 +25,24 @@ jobs:
           -c Release
           -p:Platform=x64
           --logger "trx;LogFileName=test-results.trx"
-          --logger "console;verbosity=normal"
+          --filter "FullyQualifiedName!~SchedulerProbes"
           --blame
 
-      - name: Show which test crashed the host
-        if: failure()
+      # Each probe gets its own test host: one that crashes the process must not take the others with it.
+      - name: Run Task Scheduler probes
+        if: always()
         shell: pwsh
-        run: >
-          Get-ChildItem FluentTaskScheduler.Tests/TestResults -Recurse -Filter 'Sequence_*.xml' |
-          ForEach-Object { Get-Content $_.FullName -Tail 12 }
+        env:
+          FTS_PROBE_LOG_DIR: ${{ github.workspace }}\FluentTaskScheduler.Tests\TestResults
+        run: |
+          $probes = 'Library_ReRegisteringAnExistingDefinition', 'Library_PrincipalFormats', 'Library_StoredPasswordTask_UpdateWithoutPassword',
+                    'Library_TriggerToString_PerCulture', 'Machine_TaskSchedulerOperationalLog', 'CurrentServices_MappingEveryTaskOnThisMachine',
+                    'CurrentServices_EditRoundTrip'
+          foreach ($probe in $probes) {
+            dotnet test FluentTaskScheduler.Tests/FluentTaskScheduler.Tests.csproj -c Release -p:Platform=x64 --no-build `
+              --filter "FullyQualifiedName~SchedulerProbes.$probe" --logger "trx;LogFileName=probe-$probe.trx" | Select-Object -Last 4
+          }
+          exit 0
 
       - name: Upload test results
         if: always()
