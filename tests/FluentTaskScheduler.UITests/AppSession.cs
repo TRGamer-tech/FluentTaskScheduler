@@ -45,7 +45,7 @@ public sealed class AppSession : IDisposable
     /// <summary>Starts the app a second time, the way a user who cannot find its window would, and waits for that instance to end.</summary>
     public void StartAgain()
     {
-        using var second = Process.Start(new ProcessStartInfo(ExePath) { UseShellExecute = false })!;
+        using var second = Process.Start(StartInfo(DataDir))!;
         if (second.WaitForExit(TimeSpan.FromSeconds(30))) return;
         second.Kill();
         throw new InvalidOperationException("The second instance kept running instead of handing over to the first.");
@@ -93,22 +93,31 @@ public sealed class AppSession : IDisposable
         Directory.CreateDirectory(data);
         File.WriteAllText(Path.Combine(data, "settings.json"), settingsJson);
 
-        var startInfo = new ProcessStartInfo(ExePath) { WorkingDirectory = Path.GetDirectoryName(ExePath)!, UseShellExecute = false };
-        startInfo.Environment["FLUENTTASKSCHEDULER_DATA"] = data;
-        var app = Application.Launch(startInfo);
+        var app = Application.Launch(StartInfo(data));
         var automation = new UIA3Automation();
-        var window = app.GetMainWindow(automation, TimeSpan.FromSeconds(60))
-                     ?? throw new InvalidOperationException("The app did not show a main window within 60 s.");
         try
         {
+            var window = app.GetMainWindow(automation, TimeSpan.FromSeconds(60))
+                         ?? throw new InvalidOperationException("The app did not show a main window within 60 s.");
             BringToFront(automation, app, window);
+            return new AppSession(app, automation, window, artifacts, data);
         }
         catch
         {
-            app.Kill();
+            // No session comes of it to be disposed, but the app's logs, a crash log among them, explain why.
+            End(app, automation, data, artifacts);
             throw;
         }
-        return new AppSession(app, automation, window, artifacts, data);
+    }
+
+    /// <summary>Where the app keeps its settings and state, in place of the folder of whoever runs it.</summary>
+    private const string DataFolderVariable = "FLUENTTASKSCHEDULER_DATA";
+
+    private static ProcessStartInfo StartInfo(string dataDir)
+    {
+        var startInfo = new ProcessStartInfo(ExePath) { WorkingDirectory = Path.GetDirectoryName(ExePath)!, UseShellExecute = false };
+        startInfo.Environment[DataFolderVariable] = dataDir;
+        return startInfo;
     }
 
     /// <summary>Set to 1 on a build machine to let the tests end programs whose windows lie over the app.</summary>
@@ -388,22 +397,28 @@ public sealed class AppSession : IDisposable
         // What the window showed last, and what the app wrote into its logs, explain a failure
         // that happened inside the app better than any assertion can.
         if (!_app.HasExited) Snapshot("last");
-        KeepAppFiles();
-
-        try { if (!_app.HasExited) _app.Kill(); } catch { }
-        _app.Dispose();
-        _automation.Dispose();
-        EndRunningCopies();
-        try { Directory.Delete(DataDir, recursive: true); } catch (IOException) { } catch (UnauthorizedAccessException) { }
+        End(_app, _automation, DataDir, ArtifactsDir);
     }
 
-    private void KeepAppFiles()
+    // Keeps what the app wrote, ends it, and removes its data folder.
+    private static void End(Application app, UIA3Automation automation, string dataDir, string artifactsDir)
+    {
+        KeepAppFiles(dataDir, artifactsDir);
+
+        try { if (!app.HasExited) app.Kill(); } catch { }
+        app.Dispose();
+        automation.Dispose();
+        EndRunningCopies();
+        try { Directory.Delete(dataDir, recursive: true); } catch (IOException) { } catch (UnauthorizedAccessException) { }
+    }
+
+    private static void KeepAppFiles(string dataDir, string artifactsDir)
     {
         try
         {
-            string kept = Path.Combine(ArtifactsDir, "app-data");
+            string kept = Path.Combine(artifactsDir, "app-data");
             Directory.CreateDirectory(kept);
-            foreach (string file in Directory.EnumerateFiles(DataDir, "*", SearchOption.AllDirectories)
+            foreach (string file in Directory.EnumerateFiles(dataDir, "*", SearchOption.AllDirectories)
                          .Where(file => Path.GetExtension(file) is ".txt" or ".json" or ".log"))
             {
                 File.Copy(file, Path.Combine(kept, Path.GetFileName(file)), overwrite: true);
