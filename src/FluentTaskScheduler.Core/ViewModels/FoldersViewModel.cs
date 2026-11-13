@@ -33,15 +33,17 @@ public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewMode
     private FolderNode? _selected;
 
     /// <summary>
-    /// The folder whose tasks the list shows; null while it shows the tasks of all folders. A
-    /// folder set here is the user's choice in the tree, and remembered as such.
+    /// The folder whose tasks the list shows, highlighted in the tree; null while the list shows
+    /// the tasks of all folders. A folder set here is the user's choice in the tree, and remembered
+    /// as such. Null set here changes nothing: the tree sets it when it loses its highlight by
+    /// itself, when the folder's parent is collapsed for one, and the list goes on showing the folder.
     /// </summary>
     public FolderNode? Selected
     {
         get => _selected;
         set
         {
-            if (!SetProperty(ref _selected, value) || value is null) return;
+            if (value is null || !SetProperty(ref _selected, value)) return;
             tasks.FolderPath = value.Path;
             Remember(value.Path);
         }
@@ -64,9 +66,15 @@ public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewMode
     /// <summary>Shows the tasks of all folders, as the user chose.</summary>
     public void ChooseAllTasks()
     {
+        ShowAllTasks();
+        Remember(null);
+    }
+
+    /// <summary>Shows the tasks of all folders as the app's doing rather than the user's choice, which is not remembered.</summary>
+    public void ShowAllTasks()
+    {
         Highlight(null);
         tasks.FolderPath = null;
-        Remember(null);
     }
 
     /// <summary>
@@ -129,9 +137,7 @@ public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewMode
     /// </summary>
     public void Reveal(string taskPath)
     {
-        if (string.Equals(tasks.FolderPath, TaskPaths.ParentOf(taskPath), StringComparison.OrdinalIgnoreCase)) return;
-        Highlight(null);
-        tasks.FolderPath = null;
+        if (!string.Equals(tasks.FolderPath, TaskPaths.ParentOf(taskPath), StringComparison.OrdinalIgnoreCase)) ShowAllTasks();
     }
 
     /// <summary>Asks for a name and creates a folder in <paramref name="parent"/>.</summary>

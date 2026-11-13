@@ -149,12 +149,8 @@ public sealed partial class ShellPage : Page, IShellNavigator
     {
         if (args.SelectedItem is not NavigationViewItem { Tag: string tag }) return;
 
-        if (tag == "Tasks")
-        {
-            // "All tasks" means all folders.
-            _folders.Selected = null;
-            _tasks.FolderPath = null;
-        }
+        // "All tasks" means all folders.
+        if (tag == "Tasks") _folders.ShowAllTasks();
         Show(tag);
     }
 

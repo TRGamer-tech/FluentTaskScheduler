@@ -11,8 +11,13 @@ public sealed partial class FolderTree : UserControl
         nameof(ViewModel), typeof(FoldersViewModel), typeof(FolderTree), new PropertyMetadata(null));
 
     private FolderNode? _menuFolder;
+    private bool _highlighting;
 
-    public FolderTree() => InitializeComponent();
+    public FolderTree()
+    {
+        InitializeComponent();
+        Tree.RegisterPropertyChangedCallback(TreeView.SelectedItemProperty, (_, _) => HighlightSelected());
+    }
 
     public FoldersViewModel? ViewModel
     {
@@ -22,6 +27,45 @@ public sealed partial class FolderTree : UserControl
 
     /// <summary>Raised when the user picks a folder, also when it is the one already selected.</summary>
     public event EventHandler? FolderChosen;
+
+    /// <summary>
+    /// Highlights the folder the view model has selected. The tree drops a folder it has no node
+    /// for yet, and it makes the node of a subfolder only once it has laid out the item of the
+    /// parent: the folder the list opens on is selected before that. So until the node is there,
+    /// this looks again after each layout pass.
+    /// </summary>
+    private void HighlightSelected()
+    {
+        Tree.LayoutUpdated -= Tree_LayoutUpdated;
+        if (_highlighting || ViewModel?.Selected is not { } folder || ReferenceEquals(Tree.SelectedNode?.Content, folder)) return;
+
+        if (NodeOf(folder, Tree.RootNodes) is not { } node)
+        {
+            Tree.LayoutUpdated += Tree_LayoutUpdated;
+            return;
+        }
+        _highlighting = true;
+        try
+        {
+            Tree.SelectedNode = node;
+        }
+        finally
+        {
+            _highlighting = false;
+        }
+    }
+
+    private void Tree_LayoutUpdated(object? sender, object e) => HighlightSelected();
+
+    private static TreeViewNode? NodeOf(FolderNode folder, IList<TreeViewNode> nodes)
+    {
+        foreach (TreeViewNode node in nodes)
+        {
+            if (ReferenceEquals(node.Content, folder)) return node;
+            if (NodeOf(folder, node.Children) is { } inside) return inside;
+        }
+        return null;
+    }
 
     private void Tree_ItemInvoked(TreeView sender, TreeViewItemInvokedEventArgs args)
     {

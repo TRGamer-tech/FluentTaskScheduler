@@ -382,6 +382,33 @@ public sealed class FoldersViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task TheTreeLosingItsHighlight_LeavesTheFolderShownAndChosen()
+    {
+        await _folders.ReloadAsync();
+        _folders.Choose(Node(@"\Jobs\Nightly"));
+
+        // As the tree does when the parent of the folder is collapsed.
+        _folders.Selected = null;
+
+        Assert.Equal(@"\Jobs\Nightly", _folders.Selected?.Path);
+        Assert.Equal(@"\Jobs\Nightly", _tasks.FolderPath);
+        Assert.Equal(@"\Jobs\Nightly", _settings.Current.LastFolderPath);
+    }
+
+    [Fact]
+    public async Task AllTasksShownByTheApp_ClearTheHighlight_WithoutForgettingTheChoice()
+    {
+        await _folders.ReloadAsync();
+        _folders.Choose(Node(@"\Jobs"));
+
+        _folders.ShowAllTasks();
+
+        Assert.Null(_tasks.FolderPath);
+        Assert.Null(_folders.Selected);
+        Assert.Equal(@"\Jobs", _settings.Current.LastFolderPath);
+    }
+
+    [Fact]
     public async Task ChoosingAllTasks_IsRememberedAsWell()
     {
         await _folders.ReloadAsync();
