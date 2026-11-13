@@ -81,7 +81,16 @@ public sealed class TaskStore : ITaskStore
     public TaskDraft Load(string path)
     {
         using var service = Open();
-        return TaskDraftReader.Read(Find(service, path));
+        var task = Find(service, path);
+        try
+        {
+            return TaskDraftReader.Read(task);
+        }
+        catch (Exception ex) when (TaskSchedulerErrors.IsAccessDenied(ex))
+        {
+            // Every task is listed, but not every one may be read.
+            throw new TaskAccessDeniedException(path, ex);
+        }
     }
 
     public CompletionActions GetCompletionActions(string path)
@@ -190,7 +199,15 @@ public sealed class TaskStore : ITaskStore
     public void Stop(string path)
     {
         using var service = Open();
-        Find(service, path).Stop();
+        var task = Find(service, path);
+        try
+        {
+            task.Stop();
+        }
+        catch (Exception ex) when (TaskSchedulerErrors.IsAccessDenied(ex))
+        {
+            throw new TaskAccessDeniedException(path, ex);
+        }
     }
 
     public void Delete(string path)
@@ -210,7 +227,15 @@ public sealed class TaskStore : ITaskStore
     public string Export(string path)
     {
         using var service = Open();
-        return Find(service, path).Xml;
+        var task = Find(service, path);
+        try
+        {
+            return task.Xml;
+        }
+        catch (Exception ex) when (TaskSchedulerErrors.IsAccessDenied(ex))
+        {
+            throw new TaskAccessDeniedException(path, ex);
+        }
     }
 
     public TaskImportInfo Inspect(string xml)

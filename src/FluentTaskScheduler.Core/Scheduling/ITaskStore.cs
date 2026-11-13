@@ -19,6 +19,7 @@ public interface ITaskStore
 
     /// <summary>Reads a task for editing.</summary>
     /// <exception cref="TaskNotFoundException">There is no task at <paramref name="path"/>.</exception>
+    /// <exception cref="TaskAccessDeniedException">Windows does not let this user read the task.</exception>
     TaskDraft Load(string path);
 
     /// <summary>
@@ -55,6 +56,7 @@ public interface ITaskStore
     void Delete(string path);
 
     /// <summary>The task as XML, in the format Task Scheduler itself exports and imports.</summary>
+    /// <exception cref="TaskAccessDeniedException">Windows does not let this user read the task.</exception>
     string Export(string path);
 
     /// <summary>What an exported task says about the account it runs as, when it runs and what it runs.</summary>
