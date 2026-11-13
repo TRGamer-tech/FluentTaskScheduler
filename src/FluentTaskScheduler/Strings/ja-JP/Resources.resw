@@ -574,7 +574,7 @@
   <data name="Dashboard.AvgDurationHint" xml:space="preserve"><value>完了したすべての実行の平均（7日間）</value></data>
   <data name="Dashboard.LongestTask" xml:space="preserve"><value>最長実行</value></data>
   <data name="Dashboard.HeatmapTitle" xml:space="preserve"><value>時間帯別の実行回数</value></data>
-  <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>{0}:00 - 過去7日間で{1}回実行</value></data>
+  <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>{0} - 過去7日間で{1}回実行</value></data>
   <data name="Dashboard.PeakHour" xml:space="preserve"><value>最も多い時間帯:</value></data>
   <data name="Dashboard.ExecutionStream" xml:space="preserve"><value>実行ログ</value></data>
   <data name="Dashboard.NoExecutionEntries" xml:space="preserve"><value>このフィルターに該当する実行はありません。</value></data>

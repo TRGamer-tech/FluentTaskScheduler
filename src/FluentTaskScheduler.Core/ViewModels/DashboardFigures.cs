@@ -139,7 +139,7 @@ public sealed record DashboardFigures
 
     public IReadOnlyList<HourCell> Hours { get; private init; } = [];
 
-    /// <summary>The hour of the day in which the most runs began, e.g. "03:00"; a dash without runs.</summary>
+    /// <summary>The hour of the day in which the most runs began, in the user's time format; a dash without runs.</summary>
     public string BusiestHour { get; private init; } = "-";
 
     /// <summary>The running tasks, the one that started last first.</summary>
@@ -210,8 +210,8 @@ public sealed record DashboardFigures
                 hour,
                 count,
                 count == 0 ? 0 : LightestShade + (1 - LightestShade) * count / busiest,
-                Loc.Format("Dashboard.Heatmap.CellTooltip", hour.ToString("00", CultureInfo.InvariantCulture), count))).ToList(),
-            BusiestHour = busiest == 0 ? "-" : Array.IndexOf(perHour, busiest).ToString("00", CultureInfo.InvariantCulture) + ":00",
+                Loc.Format("Dashboard.Heatmap.CellTooltip", HourText(hour), count))).ToList(),
+            BusiestHour = busiest == 0 ? "-" : HourText(Array.IndexOf(perHour, busiest)),
 
             Running = tasks.Where(task => task.State == TaskRowState.Running)
                 .OrderByDescending(task => task.LastRunTime)
@@ -225,6 +225,9 @@ public sealed record DashboardFigures
             Log = logged.OrderByDescending(entry => entry.At).Take(MostLogEntries).Select(entry => entry.Entry).ToList()
         };
     }
+
+    /// <summary>An hour of the day the way the user's region writes times, e.g. "6:00 PM" or "18:00".</summary>
+    public static string HourText(int hour) => new DateTime(2000, 1, 1, hour, 0, 0).ToString("t", CultureInfo.CurrentCulture);
 
     /// <summary>What tells one run from another: its instance, or for a start that failed without one, the task and the moment.</summary>
     internal static string KeyOf(TaskRun run) =>

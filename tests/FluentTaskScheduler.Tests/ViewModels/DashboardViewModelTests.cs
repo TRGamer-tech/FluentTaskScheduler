@@ -159,7 +159,7 @@ public sealed class DashboardViewModelTests : IDisposable
         Assert.Equal(24, _dashboard.Hours.Count);
         Assert.Equal((21, 1.0), (_dashboard.Hours[15].Runs, _dashboard.Hours[15].Shade));
         Assert.Equal(0, _dashboard.Hours[14].Runs);
-        Assert.Equal("15:00", Figures.BusiestHour);
+        Assert.Equal(At(15, 0).ToString("t", CultureInfo.CurrentCulture), Figures.BusiestHour);
     }
 
     [Fact]

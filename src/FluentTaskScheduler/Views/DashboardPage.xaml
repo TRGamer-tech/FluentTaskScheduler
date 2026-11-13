@@ -212,10 +212,10 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="00:00" Style="{StaticResource NoteStyle}"/>
-                        <TextBlock Grid.Column="1" Text="06:00" Style="{StaticResource NoteStyle}"/>
-                        <TextBlock Grid.Column="2" Text="12:00" Style="{StaticResource NoteStyle}"/>
-                        <TextBlock Grid.Column="3" Text="18:00" Style="{StaticResource NoteStyle}"/>
+                        <TextBlock Text="{x:Bind vm:DashboardFigures.HourText(0)}" Style="{StaticResource NoteStyle}"/>
+                        <TextBlock Grid.Column="1" Text="{x:Bind vm:DashboardFigures.HourText(6)}" Style="{StaticResource NoteStyle}"/>
+                        <TextBlock Grid.Column="2" Text="{x:Bind vm:DashboardFigures.HourText(12)}" Style="{StaticResource NoteStyle}"/>
+                        <TextBlock Grid.Column="3" Text="{x:Bind vm:DashboardFigures.HourText(18)}" Style="{StaticResource NoteStyle}"/>
                     </Grid>
                 </Grid>
 

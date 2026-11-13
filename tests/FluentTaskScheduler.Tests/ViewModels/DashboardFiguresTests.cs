@@ -156,7 +156,7 @@ public sealed class DashboardFiguresTests
         Assert.Equal(1, figures.Hours[14].Runs);
         Assert.Equal(0.6, figures.Hours[14].Shade, precision: 9);
         Assert.Equal((0, 0.0), (figures.Hours[1].Runs, figures.Hours[1].Shade));
-        Assert.Equal("03:00", figures.BusiestHour);
+        Assert.Equal(new DateTime(2031, 5, 8, 3, 0, 0).ToString("t", CultureInfo.CurrentCulture), figures.BusiestHour);
     }
 
     [Fact]
@@ -317,6 +317,7 @@ public sealed class DashboardNotesTests : IDisposable
         "Dashboard.Health.Note" => "{0} succeeded, {1} failed",
         "Dashboard.Runs.Note" => "{0} in the last 24 hours",
         "Dashboard.Duration.Note" => "Longest: {0} ({1})",
+        "Dashboard.Heatmap.CellTooltip" => "{0} - {1} run(s) in the last 7 days",
         _ => null
     });
 
@@ -345,5 +346,29 @@ public sealed class DashboardNotesTests : IDisposable
         Assert.Equal("2 succeeded, 1 failed", figures.HealthNote);
         Assert.Equal("1 in the last 24 hours", figures.RunsNote);
         Assert.Equal("Longest: 5m (Backup)", figures.LongestRun);
+    }
+
+    [Fact]
+    public void TheHours_AreWrittenTheWayTheUsersRegionWritesTimes()
+    {
+        var culture = (CultureInfo)CultureInfo.InvariantCulture.Clone();
+        culture.DateTimeFormat.ShortTimePattern = "h:mm tt";
+        CultureInfo before = CultureInfo.CurrentCulture;
+        CultureInfo.CurrentCulture = culture;
+        try
+        {
+            var now = new DateTimeOffset(2031, 5, 9, 20, 0, 0, TimeSpan.Zero);
+            var runs = new[] { DashboardFiguresTests.Run(@"\Report", RunStatus.Succeeded, now.AddHours(-2), TimeSpan.FromSeconds(30)) };
+
+            var figures = DashboardFigures.From([], runs, [], LogFilter.All, now, TimeZoneInfo.Utc);
+
+            Assert.Equal("6:00 PM", figures.BusiestHour);
+            Assert.Equal("6:00 PM - 1 run(s) in the last 7 days", figures.Hours[18].Description);
+            Assert.Equal(["12:00 AM", "6:00 AM", "12:00 PM", "6:00 PM"], new[] { 0, 6, 12, 18 }.Select(DashboardFigures.HourText));
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = before;
+        }
     }
 }

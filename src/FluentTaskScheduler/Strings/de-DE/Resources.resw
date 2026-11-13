@@ -574,7 +574,7 @@ Jetzt App neustarten?</value></data>
   <data name="Dashboard.AvgDurationHint" xml:space="preserve"><value>Über alle abgeschlossenen Läufe (7 Tage)</value></data>
   <data name="Dashboard.LongestTask" xml:space="preserve"><value>Längster Lauf</value></data>
   <data name="Dashboard.HeatmapTitle" xml:space="preserve"><value>Ausführungen nach Tageszeit</value></data>
-  <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>{0}:00 Uhr - {1} Lauf/Läufe in den letzten 7 Tagen</value></data>
+  <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>{0} - {1} Lauf/Läufe in den letzten 7 Tagen</value></data>
   <data name="Dashboard.PeakHour" xml:space="preserve"><value>Stärkste Stunde:</value></data>
   <data name="Dashboard.ExecutionStream" xml:space="preserve"><value>Ausführungsprotokoll</value></data>
   <data name="Dashboard.NoExecutionEntries" xml:space="preserve"><value>Für diesen Filter sind keine Läufe erfasst.</value></data>

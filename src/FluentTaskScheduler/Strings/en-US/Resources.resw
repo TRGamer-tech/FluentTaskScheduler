@@ -573,7 +573,7 @@ Restart now to apply the update?</value></data>
   <data name="Dashboard.AvgDurationHint" xml:space="preserve"><value>Across all completed runs (7 days)</value></data>
   <data name="Dashboard.LongestTask" xml:space="preserve"><value>Longest Run</value></data>
   <data name="Dashboard.HeatmapTitle" xml:space="preserve"><value>Runs by hour of day</value></data>
-  <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>{0}:00 - {1} run(s) in the last 7 days</value></data>
+  <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>{0} - {1} run(s) in the last 7 days</value></data>
   <data name="Dashboard.PeakHour" xml:space="preserve"><value>Busiest hour:</value></data>
   <data name="Dashboard.ExecutionStream" xml:space="preserve"><value>Execution log</value></data>
   <data name="Dashboard.NoExecutionEntries" xml:space="preserve"><value>No runs recorded for this filter.</value></data>
