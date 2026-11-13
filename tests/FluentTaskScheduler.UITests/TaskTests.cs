@@ -1,3 +1,4 @@
+using System.Drawing;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
 
@@ -185,6 +186,30 @@ public sealed class TaskTests : IDisposable
         }, seconds: 40), $"The history does not show the run; last result reads '{app.Require("DetailsLastResult").Name}'. " + ProblemsShown(app, "DetailsProblem"));
         app.Snapshot("details-history");
         Assert.NotNull(app.Find(element => element.ControlType == ControlType.ListItem && element.Parent?.AutomationId == "DetailsHistory", 5000));
+    }
+
+    [Fact]
+    public void InANarrowWindow_TheDetailsGiveWay_InsteadOfBeingCutOff()
+    {
+        _windows.CreateDaily("Seen narrow");
+        // German has the longest texts.
+        using var app = AppSession.Launch("details-narrow", AppSession.FirstRunDone(("Language", "de-DE")));
+        app.Require("SearchBox").AsTextBox().Enter("Seen narrow");
+        (app.Find(RowNamed("Seen narrow"), 20000) ?? throw new InvalidOperationException("The task is not in the list.")).Click();
+        app.Require("DetailsRunButton", 20000);
+
+        app.Resize(560, 800);
+        app.Snapshot("narrow");
+
+        // The last button of the task's row of buttons, and of the history's.
+        Rectangle window = app.Window.BoundingRectangle;
+        foreach (string id in new[] { "DetailsDeleteButton", "DetailsCopyButton" })
+        {
+            var control = app.Require(id);
+            Rectangle bounds = control.BoundingRectangle;
+            Assert.False(control.IsOffscreen, $"{id} cannot be seen.");
+            Assert.True(bounds.Left >= window.Left && bounds.Right <= window.Right, $"{id} at {bounds} is not inside the window at {window}.");
+        }
     }
 
     /// <summary>

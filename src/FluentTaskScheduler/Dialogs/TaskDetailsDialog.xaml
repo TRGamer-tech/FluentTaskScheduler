@@ -26,250 +26,259 @@
     </ContentDialog.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" IsTabStop="False">
-        <StackPanel Spacing="12" Width="780" Margin="0,0,16,0">
+        <!-- The details are 780 wide where the window allows it and narrower where it does not. The
+             empty border asks for the full width, so the dialog keeps its width whatever it shows. -->
+        <Grid MaxWidth="780" Margin="0,0,16,0">
+            <Border Width="780"/>
+            <StackPanel Spacing="12">
 
-            <TextBlock x:Name="DetailsPath" Text="{x:Bind ViewModel.Row.Path}" Style="{StaticResource CaptionTextBlockStyle}"
-                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" IsTextSelectionEnabled="True"/>
-            <TextBlock Text="{x:Bind ViewModel.Row.Description, Mode=OneWay}" TextWrapping="WrapWholeWords"
-                       Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfText(ViewModel.Row.Description), Mode=OneWay}"/>
+                <TextBlock x:Name="DetailsPath" Text="{x:Bind ViewModel.Row.Path}" Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" IsTextSelectionEnabled="True"/>
+                <TextBlock Text="{x:Bind ViewModel.Row.Description, Mode=OneWay}" TextWrapping="WrapWholeWords"
+                           Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfText(ViewModel.Row.Description), Mode=OneWay}"/>
 
-            <!-- What the row knows about the task. A fact the task does not have takes no room. -->
-            <StackPanel Spacing="6">
-                <Grid ColumnSpacing="16">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="140"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="{x:Bind l:Loc.Get('Details.NextRun')}" Style="{StaticResource FactNameStyle}"/>
-                    <TextBlock x:Name="DetailsNextRun" Grid.Column="1" Text="{x:Bind local:TaskDetailsDialog.DateText(ViewModel.Row.NextRunTime), Mode=OneWay}" />
-                </Grid>
-                <Grid ColumnSpacing="16">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="140"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="{x:Bind l:Loc.Get('Details.LastRun')}" Style="{StaticResource FactNameStyle}"/>
-                    <TextBlock Grid.Column="1" Text="{x:Bind local:TaskDetailsDialog.DateText(ViewModel.Row.LastRunTime), Mode=OneWay}" />
-                </Grid>
-                <Grid ColumnSpacing="16"
-                      Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfText(ViewModel.Row.Author), Mode=OneWay}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="140"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="{x:Bind l:Loc.Get('Dialog.Author')}" Style="{StaticResource FactNameStyle}"/>
-                    <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.Row.Author, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
-                </Grid>
-                <Grid ColumnSpacing="16"
-                      Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfText(ViewModel.Row.Category), Mode=OneWay}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="140"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="{x:Bind l:Loc.Get('Dialog.Category')}" Style="{StaticResource FactNameStyle}"/>
-                    <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.Row.Category, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
-                </Grid>
-                <Grid ColumnSpacing="16"
-                      Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfText(ViewModel.Row.TagsText), Mode=OneWay}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="140"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="{x:Bind l:Loc.Get('Dialog.Tags')}" Style="{StaticResource FactNameStyle}"/>
-                    <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.Row.TagsText, Mode=OneWay}" TextWrapping="Wrap"/>
-                </Grid>
-                <Grid ColumnSpacing="16"
-                      Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfAny(ViewModel.Triggers), Mode=OneWay}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="140"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="{x:Bind l:Loc.Get('Details.Triggers')}" Style="{StaticResource FactNameStyle}"/>
-                    <ItemsControl x:Name="DetailsTriggers" Grid.Column="1" ItemsSource="{x:Bind ViewModel.Triggers, Mode=OneWay}" IsTabStop="False">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="x:String">
-                                <TextBlock Text="{x:Bind}" TextWrapping="Wrap"/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Grid>
-                <Grid ColumnSpacing="16"
-                      Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfAny(ViewModel.Actions), Mode=OneWay}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="140"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="{x:Bind l:Loc.Get('Details.Actions')}" Style="{StaticResource FactNameStyle}"/>
-                    <ItemsControl x:Name="DetailsActions" Grid.Column="1" ItemsSource="{x:Bind ViewModel.Actions, Mode=OneWay}" IsTabStop="False">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="x:String">
-                                <TextBlock Text="{x:Bind}" TextWrapping="Wrap" FontFamily="Consolas"/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Grid>
-            </StackPanel>
+                <!-- What the row knows about the task. A fact the task does not have takes no room. -->
+                <StackPanel Spacing="6">
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{x:Bind l:Loc.Get('Details.NextRun')}" Style="{StaticResource FactNameStyle}"/>
+                        <TextBlock x:Name="DetailsNextRun" Grid.Column="1" Text="{x:Bind local:TaskDetailsDialog.DateText(ViewModel.Row.NextRunTime), Mode=OneWay}" />
+                    </Grid>
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{x:Bind l:Loc.Get('Details.LastRun')}" Style="{StaticResource FactNameStyle}"/>
+                        <TextBlock Grid.Column="1" Text="{x:Bind local:TaskDetailsDialog.DateText(ViewModel.Row.LastRunTime), Mode=OneWay}" />
+                    </Grid>
+                    <Grid ColumnSpacing="16"
+                          Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfText(ViewModel.Row.Author), Mode=OneWay}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{x:Bind l:Loc.Get('Dialog.Author')}" Style="{StaticResource FactNameStyle}"/>
+                        <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.Row.Author, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
+                    </Grid>
+                    <Grid ColumnSpacing="16"
+                          Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfText(ViewModel.Row.Category), Mode=OneWay}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{x:Bind l:Loc.Get('Dialog.Category')}" Style="{StaticResource FactNameStyle}"/>
+                        <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.Row.Category, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
+                    </Grid>
+                    <Grid ColumnSpacing="16"
+                          Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfText(ViewModel.Row.TagsText), Mode=OneWay}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{x:Bind l:Loc.Get('Dialog.Tags')}" Style="{StaticResource FactNameStyle}"/>
+                        <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.Row.TagsText, Mode=OneWay}" TextWrapping="Wrap"/>
+                    </Grid>
+                    <Grid ColumnSpacing="16"
+                          Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfAny(ViewModel.Triggers), Mode=OneWay}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{x:Bind l:Loc.Get('Details.Triggers')}" Style="{StaticResource FactNameStyle}"/>
+                        <ItemsControl x:Name="DetailsTriggers" Grid.Column="1" ItemsSource="{x:Bind ViewModel.Triggers, Mode=OneWay}" IsTabStop="False">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="x:String">
+                                    <TextBlock Text="{x:Bind}" TextWrapping="Wrap"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                    <Grid ColumnSpacing="16"
+                          Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfAny(ViewModel.Actions), Mode=OneWay}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{x:Bind l:Loc.Get('Details.Actions')}" Style="{StaticResource FactNameStyle}"/>
+                        <ItemsControl x:Name="DetailsActions" Grid.Column="1" ItemsSource="{x:Bind ViewModel.Actions, Mode=OneWay}" IsTabStop="False">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="x:String">
+                                    <TextBlock Text="{x:Bind}" TextWrapping="Wrap" FontFamily="Consolas"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                </StackPanel>
 
-            <!-- What can be done with the task. Each closes the dialog and is carried out by the list,
-                 except snoozing, which needs no other dialog unless the user picks a moment. -->
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button x:Name="DetailsRunButton" Tag="Run" Click="Request_Click" Style="{StaticResource AccentButtonStyle}"
-                        Content="{x:Bind l:Loc.Get('Main.Task.RunNow')}"/>
-                <Button x:Name="DetailsStopButton" Tag="Stop" Click="Request_Click" Content="{x:Bind l:Loc.Get('Main.Task.Stop')}"/>
-                <Button x:Name="DetailsEditButton" Tag="Edit" Click="Request_Click" Content="{x:Bind l:Loc.Get('Main.Task.Edit')}"/>
-                <DropDownButton x:Name="DetailsSnoozeButton" Content="{x:Bind l:Loc.Get('Task.Snooze.Label')}"
-                                Visibility="{x:Bind local:TaskDetailsDialog.VisibleUnless(ViewModel.IsSnoozed), Mode=OneWay}">
-                    <DropDownButton.Flyout>
-                        <MenuFlyout Placement="Bottom">
-                            <MenuFlyoutItem x:Name="DetailsSnoozeHalfAnHourItem" Text="{x:Bind l:Loc.Get('Snooze.Duration.30m')}"
-                                            Command="{x:Bind ViewModel.SnoozeCommand}" CommandParameter="{x:Bind sn:SnoozeChoice.HalfAnHour}"/>
-                            <MenuFlyoutItem x:Name="DetailsSnoozeOneHourItem" Text="{x:Bind l:Loc.Get('Snooze.Duration.1h')}"
-                                            Command="{x:Bind ViewModel.SnoozeCommand}" CommandParameter="{x:Bind sn:SnoozeChoice.OneHour}"/>
-                            <MenuFlyoutItem x:Name="DetailsSnoozeThreeHoursItem" Text="{x:Bind l:Loc.Get('Snooze.Duration.3h')}"
-                                            Command="{x:Bind ViewModel.SnoozeCommand}" CommandParameter="{x:Bind sn:SnoozeChoice.ThreeHours}"/>
-                            <MenuFlyoutItem x:Name="DetailsSnoozeUntilRestartItem" Text="{x:Bind l:Loc.Get('Snooze.Duration.Reboot')}"
-                                            Command="{x:Bind ViewModel.SnoozeCommand}" CommandParameter="{x:Bind sn:SnoozeChoice.UntilRestart}"/>
-                            <MenuFlyoutSeparator/>
-                            <MenuFlyoutItem x:Name="DetailsSnoozeCustomItem" Tag="SnoozeUntil" Click="Request_Click"
-                                            Text="{x:Bind l:Loc.Get('Snooze.Duration.Custom')}"/>
-                        </MenuFlyout>
-                    </DropDownButton.Flyout>
-                </DropDownButton>
-                <Button x:Name="DetailsResumeButton" Content="{x:Bind l:Loc.Get('Task.Snooze.Resume')}"
-                        Command="{x:Bind ViewModel.ResumeSnoozeCommand}" Visibility="{x:Bind ViewModel.IsSnoozed, Mode=OneWay}"/>
-                <Button x:Name="DetailsExportButton" Tag="Export" Click="Request_Click" Content="{x:Bind l:Loc.Get('Main.Task.Export')}"/>
-                <Button x:Name="DetailsDeleteButton" Tag="Delete" Click="Request_Click" Content="{x:Bind l:Loc.Get('Main.Task.Delete')}"/>
-            </StackPanel>
-            <TextBlock x:Name="DetailsSnoozeStatus" Text="{x:Bind ViewModel.SnoozeStatus, Mode=OneWay}"
-                       Foreground="{ThemeResource SystemFillColorCautionBrush}" Visibility="{x:Bind ViewModel.IsSnoozed, Mode=OneWay}"/>
-            <!-- Each bar is collapsed as well as closed while it has nothing to say: a closed bar would still take the panel's spacing. -->
-            <InfoBar x:Name="DetailsSnoozeProblem" Severity="Warning" IsClosable="False"
-                     IsOpen="{x:Bind ViewModel.HasSnoozeProblem, Mode=OneWay}" Visibility="{x:Bind ViewModel.HasSnoozeProblem, Mode=OneWay}"
-                     Message="{x:Bind ViewModel.SnoozeProblem, Mode=OneWay}"/>
+                <!-- What can be done with the task. Each closes the dialog and is carried out by the list,
+                     except snoozing, which needs no other dialog unless the user picks a moment. The first
+                     row is about running the task, the second about the task itself; each fits a narrow window. -->
+                <StackPanel Spacing="8">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="DetailsRunButton" Tag="Run" Click="Request_Click" Style="{StaticResource AccentButtonStyle}"
+                                Content="{x:Bind l:Loc.Get('Main.Task.RunNow')}"/>
+                        <Button x:Name="DetailsStopButton" Tag="Stop" Click="Request_Click" Content="{x:Bind l:Loc.Get('Main.Task.Stop')}"/>
+                        <DropDownButton x:Name="DetailsSnoozeButton" Content="{x:Bind l:Loc.Get('Task.Snooze.Label')}"
+                                        Visibility="{x:Bind local:TaskDetailsDialog.VisibleUnless(ViewModel.IsSnoozed), Mode=OneWay}">
+                            <DropDownButton.Flyout>
+                                <MenuFlyout Placement="Bottom">
+                                    <MenuFlyoutItem x:Name="DetailsSnoozeHalfAnHourItem" Text="{x:Bind l:Loc.Get('Snooze.Duration.30m')}"
+                                                    Command="{x:Bind ViewModel.SnoozeCommand}" CommandParameter="{x:Bind sn:SnoozeChoice.HalfAnHour}"/>
+                                    <MenuFlyoutItem x:Name="DetailsSnoozeOneHourItem" Text="{x:Bind l:Loc.Get('Snooze.Duration.1h')}"
+                                                    Command="{x:Bind ViewModel.SnoozeCommand}" CommandParameter="{x:Bind sn:SnoozeChoice.OneHour}"/>
+                                    <MenuFlyoutItem x:Name="DetailsSnoozeThreeHoursItem" Text="{x:Bind l:Loc.Get('Snooze.Duration.3h')}"
+                                                    Command="{x:Bind ViewModel.SnoozeCommand}" CommandParameter="{x:Bind sn:SnoozeChoice.ThreeHours}"/>
+                                    <MenuFlyoutItem x:Name="DetailsSnoozeUntilRestartItem" Text="{x:Bind l:Loc.Get('Snooze.Duration.Reboot')}"
+                                                    Command="{x:Bind ViewModel.SnoozeCommand}" CommandParameter="{x:Bind sn:SnoozeChoice.UntilRestart}"/>
+                                    <MenuFlyoutSeparator/>
+                                    <MenuFlyoutItem x:Name="DetailsSnoozeCustomItem" Tag="SnoozeUntil" Click="Request_Click"
+                                                    Text="{x:Bind l:Loc.Get('Snooze.Duration.Custom')}"/>
+                                </MenuFlyout>
+                            </DropDownButton.Flyout>
+                        </DropDownButton>
+                        <Button x:Name="DetailsResumeButton" Content="{x:Bind l:Loc.Get('Task.Snooze.Resume')}"
+                                Command="{x:Bind ViewModel.ResumeSnoozeCommand}" Visibility="{x:Bind ViewModel.IsSnoozed, Mode=OneWay}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="DetailsEditButton" Tag="Edit" Click="Request_Click" Content="{x:Bind l:Loc.Get('Main.Task.Edit')}"/>
+                        <Button x:Name="DetailsExportButton" Tag="Export" Click="Request_Click" Content="{x:Bind l:Loc.Get('Main.Task.Export')}"/>
+                        <Button x:Name="DetailsDeleteButton" Tag="Delete" Click="Request_Click" Content="{x:Bind l:Loc.Get('Main.Task.Delete')}"/>
+                    </StackPanel>
+                </StackPanel>
+                <TextBlock x:Name="DetailsSnoozeStatus" Text="{x:Bind ViewModel.SnoozeStatus, Mode=OneWay}"
+                           Foreground="{ThemeResource SystemFillColorCautionBrush}" Visibility="{x:Bind ViewModel.IsSnoozed, Mode=OneWay}"/>
+                <!-- Each bar is collapsed as well as closed while it has nothing to say: a closed bar would still take the panel's spacing. -->
+                <InfoBar x:Name="DetailsSnoozeProblem" Severity="Warning" IsClosable="False"
+                         IsOpen="{x:Bind ViewModel.HasSnoozeProblem, Mode=OneWay}" Visibility="{x:Bind ViewModel.HasSnoozeProblem, Mode=OneWay}"
+                         Message="{x:Bind ViewModel.SnoozeProblem, Mode=OneWay}"/>
 
-            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}"/>
+                <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}"/>
 
-            <!-- History -->
-            <Grid ColumnSpacing="8">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="{x:Bind l:Loc.Get('Details.History.Title')}" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
-                <ComboBox x:Name="DetailsPeriod" Grid.Column="1" MinWidth="150" SelectedIndex="{x:Bind ViewModel.PeriodIndex, Mode=TwoWay}"
+                <!-- History: the title and the period, and below them what can be done with the events listed. -->
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{x:Bind l:Loc.Get('Details.History.Title')}" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
+                    <ComboBox x:Name="DetailsPeriod" Grid.Column="1" MinWidth="150" SelectedIndex="{x:Bind ViewModel.PeriodIndex, Mode=TwoWay}"
+                              AutomationProperties.Name="{x:Bind l:Loc.Get('Details.History.Title')}">
+                        <ComboBoxItem Content="{x:Bind l:Loc.Get('Details.Period.Today')}"/>
+                        <ComboBoxItem Content="{x:Bind l:Loc.Get('Details.Period.Yesterday')}"/>
+                        <ComboBoxItem Content="{x:Bind l:Loc.Get('Details.Period.LastSevenDays')}"/>
+                        <ComboBoxItem Content="{x:Bind l:Loc.Get('Details.Period.Everything')}"/>
+                    </ComboBox>
+                </Grid>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button x:Name="DetailsReloadButton" Content="{x:Bind l:Loc.Get('Details.History.Reload')}"
+                            Command="{x:Bind ViewModel.LoadHistoryCommand}"/>
+                    <Button x:Name="DetailsExportCsvButton" Content="{x:Bind l:Loc.Get('Details.History.ExportCsv')}"
+                            Command="{x:Bind ViewModel.ExportCsvCommand}"/>
+                    <Button x:Name="DetailsCopyButton" Content="{x:Bind l:Loc.Get('Details.History.Copy')}"
+                            Command="{x:Bind ViewModel.CopyCommand}"/>
+                </StackPanel>
+
+                <InfoBar x:Name="DetailsLogOff" Severity="Warning" IsClosable="False"
+                         IsOpen="{x:Bind ViewModel.IsLogOff, Mode=OneWay}" Visibility="{x:Bind ViewModel.IsLogOff, Mode=OneWay}"
+                         Title="{x:Bind l:Loc.Get('Details.History.Off.Title')}"
+                         Message="{x:Bind l:Loc.Get('Details.History.Off.Message')}">
+                    <InfoBar.ActionButton>
+                        <Button x:Name="DetailsSwitchLogOnButton" Content="{x:Bind l:Loc.Get('Details.History.SwitchOn')}"
+                                Command="{x:Bind ViewModel.SwitchLogOnCommand}"/>
+                    </InfoBar.ActionButton>
+                </InfoBar>
+                <InfoBar x:Name="DetailsProblem" Severity="Error" IsClosable="False"
+                         IsOpen="{x:Bind ViewModel.HasProblem, Mode=OneWay}" Visibility="{x:Bind ViewModel.HasProblem, Mode=OneWay}"
+                         Message="{x:Bind ViewModel.Problem, Mode=OneWay}"/>
+
+                <!-- The numbers double as filters for the list below. -->
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <Button x:Name="DetailsStatTotal" Style="{StaticResource StatButtonStyle}"
+                            Command="{x:Bind ViewModel.ShowCommand}" CommandParameter="{x:Bind vm:HistoryFilter.All}">
+                        <StackPanel>
+                            <TextBlock Text="{x:Bind l:Loc.Get('Details.Stat.Total')}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock Text="{x:Bind ViewModel.TotalRuns, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="DetailsStatSucceeded" Style="{StaticResource StatButtonStyle}"
+                            Command="{x:Bind ViewModel.ShowCommand}" CommandParameter="{x:Bind vm:HistoryFilter.Succeeded}">
+                        <StackPanel>
+                            <TextBlock Text="{x:Bind l:Loc.Get('Details.Stat.Succeeded')}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock Text="{x:Bind ViewModel.SucceededRuns, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}"
+                                       Foreground="{ThemeResource SystemFillColorSuccessBrush}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="DetailsStatFailed" Style="{StaticResource StatButtonStyle}"
+                            Command="{x:Bind ViewModel.ShowCommand}" CommandParameter="{x:Bind vm:HistoryFilter.Failed}">
+                        <StackPanel>
+                            <TextBlock Text="{x:Bind l:Loc.Get('Details.Stat.Failed')}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock Text="{x:Bind ViewModel.FailedRuns, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}"
+                                       Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
+                        </StackPanel>
+                    </Button>
+                    <StackPanel Margin="8,4,8,6">
+                        <TextBlock Text="{x:Bind l:Loc.Get('Details.Stat.LastResult')}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock x:Name="DetailsLastResult" Text="{x:Bind ViewModel.LastResult, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <ProgressBar IsIndeterminate="True" Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}"/>
+                <TextBlock x:Name="DetailsNoHistory" Text="{x:Bind l:Loc.Get('Details.History.Empty')}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Visibility="{x:Bind ViewModel.ShowsNoHistory, Mode=OneWay}"/>
+
+                <ListView x:Name="DetailsHistory" MaxHeight="230" SelectionMode="Single"
+                          ItemsSource="{x:Bind ViewModel.Entries}" SelectionChanged="History_SelectionChanged"
                           AutomationProperties.Name="{x:Bind l:Loc.Get('Details.History.Title')}">
-                    <ComboBoxItem Content="{x:Bind l:Loc.Get('Details.Period.Today')}"/>
-                    <ComboBoxItem Content="{x:Bind l:Loc.Get('Details.Period.Yesterday')}"/>
-                    <ComboBoxItem Content="{x:Bind l:Loc.Get('Details.Period.LastSevenDays')}"/>
-                    <ComboBoxItem Content="{x:Bind l:Loc.Get('Details.Period.Everything')}"/>
-                </ComboBox>
-                <Button x:Name="DetailsReloadButton" Grid.Column="2" Content="{x:Bind l:Loc.Get('Details.History.Reload')}"
-                        Command="{x:Bind ViewModel.LoadHistoryCommand}"/>
-                <Button x:Name="DetailsExportCsvButton" Grid.Column="3" Content="{x:Bind l:Loc.Get('Details.History.ExportCsv')}"
-                        Command="{x:Bind ViewModel.ExportCsvCommand}"/>
-                <Button x:Name="DetailsCopyButton" Grid.Column="4" Content="{x:Bind l:Loc.Get('Details.History.Copy')}"
-                        Command="{x:Bind ViewModel.CopyCommand}"/>
-            </Grid>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="MinHeight" Value="32"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:HistoryEntry">
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="170"/>
+                                    <ColumnDefinition Width="190"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{x:Bind Time}"/>
+                                <TextBlock Grid.Column="1" Text="{x:Bind Label}" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Column="2" Text="{x:Bind Details}" TextTrimming="CharacterEllipsis"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
 
-            <InfoBar x:Name="DetailsLogOff" Severity="Warning" IsClosable="False"
-                     IsOpen="{x:Bind ViewModel.IsLogOff, Mode=OneWay}" Visibility="{x:Bind ViewModel.IsLogOff, Mode=OneWay}"
-                     Title="{x:Bind l:Loc.Get('Details.History.Off.Title')}"
-                     Message="{x:Bind l:Loc.Get('Details.History.Off.Message')}">
-                <InfoBar.ActionButton>
-                    <Button x:Name="DetailsSwitchLogOnButton" Content="{x:Bind l:Loc.Get('Details.History.SwitchOn')}"
-                            Command="{x:Bind ViewModel.SwitchLogOnCommand}"/>
-                </InfoBar.ActionButton>
-            </InfoBar>
-            <InfoBar x:Name="DetailsProblem" Severity="Error" IsClosable="False"
-                     IsOpen="{x:Bind ViewModel.HasProblem, Mode=OneWay}" Visibility="{x:Bind ViewModel.HasProblem, Mode=OneWay}"
-                     Message="{x:Bind ViewModel.Problem, Mode=OneWay}"/>
-
-            <!-- The numbers double as filters for the list below. -->
-            <StackPanel Orientation="Horizontal" Spacing="4">
-                <Button x:Name="DetailsStatTotal" Style="{StaticResource StatButtonStyle}"
-                        Command="{x:Bind ViewModel.ShowCommand}" CommandParameter="{x:Bind vm:HistoryFilter.All}">
-                    <StackPanel>
-                        <TextBlock Text="{x:Bind l:Loc.Get('Details.Stat.Total')}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock Text="{x:Bind ViewModel.TotalRuns, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                <!-- The selected event in full, and what the computer was doing around it. -->
+                <Grid ColumnSpacing="24" Padding="12" CornerRadius="4"
+                      Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                      BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                      Visibility="{x:Bind ViewModel.HasSelection, Mode=OneWay}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="DetailsSelectedFacts" Text="{x:Bind ViewModel.SelectedFacts, Mode=OneWay}" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
+                    <StackPanel Grid.Column="1" Spacing="4"
+                                Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfAny(ViewModel.SelectedSurroundings), Mode=OneWay}">
+                        <TextBlock Text="{x:Bind l:Loc.Get('Details.History.Around')}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                        <ItemsControl ItemsSource="{x:Bind ViewModel.SelectedSurroundings, Mode=OneWay}" IsTabStop="False">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="x:String">
+                                    <TextBlock Text="{x:Bind}" TextWrapping="Wrap"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
-                </Button>
-                <Button x:Name="DetailsStatSucceeded" Style="{StaticResource StatButtonStyle}"
-                        Command="{x:Bind ViewModel.ShowCommand}" CommandParameter="{x:Bind vm:HistoryFilter.Succeeded}">
-                    <StackPanel>
-                        <TextBlock Text="{x:Bind l:Loc.Get('Details.Stat.Succeeded')}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock Text="{x:Bind ViewModel.SucceededRuns, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}"
-                                   Foreground="{ThemeResource SystemFillColorSuccessBrush}"/>
-                    </StackPanel>
-                </Button>
-                <Button x:Name="DetailsStatFailed" Style="{StaticResource StatButtonStyle}"
-                        Command="{x:Bind ViewModel.ShowCommand}" CommandParameter="{x:Bind vm:HistoryFilter.Failed}">
-                    <StackPanel>
-                        <TextBlock Text="{x:Bind l:Loc.Get('Details.Stat.Failed')}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock Text="{x:Bind ViewModel.FailedRuns, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}"
-                                   Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
-                    </StackPanel>
-                </Button>
-                <StackPanel Margin="8,4,8,6">
-                    <TextBlock Text="{x:Bind l:Loc.Get('Details.Stat.LastResult')}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                    <TextBlock x:Name="DetailsLastResult" Text="{x:Bind ViewModel.LastResult, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                </StackPanel>
+                </Grid>
             </StackPanel>
-
-            <ProgressBar IsIndeterminate="True" Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}"/>
-            <TextBlock x:Name="DetailsNoHistory" Text="{x:Bind l:Loc.Get('Details.History.Empty')}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                       Visibility="{x:Bind ViewModel.ShowsNoHistory, Mode=OneWay}"/>
-
-            <ListView x:Name="DetailsHistory" MaxHeight="230" SelectionMode="Single"
-                      ItemsSource="{x:Bind ViewModel.Entries}" SelectionChanged="History_SelectionChanged"
-                      AutomationProperties.Name="{x:Bind l:Loc.Get('Details.History.Title')}">
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                        <Setter Property="MinHeight" Value="32"/>
-                    </Style>
-                </ListView.ItemContainerStyle>
-                <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="vm:HistoryEntry">
-                        <Grid ColumnSpacing="12">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="170"/>
-                                <ColumnDefinition Width="190"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="{x:Bind Time}"/>
-                            <TextBlock Grid.Column="1" Text="{x:Bind Label}" TextTrimming="CharacterEllipsis"/>
-                            <TextBlock Grid.Column="2" Text="{x:Bind Details}" TextTrimming="CharacterEllipsis"
-                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        </Grid>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-
-            <!-- The selected event in full, and what the computer was doing around it. -->
-            <Grid ColumnSpacing="24" Padding="12" CornerRadius="4"
-                  Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                  BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
-                  Visibility="{x:Bind ViewModel.HasSelection, Mode=OneWay}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock x:Name="DetailsSelectedFacts" Text="{x:Bind ViewModel.SelectedFacts, Mode=OneWay}" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
-                <StackPanel Grid.Column="1" Spacing="4"
-                            Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfAny(ViewModel.SelectedSurroundings), Mode=OneWay}">
-                    <TextBlock Text="{x:Bind l:Loc.Get('Details.History.Around')}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                    <ItemsControl ItemsSource="{x:Bind ViewModel.SelectedSurroundings, Mode=OneWay}" IsTabStop="False">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="x:String">
-                                <TextBlock Text="{x:Bind}" TextWrapping="Wrap"/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
-            </Grid>
-        </StackPanel>
+        </Grid>
     </ScrollViewer>
 </ContentDialog>
