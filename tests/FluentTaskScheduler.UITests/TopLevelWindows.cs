@@ -60,8 +60,20 @@ internal static class TopLevelWindows
     /// <summary>
     /// Brings <paramref name="window"/> to the foreground. Windows lets only the program in the
     /// foreground hand it on, and sharing that program's input for the moment counts as being it.
+    /// That does not work with every program, an app of the Store for one; for those, Alt is
+    /// pressed first, after which Windows lets any program take the foreground, as it does for a
+    /// user who is about to switch windows. The key goes to the window in the foreground.
     /// </summary>
     public static void BringToFront(nint window)
+    {
+        if (TryBringToFront(window)) return;
+        keybd_event(AltKey, 0, 0, 0);
+        keybd_event(AltKey, 0, KeyUp, 0);
+        Thread.Sleep(100); // the key has to reach that window before it loses the foreground
+        TryBringToFront(window);
+    }
+
+    private static bool TryBringToFront(nint window)
     {
         uint foregroundThread = GetWindowThreadProcessId(GetForegroundWindow(), out _);
         uint thisThread = GetCurrentThreadId();
@@ -74,11 +86,14 @@ internal static class TopLevelWindows
         {
             if (shared) AttachThreadInput(thisThread, foregroundThread, false);
         }
+        return GetForegroundWindow() == window;
     }
 
     private const uint OwnerRelation = 4;     // GW_OWNER
     private const uint RootOwnerRelation = 3; // GA_ROOTOWNER
     private const uint CloseMessage = 0x0010; // WM_CLOSE
+    private const byte AltKey = 0x12;         // VK_MENU
+    private const uint KeyUp = 0x0002;        // KEYEVENTF_KEYUP
 
     private delegate bool WindowVisitor(nint window, nint parameter);
 
@@ -120,4 +135,7 @@ internal static class TopLevelWindows
 
     [DllImport("user32.dll")]
     private static extern bool PostMessageW(nint window, uint message, nint wParam, nint lParam);
+
+    [DllImport("user32.dll")]
+    private static extern void keybd_event(byte key, byte scanCode, uint flags, nuint extraInfo);
 }

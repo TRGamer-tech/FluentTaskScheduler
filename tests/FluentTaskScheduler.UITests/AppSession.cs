@@ -129,7 +129,10 @@ public sealed class AppSession : IDisposable
     private const string CloseCoveringWindowsVariable = "FTS_UI_CLOSE_COVERING_WINDOWS";
 
     private const string DialogClass = "#32770";
-    private const string ConsoleClass = "ConsoleWindowClass";
+
+    /// <summary>Windows of the shell that tests work with: the taskbar, the hidden icons, menus and pop-ups.</summary>
+    private static readonly HashSet<string> ShellClasses =
+        ["Shell_TrayWnd", "Shell_SecondaryTrayWnd", "NotifyIconOverflowWindow", "TopLevelWindowForOverflowXamlIsland", "Xaml_WindowedPopupClass", "#32768"];
 
     /// <summary>
     /// Mouse input goes to whatever is on top, keyboard input to the window in the foreground. A
@@ -199,11 +202,13 @@ public sealed class AppSession : IDisposable
         TopLevelWindows.ProcessOf(window) == appProcess || TopLevelWindows.RootOwnerOf(window) == appWindow;
 
     /// <summary>
-    /// A dialog of Windows or a console window of the build machine's own setup can also come up
-    /// while a test runs, take the foreground and with it the keys the test types. Where the build
-    /// machine lets the tests close what covers the app, such a dialog is closed, and the app's
-    /// window is brought back to the front. A console window is only stepped over: it can be the
-    /// build machine's own. Anything else, such as the taskbar, is left alone for tests to use.
+    /// Windows of other programs can also come up while a test runs and take the foreground, and
+    /// with it the keys the test types: on the build machines a dialog of Windows, Windows Search,
+    /// and console windows of the machine's own setup did. Where the build machine lets the tests
+    /// close what covers the app, the app's window is brought back to the front while it is
+    /// shown, and a dialog of another program is closed first. Other windows are only stepped
+    /// over, since a console can be the build machine's own; the taskbar and its pop-ups are left
+    /// to the tests that use them.
     /// </summary>
     private void GuardForeground()
     {
@@ -214,17 +219,10 @@ public sealed class AppSession : IDisposable
             nint foreground = TopLevelWindows.Foreground;
             if (foreground == 0 || IsTheApps(foreground, _app.ProcessId, _windowHandle)) return;
 
-            switch (TopLevelWindows.ClassOf(foreground))
-            {
-                case DialogClass:
-                    CloseForeignDialog(foreground);
-                    break;
-                case ConsoleClass:
-                    Console.WriteLine($"Stepping over the console window \"{TopLevelWindows.TitleOf(foreground)}\": it took the foreground.");
-                    break;
-                default:
-                    return;
-            }
+            string className = TopLevelWindows.ClassOf(foreground);
+            if (ShellClasses.Contains(className)) return;
+            if (className == DialogClass) CloseForeignDialog(foreground);
+            else Console.WriteLine($"Stepping over \"{TopLevelWindows.TitleOf(foreground)}\" ({className}) of process {TopLevelWindows.ProcessOf(foreground)}: it took the foreground.");
             TopLevelWindows.BringToFront(_windowHandle);
         }
         catch (Exception ex)

@@ -160,15 +160,25 @@ public class TrayTests
     // Windows in another language, the icon has to be shown in the taskbar itself.
     private static AutomationElement? FindIcon(AppSession app)
     {
-        // Windows puts more than the tooltip into the name, at least a leading blank.
-        AutomationElement? Search() => ShellElements(app).FirstOrDefault(element => element.Is(ControlType.Button) && element.NameOrEmpty().Trim().StartsWith("FluentTaskScheduler"));
+        // Windows puts more than the tooltip into the name, at least a leading blank. The shell also
+        // keeps elements for icons it does not show, the hidden ones while their flyout is closed,
+        // which have no size.
+        AutomationElement? Search() => ShellElements(app).FirstOrDefault(element =>
+            element.Is(ControlType.Button) && element.NameOrEmpty().Trim().StartsWith("FluentTaskScheduler") && HasSize(element));
 
         if (Search() is { } visible) return visible;
         AutomationElement? arrow = ShellElements(app).FirstOrDefault(element =>
-            element.Is(ControlType.Button) && (element.NameOrEmpty().Contains("Hidden Icons", StringComparison.OrdinalIgnoreCase) || element.NameOrEmpty().Contains("Chevron")));
+            element.Is(ControlType.Button) && HasSize(element)
+            && (element.NameOrEmpty().Contains("Hidden Icons", StringComparison.OrdinalIgnoreCase) || element.NameOrEmpty().Contains("Chevron")));
         if (arrow is null) return null;
         arrow.Click();
         return Retry.WhileNull(Search, TimeSpan.FromSeconds(10)).Result;
+    }
+
+    private static bool HasSize(AutomationElement element)
+    {
+        try { return element.BoundingRectangle is { Width: > 1, Height: > 1 }; }
+        catch { return false; }
     }
 
     private static AutomationElement? MenuItem(AppSession app, string name) =>
