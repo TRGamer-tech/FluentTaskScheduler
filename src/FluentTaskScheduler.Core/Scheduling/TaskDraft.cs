@@ -115,7 +115,7 @@ public sealed record TaskDraft
     public string Description { get; init; } = "";
     public string Author { get; init; } = "";
     public string Category { get; init; } = "";
-    public IReadOnlyList<string> Tags { get; init; } = Array.Empty<string>();
+    public ValueList<string> Tags { get; init; } = [];
     public CompletionActions CompletionActions { get; init; } = CompletionActions.None;
     public bool Enabled { get; init; } = true;
     public bool Hidden { get; init; }
@@ -152,6 +152,6 @@ public sealed record TaskDraft
     public int RestartCount { get; init; }
     public TimeSpan RestartInterval { get; init; } = TimeSpan.FromMinutes(1);
 
-    public IReadOnlyList<TriggerDraft> Triggers { get; init; } = Array.Empty<TriggerDraft>();
-    public IReadOnlyList<ActionDraft> Actions { get; init; } = Array.Empty<ActionDraft>();
+    public ValueList<TriggerDraft> Triggers { get; init; } = [];
+    public ValueList<ActionDraft> Actions { get; init; } = [];
 }

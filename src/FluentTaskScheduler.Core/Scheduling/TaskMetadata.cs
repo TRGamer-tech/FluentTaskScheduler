@@ -13,7 +13,7 @@ public static class TaskMetadata
     private const string Suffix = " -->";
 
     /// <summary>What a raw task description holds: the text the user wrote, plus the metadata hidden in it.</summary>
-    public sealed record Parts(string Description, string Category, IReadOnlyList<string> Tags, CompletionActions CompletionActions);
+    public sealed record Parts(string Description, string Category, ValueList<string> Tags, CompletionActions CompletionActions);
 
     // Property names are the stored format; do not rename.
     private sealed class Block
@@ -82,6 +82,6 @@ public static class TaskMetadata
         return $"{text}\n\n{Prefix}{json}{Suffix}".Trim();
     }
 
-    private static string[] Clean(List<string>? items) =>
-        items?.Where(item => !string.IsNullOrWhiteSpace(item)).ToArray() ?? [];
+    private static ValueList<string> Clean(List<string>? items) =>
+        items?.Where(item => !string.IsNullOrWhiteSpace(item)).ToValueList() ?? [];
 }

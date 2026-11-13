@@ -11,21 +11,13 @@ public sealed record CompletionActions
     public bool Enabled { get; init; }
 
     /// <summary>Paths of the tasks to start after a successful run.</summary>
-    public IReadOnlyList<string> OnSuccess { get; init; } = [];
+    public ValueList<string> OnSuccess { get; init; } = [];
 
     /// <summary>Paths of the tasks to start after a failed run.</summary>
-    public IReadOnlyList<string> OnFailure { get; init; } = [];
+    public ValueList<string> OnFailure { get; init; } = [];
 
     public bool HasTargets => OnSuccess.Count > 0 || OnFailure.Count > 0;
 
     /// <summary>True when finishing the task actually starts something.</summary>
     public bool IsActive => Enabled && HasTargets;
-
-    public bool Equals(CompletionActions? other) =>
-        other is not null
-        && Enabled == other.Enabled
-        && OnSuccess.SequenceEqual(other.OnSuccess, StringComparer.OrdinalIgnoreCase)
-        && OnFailure.SequenceEqual(other.OnFailure, StringComparer.OrdinalIgnoreCase);
-
-    public override int GetHashCode() => HashCode.Combine(Enabled, OnSuccess.Count, OnFailure.Count);
 }
