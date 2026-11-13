@@ -282,8 +282,23 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         bool changed = _tasksChanged;
         _tasksThatRan.Clear();
         _tasksChanged = false;
-        await _reads.Enqueue(changed ? ReadAllTasksAsync : () => ReadTasksAsync(ran));
-        Present();
+
+        // The figures are worked out in turn with the reads, so that figures worked out from these
+        // tasks cannot replace those of a later read.
+        await _reads.Enqueue(async () =>
+        {
+            try
+            {
+                await (changed ? ReadAllTasksAsync() : ReadTasksAsync(ran));
+                Present();
+            }
+            catch (Exception ex)
+            {
+                // The reads deal with Task Scheduler's failures. Whatever went wrong in showing what
+                // they found: the dashboard keeps what it shows, and the reads after this one go on.
+                Serilog.Log.Warning(ex, "The dashboard could not show the tasks it read again");
+            }
+        });
     }
 
     /// <summary>Reads all tasks, and on the way whether Windows records history. Never throws.</summary>
