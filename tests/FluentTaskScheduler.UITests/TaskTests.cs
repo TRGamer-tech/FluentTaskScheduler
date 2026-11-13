@@ -30,7 +30,7 @@ public sealed class TaskTests : IDisposable
         using var app = AppSession.Launch("weekly");
         OpenFolderlessList(app);
 
-        app.Require("NewTaskButton").Click();
+        app.ToolbarButton("NewTaskButton").Press();
         app.Require("EditorName", 20000).AsTextBox().Text = "Weekly report";
         app.Snapshot("editor-new");
 
@@ -127,7 +127,8 @@ public sealed class TaskTests : IDisposable
         using var app = AppSession.Launch("import");
         try
         {
-            app.Require("ImportButton").Click();
+            // A real click: the classic file dialog holds on to whoever opened it until it is closed.
+            app.ToolbarButton("ImportButton").Click();
             // The app runs elevated here and therefore shows the classic file dialog, with the file name box focused.
             Thread.Sleep(2500);
             Keyboard.Type(file);
@@ -159,10 +160,8 @@ public sealed class TaskTests : IDisposable
         string name = "FtsUiFolder" + Guid.NewGuid().ToString("N")[..6];
         using var app = AppSession.Launch("folders");
 
-        app.Require("NewFolderButton").Click();
-        var input = app.Find(element => element.ControlType == ControlType.Edit && element.Parent?.ControlType == ControlType.Window, 10000)
-                    ?? throw new InvalidOperationException("No dialog asked for the folder's name.");
-        input.AsTextBox().Text = name;
+        app.Require("NewFolderButton").Press();
+        app.Require("PromptInput").AsTextBox().Text = name;
         app.Require("PrimaryButton").AsButton().Invoke();
 
         var folder = app.Find(element => element.ControlType == ControlType.TreeItem && element.Name == name, 20000);
@@ -231,7 +230,7 @@ public sealed class TaskTests : IDisposable
     private static Func<AutomationElement, bool> RowNamed(string name) =>
         element => element.ControlType == ControlType.ListItem && element.Name == name;
 
-    private static void OpenFolderlessList(AppSession app) => app.Require("NavAllTasks").Click();
+    private static void OpenFolderlessList(AppSession app) => app.Require("NavAllTasks").Press();
 
     private static void Toggle(AppSession app, string name)
     {

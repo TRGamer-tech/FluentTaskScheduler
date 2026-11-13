@@ -61,14 +61,58 @@ public sealed class AppSession : IDisposable
         var automation = new UIA3Automation();
         var window = app.GetMainWindow(automation, TimeSpan.FromSeconds(60))
                      ?? throw new InvalidOperationException("The app did not show a main window within 60 s.");
-        window.SetForeground();
+        try
+        {
+            BringToFront(automation, app, window);
+        }
+        catch
+        {
+            app.Kill();
+            throw;
+        }
         return new AppSession(app, automation, window, artifacts, data);
+    }
+
+    /// <summary>Set to 1 on a build machine to let the tests end programs whose windows lie over the app.</summary>
+    private const string CloseCoveringWindowsVariable = "FTS_UI_CLOSE_COVERING_WINDOWS";
+
+    /// <summary>
+    /// Mouse and keyboard input goes to whatever is on top. A hosted build machine can have a
+    /// first sign-in screen of Windows lying over everything, with nobody there to click it away.
+    /// </summary>
+    private static void BringToFront(UIA3Automation automation, Application app, Window window)
+    {
+        for (int attempt = 0; attempt < 5; attempt++)
+        {
+            window.SetForeground();
+            Thread.Sleep(500);
+
+            int owner = automation.FromPoint(window.BoundingRectangle.Center()).Properties.ProcessId.ValueOrDefault;
+            if (owner == app.ProcessId) return;
+
+            using var covering = Process.GetProcessById(owner);
+            string what = $"{covering.ProcessName} (process {owner})";
+            if (Environment.GetEnvironmentVariable(CloseCoveringWindowsVariable) != "1")
+            {
+                throw new InvalidOperationException(
+                    $"The app's window is covered by a window of {what}, so clicks would not reach the app. " +
+                    $"Close that window, or set {CloseCoveringWindowsVariable}=1 to let the tests end such programs.");
+            }
+
+            Console.WriteLine($"Ending {what}: its window covers the app.");
+            covering.Kill();
+            covering.WaitForExit(5000);
+        }
+        throw new InvalidOperationException("The app's window is still covered by another window.");
     }
 
     /// <summary>Settings of someone who has seen the welcome tour and the release notes, with an English UI.</summary>
     public const string FirstRunDone = """{"Language":"en-US","HasCompletedOnboarding":true,"LastSeenVersion":"999.0.0"}""";
 
     public bool HasExited => _app.HasExited;
+
+    /// <summary>The whole desktop, in the pixels window positions are given in.</summary>
+    public System.Drawing.Rectangle Screen => _automation.GetDesktop().BoundingRectangle;
 
     /// <summary>
     /// Finds an element by walking the tree child by child. UI Automation's own descendant search
@@ -106,6 +150,17 @@ public sealed class AppSession : IDisposable
 
     public AutomationElement Require(string automationId, int timeoutMs = 10000) =>
         Find(automationId, timeoutMs) ?? throw new InvalidOperationException($"Element '{automationId}' was not found.");
+
+    /// <summary>
+    /// A button of the task list's toolbar, wherever the toolbar put it: what does not fit next
+    /// to the search box moves into the menu behind the "more" button.
+    /// </summary>
+    public AutomationElement ToolbarButton(string automationId)
+    {
+        if (Find(automationId, 3000) is { IsOffscreen: false } button) return button;
+        Require("MoreButton").Press();
+        return Require(automationId);
+    }
 
     /// <summary>Saves a screenshot of the app window plus a dump of its automation tree.</summary>
     public void Snapshot(string name)

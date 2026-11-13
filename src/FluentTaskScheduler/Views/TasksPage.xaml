@@ -60,7 +60,7 @@
         <!-- Search and filter on the left, commands on the right; the command bar moves what does not fit into its menu. -->
         <Grid Grid.Row="2" ColumnSpacing="8">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" MaxWidth="320" MinWidth="140"/>
+                <ColumnDefinition Width="*" MaxWidth="240" MinWidth="120"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
@@ -80,7 +80,7 @@
                         <KeyboardAccelerator Key="N" Modifiers="Control"/>
                     </AppBarButton.KeyboardAccelerators>
                 </AppBarButton>
-                <AppBarButton x:Name="RefreshButton" Icon="Refresh" Label="{x:Bind l:Loc.Get('Main.Toolbar.Refresh')}"
+                <AppBarButton x:Name="RefreshButton" Icon="Refresh" Label="{x:Bind l:Loc.Get('Main.Toolbar.Refresh')}" LabelPosition="Collapsed"
                               Command="{x:Bind ViewModel.ReloadCommand}">
                     <AppBarButton.KeyboardAccelerators>
                         <KeyboardAccelerator Key="F5"/>

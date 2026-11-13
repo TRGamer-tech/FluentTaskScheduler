@@ -42,8 +42,10 @@ public sealed class WindowsTasks : IDisposable
         }
     }
 
-    /// <summary>Registers a task that runs a harmless command once a day.</summary>
-    public void CreateDaily(string name) => Run($"/Create /TN \"{PathOf(name)}\" /TR \"cmd.exe /c exit 0\" /SC DAILY /ST 03:00 /F");
+    /// <summary>Registers a task that runs a command once a day, at night. The default command does nothing.</summary>
+    /// <param name="command">Must not contain quotation marks.</param>
+    public void CreateDaily(string name, string command = "cmd.exe /c exit 0") =>
+        Run($"/Create /TN \"{PathOf(name)}\" /TR \"{command}\" /SC DAILY /ST 03:00 /F");
 
     public bool Exists(string name) => TryRun($"/Query /TN \"{PathOf(name)}\"", out _);
 
@@ -73,8 +75,6 @@ public sealed class WindowsTasks : IDisposable
     {
         if (Folder.Length == 0) return;
 
-        // Deleting what is left; the folder itself can only be removed through the COM API, which
-        // an empty folder does not need to block a test run for.
         if (TryRun($"/Query /FO CSV /NH /TN \"{Folder}\\\"", out string listing))
         {
             foreach (string line in listing.Split('\n', StringSplitOptions.RemoveEmptyEntries))
@@ -83,7 +83,21 @@ public sealed class WindowsTasks : IDisposable
                 if (task.StartsWith(Folder, StringComparison.OrdinalIgnoreCase)) TryRun($"/Delete /TN \"{task}\" /F", out _);
             }
         }
-        TryRun($"/Delete /TN \"{Folder}\" /F", out _);
+        RemoveFolder(Folder);
+    }
+
+    // schtasks has no command for folders; the scripting interface of Task Scheduler does.
+    private static void RemoveFolder(string folder)
+    {
+        string script = "$scheduler = New-Object -ComObject Schedule.Service; $scheduler.Connect(); " +
+                        $"$scheduler.GetFolder('\\').DeleteFolder('{folder.TrimStart('\\')}', 0)";
+        using var process = Process.Start(new ProcessStartInfo("powershell.exe")
+        {
+            ArgumentList = { "-NoProfile", "-NonInteractive", "-Command", script },
+            UseShellExecute = false,
+            CreateNoWindow = true
+        });
+        process?.WaitForExit(30000);
     }
 
     private static string Run(string arguments) =>

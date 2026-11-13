@@ -1,6 +1,7 @@
 using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.ViewModels;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 
 namespace FluentTaskScheduler.Shell;
@@ -62,6 +63,7 @@ public sealed class DialogService(WindowContext window) : IDialogService
     public async Task<string?> AskForTextAsync(string title, string label, string initialText, string confirmText)
     {
         var input = new TextBox { Header = label, Text = initialText, MinWidth = 320 };
+        AutomationProperties.SetAutomationId(input, "PromptInput");
         input.SelectAll();
         var dialog = new ContentDialog
         {

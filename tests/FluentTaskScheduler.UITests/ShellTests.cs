@@ -22,13 +22,24 @@ public class ShellTests
         foreach (object[] page in Pages)
         {
             string item = (string)page[0], heading = (string)page[1];
-            app.Require(item).Click();
+            app.Require(item).Press();
 
             // A page may take a while to load its data on a slow machine; the heading follows the page.
             Assert.True(app.Find(e => e.AutomationId == "PageTitle" && e.Name == heading, timeoutMs: 30000) != null, $"The heading is not '{heading}' after choosing {item}.");
             app.Snapshot(item);
             Assert.False(app.HasExited, $"The app exited after choosing {item}.");
         }
+    }
+
+    [Fact]
+    public void TheWindow_OpensInsideTheScreen_HoweverSmallThatIs()
+    {
+        using var app = AppSession.Launch("placement");
+
+        var window = app.Window.BoundingRectangle;
+        var screen = app.Screen;
+        app.Log($"Window {window}, screen {screen}");
+        Assert.True(screen.Contains(window), $"The window {window} reaches beyond the screen {screen}.");
     }
 
     [Fact]

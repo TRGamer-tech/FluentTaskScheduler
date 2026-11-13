@@ -83,6 +83,8 @@ jobs:
         env:
           FTS_APP_EXE: ${{ github.workspace }}\publish\FluentTaskScheduler.exe
           FTS_UI_ARTIFACTS: ${{ github.workspace }}\ui-artifacts
+          # A fresh runner can show Windows' first sign-in screens on top of everything.
+          FTS_UI_CLOSE_COVERING_WINDOWS: 1
         run: >
           dotnet test tests/FluentTaskScheduler.UITests
           -c Release

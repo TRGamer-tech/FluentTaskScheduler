@@ -101,13 +101,18 @@ public sealed class WindowManager(IServiceProvider services, ISettingsStore sett
     }
 
     // The size is stored in device-independent pixels, so it means the same on every display.
+    // Windows chooses the position, and on a small screen that can leave part of the window
+    // outside of it, so the window is moved back in.
     private void RestoreSize(Window window)
     {
         double scale = ScaleOf(window);
-        RectInt32 workArea = DisplayArea.GetFromWindowId(window.AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
+        AppWindow appWindow = window.AppWindow;
+        RectInt32 workArea = DisplayArea.GetFromWindowId(appWindow.Id, DisplayAreaFallback.Primary).WorkArea;
         int width = Math.Min((int)(settings.Current.WindowWidth * scale), workArea.Width);
         int height = Math.Min((int)(settings.Current.WindowHeight * scale), workArea.Height);
-        window.AppWindow.Resize(new SizeInt32(width, height));
+        int x = Math.Clamp(appWindow.Position.X, workArea.X, workArea.X + workArea.Width - width);
+        int y = Math.Clamp(appWindow.Position.Y, workArea.Y, workArea.Y + workArea.Height - height);
+        appWindow.MoveAndResize(new RectInt32(x, y, width, height));
     }
 
     private void RememberSize(AppWindow sender, AppWindowChangedEventArgs args)
