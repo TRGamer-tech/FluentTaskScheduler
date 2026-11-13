@@ -4,7 +4,7 @@ using FlaUI.Core.WindowsAPI;
 
 namespace FluentTaskScheduler.UITests;
 
-/// <summary>The script editor: running a script for real, stopping it, and saving it to the library.</summary>
+/// <summary>The script editor: writing a script, running it for real, stopping it, and saving it to the library.</summary>
 public class ScriptEditorTests
 {
     [Fact]
@@ -21,6 +21,24 @@ public class ScriptEditorTests
         Assert.True(exited, "The output does not say that the script exited with code 3.");
         Assert.True(app.Find(e => e.Name == "fts-plain", 2000) != null, "The output does not show the plain word the script wrote.");
         Assert.True(app.Find(e => e.Name == "Zürich 東京", 2000) != null, "The output does not show the non-ASCII words the script wrote as written.");
+    }
+
+    [Fact]
+    public void TheOutput_FollowsWhatAScriptWrites_AlsoWhenItWritesBlankLines()
+    {
+        using var app = AppSession.Launch("script-follow");
+        app.Require("NavScriptEditor").Press();
+
+        // More lines than the output shows at once, each followed by a blank one, as in PowerShell's
+        // tables and listings. The script then waits longer than the test looks, so no last note
+        // that comes only once can move the output.
+        app.Require("ScriptEditorText").AsTextBox().Text = "1..60 | ForEach-Object { \"fts-line $_\"; '' }; Start-Sleep -Seconds 120";
+        PressWhenEnabled(app, "ScriptEditorRun");
+
+        bool followed = app.Find(e => e.Name == "fts-line 60" && !e.IsOffscreen, 60000) != null;
+        app.Snapshot("written");
+        PressWhenEnabled(app, "ScriptEditorStop");
+        Assert.True(followed, "The output does not show the last line the script wrote.");
     }
 
     [Fact]
