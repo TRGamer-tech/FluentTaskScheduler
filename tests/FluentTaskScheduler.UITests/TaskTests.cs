@@ -113,6 +113,31 @@ public sealed class TaskTests : IDisposable
         app.Snapshot("editor-reopened");
     }
 
+    /// <summary>
+    /// What other programs do to tasks shows up without pressing Refresh. The app learns of it
+    /// from the history Windows records, which the test switches on for its duration.
+    /// </summary>
+    [Fact]
+    public void ATaskCreatedAndDeletedElsewhereWhileTheListIsOpen_AppearsAndDisappearsByItself()
+    {
+        using var history = new HistoryLog();
+        using var app = AppSession.Launch("live");
+        OpenFolderlessList(app);
+        Assert.True(app.Find(element => element.ControlType == ControlType.ListItem, 30000) != null, "The list stayed empty.");
+        app.Require("SearchBox").AsTextBox().Enter("Arrives later");
+        Assert.True(WaitFor(() => app.Find(RowNamed("Arrives later"), 500) == null), "A task of that name is already there.");
+
+        _windows.CreateDaily("Arrives later");
+
+        bool appeared = app.Find(RowNamed("Arrives later"), 30000) != null;
+        app.Snapshot("appeared");
+        Assert.True(appeared, "The task created with schtasks did not appear by itself.");
+
+        _windows.Delete("Arrives later");
+
+        Assert.True(WaitFor(() => app.Find(RowNamed("Arrives later"), 500) == null, seconds: 30), "The deleted task stayed in the list.");
+    }
+
     [Fact]
     public void TheShortcutOverview_ListsTheKeysOfTheTaskList()
     {
