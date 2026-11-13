@@ -128,7 +128,7 @@ public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewMode
     private async Task<bool> IsValidAsync(string name)
     {
         // A folder name follows the same rules as a task name.
-        if (TaskDraftValidator.Validate(new TaskDraft { Name = name, Actions = [new ActionDraft { Path = "." }] }) is not [var problem, ..]) return true;
+        if (TaskDraftValidator.CheckName(name) is not { } problem) return true;
         await prompts.ShowErrorAsync(problem.Message);
         return false;
     }
