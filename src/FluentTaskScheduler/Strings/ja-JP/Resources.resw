@@ -664,9 +664,9 @@
   <data name="EventResult.103" xml:space="preserve"><value>タスク失敗</value></data>
   <data name="EventResult.106" xml:space="preserve"><value>タスク登録</value></data>
   <data name="EventResult.107" xml:space="preserve"><value>タスクトリガー</value></data>
-  <data name="EventResult.110" xml:space="preserve"><value>タスク起動</value></data>
+  <data name="EventResult.110" xml:space="preserve"><value>ユーザーが開始</value></data>
   <data name="EventResult.111" xml:space="preserve"><value>タスク終了</value></data>
-  <data name="EventResult.129" xml:space="preserve"><value>アクション開始</value></data>
+  <data name="EventResult.129" xml:space="preserve"><value>プロセスを作成</value></data>
   <data name="EventResult.200" xml:space="preserve"><value>アクション開始</value></data>
   <data name="EventResult.201" xml:space="preserve"><value>アクション完了</value></data>
   <data name="EventResult.203" xml:space="preserve"><value>アクション起動失敗</value></data>

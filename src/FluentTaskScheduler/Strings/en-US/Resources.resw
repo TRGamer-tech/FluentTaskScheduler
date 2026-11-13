@@ -664,9 +664,9 @@ Restart now to apply the update?</value></data>
   <data name="EventResult.103" xml:space="preserve"><value>Task Failed</value></data>
   <data name="EventResult.106" xml:space="preserve"><value>Task Registered</value></data>
   <data name="EventResult.107" xml:space="preserve"><value>Task Triggered</value></data>
-  <data name="EventResult.110" xml:space="preserve"><value>Task Launched</value></data>
+  <data name="EventResult.110" xml:space="preserve"><value>Started by User</value></data>
   <data name="EventResult.111" xml:space="preserve"><value>Task Terminated</value></data>
-  <data name="EventResult.129" xml:space="preserve"><value>Action Started</value></data>
+  <data name="EventResult.129" xml:space="preserve"><value>Process Created</value></data>
   <data name="EventResult.200" xml:space="preserve"><value>Action Started</value></data>
   <data name="EventResult.201" xml:space="preserve"><value>Action Completed</value></data>
   <data name="EventResult.203" xml:space="preserve"><value>Action Launch Failed</value></data>

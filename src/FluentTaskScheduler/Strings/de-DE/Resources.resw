@@ -664,9 +664,9 @@ Jetzt App neustarten?</value></data>
   <data name="EventResult.103" xml:space="preserve"><value>Aufgabe fehlgeschlagen</value></data>
   <data name="EventResult.106" xml:space="preserve"><value>Aufgabe registriert</value></data>
   <data name="EventResult.107" xml:space="preserve"><value>Aufgabe ausgelöst</value></data>
-  <data name="EventResult.110" xml:space="preserve"><value>Aufgabe gestartet</value></data>
+  <data name="EventResult.110" xml:space="preserve"><value>Vom Benutzer gestartet</value></data>
   <data name="EventResult.111" xml:space="preserve"><value>Aufgabe beendet</value></data>
-  <data name="EventResult.129" xml:space="preserve"><value>Aktion gestartet</value></data>
+  <data name="EventResult.129" xml:space="preserve"><value>Prozess erstellt</value></data>
   <data name="EventResult.200" xml:space="preserve"><value>Aktion gestartet</value></data>
   <data name="EventResult.201" xml:space="preserve"><value>Aktion abgeschlossen</value></data>
   <data name="EventResult.203" xml:space="preserve"><value>Aktionsstart fehlgeschlagen</value></data>

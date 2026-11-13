@@ -32,60 +32,82 @@
             <TextBlock Text="{x:Bind ViewModel.Row.Description, Mode=OneWay}" TextWrapping="WrapWholeWords"
                        Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfText(ViewModel.Row.Description), Mode=OneWay}"/>
 
-            <!-- What the row knows about the task. -->
-            <Grid ColumnSpacing="16" RowSpacing="6">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
-                <TextBlock Text="{x:Bind l:Loc.Get('Details.NextRun')}" Style="{StaticResource FactNameStyle}"/>
-                <TextBlock x:Name="DetailsNextRun" Grid.Column="1" Text="{x:Bind local:TaskDetailsDialog.DateText(ViewModel.Row.NextRunTime), Mode=OneWay}"/>
-
-                <TextBlock Grid.Row="1" Text="{x:Bind l:Loc.Get('Details.LastRun')}" Style="{StaticResource FactNameStyle}"/>
-                <TextBlock Grid.Row="1" Grid.Column="1" Text="{x:Bind local:TaskDetailsDialog.DateText(ViewModel.Row.LastRunTime), Mode=OneWay}"/>
-
-                <TextBlock Grid.Row="2" Text="{x:Bind l:Loc.Get('Dialog.Author')}" Style="{StaticResource FactNameStyle}"
-                           Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfText(ViewModel.Row.Author), Mode=OneWay}"/>
-                <TextBlock Grid.Row="2" Grid.Column="1" Text="{x:Bind ViewModel.Row.Author, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
-
-                <TextBlock Grid.Row="3" Text="{x:Bind l:Loc.Get('Dialog.Category')}" Style="{StaticResource FactNameStyle}"
-                           Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfText(ViewModel.Row.Category), Mode=OneWay}"/>
-                <TextBlock Grid.Row="3" Grid.Column="1" Text="{x:Bind ViewModel.Row.Category, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
-
-                <TextBlock Grid.Row="4" Text="{x:Bind l:Loc.Get('Dialog.Tags')}" Style="{StaticResource FactNameStyle}"
-                           Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfText(ViewModel.Row.TagsText), Mode=OneWay}"/>
-                <TextBlock Grid.Row="4" Grid.Column="1" Text="{x:Bind ViewModel.Row.TagsText, Mode=OneWay}" TextWrapping="Wrap"/>
-
-                <TextBlock Grid.Row="5" Text="{x:Bind l:Loc.Get('Details.Triggers')}" Style="{StaticResource FactNameStyle}"
-                           Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfAny(ViewModel.Triggers), Mode=OneWay}"/>
-                <ItemsControl x:Name="DetailsTriggers" Grid.Row="5" Grid.Column="1" ItemsSource="{x:Bind ViewModel.Triggers, Mode=OneWay}" IsTabStop="False">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="x:String">
-                            <TextBlock Text="{x:Bind}" TextWrapping="Wrap"/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-
-                <TextBlock Grid.Row="6" Text="{x:Bind l:Loc.Get('Details.Actions')}" Style="{StaticResource FactNameStyle}"
-                           Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfAny(ViewModel.Actions), Mode=OneWay}"/>
-                <ItemsControl x:Name="DetailsActions" Grid.Row="6" Grid.Column="1" ItemsSource="{x:Bind ViewModel.Actions, Mode=OneWay}" IsTabStop="False">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="x:String">
-                            <TextBlock Text="{x:Bind}" TextWrapping="Wrap" FontFamily="Consolas"/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </Grid>
+            <!-- What the row knows about the task. A fact the task does not have takes no room. -->
+            <StackPanel Spacing="6">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{x:Bind l:Loc.Get('Details.NextRun')}" Style="{StaticResource FactNameStyle}"/>
+                    <TextBlock x:Name="DetailsNextRun" Grid.Column="1" Text="{x:Bind local:TaskDetailsDialog.DateText(ViewModel.Row.NextRunTime), Mode=OneWay}" />
+                </Grid>
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{x:Bind l:Loc.Get('Details.LastRun')}" Style="{StaticResource FactNameStyle}"/>
+                    <TextBlock Grid.Column="1" Text="{x:Bind local:TaskDetailsDialog.DateText(ViewModel.Row.LastRunTime), Mode=OneWay}" />
+                </Grid>
+                <Grid ColumnSpacing="16"
+                      Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfText(ViewModel.Row.Author), Mode=OneWay}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{x:Bind l:Loc.Get('Dialog.Author')}" Style="{StaticResource FactNameStyle}"/>
+                    <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.Row.Author, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
+                </Grid>
+                <Grid ColumnSpacing="16"
+                      Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfText(ViewModel.Row.Category), Mode=OneWay}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{x:Bind l:Loc.Get('Dialog.Category')}" Style="{StaticResource FactNameStyle}"/>
+                    <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.Row.Category, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
+                </Grid>
+                <Grid ColumnSpacing="16"
+                      Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfText(ViewModel.Row.TagsText), Mode=OneWay}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{x:Bind l:Loc.Get('Dialog.Tags')}" Style="{StaticResource FactNameStyle}"/>
+                    <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.Row.TagsText, Mode=OneWay}" TextWrapping="Wrap"/>
+                </Grid>
+                <Grid ColumnSpacing="16"
+                      Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfAny(ViewModel.Triggers), Mode=OneWay}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{x:Bind l:Loc.Get('Details.Triggers')}" Style="{StaticResource FactNameStyle}"/>
+                    <ItemsControl x:Name="DetailsTriggers" Grid.Column="1" ItemsSource="{x:Bind ViewModel.Triggers, Mode=OneWay}" IsTabStop="False">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <TextBlock Text="{x:Bind}" TextWrapping="Wrap"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+                <Grid ColumnSpacing="16"
+                      Visibility="{x:Bind local:TaskDetailsDialog.VisibleIfAny(ViewModel.Actions), Mode=OneWay}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{x:Bind l:Loc.Get('Details.Actions')}" Style="{StaticResource FactNameStyle}"/>
+                    <ItemsControl x:Name="DetailsActions" Grid.Column="1" ItemsSource="{x:Bind ViewModel.Actions, Mode=OneWay}" IsTabStop="False">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <TextBlock Text="{x:Bind}" TextWrapping="Wrap" FontFamily="Consolas"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+            </StackPanel>
 
             <!-- What can be done with the task. Each closes the dialog and is carried out by the list. -->
             <StackPanel Orientation="Horizontal" Spacing="8">
