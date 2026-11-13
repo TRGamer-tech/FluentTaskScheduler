@@ -623,7 +623,7 @@ public sealed class TasksViewModelTests : IDisposable
 
         Assert.NotNull(import);
         Assert.Equal("Nightly backup", import.Name);
-        Assert.Equal(["\\", @"\Reports", @"\Reports\Old"], import.Folders);
+        Assert.Equal(["Folders.Library", @"\Reports", @"\Reports\Old"], import.Folders);
         Assert.Equal(1, import.FolderIndex);
     }
 

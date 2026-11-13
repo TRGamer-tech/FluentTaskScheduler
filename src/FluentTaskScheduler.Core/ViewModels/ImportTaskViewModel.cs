@@ -18,6 +18,7 @@ public sealed partial class ImportTaskViewModel : ObservableObject
     private readonly IAppLifetime _app;
     private readonly string _xml;
     private readonly TaskImportInfo _info;
+    private readonly IReadOnlyList<string> _folderPaths;
 
     public ImportTaskViewModel(ITaskStore store, IAppLifetime app, string xml, TaskImportInfo info, string suggestedName,
         IReadOnlyList<string> folders, string? currentFolder)
@@ -27,8 +28,9 @@ public sealed partial class ImportTaskViewModel : ObservableObject
         _xml = xml;
         _info = info;
         _name = suggestedName;
-        Folders = folders.Count > 0 ? folders : [TaskPaths.Root];
-        _folderIndex = Math.Max(Folders.ToList().FindIndex(folder => string.Equals(folder, currentFolder, StringComparison.OrdinalIgnoreCase)), 0);
+        _folderPaths = folders.Count > 0 ? folders : [TaskPaths.Root];
+        Folders = _folderPaths.Select(FoldersViewModel.PathText).ToList();
+        _folderIndex = Math.Max(_folderPaths.ToList().FindIndex(folder => string.Equals(folder, currentFolder, StringComparison.OrdinalIgnoreCase)), 0);
         Actions = info.Actions.Select(ActionText.Describe).ToList();
         Triggers = info.Triggers.Select(TriggerText.Describe).ToList();
 
@@ -45,6 +47,7 @@ public sealed partial class ImportTaskViewModel : ObservableObject
 
     [ObservableProperty] private string _name;
 
+    /// <summary>The folders the task can go to, as the list of folders shows them.</summary>
     public IReadOnlyList<string> Folders { get; }
     [ObservableProperty] private int _folderIndex;
 
@@ -135,7 +138,7 @@ public sealed partial class ImportTaskViewModel : ObservableObject
         }
 
         var options = new TaskImportOptions(
-            Folders[FolderIndex],
+            _folderPaths[FolderIndex],
             name,
             AccountIndex switch { AsCurrentUser => TaskAccount.CurrentUser, AsSystem => TaskAccount.System, _ => null },
             HighestPrivileges,

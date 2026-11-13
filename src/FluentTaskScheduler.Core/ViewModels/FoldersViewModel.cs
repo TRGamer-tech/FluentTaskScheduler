@@ -36,6 +36,9 @@ public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewMode
     /// <summary>The paths of all folders, parents first, for pickers.</summary>
     public IReadOnlyList<string> AllPaths { get; private set; } = [];
 
+    /// <summary>A folder as a list of all folders shows it: by its path, and the root by the name the tree gives it.</summary>
+    public static string PathText(string path) => path == TaskPaths.Root ? Loc.Get("Folders.Library") : path;
+
     /// <summary>Reads the folders and rebuilds the tree, keeping what was expanded and selected.</summary>
     public async Task ReloadAsync()
     {

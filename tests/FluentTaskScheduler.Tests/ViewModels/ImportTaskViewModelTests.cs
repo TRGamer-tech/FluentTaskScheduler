@@ -32,6 +32,16 @@ public class ImportTaskViewModelTests
     }
 
     [Fact]
+    public async Task TheLibrary_IsOfferedByItsName_AndTheTaskGoesToItsTop()
+    {
+        var import = Import(Info(TaskAccount.CurrentUser));
+
+        Assert.Equal(["Folders.Library", @"\Jobs"], import.Folders);
+        Assert.True(await import.ImportAsync());
+        Assert.Equal(@"\Backup", import.ImportedPath);
+    }
+
+    [Fact]
     public void WhatTheTaskRunsAndWhen_IsShownBeforeItIsImported()
     {
         var daily = new TriggerDraft { Type = TriggerType.Daily, SourceIndex = 0, Start = new DateTime(2031, 5, 6, 7, 8, 0) };

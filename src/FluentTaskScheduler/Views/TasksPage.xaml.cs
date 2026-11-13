@@ -159,7 +159,7 @@ public sealed partial class TasksPage : Page
         items.Clear();
         foreach (string folder in _folders.AllPaths)
         {
-            var item = new MenuFlyoutItem { Text = folder };
+            var item = new MenuFlyoutItem { Text = FoldersViewModel.PathText(folder) };
             item.Click += async (_, _) => await ViewModel.MoveToFolderAsync(row(), folder);
             items.Add(item);
         }
