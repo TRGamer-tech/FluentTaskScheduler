@@ -289,7 +289,7 @@ Restart now to apply the update?</value></data>
   <data name="Dialog.Sess.Unlock" xml:space="preserve"><value>Workstation Unlock</value></data>
   <data name="Dialog.Action.RunProg" xml:space="preserve"><value>Run Program</value></data>
   <data name="Dialog.Action.Email" xml:space="preserve"><value>Send Email</value></data>
-  <data name="Dialog.Action.Notif" xml:space="preserve"><value>Show Notification</value></data>
+  <data name="Dialog.Action.Notif" xml:space="preserve"><value>Display a Message</value></data>
   <data name="Dialog.Browse" xml:space="preserve"><value>Browse...</value></data>
   <data name="Dialog.Pri.Realtime" xml:space="preserve"><value>Realtime</value></data>
   <data name="Dialog.Pri.High" xml:space="preserve"><value>High</value></data>
@@ -850,5 +850,8 @@ Restart now to apply the update?</value></data>
   <data name="Action.Kind.ComHandler" xml:space="preserve"><value>COM handler {0}</value></data>
   <data name="Action.Kind.SendEmail" xml:space="preserve"><value>send an email</value></data>
   <data name="Action.Kind.ShowMessage" xml:space="preserve"><value>display a message</value></data>
+  <data name="NewTask.Email.Subject" xml:space="preserve"><value>Task started</value></data>
+  <data name="NewTask.Email.Body" xml:space="preserve"><value>The task has started.</value></data>
+  <data name="NewTask.Message.Text" xml:space="preserve"><value>Message from a scheduled task</value></data>
 </root>
 

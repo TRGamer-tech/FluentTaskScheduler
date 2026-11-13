@@ -850,4 +850,7 @@
   <data name="Action.Kind.ComHandler" xml:space="preserve"><value>COM ハンドラー {0}</value></data>
   <data name="Action.Kind.SendEmail" xml:space="preserve"><value>電子メールの送信</value></data>
   <data name="Action.Kind.ShowMessage" xml:space="preserve"><value>メッセージの表示</value></data>
+  <data name="NewTask.Email.Subject" xml:space="preserve"><value>タスクが開始されました</value></data>
+  <data name="NewTask.Email.Body" xml:space="preserve"><value>タスクが開始されました。</value></data>
+  <data name="NewTask.Message.Text" xml:space="preserve"><value>スケジュールされたタスクからのメッセージ</value></data>
 </root>

@@ -290,7 +290,7 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.Sess.Unlock" xml:space="preserve"><value>Arbeitsstation entsperren</value></data>
   <data name="Dialog.Action.RunProg" xml:space="preserve"><value>Programm starten</value></data>
   <data name="Dialog.Action.Email" xml:space="preserve"><value>E-Mail senden</value></data>
-  <data name="Dialog.Action.Notif" xml:space="preserve"><value>Benachrichtigung anzeigen</value></data>
+  <data name="Dialog.Action.Notif" xml:space="preserve"><value>Meldung anzeigen</value></data>
   <data name="Dialog.Browse" xml:space="preserve"><value>Durchsuchen...</value></data>
   <data name="Dialog.Pri.Realtime" xml:space="preserve"><value>Echtzeit</value></data>
   <data name="Dialog.Pri.High" xml:space="preserve"><value>Hoch</value></data>
@@ -850,4 +850,7 @@ Jetzt App neustarten?</value></data>
   <data name="Action.Kind.ComHandler" xml:space="preserve"><value>COM-Handler {0}</value></data>
   <data name="Action.Kind.SendEmail" xml:space="preserve"><value>E-Mail senden</value></data>
   <data name="Action.Kind.ShowMessage" xml:space="preserve"><value>Meldung anzeigen</value></data>
+  <data name="NewTask.Email.Subject" xml:space="preserve"><value>Aufgabe gestartet</value></data>
+  <data name="NewTask.Email.Body" xml:space="preserve"><value>Die Aufgabe wurde gestartet.</value></data>
+  <data name="NewTask.Message.Text" xml:space="preserve"><value>Nachricht einer geplanten Aufgabe</value></data>
 </root>
