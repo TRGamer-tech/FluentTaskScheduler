@@ -59,8 +59,8 @@ internal static class TaskDraftReader
         {
             SourceIndex = index,
             Enabled = trigger.Enabled,
-            Start = trigger.StartBoundary == DateTime.MinValue ? null : LocalTime(trigger.StartBoundary),
-            End = trigger.EndBoundary == DateTime.MaxValue ? null : LocalTime(trigger.EndBoundary),
+            Start = trigger.StartBoundary == DateTime.MinValue ? null : InLocalTime(trigger.StartBoundary),
+            End = trigger.EndBoundary == DateTime.MaxValue ? null : InLocalTime(trigger.EndBoundary),
             RepetitionInterval = trigger.Repetition.Interval,
             RepetitionDuration = trigger.Repetition.Duration
         };
@@ -97,6 +97,13 @@ internal static class TaskDraftReader
         };
     }
 
+    /// <summary>
+    /// A boundary stored in UTC (Task Scheduler's "synchronize across time zones") comes back from
+    /// the library as UTC for the start but as local time for the end. Everything that works with
+    /// a draft, the editor and every text included, takes its times as local times.
+    /// </summary>
+    private static DateTime InLocalTime(DateTime boundary) => boundary.Kind == DateTimeKind.Utc ? boundary.ToLocalTime() : boundary;
+
     public static ActionDraft Read(TaskAction action, int index) => action switch
     {
         ExecAction exec => new ActionDraft
@@ -109,13 +116,6 @@ internal static class TaskDraftReader
         ComHandlerAction com => new ActionDraft { SourceIndex = index, UnsupportedSummary = $"{action.ActionType} {com.ClassId:B}" },
         _ => new ActionDraft { SourceIndex = index, UnsupportedSummary = action.ActionType.ToString() }
     };
-
-    /// <summary>
-    /// Task Scheduler keeps a boundary as it was written: without a time zone, with an offset, or
-    /// in UTC. The library hands out the first as it is, the second in local time and a start in
-    /// UTC as UTC. The editor and its texts work with the local clock, so that one is converted.
-    /// </summary>
-    private static DateTime LocalTime(DateTime boundary) => boundary.Kind == DateTimeKind.Utc ? boundary.ToLocalTime() : boundary;
 
     /// <summary>Days 1 to 31 as a bit mask: bit 0 is the 1st.</summary>
     public static uint DaysOfMonthMask(IEnumerable<int> days) =>

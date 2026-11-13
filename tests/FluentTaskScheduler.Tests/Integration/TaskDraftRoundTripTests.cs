@@ -36,6 +36,17 @@ public class TaskDraftRoundTripTests
         return diff;
     }
 
+    private static ScheduledTask RegisterWithTrigger(SchedulerSandbox sandbox, Trigger trigger)
+    {
+        var definition = sandbox.Service.NewTask();
+        definition.Triggers.Add(trigger);
+        definition.Actions.Add(new ExecAction("cmd.exe", "/c exit 0"));
+        return sandbox.Folder.RegisterTaskDefinition("Window", definition);
+    }
+
+    private static TriggerDraft ReadTrigger(SchedulerSandbox sandbox, ScheduledTask task) =>
+        Assert.Single(TaskDraftReader.Read(sandbox.Service.GetTask(task.Path)).Triggers);
+
     private static void AssertOnlyChanged(List<string> diff, params string[] allowedPaths)
     {
         Assert.NotEmpty(diff);
@@ -161,6 +172,60 @@ public class TaskDraftRoundTripTests
 
     private static string StartBoundaryIn(string taskXml) =>
         System.Xml.Linq.XDocument.Parse(taskXml).Descendants().First(element => element.Name.LocalName == "StartBoundary").Value;
+
+    [SkippableFact]
+    public void MovingATriggerPastTheEndItHad_IsSaved()
+    {
+        Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
+        using var sandbox = new SchedulerSandbox();
+        var task = RegisterWithTrigger(sandbox, new DailyTrigger { StartBoundary = new DateTime(2030, 11, 1, 6, 30, 0), EndBoundary = new DateTime(2030, 11, 30, 6, 30, 0) });
+        DateTime start = new(2030, 12, 1, 6, 30, 0), end = new(2030, 12, 31, 6, 30, 0);
+
+        var diff = Edit(sandbox, task, draft => draft with { Triggers = [draft.Triggers[0] with { Start = start, End = end }] });
+
+        AssertOnlyChanged(diff, "/Task/Triggers/CalendarTrigger/StartBoundary", "/Task/Triggers/CalendarTrigger/EndBoundary");
+        var saved = ReadTrigger(sandbox, task);
+        Assert.Equal(start, saved.Start);
+        Assert.Equal(end, saved.End);
+    }
+
+    [SkippableFact]
+    public void AnExpiredTrigger_CanBeSetForLater_WithoutAnEnd()
+    {
+        Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
+        using var sandbox = new SchedulerSandbox();
+        var task = RegisterWithTrigger(sandbox, new TimeTrigger { StartBoundary = new DateTime(2020, 5, 1, 9, 0, 0), EndBoundary = new DateTime(2020, 5, 2, 9, 0, 0) });
+        var next = new DateTime(2031, 5, 1, 9, 0, 0);
+
+        Edit(sandbox, task, draft => draft with { Triggers = [draft.Triggers[0] with { Start = next, End = null }] });
+
+        var saved = ReadTrigger(sandbox, task);
+        Assert.Equal(next, saved.Start);
+        Assert.Null(saved.End);
+    }
+
+    [SkippableFact]
+    public void ATriggerSynchronisedAcrossTimeZones_IsReadInLocalTime_AndItsEndCanBeChanged()
+    {
+        Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
+        using var sandbox = new SchedulerSandbox();
+        var start = new DateTime(2030, 1, 2, 8, 0, 0, DateTimeKind.Utc);
+        var task = RegisterWithTrigger(sandbox, new DailyTrigger { StartBoundary = start, EndBoundary = start.AddMinutes(30) });
+        _out.WriteLine(task.Xml);
+        Assert.Contains("<StartBoundary>2030-01-02T08:00:00Z</StartBoundary>", task.Xml);
+
+        var read = ReadTrigger(sandbox, task);
+        Assert.Equal(start.ToLocalTime(), read.Start);
+        Assert.Equal(DateTimeKind.Local, read.Start?.Kind);
+        Assert.Equal(start.AddMinutes(30).ToLocalTime(), read.End);
+
+        DateTime end = start.AddHours(2).ToLocalTime();
+        Edit(sandbox, task, draft => draft with { Triggers = [draft.Triggers[0] with { End = end }] });
+
+        var saved = ReadTrigger(sandbox, task);
+        Assert.Equal(start.ToLocalTime(), saved.Start);
+        Assert.Equal(end, saved.End);
+    }
 
     [SkippableFact]
     public void RemovingATrigger_KeepsTheOthersIntact()

@@ -138,8 +138,16 @@ internal static class TaskDraftWriter
     private static void Configure(Trigger trigger, TriggerDraft draft, TriggerDraft? before)
     {
         if (draft.Enabled != before?.Enabled) trigger.Enabled = draft.Enabled;
-        if (draft.Start != before?.Start) trigger.StartBoundary = draft.Start ?? DateTime.MinValue;
-        if (draft.End != before?.End) trigger.EndBoundary = draft.End ?? DateTime.MaxValue;
+        if (draft.Start != before?.Start || draft.End != before?.End)
+        {
+            // On a registered trigger the library checks each boundary, as it is set, against the
+            // other one as stored at that moment, and it reads a start stored in UTC as UTC. With
+            // the end out of the way, both are written from the draft, which holds local time, so
+            // a trigger can also be moved past the end it had.
+            trigger.EndBoundary = DateTime.MaxValue;
+            trigger.StartBoundary = draft.Start ?? DateTime.MinValue;
+            trigger.EndBoundary = draft.End ?? DateTime.MaxValue;
+        }
 
         if (draft.RepetitionInterval != before?.RepetitionInterval || draft.RepetitionDuration != before?.RepetitionDuration)
         {
