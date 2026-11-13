@@ -158,7 +158,7 @@ public sealed partial class TaskDetailsViewModel : ObservableObject, IDisposable
         {
             TaskDraft draft = await Task.Run(() => _store.Load(Row.Path));
             Triggers = draft.Triggers.Select(TriggerText.Describe).ToList();
-            Actions = draft.Actions.Select(Describe).ToList();
+            Actions = draft.Actions.Select(ActionText.Describe).ToList();
         }
         catch (Exception ex)
         {
@@ -168,9 +168,6 @@ public sealed partial class TaskDetailsViewModel : ObservableObject, IDisposable
             Serilog.Log.Information(ex, "The definition of {Path} could not be read for its details", Row.Path);
         }
     }
-
-    private static string Describe(ActionDraft action) =>
-        action.UnsupportedSummary ?? (action.Arguments.Length == 0 ? action.Path : $"{action.Path} {action.Arguments}");
 
     partial void OnPeriodIndexChanged(int oldValue, int newValue)
     {

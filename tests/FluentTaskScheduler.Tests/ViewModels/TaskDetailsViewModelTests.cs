@@ -58,6 +58,17 @@ public sealed class TaskDetailsViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task AnActionTheEditorCannotChange_IsNamedAsSuch()
+    {
+        _store.Add(@"\Windows", draft: new TaskDraft { Actions = [new ActionDraft { SourceIndex = 0, UnsupportedSummary = "ComHandler {0000}" }] });
+        using TaskDetailsViewModel details = Open(@"\Windows");
+
+        await details.LoadAsync();
+
+        Assert.Equal(["Action.Unsupported (ComHandler {0000})"], details.Actions);
+    }
+
+    [Fact]
     public async Task ATaskThatCannotBeRead_StillShowsItsHistory()
     {
         using TaskDetailsViewModel details = Open(@"\Gone");
