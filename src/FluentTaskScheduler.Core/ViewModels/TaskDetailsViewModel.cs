@@ -130,9 +130,11 @@ public sealed partial class TaskDetailsViewModel : ObservableObject
             Triggers = draft.Triggers.Select(TriggerText.Describe).ToList();
             Actions = draft.Actions.Select(Describe).ToList();
         }
-        catch (Exception ex) when (ex is TaskNotFoundException or TaskAccessDeniedException or InvalidOperationException or System.Runtime.InteropServices.COMException)
+        catch (Exception ex)
         {
-            // The row already says when a task cannot be read; the history may still be there.
+            // Any task on the computer can be opened here, including ones this user may not read
+            // and ones the scheduler library cannot interpret. The row already says when a task
+            // cannot be read, and its history may still be there.
             Serilog.Log.Information(ex, "The definition of {Path} could not be read for its details", Row.Path);
         }
     }
