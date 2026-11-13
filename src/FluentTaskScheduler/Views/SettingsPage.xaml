@@ -11,8 +11,10 @@
             <Setter Property="AutomationProperties.HeadingLevel" Value="Level2"/>
         </Style>
 
-        <!-- An expander that looks like the cards around it: as wide, as tall, its rows bringing their own padding. -->
-        <Style x:Key="SettingsExpanderStyle" TargetType="Expander" BasedOn="{StaticResource DefaultExpanderStyle}">
+        <!-- An expander that looks like the cards around it: as wide, as tall, its rows bringing their own padding.
+             The expander's default style still applies underneath. Windows App SDK 1.5 does not let
+             app XAML name that style, so BasedOn would fail when the page loads. -->
+        <Style x:Key="SettingsExpanderStyle" TargetType="Expander">
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
             <Setter Property="MinHeight" Value="68"/>
