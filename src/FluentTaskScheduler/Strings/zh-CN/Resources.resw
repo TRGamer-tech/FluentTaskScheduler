@@ -1079,6 +1079,9 @@
   <data name="Snooze.Unreadable.MessageFormat" xml:space="preserve"><value>之前的暂停所禁用的任务可能仍处于禁用状态，但不会在此列出。其记录无法读取，已保存为 {0}。</value></data>
   <data name="Snooze.Dialog.Until" xml:space="preserve"><value>暂停所有任务，直到：</value></data>
   <data name="Task.Snooze.AlreadyDisabled" xml:space="preserve"><value>此任务已被禁用。暂停结束时会将其启用，因此保持原样。</value></data>
+  <data name="Snooze.Restore.Title" xml:space="preserve"><value>部分任务仍处于禁用状态</value></data>
+  <data name="Snooze.Restore.Retry" xml:space="preserve"><value>重试</value></data>
+  <data name="Snooze.Unreadable.Title" xml:space="preserve"><value>无法读取之前的暂停</value></data>
 </root>
 
 

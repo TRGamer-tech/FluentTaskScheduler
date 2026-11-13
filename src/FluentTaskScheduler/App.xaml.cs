@@ -161,6 +161,7 @@ public partial class App : Application, IAppLifetime, IDisposable
         services.AddScoped<TaskEditorFactory>();
         services.AddScoped<TaskDetailsFactory>();
         services.AddScoped<TasksViewModel>();
+        services.AddScoped<SnoozeViewModel>();
         services.AddScoped<FoldersViewModel>();
         services.AddScoped<TasksPage>();
         services.AddScoped<QuickActionsViewModel>();

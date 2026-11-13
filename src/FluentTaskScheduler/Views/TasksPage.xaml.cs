@@ -20,9 +20,10 @@ public sealed partial class TasksPage : Page
     private bool _dialogOpen;
     private TaskRow? _menuRow;
 
-    public TasksPage(TasksViewModel viewModel, FoldersViewModel folders, TaskDetailsFactory details, IDialogService dialogs)
+    public TasksPage(TasksViewModel viewModel, SnoozeViewModel snooze, FoldersViewModel folders, TaskDetailsFactory details, IDialogService dialogs)
     {
         ViewModel = viewModel;
+        Snooze = snooze;
         _folders = folders;
         _details = details;
         _dialogs = dialogs;
@@ -36,6 +37,7 @@ public sealed partial class TasksPage : Page
     }
 
     public TasksViewModel ViewModel { get; }
+    public SnoozeViewModel Snooze { get; }
 
     /// <summary>Opens the editor for a new task and returns the path of what was created, or null.</summary>
     public Task<string?> CreateTaskAsync(TaskDraft? template = null) => ShowEditorAsync(ViewModel.EditNew(template));
@@ -53,11 +55,16 @@ public sealed partial class TasksPage : Page
         TaskList.ScrollIntoView(row);
     }
 
+    /// <summary>Opens the dialog that snoozes all tasks until a moment of the user's choosing.</summary>
+    public Task ShowSnoozeDialogAsync() => ShowSnoozeDialogAsync(Snooze.PickMoment());
+
     public static bool Not(bool value) => !value;
     public static double OpacityOf(bool isHidden) => isHidden ? 0.55 : 1;
     public static Visibility VisibleIfText(string text) => text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
     public static Visibility VisibleIfSet(DateTime? time) => time is null ? Visibility.Collapsed : Visibility.Visible;
     public static Visibility VisibleIfNone(int count, bool isLoading) => count == 0 && !isLoading ? Visibility.Visible : Visibility.Collapsed;
+    public static Visibility VisibleUnless(bool value) => value ? Visibility.Collapsed : Visibility.Visible;
+    public static Visibility VisibleIfEither(bool first, bool second) => first || second ? Visibility.Visible : Visibility.Collapsed;
 
     public static string NextRunText(DateTime? time) =>
         time is { } next ? Loc.Format("Tasks.NextRunFormat", next.ToString("g", CultureInfo.CurrentCulture)) : "";
@@ -92,6 +99,20 @@ public sealed partial class TasksPage : Page
         if (await ViewModel.EditAsync(row) is { } editor) await ShowEditorAsync(editor);
     }
 
+    private async Task ShowSnoozeDialogAsync(SnoozeUntilViewModel moment)
+    {
+        if (_dialogOpen) return;
+        _dialogOpen = true;
+        try
+        {
+            await _dialogs.ShowAsync(new SnoozeDialog(moment));
+        }
+        finally
+        {
+            _dialogOpen = false;
+        }
+    }
+
     /// <summary>Shows the task's details. What the user asks for in there is carried out once the dialog has closed.</summary>
     private async Task ShowDetailsAsync(TaskRow row)
     {
@@ -115,6 +136,7 @@ public sealed partial class TasksPage : Page
             case TaskDetailsRequest.Edit: await EditAsync(row); break;
             case TaskDetailsRequest.Export: await ViewModel.ExportCommand.ExecuteAsync(row); break;
             case TaskDetailsRequest.Delete: await ViewModel.DeleteCommand.ExecuteAsync(row); break;
+            case TaskDetailsRequest.SnoozeUntil: await ShowSnoozeDialogAsync(details.PickSnoozeMoment()); break;
         }
     }
 
@@ -150,6 +172,8 @@ public sealed partial class TasksPage : Page
     }
 
     private async void NewTask_Click(object sender, RoutedEventArgs e) => await CreateTaskAsync();
+
+    private async void SnoozeCustom_Click(object sender, RoutedEventArgs e) => await ShowSnoozeDialogAsync();
 
     private async void Shortcuts_Click(object sender, RoutedEventArgs e)
     {

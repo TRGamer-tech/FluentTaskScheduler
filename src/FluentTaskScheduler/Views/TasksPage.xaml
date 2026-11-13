@@ -6,6 +6,7 @@
     xmlns:l="using:FluentTaskScheduler.Localization"
     xmlns:local="using:FluentTaskScheduler.Views"
     xmlns:s="using:FluentTaskScheduler.Scheduling"
+    xmlns:sn="using:FluentTaskScheduler.Snoozing"
     xmlns:vm="using:FluentTaskScheduler.ViewModels">
 
     <Page.Resources>
@@ -52,10 +53,35 @@
             </InfoBar.ActionButton>
         </InfoBar>
 
-        <InfoBar x:Name="LoadErrorBar" Grid.Row="1" Severity="Error" IsClosable="False"
-                 IsOpen="{x:Bind ViewModel.HasLoadError, Mode=OneWay}"
-                 Title="{x:Bind l:Loc.Get('Tasks.LoadError.Title')}"
-                 Message="{x:Bind ViewModel.LoadError, Mode=OneWay}"/>
+        <!-- Each bar is collapsed as well as closed while it has nothing to say: a closed bar would still take the panel's spacing. -->
+        <StackPanel Grid.Row="1" Spacing="8">
+            <InfoBar x:Name="LoadErrorBar" Severity="Error" IsClosable="False"
+                     IsOpen="{x:Bind ViewModel.HasLoadError, Mode=OneWay}" Visibility="{x:Bind ViewModel.HasLoadError, Mode=OneWay}"
+                     Title="{x:Bind l:Loc.Get('Tasks.LoadError.Title')}"
+                     Message="{x:Bind ViewModel.LoadError, Mode=OneWay}"/>
+            <InfoBar x:Name="SnoozeBanner" Severity="Warning" IsClosable="False"
+                     IsOpen="{x:Bind Snooze.IsSnoozed, Mode=OneWay}" Visibility="{x:Bind Snooze.IsSnoozed, Mode=OneWay}"
+                     Title="{x:Bind Snooze.StatusText, Mode=OneWay}"
+                     Message="{x:Bind Snooze.EffectText, Mode=OneWay}">
+                <InfoBar.ActionButton>
+                    <Button x:Name="SnoozeBannerResume" Content="{x:Bind l:Loc.Get('Snooze.Menu.Resume')}"
+                            Command="{x:Bind Snooze.ResumeCommand}"/>
+                </InfoBar.ActionButton>
+            </InfoBar>
+            <InfoBar x:Name="SnoozeRestoreBar" Severity="Warning" IsClosable="False"
+                     IsOpen="{x:Bind Snooze.HasPendingRestores, Mode=OneWay}" Visibility="{x:Bind Snooze.HasPendingRestores, Mode=OneWay}"
+                     Title="{x:Bind l:Loc.Get('Snooze.Restore.Title')}"
+                     Message="{x:Bind Snooze.PendingRestoresText, Mode=OneWay}">
+                <InfoBar.ActionButton>
+                    <Button x:Name="SnoozeRetryButton" Content="{x:Bind l:Loc.Get('Snooze.Restore.Retry')}"
+                            Command="{x:Bind Snooze.RetryRestoresCommand}"/>
+                </InfoBar.ActionButton>
+            </InfoBar>
+            <InfoBar x:Name="SnoozeUnreadableBar" Severity="Warning" IsClosable="True"
+                     IsOpen="{x:Bind Snooze.HasUnreadableStateFile, Mode=OneWay}" Visibility="{x:Bind Snooze.HasUnreadableStateFile, Mode=OneWay}"
+                     Title="{x:Bind l:Loc.Get('Snooze.Unreadable.Title')}"
+                     Message="{x:Bind Snooze.UnreadableStateText, Mode=OneWay}"/>
+        </StackPanel>
 
         <!-- Search and filter on the left, commands on the right; the command bar moves what does not fit into its menu. -->
         <Grid Grid.Row="2" ColumnSpacing="8">
@@ -73,6 +99,7 @@
                 <ComboBoxItem Content="{x:Bind l:Loc.Get('Main.Status.Running')}"/>
                 <ComboBoxItem Content="{x:Bind l:Loc.Get('Main.Status.Enabled')}"/>
                 <ComboBoxItem Content="{x:Bind l:Loc.Get('Main.Status.Disabled')}"/>
+                <ComboBoxItem Content="{x:Bind l:Loc.Get('Main.Status.Snoozed')}"/>
             </ComboBox>
             <CommandBar Grid.Column="2" DefaultLabelPosition="Right" Background="Transparent" HorizontalAlignment="Right">
                 <AppBarButton x:Name="NewTaskButton" Icon="Add" Label="{x:Bind l:Loc.Get('Main.Nav.NewTask')}" Click="NewTask_Click">
@@ -96,6 +123,36 @@
                             <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Main.Sort.LastRun')}" Command="{x:Bind ViewModel.SortByCommand}" CommandParameter="{x:Bind vm:TaskSort.LastRun}"/>
                             <MenuFlyoutSeparator/>
                             <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Main.Sort.Clear')}" Command="{x:Bind ViewModel.SortByCommand}" CommandParameter="{x:Bind vm:TaskSort.None}"/>
+                        </MenuFlyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+                <!-- For how long to snooze all tasks; while they are snoozed, until when, and the way out. -->
+                <AppBarButton x:Name="SnoozeButton" Icon="Pause" Label="{x:Bind Snooze.Caption, Mode=OneWay}">
+                    <AppBarButton.Flyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem x:Name="SnoozeStatusItem" Text="{x:Bind Snooze.StatusText, Mode=OneWay}" IsEnabled="False"
+                                            Visibility="{x:Bind Snooze.IsSnoozed, Mode=OneWay}"/>
+                            <MenuFlyoutItem x:Name="SnoozeResumeItem" Icon="Play" Text="{x:Bind l:Loc.Get('Snooze.Menu.Resume')}"
+                                            Command="{x:Bind Snooze.ResumeCommand}" Visibility="{x:Bind Snooze.IsSnoozed, Mode=OneWay}"/>
+                            <MenuFlyoutItem x:Name="SnoozeHalfAnHourItem" Text="{x:Bind l:Loc.Get('Snooze.Duration.30m')}"
+                                            Command="{x:Bind Snooze.SnoozeCommand}" CommandParameter="{x:Bind sn:SnoozeChoice.HalfAnHour}"
+                                            Visibility="{x:Bind local:TasksPage.VisibleUnless(Snooze.IsSnoozed), Mode=OneWay}"/>
+                            <MenuFlyoutItem x:Name="SnoozeOneHourItem" Text="{x:Bind l:Loc.Get('Snooze.Duration.1h')}"
+                                            Command="{x:Bind Snooze.SnoozeCommand}" CommandParameter="{x:Bind sn:SnoozeChoice.OneHour}"
+                                            Visibility="{x:Bind local:TasksPage.VisibleUnless(Snooze.IsSnoozed), Mode=OneWay}"/>
+                            <MenuFlyoutItem x:Name="SnoozeThreeHoursItem" Text="{x:Bind l:Loc.Get('Snooze.Duration.3h')}"
+                                            Command="{x:Bind Snooze.SnoozeCommand}" CommandParameter="{x:Bind sn:SnoozeChoice.ThreeHours}"
+                                            Visibility="{x:Bind local:TasksPage.VisibleUnless(Snooze.IsSnoozed), Mode=OneWay}"/>
+                            <MenuFlyoutItem x:Name="SnoozeUntilRestartItem" Text="{x:Bind l:Loc.Get('Snooze.Duration.Reboot')}"
+                                            Command="{x:Bind Snooze.SnoozeCommand}" CommandParameter="{x:Bind sn:SnoozeChoice.UntilRestart}"
+                                            Visibility="{x:Bind local:TasksPage.VisibleUnless(Snooze.IsSnoozed), Mode=OneWay}"/>
+                            <MenuFlyoutItem x:Name="SnoozeCustomItem" Text="{x:Bind l:Loc.Get('Snooze.Duration.Custom')}" Click="SnoozeCustom_Click"
+                                            Visibility="{x:Bind local:TasksPage.VisibleUnless(Snooze.IsSnoozed), Mode=OneWay}"/>
+                            <MenuFlyoutSeparator Visibility="{x:Bind local:TasksPage.VisibleUnless(Snooze.IsSnoozed), Mode=OneWay}"/>
+                            <!-- Here as well as in the dialog: the banner of a snooze that does not suspend triggers points to it. -->
+                            <ToggleMenuFlyoutItem x:Name="SnoozeSuspendTriggersItem" Text="{x:Bind l:Loc.Get('Snooze.SuspendTriggers')}"
+                                                  IsChecked="{x:Bind Snooze.SuspendsTriggers, Mode=TwoWay}"
+                                                  Visibility="{x:Bind local:TasksPage.VisibleUnless(Snooze.IsSnoozed), Mode=OneWay}"/>
                         </MenuFlyout>
                     </AppBarButton.Flyout>
                 </AppBarButton>
@@ -136,7 +193,7 @@
         </Grid>
 
         <ProgressBar Grid.Row="4" VerticalAlignment="Top" IsIndeterminate="True"
-                     Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}"/>
+                     Visibility="{x:Bind local:TasksPage.VisibleIfEither(ViewModel.IsLoading, Snooze.IsBusy), Mode=OneWay}"/>
 
         <TextBlock x:Name="EmptyText" Grid.Row="4" Margin="0,48,0,0" HorizontalAlignment="Center"
                    Text="{x:Bind l:Loc.Get('Tasks.Empty')}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -203,6 +260,12 @@
                                     <StackPanel Orientation="Horizontal" Spacing="4">
                                         <FontIcon Glyph="&#xE71B;" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                                         <TextBlock Text="{x:Bind l:Loc.Get('Main.Badge.Chained')}" Style="{StaticResource BadgeTextStyle}"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource BadgeStyle}" Visibility="{x:Bind IsSnoozed, Mode=OneWay}">
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <FontIcon Glyph="&#xE769;" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                        <TextBlock Text="{x:Bind l:Loc.Get('Main.Status.Snoozed')}" Style="{StaticResource BadgeTextStyle}"/>
                                     </StackPanel>
                                 </Border>
                                 <Border Style="{StaticResource BadgeStyle}" Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}"

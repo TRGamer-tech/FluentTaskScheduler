@@ -1076,4 +1076,7 @@
   <data name="Snooze.Unreadable.MessageFormat" xml:space="preserve"><value>以前のスヌーズで無効にされたタスクが、ここに表示されないまま無効になっている可能性があります。その記録は読み取れなかったため、{0} として保存されています。</value></data>
   <data name="Snooze.Dialog.Until" xml:space="preserve"><value>すべてのタスクをスヌーズする期限:</value></data>
   <data name="Task.Snooze.AlreadyDisabled" xml:space="preserve"><value>このタスクはすでに無効です。スヌーズすると終了時に有効になってしまうため、そのままにしました。</value></data>
+  <data name="Snooze.Restore.Title" xml:space="preserve"><value>一部のタスクがまだ無効です</value></data>
+  <data name="Snooze.Restore.Retry" xml:space="preserve"><value>再試行</value></data>
+  <data name="Snooze.Unreadable.Title" xml:space="preserve"><value>以前のスヌーズを読み取れませんでした</value></data>
 </root>

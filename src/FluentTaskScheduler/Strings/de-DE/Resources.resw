@@ -1076,4 +1076,7 @@ Jetzt App neustarten?</value></data>
   <data name="Snooze.Unreadable.MessageFormat" xml:space="preserve"><value>Aufgaben, die eine frühere Pause deaktiviert hat, sind womöglich noch deaktiviert, ohne hier zu erscheinen. Ihre Aufzeichnung konnte nicht gelesen werden und wurde als {0} aufbewahrt.</value></data>
   <data name="Snooze.Dialog.Until" xml:space="preserve"><value>Alle Aufgaben pausieren bis:</value></data>
   <data name="Task.Snooze.AlreadyDisabled" xml:space="preserve"><value>Diese Aufgabe ist bereits deaktiviert. Eine Pause würde sie an ihrem Ende aktivieren, deshalb bleibt die Aufgabe, wie sie ist.</value></data>
+  <data name="Snooze.Restore.Title" xml:space="preserve"><value>Einige Aufgaben sind noch deaktiviert</value></data>
+  <data name="Snooze.Restore.Retry" xml:space="preserve"><value>Erneut versuchen</value></data>
+  <data name="Snooze.Unreadable.Title" xml:space="preserve"><value>Frühere Pausen konnten nicht gelesen werden</value></data>
 </root>

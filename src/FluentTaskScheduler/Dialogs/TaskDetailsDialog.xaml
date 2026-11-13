@@ -5,6 +5,7 @@
     xmlns:controls="using:FluentTaskScheduler.Controls"
     xmlns:l="using:FluentTaskScheduler.Localization"
     xmlns:local="using:FluentTaskScheduler.Dialogs"
+    xmlns:sn="using:FluentTaskScheduler.Snoozing"
     xmlns:vm="using:FluentTaskScheduler.ViewModels"
     Title="{x:Bind ViewModel.Row.Name}"
     CloseButtonText="{x:Bind l:Loc.Get('Dialog.Common.Close')}"
@@ -109,15 +110,42 @@
                 </Grid>
             </StackPanel>
 
-            <!-- What can be done with the task. Each closes the dialog and is carried out by the list. -->
+            <!-- What can be done with the task. Each closes the dialog and is carried out by the list,
+                 except snoozing, which needs no other dialog unless the user picks a moment. -->
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <Button x:Name="DetailsRunButton" Tag="Run" Click="Request_Click" Style="{StaticResource AccentButtonStyle}"
                         Content="{x:Bind l:Loc.Get('Main.Task.RunNow')}"/>
                 <Button x:Name="DetailsStopButton" Tag="Stop" Click="Request_Click" Content="{x:Bind l:Loc.Get('Main.Task.Stop')}"/>
                 <Button x:Name="DetailsEditButton" Tag="Edit" Click="Request_Click" Content="{x:Bind l:Loc.Get('Main.Task.Edit')}"/>
+                <DropDownButton x:Name="DetailsSnoozeButton" Content="{x:Bind l:Loc.Get('Task.Snooze.Label')}"
+                                Visibility="{x:Bind local:TaskDetailsDialog.VisibleUnless(ViewModel.IsSnoozed), Mode=OneWay}">
+                    <DropDownButton.Flyout>
+                        <MenuFlyout Placement="Bottom">
+                            <MenuFlyoutItem x:Name="DetailsSnoozeHalfAnHourItem" Text="{x:Bind l:Loc.Get('Snooze.Duration.30m')}"
+                                            Command="{x:Bind ViewModel.SnoozeCommand}" CommandParameter="{x:Bind sn:SnoozeChoice.HalfAnHour}"/>
+                            <MenuFlyoutItem x:Name="DetailsSnoozeOneHourItem" Text="{x:Bind l:Loc.Get('Snooze.Duration.1h')}"
+                                            Command="{x:Bind ViewModel.SnoozeCommand}" CommandParameter="{x:Bind sn:SnoozeChoice.OneHour}"/>
+                            <MenuFlyoutItem x:Name="DetailsSnoozeThreeHoursItem" Text="{x:Bind l:Loc.Get('Snooze.Duration.3h')}"
+                                            Command="{x:Bind ViewModel.SnoozeCommand}" CommandParameter="{x:Bind sn:SnoozeChoice.ThreeHours}"/>
+                            <MenuFlyoutItem x:Name="DetailsSnoozeUntilRestartItem" Text="{x:Bind l:Loc.Get('Snooze.Duration.Reboot')}"
+                                            Command="{x:Bind ViewModel.SnoozeCommand}" CommandParameter="{x:Bind sn:SnoozeChoice.UntilRestart}"/>
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem x:Name="DetailsSnoozeCustomItem" Tag="SnoozeUntil" Click="Request_Click"
+                                            Text="{x:Bind l:Loc.Get('Snooze.Duration.Custom')}"/>
+                        </MenuFlyout>
+                    </DropDownButton.Flyout>
+                </DropDownButton>
+                <Button x:Name="DetailsResumeButton" Content="{x:Bind l:Loc.Get('Task.Snooze.Resume')}"
+                        Command="{x:Bind ViewModel.ResumeSnoozeCommand}" Visibility="{x:Bind ViewModel.IsSnoozed, Mode=OneWay}"/>
                 <Button x:Name="DetailsExportButton" Tag="Export" Click="Request_Click" Content="{x:Bind l:Loc.Get('Main.Task.Export')}"/>
                 <Button x:Name="DetailsDeleteButton" Tag="Delete" Click="Request_Click" Content="{x:Bind l:Loc.Get('Main.Task.Delete')}"/>
             </StackPanel>
+            <TextBlock x:Name="DetailsSnoozeStatus" Text="{x:Bind ViewModel.SnoozeStatus, Mode=OneWay}"
+                       Foreground="{ThemeResource SystemFillColorCautionBrush}" Visibility="{x:Bind ViewModel.IsSnoozed, Mode=OneWay}"/>
+            <!-- Collapsed as well as closed while there is nothing to say: a closed bar would still take the panel's spacing. -->
+            <InfoBar x:Name="DetailsSnoozeProblem" Severity="Warning" IsClosable="False"
+                     IsOpen="{x:Bind ViewModel.HasSnoozeProblem, Mode=OneWay}" Visibility="{x:Bind ViewModel.HasSnoozeProblem, Mode=OneWay}"
+                     Message="{x:Bind ViewModel.SnoozeProblem, Mode=OneWay}"/>
 
             <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}"/>
 
