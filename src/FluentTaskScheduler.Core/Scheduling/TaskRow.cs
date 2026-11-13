@@ -69,13 +69,6 @@ public sealed partial class TaskRow : ObservableObject
     [NotifyPropertyChangedFor(nameof(HasCompletionActions))]
     private CompletionActions _completionActions = CompletionActions.None;
 
-    /// <summary>
-    /// True for a task that is known to exist (it appears in the Task Scheduler event log) but
-    /// that this user is not allowed to read. It is listed so it does not silently go missing;
-    /// nothing can be done with it.
-    /// </summary>
-    [ObservableProperty] private bool _isInaccessible;
-
     /// <summary>Why the task's definition could not be read, if it could not. The task is still listed.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasLoadError))]
@@ -101,7 +94,6 @@ public sealed partial class TaskRow : ObservableObject
         LastRunTime = fresh.LastRunTime;
         NextRunTime = fresh.NextRunTime;
         CompletionActions = fresh.CompletionActions;
-        IsInaccessible = fresh.IsInaccessible;
         LoadError = fresh.LoadError;
     }
 

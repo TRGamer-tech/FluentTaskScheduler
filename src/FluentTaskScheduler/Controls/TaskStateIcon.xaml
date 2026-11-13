@@ -33,12 +33,6 @@
                         <Setter Target="Icon.Foreground" Value="{ThemeResource TextFillColorDisabledBrush}"/>
                     </VisualState.Setters>
                 </VisualState>
-                <VisualState x:Name="AccessDenied">
-                    <VisualState.Setters>
-                        <Setter Target="Icon.Glyph" Value="&#xE72E;"/>
-                        <Setter Target="Icon.Foreground" Value="{ThemeResource SystemFillColorCriticalBrush}"/>
-                    </VisualState.Setters>
-                </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
 

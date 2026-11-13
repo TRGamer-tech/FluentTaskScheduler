@@ -7,8 +7,5 @@ public enum TaskRowState
     Ready,
     Running,
     Queued,
-    Disabled,
-
-    /// <summary>The task exists, but this user is not allowed to read it.</summary>
-    AccessDenied
+    Disabled
 }
