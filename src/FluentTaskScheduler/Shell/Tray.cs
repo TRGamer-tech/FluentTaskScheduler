@@ -1,16 +1,18 @@
 using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Settings;
+using FluentTaskScheduler.Snoozing;
 using FluentTaskScheduler.ViewModels;
 
 namespace FluentTaskScheduler.Shell;
 
 /// <summary>
 /// The app in the notification area, for as long as the setting for it is on: an icon that shows
-/// how many tasks are running, brings hidden windows back, and offers what can be done without a
-/// window.
+/// how many tasks are running and whether all of them are snoozed, brings hidden windows back,
+/// and offers what can be done without a window.
 /// </summary>
-internal sealed class Tray(WindowManager windows, ISettingsStore settings, ITaskStore store, IUiThread ui, TimeProvider time) : IDisposable
+internal sealed class Tray(WindowManager windows, ISettingsStore settings, ITaskStore store, ISnoozeService snooze, IUiThread ui, TimeProvider time)
+    : IDisposable
 {
     private static readonly TimeSpan CountInterval = TimeSpan.FromSeconds(10);
     private static readonly string IconFile = Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico");
@@ -23,6 +25,7 @@ internal sealed class Tray(WindowManager windows, ISettingsStore settings, ITask
     public void Start()
     {
         settings.Changed += OnSettingsChanged;
+        snooze.Changed += OnSnoozeChanged;
         Apply();
     }
 
@@ -30,6 +33,14 @@ internal sealed class Tray(WindowManager windows, ISettingsStore settings, ITask
     {
         if (change.Previous.EnableTrayIcon != change.Current.EnableTrayIcon || change.Previous.Language != change.Current.Language) ui.Post(Apply);
     }
+
+    // The service reports on whatever thread made the change.
+    private void OnSnoozeChanged(object? sender, EventArgs e) => ui.Post(() =>
+    {
+        if (_icon is null) return;
+        Redraw();
+        _icon.SetTooltip(Tooltip());
+    });
 
     private void Apply()
     {
@@ -51,8 +62,14 @@ internal sealed class Tray(WindowManager windows, ISettingsStore settings, ITask
             icon.Show();
             _counting = time.CreateTimer(_ => CountRunningTasks(), null, TimeSpan.Zero, CountInterval);
         }
-        _icon.SetTooltip(Loc.Get("App.WindowTitle"));
+        _icon.SetTooltip(Tooltip());
     }
+
+    /// <summary>The app's name and, while all tasks are snoozed, until when, on a line of its own. Windows shows at most 127 characters of it.</summary>
+    private string Tooltip() =>
+        snooze.State.Global is { } global
+            ? Loc.Get("App.WindowTitle") + "\n" + SnoozeText.AllTasks(global.Window, time)
+            : Loc.Get("App.WindowTitle");
 
     private List<TrayMenuItem> BuildMenu()
     {
@@ -65,10 +82,47 @@ internal sealed class Tray(WindowManager windows, ISettingsStore settings, ITask
         if (items.Count == 0) items.Add(new(Loc.Get("Tray.Open"), windows.ShowMainWindow));
 
         items.Add(TrayMenuItem.Separator);
+        items.AddRange(SnoozeItems());
+        items.Add(TrayMenuItem.Separator);
         items.Add(new(Loc.Get("Tray.NewWindow"), windows.OpenWindow));
         items.Add(TrayMenuItem.Separator);
         items.Add(new(Loc.Get("Tray.ExitAll"), windows.CloseAll));
         return items;
+    }
+
+    // While all tasks are snoozed: until when, as a greyed caption, and the way out. Otherwise: for how long.
+    private IEnumerable<TrayMenuItem> SnoozeItems()
+    {
+        if (snooze.State.Global is { } global)
+            return [new(SnoozeText.AllTasks(global.Window, time)), new(Loc.Get("Snooze.Menu.Resume"), () => _ = snooze.ResumeAllAsync())];
+
+        List<TrayMenuItem> lengths =
+        [
+            .. SnoozeChoice.All.Select(choice => new TrayMenuItem(choice.Label, () => SnoozeAll(choice.End))),
+            TrayMenuItem.Separator,
+            new(Loc.Get("Snooze.Duration.Custom"), ShowSnoozeDialog)
+        ];
+        return [new(Loc.Get("Snooze.Menu.SnoozeAll"), Children: lengths)];
+    }
+
+    private async void SnoozeAll(SnoozeEnd end)
+    {
+        try
+        {
+            await snooze.SnoozeAllAsync(end);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // Nothing was snoozed. The icon cannot say why; the window can.
+            windows.ShowMainWindow();
+            if (windows.MainShell is { } shell) await shell.ShowErrorAsync(Loc.Format("Snooze.Error.NotRecorded", ex.Message));
+        }
+    }
+
+    private void ShowSnoozeDialog()
+    {
+        windows.ShowMainWindow();
+        windows.MainShell?.ShowSnoozeDialog();
     }
 
     // Runs on a timer thread. Asking Task Scheduler directly keeps the number right whether or
@@ -95,7 +149,7 @@ internal sealed class Tray(WindowManager windows, ISettingsStore settings, ITask
         if (_icon is null) return;
         try
         {
-            _icon.SetIcon(TrayIconImage.Create(IconFile, _runningTasks, snoozed: false));
+            _icon.SetIcon(TrayIconImage.Create(IconFile, _runningTasks, snoozed: snooze.State.Global is not null));
         }
         catch (Exception ex) when (ex is IOException or ArgumentException or System.Runtime.InteropServices.ExternalException)
         {
@@ -114,6 +168,7 @@ internal sealed class Tray(WindowManager windows, ISettingsStore settings, ITask
     public void Dispose()
     {
         settings.Changed -= OnSettingsChanged;
+        snooze.Changed -= OnSnoozeChanged;
         Remove();
     }
 }

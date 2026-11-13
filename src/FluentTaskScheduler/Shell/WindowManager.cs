@@ -37,6 +37,9 @@ public sealed class WindowManager(IServiceProvider services, ISettingsStore sett
 
     public Window? MainWindow => _windows.FirstOrDefault()?.Window;
 
+    /// <summary>The frame of the first window, for what the notification area asks of a window.</summary>
+    public ShellPage? MainShell => _windows.FirstOrDefault()?.Shell;
+
     /// <summary>The hidden windows, in the order they were hidden.</summary>
     public IReadOnlyList<HiddenWindow> HiddenWindows =>
         _windows.Where(entry => entry.IsHidden).OrderBy(entry => entry.HiddenOrder)

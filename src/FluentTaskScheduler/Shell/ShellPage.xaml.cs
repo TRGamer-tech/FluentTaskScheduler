@@ -82,6 +82,16 @@ public sealed partial class ShellPage : Page, IShellNavigator
 
     public void ShowScriptEditor() => Navigate("ScriptEditor");
 
+    /// <summary>Switches to the task list and opens the dialog that snoozes all tasks until a moment of the user's choosing.</summary>
+    public void ShowSnoozeDialog()
+    {
+        Navigate("Tasks");
+        _ = _windowServices.GetRequiredService<TasksPage>().ShowSnoozeDialogAsync();
+    }
+
+    /// <summary>Tells the user in this window what went wrong elsewhere, e.g. in the notification area.</summary>
+    public Task ShowErrorAsync(string message) => _windowServices.GetRequiredService<IPrompts>().ShowErrorAsync(message);
+
     private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
         if (args.SelectedItem is not NavigationViewItem { Tag: string tag }) return;
