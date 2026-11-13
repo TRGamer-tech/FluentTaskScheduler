@@ -238,8 +238,8 @@ ended and, where that helps, its last lines.
   source code and to report a problem.
 
 Starting the app a second time brings its window back instead of opening a second copy. The window
-opens at the size it had last. A welcome tour comes up at the first start, and the release notes of a
-new version after an update.
+opens at the size it had last, and the task list on what you chose last: a folder, or all tasks. A
+welcome tour comes up at the first start, and the release notes of a new version after an update.
 
 ### Keyboard shortcuts
 

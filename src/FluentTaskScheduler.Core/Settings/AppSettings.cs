@@ -41,6 +41,12 @@ public sealed record AppSettings
 
     public int WindowWidth { get; init; } = DefaultWindowWidth;
     public int WindowHeight { get; init; } = DefaultWindowHeight;
+
+    /// <summary>
+    /// What the user chose last to see in the task list: the path of a folder, or "\" for the tasks
+    /// of all folders, as the default has always been. The root folder, whose path that is, is
+    /// written as "" instead.
+    /// </summary>
     public string LastFolderPath { get; init; } = "\\";
 
     /// <summary>App version whose release notes were last shown.</summary>
@@ -79,7 +85,7 @@ public sealed record AppSettings
     {
         Theme = Enum.IsDefined(Theme) ? Theme : AppTheme.Default,
         Language = Language?.Trim() ?? "",
-        LastFolderPath = string.IsNullOrWhiteSpace(LastFolderPath) ? "\\" : LastFolderPath,
+        LastFolderPath = LastFolderPath is "" or ['\\', ..] ? LastFolderPath : "\\",
         LastSeenVersion = LastSeenVersion ?? "",
         WindowWidth = WindowWidth >= 320 ? WindowWidth : DefaultWindowWidth,
         WindowHeight = WindowHeight >= 240 ? WindowHeight : DefaultWindowHeight,

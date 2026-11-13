@@ -147,7 +147,10 @@ public sealed class FakeTaskFolders(FakeTaskStore tasks, params string[] folders
     /// <summary>When set, every change fails with this, and changes nothing.</summary>
     public Exception? Fails { get; set; }
 
-    public IReadOnlyList<string> GetFolders() => _folders.ToList();
+    /// <summary>When set, listing the folders fails with this, as when the Task Scheduler service is not reachable.</summary>
+    public Exception? ListingFails { get; set; }
+
+    public IReadOnlyList<string> GetFolders() => ListingFails is { } failure ? throw failure : _folders.ToList();
 
     public void Create(string path)
     {

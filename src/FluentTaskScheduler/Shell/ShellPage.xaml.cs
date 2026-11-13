@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Settings;
@@ -52,6 +53,7 @@ public sealed partial class ShellPage : Page, IShellNavigator
 
         Folders.ViewModel = folders;
         SizeChanged += (_, e) => Folders.MaxHeight = Math.Max(120, e.NewSize.Height - HeightOfPaneEntries);
+        tasks.PropertyChanged += Tasks_PropertyChanged;
         Loaded += async (_, _) => await folders.ReloadAsync();
         Loaded += async (_, _) => await windowServices.GetRequiredService<StartupFlow>().RunAsync();
     }
@@ -61,6 +63,18 @@ public sealed partial class ShellPage : Page, IShellNavigator
 
     /// <summary>Tag of the page that is showing.</summary>
     public string CurrentPage { get; private set; } = "";
+
+    /// <summary>
+    /// Shows the page with the given tag in a window that has just been built. The task list shows
+    /// what the user chose last, in this window or another: the tasks of one folder, or of all.
+    /// </summary>
+    public void Open(string tag)
+    {
+        _folders.ShowLastChoice();
+        // The task list of one folder is no entry of the pane.
+        if (tag == "Tasks" && _tasks.FolderPath is not null) Show(tag);
+        else Navigate(tag);
+    }
 
     /// <summary>Shows the page with the given tag and selects its entry in the pane.</summary>
     public void Navigate(string tag)
@@ -149,6 +163,13 @@ public sealed partial class ShellPage : Page, IShellNavigator
         Show("Tasks");
     }
 
+    // The list also falls back to all tasks by itself: when the folder it shows is gone, or to show
+    // a task of another folder. The pane's entry for all tasks is then selected as well.
+    private void Tasks_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(TasksViewModel.FolderPath) && _tasks.FolderPath is null && CurrentPage == "Tasks") NavView.SelectedItem = NavAllTasks;
+    }
+
     private void Show(string tag)
     {
         if (tag == CurrentPage) return;
@@ -176,9 +197,16 @@ public sealed partial class ShellPage : Page, IShellNavigator
 
     private async void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
     {
-        if (!ReferenceEquals(args.InvokedItemContainer, NavAdd)) return;
-        Navigate("Tasks");
-        await _windowServices.GetRequiredService<TasksPage>().CreateTaskAsync();
+        if (ReferenceEquals(args.InvokedItemContainer, NavAllTasks))
+        {
+            // Unlike selecting the entry from code, as showing a task does, this is the user's choice.
+            _folders.ChooseAllTasks();
+        }
+        else if (ReferenceEquals(args.InvokedItemContainer, NavAdd))
+        {
+            Navigate("Tasks");
+            await _windowServices.GetRequiredService<TasksPage>().CreateTaskAsync();
+        }
     }
 
     // The area next to the pane normally sits one layer above the window background. OLED mode

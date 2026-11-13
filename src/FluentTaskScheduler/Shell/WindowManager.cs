@@ -179,7 +179,7 @@ public sealed class WindowManager(IServiceProvider services, ISettingsStore sett
         shell.Loaded += (_, _) => WindowTheme.Apply(entry.Window, shell, settings.Current);
         shell.ActualThemeChanged += (_, _) => WindowTheme.Apply(entry.Window, shell, settings.Current);
         WindowTheme.Apply(entry.Window, shell, settings.Current);
-        shell.Navigate(page);
+        shell.Open(page);
     }
 
     private static string TitleOf(int number)

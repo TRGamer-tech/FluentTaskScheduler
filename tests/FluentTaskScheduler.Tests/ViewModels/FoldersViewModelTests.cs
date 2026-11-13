@@ -16,6 +16,7 @@ public sealed class FoldersViewModelTests : IDisposable
     private readonly FakeTimeProvider _time = new();
     private readonly FakeSnoozeService _snooze = new();
     private readonly SettingsStore _settings;
+    private readonly List<TasksViewModel> _opened = [];
     private readonly TasksViewModel _tasks;
     private readonly FoldersViewModel _folders;
 
@@ -23,18 +24,34 @@ public sealed class FoldersViewModelTests : IDisposable
     {
         _settings = new SettingsStore(_folder.Paths, _time);
         _taskFolders = new FakeTaskFolders(_store, @"\Jobs", @"\Jobs\Nightly", @"\Reports");
-        var files = new ScriptedFilePicker();
-        _tasks = new TasksViewModel(_store, new TaskRunner(_store, new FakeSnoozeGate(), new RecordingNotifier()), _settings, _prompts, files, _app,
-            new InlineUiThread(), _time, new TaskEditorFactory(_store, _settings, _app, files, new FakeNetworkProfiles(), _time, _snooze), _taskFolders,
-            new FakeTaskEventStream(), _snooze);
-        _folders = new FoldersViewModel(_taskFolders, _tasks, _prompts, _app, _snooze);
+        (_tasks, _folders) = NewWindow();
     }
 
     public void Dispose()
     {
-        _tasks.Dispose();
+        foreach (TasksViewModel tasks in _opened) tasks.Dispose();
         _settings.Dispose();
         _folder.Dispose();
+    }
+
+    /// <summary>The task list and the folder tree of a window. All windows share the settings, as in the app.</summary>
+    private (TasksViewModel Tasks, FoldersViewModel Folders) NewWindow()
+    {
+        var files = new ScriptedFilePicker();
+        var tasks = new TasksViewModel(_store, new TaskRunner(_store, new FakeSnoozeGate(), new RecordingNotifier()), _settings, _prompts, files, _app,
+            new InlineUiThread(), _time, new TaskEditorFactory(_store, _settings, _app, files, new FakeNetworkProfiles(), _time, _snooze), _taskFolders,
+            new FakeTaskEventStream(), _snooze);
+        _opened.Add(tasks);
+        return (tasks, new FoldersViewModel(_taskFolders, tasks, _settings, _prompts, _app, _snooze));
+    }
+
+    /// <summary>Opens a window the way the app does: on what the user chose last, with the folders read.</summary>
+    private async Task<(TasksViewModel Tasks, FoldersViewModel Folders)> OpenWindowAsync()
+    {
+        var window = NewWindow();
+        window.Folders.ShowLastChoice();
+        await window.Folders.ReloadAsync();
+        return window;
     }
 
     private FolderNode Node(string path) => Find(_folders.Roots, path) ?? throw new InvalidOperationException($"No node for {path}.");
@@ -337,5 +354,163 @@ public sealed class FoldersViewModelTests : IDisposable
         await _tasks.MoveToFolderAsync(null, @"\Jobs");
 
         Assert.Equal([@"MoveTask \A -> \Jobs", @"MoveTask \C -> \Jobs"], _taskFolders.Calls);
+    }
+
+    [Fact]
+    public async Task AFolderPickedInTheTree_IsWhereTheNextWindowOpens_WithTheTreeOpenedUpToIt()
+    {
+        await _folders.ReloadAsync();
+
+        _folders.Choose(Node(@"\Jobs\Nightly"));
+
+        var (tasks, folders) = await OpenWindowAsync();
+        Assert.Equal(@"\Jobs\Nightly", tasks.FolderPath);
+        Assert.Equal(@"\Jobs\Nightly", folders.Selected?.Path);
+        Assert.True(Find(folders.Roots, @"\Jobs")!.IsExpanded);
+    }
+
+    [Fact]
+    public async Task MovingTheTreesSelectionToAFolder_IsAChoiceToo()
+    {
+        await _folders.ReloadAsync();
+
+        // As the tree does when its selection moves without the folder being invoked, by a screen
+        // reader for one.
+        _folders.Selected = Node(@"\Reports");
+
+        Assert.Equal(@"\Reports", _settings.Current.LastFolderPath);
+    }
+
+    [Fact]
+    public async Task ChoosingAllTasks_IsRememberedAsWell()
+    {
+        await _folders.ReloadAsync();
+        _folders.Choose(Node(@"\Jobs"));
+
+        _folders.ChooseAllTasks();
+
+        Assert.Null(_tasks.FolderPath);
+        Assert.Null(_folders.Selected);
+        var (tasks, folders) = await OpenWindowAsync();
+        Assert.Null(tasks.FolderPath);
+        Assert.Null(folders.Selected);
+    }
+
+    [Fact]
+    public async Task WhatEarlierVersionsSaved_OpensOnAllTasks_AsTheFirstStartDoes()
+    {
+        // The default, and so what a settings file of an earlier version holds, unless version 1.9
+        // remembered a folder there.
+        _settings.Update(s => s with { LastFolderPath = "\\" });
+
+        var (tasks, folders) = await OpenWindowAsync();
+
+        Assert.Null(tasks.FolderPath);
+        Assert.Null(folders.Selected);
+    }
+
+    [Fact]
+    public async Task TheRootFolder_IsRememberedApartFromAllTasks()
+    {
+        await _folders.ReloadAsync();
+
+        _folders.Choose(Node("\\"));
+
+        var (tasks, folders) = await OpenWindowAsync();
+        Assert.Equal("\\", tasks.FolderPath);
+        Assert.True(folders.Selected?.IsRoot);
+    }
+
+    [Fact]
+    public async Task AChosenFolderThatIsGone_OpensAsAllTasks_AndIsForgotten()
+    {
+        _settings.Update(s => s with { LastFolderPath = @"\Archive" });
+
+        var (tasks, folders) = await OpenWindowAsync();
+
+        Assert.Null(tasks.FolderPath);
+        Assert.Null(folders.Selected);
+        Assert.Equal("\\", _settings.Current.LastFolderPath);
+    }
+
+    [Fact]
+    public async Task WhileTheFoldersCannotBeRead_TheChosenFolderIsShownAndKept()
+    {
+        _settings.Update(s => s with { LastFolderPath = @"\Jobs" });
+        _taskFolders.ListingFails = new InvalidOperationException("The Task Scheduler service is not available.");
+
+        var (tasks, _) = await OpenWindowAsync();
+
+        Assert.Equal(@"\Jobs", tasks.FolderPath);
+        Assert.Equal(@"\Jobs", _settings.Current.LastFolderPath);
+    }
+
+    [Fact]
+    public async Task RenamingTheChosenFolderOrOneItIsIn_TakesTheChoiceAlong_WhicheverWindowDoesIt()
+    {
+        var (_, other) = await OpenWindowAsync();
+        await _folders.ReloadAsync();
+        _folders.Choose(Node(@"\Jobs\Nightly"));
+        _prompts.Text = "Work";
+
+        await other.RenameAsync(Find(other.Roots, @"\Jobs")!);
+
+        Assert.Equal(@"\Work\Nightly", _settings.Current.LastFolderPath);
+    }
+
+    [Fact]
+    public async Task DeletingTheChosenFolderOrOneItIsIn_ForgetsTheChoice()
+    {
+        await _folders.ReloadAsync();
+        _folders.Choose(Node(@"\Jobs\Nightly"));
+
+        await _folders.DeleteAsync(Node(@"\Reports"));
+        Assert.Equal(@"\Jobs\Nightly", _settings.Current.LastFolderPath);
+
+        await _folders.DeleteAsync(Node(@"\Jobs"));
+        Assert.Equal("\\", _settings.Current.LastFolderPath); // all tasks
+        Assert.Equal("\\", _tasks.FolderPath); // the root folder, which held \Jobs
+    }
+
+    [Fact]
+    public async Task RevealingATaskOfAnotherFolder_LeavesTheUsersChoiceAsItWas()
+    {
+        await _folders.ReloadAsync();
+        _folders.Choose(Node(@"\Jobs"));
+
+        _folders.Reveal(@"\Reports\Monthly");
+
+        var (tasks, _) = await OpenWindowAsync();
+        Assert.Equal(@"\Jobs", tasks.FolderPath);
+    }
+
+    [Fact]
+    public async Task OfTwoWindows_TheLatestChoiceCounts_EvenOfAFolderShownAlready()
+    {
+        await _folders.ReloadAsync();
+        _folders.Choose(Node(@"\Jobs"));
+        var (otherTasks, other) = await OpenWindowAsync();
+
+        other.Choose(Find(other.Roots, @"\Reports")!);
+        Assert.Equal(@"\Jobs", _tasks.FolderPath);
+        Assert.Equal(@"\Reports", _settings.Current.LastFolderPath);
+
+        _folders.Choose(Node(@"\Jobs"));
+        Assert.Equal(@"\Reports", otherTasks.FolderPath);
+        Assert.Equal(@"\Jobs", _settings.Current.LastFolderPath);
+    }
+
+    [Fact]
+    public async Task ReadingTheFoldersAgain_IsNoChoice()
+    {
+        await _folders.ReloadAsync();
+        _folders.Choose(Node(@"\Jobs"));
+        var (_, other) = await OpenWindowAsync();
+        other.Choose(Find(other.Roots, @"\Reports")!);
+
+        await _folders.ReloadAsync();
+
+        Assert.Equal(@"\Jobs", _folders.Selected?.Path);
+        Assert.Equal(@"\Reports", _settings.Current.LastFolderPath);
     }
 }

@@ -157,6 +157,21 @@ public sealed class SettingsStoreTests : IDisposable
         Assert.Equal(["Work", "Home"], store.Current.SavedCategories);
     }
 
+    [Theory]
+    [InlineData(@"\Backups", @"\Backups")]
+    [InlineData("\\", "\\")]
+    [InlineData("", "")]
+    [InlineData("Backups", "\\")]
+    [InlineData(null, "\\")]
+    public void TheLastFolder_IsAFolderPath_OrEmptyForTheRootFolder_AndAnythingElseMeansAllTasks(string? stored, string expected)
+    {
+        using var store = NewStore();
+
+        store.Update(s => s with { LastFolderPath = stored! });
+
+        Assert.Equal(expected, store.Current.LastFolderPath);
+    }
+
     [Fact]
     public void ExportThenImport_CarriesThePreferencesOver_ButNotTheWindowOfTheOtherMachine()
     {

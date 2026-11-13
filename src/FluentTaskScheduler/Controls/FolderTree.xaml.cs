@@ -26,7 +26,7 @@ public sealed partial class FolderTree : UserControl
     private void Tree_ItemInvoked(TreeView sender, TreeViewItemInvokedEventArgs args)
     {
         if (args.InvokedItem is not FolderNode folder || ViewModel is not { } viewModel) return;
-        viewModel.Selected = folder;
+        viewModel.Choose(folder);
         FolderChosen?.Invoke(this, EventArgs.Empty);
     }
 
