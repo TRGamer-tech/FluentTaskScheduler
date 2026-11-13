@@ -1114,4 +1114,5 @@ Jetzt App neustarten?</value></data>
   <data name="Templates.Tag.Power" xml:space="preserve"><value>Energie</value></data>
   <data name="Templates.Tag.Battery" xml:space="preserve"><value>Akku</value></data>
   <data name="Templates.Tag.Display" xml:space="preserve"><value>Bildschirm</value></data>
+  <data name="Dashboard.Tasks.Unavailable" xml:space="preserve"><value>Die Aufgaben konnten nicht gelesen werden: {0}</value></data>
 </root>

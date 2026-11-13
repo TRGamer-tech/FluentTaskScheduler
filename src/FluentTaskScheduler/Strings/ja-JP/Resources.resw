@@ -1114,4 +1114,5 @@
   <data name="Templates.Tag.Power" xml:space="preserve"><value>電源</value></data>
   <data name="Templates.Tag.Battery" xml:space="preserve"><value>バッテリー</value></data>
   <data name="Templates.Tag.Display" xml:space="preserve"><value>ディスプレイ</value></data>
+  <data name="Dashboard.Tasks.Unavailable" xml:space="preserve"><value>タスクを読み取れませんでした: {0}</value></data>
 </root>

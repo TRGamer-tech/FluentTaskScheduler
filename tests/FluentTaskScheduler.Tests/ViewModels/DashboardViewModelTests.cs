@@ -516,7 +516,7 @@ public sealed class DashboardViewModelTests : IDisposable
 
         await _dashboard.ShowAsync();
 
-        Assert.Equal("The Task Scheduler service is not available.", _dashboard.Problem);
+        Assert.Equal("Dashboard.Tasks.Unavailable", _dashboard.Problem);
         Assert.Equal(7, Figures.SucceededRuns);
 
         _store.ListingFails = null;

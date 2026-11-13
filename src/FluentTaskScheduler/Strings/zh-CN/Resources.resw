@@ -1117,6 +1117,7 @@
   <data name="Templates.Tag.Power" xml:space="preserve"><value>电源</value></data>
   <data name="Templates.Tag.Battery" xml:space="preserve"><value>电池</value></data>
   <data name="Templates.Tag.Display" xml:space="preserve"><value>显示器</value></data>
+  <data name="Dashboard.Tasks.Unavailable" xml:space="preserve"><value>无法读取任务：{0}</value></data>
 </root>
 
 

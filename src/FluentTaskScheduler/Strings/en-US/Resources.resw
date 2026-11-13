@@ -1114,5 +1114,6 @@ Restart now to apply the update?</value></data>
   <data name="Templates.Tag.Power" xml:space="preserve"><value>power</value></data>
   <data name="Templates.Tag.Battery" xml:space="preserve"><value>battery</value></data>
   <data name="Templates.Tag.Display" xml:space="preserve"><value>display</value></data>
+  <data name="Dashboard.Tasks.Unavailable" xml:space="preserve"><value>The tasks could not be read: {0}</value></data>
 </root>
 

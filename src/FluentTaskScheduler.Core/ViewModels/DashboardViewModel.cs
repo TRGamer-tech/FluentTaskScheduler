@@ -300,7 +300,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         {
             // Whatever Task Scheduler answered: the dashboard keeps the tasks it had and says why.
             Serilog.Log.Error(ex, "The tasks could not be read for the dashboard");
-            TasksProblem = ex.Message;
+            TasksProblem = Loc.Format("Dashboard.Tasks.Unavailable", ex.Message);
             return;
         }
 
