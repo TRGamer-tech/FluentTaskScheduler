@@ -49,6 +49,7 @@ public interface ISnoozeService
     /// </summary>
     /// <exception cref="IOException">The snooze could not be recorded on disk; nothing was changed.</exception>
     /// <exception cref="UnauthorizedAccessException">As for <see cref="IOException"/>.</exception>
+    /// <exception cref="System.Runtime.InteropServices.COMException">Task Scheduler could not list the tasks to disable; nothing was changed.</exception>
     Task SnoozeAllAsync(SnoozeEnd end);
 
     /// <summary>Ends the snooze of all tasks now. A task that is also snoozed on its own stays snoozed.</summary>
@@ -62,6 +63,7 @@ public interface ISnoozeService
     /// <exception cref="TaskAccessDeniedException">Windows refused to disable the task; it is not snoozed.</exception>
     /// <exception cref="IOException">The snooze could not be recorded on disk; nothing was changed.</exception>
     /// <exception cref="UnauthorizedAccessException">As for <see cref="IOException"/>.</exception>
+    /// <exception cref="System.Runtime.InteropServices.COMException">Task Scheduler answered with another error; the task is not snoozed.</exception>
     Task<SnoozeTaskOutcome> SnoozeTaskAsync(string taskPath, SnoozeEnd end);
 
     /// <summary>Ends the task's own snooze now. The task stays disabled while a snooze of all tasks still covers it.</summary>

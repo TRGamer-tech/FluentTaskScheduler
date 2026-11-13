@@ -111,11 +111,11 @@ internal sealed class Tray(WindowManager windows, ISettingsStore settings, ITask
         {
             await snooze.SnoozeAllAsync(end);
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        catch (Exception ex) when (SnoozeText.WhyNotSnoozed(ex) is { } why)
         {
             // Nothing was snoozed. The icon cannot say why; the window can.
             windows.ShowMainWindow();
-            if (windows.MainShell is { } shell) await shell.ShowErrorAsync(Loc.Format("Snooze.Error.NotRecorded", ex.Message));
+            if (windows.MainShell is { } shell) await shell.ShowErrorAsync(why);
         }
     }
 

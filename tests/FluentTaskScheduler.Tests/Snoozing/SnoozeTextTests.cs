@@ -89,6 +89,14 @@ public sealed class SnoozeTextTests : IDisposable
         Assert.Equal("Snoozed until restart or sign-out", SnoozeText.OneTask(SnoozeWindow.UntilRestart, _time));
     }
 
+    /// <summary>A mistake of the app has to reach its crash report, not pass for a snooze that could not be saved.</summary>
+    [Fact]
+    public void AnExceptionThatIsNoFailureOfASnooze_IsNotWordedAsOne()
+    {
+        Assert.Null(SnoozeText.WhyNotSnoozed(new InvalidOperationException("Collection was modified.")));
+        Assert.Null(SnoozeText.WhyNotSnoozed(new NullReferenceException()));
+    }
+
     /// <summary>That the other languages have the same texts with the same placeholders is checked for all texts at once.</summary>
     [Fact]
     public void TheTextsTheStatusIsMadeOf_Exist_WithAPlaceForTheTimeWhereOneIsGiven()

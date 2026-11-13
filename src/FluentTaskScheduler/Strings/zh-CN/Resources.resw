@@ -1098,6 +1098,7 @@
   <data name="Main.Status.Ready" xml:space="preserve"><value>就绪</value></data>
   <data name="Main.Status.Queued" xml:space="preserve"><value>已排队</value></data>
   <data name="Main.Status.Unknown" xml:space="preserve"><value>状态未知</value></data>
+  <data name="Snooze.Error.TaskScheduler" xml:space="preserve"><value>任务计划程序报告了错误，因此未暂停任何任务。{0}</value></data>
 </root>
 
 

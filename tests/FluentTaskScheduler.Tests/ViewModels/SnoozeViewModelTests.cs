@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Settings;
 using FluentTaskScheduler.Snoozing;
@@ -31,6 +32,7 @@ public sealed class SnoozeViewModelTests : IDisposable
         Loc.Use(key => key switch
         {
             "Snooze.Error.NotRecorded" => "Not saved. {0}",
+            "Snooze.Error.TaskScheduler" => "Task Scheduler failed. {0}",
             "Snooze.Restore.MessageFormat" => "Still disabled: {0}",
             "Snooze.Restore.MoreFormat" => "{0} and {1} more",
             "Snooze.Unreadable.MessageFormat" => "Kept as {0}",
@@ -112,6 +114,16 @@ public sealed class SnoozeViewModelTests : IDisposable
         await _snooze.SnoozeCommand.ExecuteAsync(SnoozeChoice.OneHour);
 
         Assert.Equal(["Error: Not saved. There is not enough space on the disk."], _prompts.Shown);
+    }
+
+    [Fact]
+    public async Task ASnoozeThatTaskSchedulerFails_IsReported_WithItsAnswer()
+    {
+        _service.Fails = new COMException("The RPC server is unavailable.");
+
+        await _snooze.SnoozeCommand.ExecuteAsync(SnoozeChoice.OneHour);
+
+        Assert.Equal(["Error: Task Scheduler failed. The RPC server is unavailable."], _prompts.Shown);
     }
 
     [Fact]

@@ -122,9 +122,9 @@ public sealed partial class SnoozeViewModel : ObservableObject, IDisposable
             await _snooze.SnoozeAllAsync(end);
             return null;
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        catch (Exception ex) when (SnoozeText.WhyNotSnoozed(ex) is { } why)
         {
-            return Loc.Format("Snooze.Error.NotRecorded", ex.Message);
+            return why;
         }
     }
 

@@ -1095,4 +1095,5 @@
   <data name="Main.Status.Ready" xml:space="preserve"><value>準備完了</value></data>
   <data name="Main.Status.Queued" xml:space="preserve"><value>キューに登録済み</value></data>
   <data name="Main.Status.Unknown" xml:space="preserve"><value>状態不明</value></data>
+  <data name="Snooze.Error.TaskScheduler" xml:space="preserve"><value>タスクスケジューラがエラーを返したため、何もスヌーズされていません。{0}</value></data>
 </root>

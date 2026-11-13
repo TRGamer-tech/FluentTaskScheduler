@@ -1095,4 +1095,5 @@ Jetzt App neustarten?</value></data>
   <data name="Main.Status.Ready" xml:space="preserve"><value>Bereit</value></data>
   <data name="Main.Status.Queued" xml:space="preserve"><value>In Warteschlange</value></data>
   <data name="Main.Status.Unknown" xml:space="preserve"><value>Status unbekannt</value></data>
+  <data name="Snooze.Error.TaskScheduler" xml:space="preserve"><value>Die Aufgabenplanung hat einen Fehler gemeldet, deshalb wurde nichts pausiert. {0}</value></data>
 </root>

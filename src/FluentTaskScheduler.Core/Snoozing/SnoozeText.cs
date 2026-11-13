@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.InteropServices;
 using FluentTaskScheduler.Localization;
 
 namespace FluentTaskScheduler.Snoozing;
@@ -20,6 +21,17 @@ public static class SnoozeText
         window.Until is { } until
             ? Loc.Format("Task.Snooze.Status", EndTime(until, time))
             : Loc.Get("Task.Snooze.UntilRestart");
+
+    /// <summary>
+    /// Why the snooze of all tasks did not start, for the failures of
+    /// <see cref="ISnoozeService.SnoozeAllAsync"/>; null for any other exception.
+    /// </summary>
+    public static string? WhyNotSnoozed(Exception failure) => failure switch
+    {
+        IOException or UnauthorizedAccessException => Loc.Format("Snooze.Error.NotRecorded", failure.Message),
+        COMException => Loc.Format("Snooze.Error.TaskScheduler", failure.Message),
+        _ => null
+    };
 
     /// <summary>The time alone for an end later today; date and time for an end on another day.</summary>
     private static string EndTime(DateTimeOffset until, TimeProvider time)

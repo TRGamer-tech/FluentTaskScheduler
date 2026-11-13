@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -393,6 +394,11 @@ public sealed partial class TaskDetailsViewModel : ObservableObject, IDisposable
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             return Loc.Format("Snooze.Error.NotRecorded", ex.Message);
+        }
+        catch (Exception ex) when (ex is COMException or InvalidOperationException)
+        {
+            // Any other answer of Task Scheduler, worded as the task list words it.
+            return $"{Row.Name}: {ex.Message}";
         }
     }
 

@@ -1095,5 +1095,6 @@ Restart now to apply the update?</value></data>
   <data name="Main.Status.Ready" xml:space="preserve"><value>Ready</value></data>
   <data name="Main.Status.Queued" xml:space="preserve"><value>Queued</value></data>
   <data name="Main.Status.Unknown" xml:space="preserve"><value>State unknown</value></data>
+  <data name="Snooze.Error.TaskScheduler" xml:space="preserve"><value>Task Scheduler reported an error, so nothing was snoozed. {0}</value></data>
 </root>
 

@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using FluentTaskScheduler.History;
 using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Snoozing;
@@ -304,6 +305,16 @@ public sealed class TaskDetailsViewModelTests : IDisposable
         _snooze.Fails = new IOException("There is not enough space on the disk.");
         await _details.SnoozeCommand.ExecuteAsync(SnoozeChoice.OneHour);
         Assert.Equal("Snooze.Error.NotRecorded", _details.SnoozeProblem);
+    }
+
+    [Fact]
+    public async Task AnyOtherErrorOfTaskScheduler_IsShownAsAProblemOfTheTask()
+    {
+        _snooze.Fails = new COMException("The task image is corrupt or has been tampered with.", unchecked((int)0x80041321));
+
+        await _details.SnoozeCommand.ExecuteAsync(SnoozeChoice.OneHour);
+
+        Assert.Equal("Backup: The task image is corrupt or has been tampered with.", _details.SnoozeProblem);
     }
 
     [Fact]
