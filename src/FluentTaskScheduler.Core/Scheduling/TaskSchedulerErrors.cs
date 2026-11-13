@@ -15,7 +15,6 @@ internal static class TaskSchedulerErrors
         for (var e = ex; e != null; e = e.InnerException)
         {
             if (e.HResult == E_ACCESSDENIED) return true;
-            if (e is System.Runtime.InteropServices.COMException com && com.ErrorCode == E_ACCESSDENIED) return true;
         }
         return false;
     }
