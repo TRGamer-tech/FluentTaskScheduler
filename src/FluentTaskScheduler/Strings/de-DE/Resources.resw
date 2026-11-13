@@ -1073,7 +1073,7 @@ Jetzt App neustarten?</value></data>
   <data name="Snooze.Restore.MessageFormat" xml:space="preserve"><value>Eine Pause ist zu Ende, doch diese Aufgaben konnten nicht wieder aktiviert werden: {0}</value></data>
   <data name="Snooze.Restore.MoreFormat" xml:space="preserve"><value>{0} und {1} weitere</value></data>
   <data name="Snooze.Restore.AccessDenied" xml:space="preserve"><value>Windows hat den Zugriff verweigert. Eine Aufgabe, die pausiert wurde, während die App als Administrator lief, lässt sich nur mit Administratorrechten wieder aktivieren.</value></data>
-  <data name="Snooze.Unreadable.MessageFormat" xml:space="preserve"><value>Aufgaben, die eine frühere Pause deaktiviert hat, sind womöglich noch deaktiviert, ohne hier zu erscheinen. Ihre Aufzeichnung konnte nicht gelesen werden und wurde als {0} aufbewahrt.</value></data>
+  <data name="Snooze.Unreadable.MessageFormat" xml:space="preserve"><value>Aufgaben, die eine frühere Pause deaktiviert hat, sind womöglich noch deaktiviert, ohne hier zu erscheinen. Die Aufzeichnung darüber konnte nicht gelesen werden und wurde als {0} aufbewahrt.</value></data>
   <data name="Snooze.Dialog.Until" xml:space="preserve"><value>Alle Aufgaben pausieren bis:</value></data>
   <data name="Task.Snooze.AlreadyDisabled" xml:space="preserve"><value>Diese Aufgabe ist bereits deaktiviert. Eine Pause würde sie an ihrem Ende aktivieren, deshalb bleibt die Aufgabe, wie sie ist.</value></data>
   <data name="Snooze.Restore.Title" xml:space="preserve"><value>Einige Aufgaben sind noch deaktiviert</value></data>
