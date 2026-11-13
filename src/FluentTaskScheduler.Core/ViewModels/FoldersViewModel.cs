@@ -140,7 +140,7 @@ public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewMode
             await prompts.ShowErrorAsync(Describe(folder.Name, ex));
             return;
         }
-        await AfterChangeAsync(folder.Path, TaskPaths.ParentOf(folder.Path));
+        await AfterChangeAsync(folder.Path, newPath: null);
     }
 
     private async Task MoveAsync(FolderNode folder, string newPath)
@@ -171,11 +171,16 @@ public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewMode
         if (problems.Count > 0) await prompts.ShowErrorAsync(string.Join(Environment.NewLine, problems));
     }
 
-    // The list may be showing the folder that just went away, or one inside it.
-    private async Task AfterChangeAsync(string oldPath, string replacement)
+    /// <summary>
+    /// Brings everything up to date after the folder at <paramref name="oldPath"/> moved to
+    /// <paramref name="newPath"/>, or was deleted when that is null. The list may be showing the
+    /// folder or one inside it: it moves along, or falls back to the folder that held the deleted
+    /// one.
+    /// </summary>
+    private async Task AfterChangeAsync(string oldPath, string? newPath)
     {
         if (tasks.FolderPath is { } shown && TaskPaths.IsWithin(shown, oldPath))
-            tasks.FolderPath = replacement + shown[oldPath.Length..];
+            tasks.FolderPath = newPath is null ? TaskPaths.ParentOf(oldPath) : newPath + shown[oldPath.Length..];
         if (Selected is { } selected && TaskPaths.IsWithin(selected.Path, oldPath)) Selected = null;
 
         await ReloadAsync();

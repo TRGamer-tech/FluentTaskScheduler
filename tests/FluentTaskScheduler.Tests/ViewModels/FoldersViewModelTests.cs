@@ -269,6 +269,20 @@ public sealed class FoldersViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task DeletingAFolderTheShownOneIsIn_FallsBackToTheFolderThatHeldIt_NotToANamesake()
+    {
+        _taskFolders.Create(@"\Jobs\Nightly\Late");
+        _taskFolders.Create(@"\Jobs\Late");
+        await _folders.ReloadAsync();
+        _folders.Selected = Node(@"\Jobs\Nightly\Late");
+
+        await _folders.DeleteAsync(Node(@"\Jobs\Nightly"));
+
+        Assert.Equal(@"\Jobs", _tasks.FolderPath);
+        Assert.Equal(@"\Jobs", _folders.Selected?.Path);
+    }
+
+    [Fact]
     public async Task TheLibraryItself_CanNeitherBeRenamedNorDeleted()
     {
         await _folders.ReloadAsync();
