@@ -52,14 +52,39 @@ public sealed class AppSession : IDisposable
 
     public bool HasExited => _app.HasExited;
 
+    /// <summary>
+    /// Finds an element by walking the tree child by child. UI Automation's own descendant search
+    /// does not reach into the WinUI content island reliably, while a manual walk does.
+    /// </summary>
+    public AutomationElement? Find(Func<AutomationElement, bool> predicate, int timeoutMs = 5000) =>
+        Retry.WhileNull(() => Walk(Window).FirstOrDefault(e => Matches(e, predicate)),
+            TimeSpan.FromMilliseconds(timeoutMs), TimeSpan.FromMilliseconds(250)).Result;
+
     public AutomationElement? Find(string automationId, int timeoutMs = 5000) =>
-        Retry.WhileNull(() => Window.FindFirstDescendant(cf => cf.ByAutomationId(automationId)),
-            TimeSpan.FromMilliseconds(timeoutMs), TimeSpan.FromMilliseconds(200)).Result;
+        Find(e => e.AutomationId == automationId, timeoutMs);
 
     public AutomationElement? FindByName(string name, ControlType? type = null, int timeoutMs = 5000) =>
-        Retry.WhileNull(() => Window.FindFirstDescendant(cf =>
-                type is { } t ? cf.ByName(name).And(cf.ByControlType(t)) : cf.ByName(name)),
-            TimeSpan.FromMilliseconds(timeoutMs), TimeSpan.FromMilliseconds(200)).Result;
+        Find(e => e.Name == name && (type is null || e.ControlType == type), timeoutMs);
+
+    private static bool Matches(AutomationElement element, Func<AutomationElement, bool> predicate)
+    {
+        try { return predicate(element); }
+        catch { return false; } // properties of elements that just went away throw
+    }
+
+    private static IEnumerable<AutomationElement> Walk(AutomationElement root)
+    {
+        var queue = new Queue<AutomationElement>();
+        queue.Enqueue(root);
+        while (queue.Count > 0)
+        {
+            var element = queue.Dequeue();
+            yield return element;
+            AutomationElement[] children;
+            try { children = element.FindAllChildren(); } catch { continue; }
+            foreach (var child in children) queue.Enqueue(child);
+        }
+    }
 
     public AutomationElement Require(string automationId, int timeoutMs = 10000) =>
         Find(automationId, timeoutMs) ?? throw new InvalidOperationException($"Element '{automationId}' was not found.");

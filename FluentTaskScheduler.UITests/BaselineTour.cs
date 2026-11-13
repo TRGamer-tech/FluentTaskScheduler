@@ -32,37 +32,46 @@ public class BaselineTour
             Thread.Sleep(400);
         }
 
-        // Any other startup dialog (What's New, update prompt, crash dialog): record and close it.
-        for (int i = 0; i < 4; i++)
-        {
-            var dialog = app.Window.FindFirstDescendant(cf => cf.ByControlType(ControlType.Window));
-            if (dialog == null) break;
-            app.Log($"startup dialog: '{dialog.Name}' class '{dialog.ClassName}'");
-            app.Snapshot($"startup-dialog-{i}");
-            var close = dialog.FindFirstDescendant(cf => cf.ByAutomationId("CloseButton"))
-                        ?? dialog.FindFirstDescendant(cf => cf.ByAutomationId("PrimaryButton"));
-            if (close == null) { Keyboard.Type(FlaUI.Core.WindowsAPI.VirtualKeyShort.ESCAPE); }
-            else close.AsButton().Invoke();
-            Thread.Sleep(800);
-        }
-
         app.Snapshot("main");
 
-        foreach (string nav in new[] { "NavDashboard", "NavQuickActions", "NavScriptLibrary", "NavScriptEditor", "NavSettings", "NavAllTasks" })
+        foreach (string nav in new[] { "NavDashboard", "NavQuickActions", "NavScriptLibrary", "NavScriptEditor", "NavSettings" })
         {
-            var item = app.Find(nav);
-            if (item == null) { app.Log($"nav item {nav} not found"); continue; }
-            item.Click();
-            Thread.Sleep(1500);
-            app.Log($"navigated via {nav}; exited={app.HasExited}");
-            app.Snapshot(nav);
+            Visit(app, nav);
+        }
+
+        foreach (string section in new[] { "NavNotificationsItem", "NavSystemItem", "NavAdvancedItem", "NavCategoriesItem", "NavAboutItem" })
+        {
+            Visit(app, section);
+        }
+
+        Visit(app, "NavAllTasks");
+
+        // Task details dialog of the first task in the list
+        var firstTask = app.Find(e => e.ControlType == ControlType.ListItem && e.Parent?.AutomationId == "TaskListView");
+        if (firstTask != null)
+        {
+            firstTask.Click();
+            Thread.Sleep(2500);
+            app.Snapshot("task-details");
+            Keyboard.Type(FlaUI.Core.WindowsAPI.VirtualKeyShort.ESCAPE);
+            Thread.Sleep(800);
         }
 
         // New task editor
         var add = app.Find("NavAdd");
         add?.Click();
-        Thread.Sleep(1500);
+        Thread.Sleep(2000);
         app.Snapshot("new-task-editor");
+        var scroller = app.Find("EditScrollViewer", 2000);
+        if (scroller != null)
+        {
+            for (int page = 1; page <= 4; page++)
+            {
+                scroller.Patterns.Scroll.PatternOrDefault?.Scroll(ScrollAmount.NoAmount, ScrollAmount.LargeIncrement);
+                Thread.Sleep(500);
+                app.Snapshot($"new-task-editor-page{page}");
+            }
+        }
         var editorClose = app.Find("CloseButton", 2000);
         app.Log($"editor close button found: {editorClose != null}");
         editorClose?.AsButton().Invoke();
@@ -75,5 +84,15 @@ public class BaselineTour
         app.Snapshot("narrow-720");
 
         Assert.False(app.HasExited, "The app exited during the tour.");
+    }
+
+    private static void Visit(AppSession app, string automationId)
+    {
+        var item = app.Find(automationId);
+        if (item == null) { app.Log($"{automationId} not found"); return; }
+        item.Click();
+        Thread.Sleep(1800);
+        app.Log($"visited {automationId}; exited={app.HasExited}");
+        app.Snapshot(automationId);
     }
 }
