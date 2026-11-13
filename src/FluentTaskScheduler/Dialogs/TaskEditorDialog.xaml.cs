@@ -1,6 +1,8 @@
 using FluentTaskScheduler.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using VirtualKey = Windows.System.VirtualKey;
 
 namespace FluentTaskScheduler.Dialogs;
 
@@ -37,11 +39,26 @@ public sealed partial class TaskEditorDialog : ContentDialog
         }
     }
 
-    private void Category_GotFocus(object sender, RoutedEventArgs e) => EditorCategory.ItemsSource = ViewModel.SuggestCategories();
+    // Entering an empty box lists all it can suggest; once the box holds something, the list waits
+    // for typing. An AutoSuggestBox puts back the text last typed into it when Tab is pressed while
+    // its list shows, and a value the editor filled in was never typed: Tab would empty the box.
+    private void Category_GotFocus(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel.Category.Length == 0) EditorCategory.ItemsSource = ViewModel.SuggestCategories();
+    }
 
     private void Category_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
         if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput) sender.ItemsSource = ViewModel.SuggestCategories();
+    }
+
+    // Escape, too, puts back the text last typed into an AutoSuggestBox, and the box keeps the key
+    // even when it has no list to close. Then Escape cancels the editor here, as in its other fields.
+    private void SuggestionBox_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key != VirtualKey.Escape || ((AutoSuggestBox)sender).IsSuggestionListOpen) return;
+        e.Handled = true;
+        Hide();
     }
 
     private void RemoveOnSuccess_Click(object sender, RoutedEventArgs e) =>
