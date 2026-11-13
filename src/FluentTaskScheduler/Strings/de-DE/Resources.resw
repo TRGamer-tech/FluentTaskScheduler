@@ -363,7 +363,7 @@ Jetzt neu starten, um das Update zu installieren?</value></data>
   <data name="Pipeline.PickTask" xml:space="preserve"><value>Aufgabe wählen...</value></data>
   <data name="Pipeline.Toast.OnSuccess" xml:space="preserve"><value>Von einer Abschlussaktion gestartet, weil „{0}“ erfolgreich war.</value></data>
   <data name="Pipeline.Toast.OnFailure" xml:space="preserve"><value>Von einer Abschlussaktion gestartet, weil „{0}“ fehlgeschlagen ist.</value></data>
-  <data name="Dashboard.HealthCaption" xml:space="preserve"><value>Anteil der erfolgreichen unter den Läufen, die in den letzten 7 Tagen geendet haben. Gestoppte Läufe zählen nicht mit.</value></data>
+  <data name="Dashboard.HealthCaption" xml:space="preserve"><value>Anteil der erfolgreichen unter den Ausführungen, die in den letzten 7 Tagen geendet haben. Gestoppte Ausführungen zählen nicht mit.</value></data>
   <data name="Dashboard.AvgDuration" xml:space="preserve"><value>Durchschnittliche Dauer</value></data>
   <data name="Dashboard.HeatmapTitle" xml:space="preserve"><value>Ausführungen nach Tageszeit</value></data>
   <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>In den letzten 7 Tagen zwischen {0} und {1} gestartete Ausführungen: {2}</value></data>

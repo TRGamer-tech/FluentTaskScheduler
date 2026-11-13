@@ -363,7 +363,7 @@
   <data name="Pipeline.PickTask" xml:space="preserve"><value>タスクを選択...</value></data>
   <data name="Pipeline.Toast.OnSuccess" xml:space="preserve"><value>「{0}」が成功したため、完了時アクションによって開始されました。</value></data>
   <data name="Pipeline.Toast.OnFailure" xml:space="preserve"><value>「{0}」が失敗したため、完了時アクションによって開始されました。</value></data>
-  <data name="Dashboard.HealthCaption" xml:space="preserve"><value>過去7日間に終了した実行のうち、成功した実行の割合。停止した実行は含みません。</value></data>
+  <data name="Dashboard.HealthCaption" xml:space="preserve"><value>過去 7 日間に終了した実行のうち、成功した実行の割合。停止した実行は含みません。</value></data>
   <data name="Dashboard.AvgDuration" xml:space="preserve"><value>平均実行時間</value></data>
   <data name="Dashboard.HeatmapTitle" xml:space="preserve"><value>時間帯別の実行回数</value></data>
   <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>過去 7 日間に {0}～{1} の間に開始された実行: {2} 回</value></data>
