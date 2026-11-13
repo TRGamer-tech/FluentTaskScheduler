@@ -25,8 +25,9 @@
                           IsChecked="{x:Bind Trigger.Enabled, Mode=TwoWay}"/>
             </Grid>
 
-            <!-- When: the types that fire at a time of day -->
-            <StackPanel Orientation="Horizontal" Spacing="16" Visibility="{x:Bind Trigger.HasSchedule, Mode=OneWay}">
+            <!-- When: the types that fire at a time of day. The pickers go one below the other:
+                 side by side they are wider than the form in a narrow window. -->
+            <StackPanel Spacing="12" Visibility="{x:Bind Trigger.HasSchedule, Mode=OneWay}">
                 <DatePicker x:Name="TriggerStartDate" Header="{x:Bind l:Loc.Get('Editor.Trigger.StartDate')}"
                             Date="{x:Bind Trigger.StartDate, Mode=TwoWay}"/>
                 <TimePicker x:Name="TriggerStartTime" Header="{x:Bind l:Loc.Get('Editor.Trigger.StartTime')}"
@@ -119,7 +120,7 @@
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
 
             <CheckBox x:Name="TriggerExpires" Content="{x:Bind l:Loc.Get('Editor.Trigger.Expires')}" IsChecked="{x:Bind Trigger.Expires, Mode=TwoWay}"/>
-            <StackPanel Orientation="Horizontal" Spacing="16" Visibility="{x:Bind Trigger.Expires, Mode=OneWay}">
+            <StackPanel Spacing="12" Visibility="{x:Bind Trigger.Expires, Mode=OneWay}">
                 <DatePicker x:Name="TriggerEndDate" Header="{x:Bind l:Loc.Get('Editor.Trigger.ExpiryDate')}"
                             Date="{x:Bind Trigger.EndDate, Mode=TwoWay}"/>
                 <TimePicker x:Name="TriggerEndTime" Header="{x:Bind l:Loc.Get('Editor.Trigger.StartTime')}"
