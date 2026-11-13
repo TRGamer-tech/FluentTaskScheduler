@@ -57,7 +57,8 @@ internal sealed class TrayIcon : IDisposable
 
         // Windows keeps the messages of programs with fewer rights, Explorer's among them, from a
         // program that runs as administrator unless it lets them through. Without this, the icon
-        // would not come back after Explorer restarts, and could miss a new display scaling.
+        // would not come back after Explorer restarts, and could miss a new display scaling or
+        // the taskbar moving to another display.
         ChangeWindowMessageFilterEx(_window, TaskbarCreated, MSGFLT_ALLOW, 0);
         ChangeWindowMessageFilterEx(_window, WM_SETTINGCHANGE, MSGFLT_ALLOW, 0);
         ChangeWindowMessageFilterEx(_window, WM_DISPLAYCHANGE, MSGFLT_ALLOW, 0);
@@ -69,8 +70,8 @@ internal sealed class TrayIcon : IDisposable
     /// <summary>The user asked for the icon's menu. Answer with <see cref="ShowMenu"/>.</summary>
     public event Action? MenuRequested;
 
-    /// <summary>The DPI of the display with the notification area, which the icon is to be drawn for.</summary>
-    public uint Dpi { get; private set; } = MainDisplayDpi();
+    /// <summary>The DPI of the display whose taskbar has the notification area, which the icon is to be drawn for.</summary>
+    public uint Dpi { get; private set; } = NotificationAreaDpi();
 
     /// <summary><see cref="Dpi"/> changed, as it does with the display scaling: the icon is to be drawn anew.</summary>
     public event Action? DpiChanged;
@@ -225,9 +226,10 @@ internal sealed class TrayIcon : IDisposable
 
             // Which of these reaches a window that is never shown when the display scaling
             // changes is up to Windows: WM_DPICHANGED is meant for windows on a display,
-            // WM_SETTINGCHANGE comes when the taskbar takes another size with the scaling,
-            // WM_DISPLAYCHANGE with a new resolution. Each leads to a check once the window has
-            // answered: the sender waits for that, and can be Explorer, which a new icon goes to.
+            // WM_SETTINGCHANGE comes when the taskbar takes another size with the scaling or
+            // moves to another display, WM_DISPLAYCHANGE with a new resolution. Each leads to a
+            // check once the window has answered: the sender waits for that, and can be
+            // Explorer, which a new icon goes to.
             if (message is WM_DPICHANGED or WM_SETTINGCHANGE or WM_DISPLAYCHANGE) PostMessageW(_window, CheckDpiMessage, 0, 0);
         }
         catch (Exception ex)
@@ -241,20 +243,24 @@ internal sealed class TrayIcon : IDisposable
 
     private void CheckDpi()
     {
-        uint dpi = MainDisplayDpi();
+        uint dpi = NotificationAreaDpi();
         if (dpi == Dpi) return;
         Dpi = dpi;
         DpiChanged?.Invoke();
     }
 
     /// <summary>
-    /// The DPI of the main display, whose taskbar has the notification area. It follows the
+    /// The DPI of the display whose taskbar has the notification area. That is the main display
+    /// unless the user dragged the taskbar to another one, as Windows 10 allows. It follows the
     /// display scaling at once, where the system DPI of a running program stays as it was when
     /// the program started.
     /// </summary>
-    private static uint MainDisplayDpi()
+    private static uint NotificationAreaDpi()
     {
-        nint display = MonitorFromPoint(default, MONITOR_DEFAULTTOPRIMARY);
+        // The taskbars on the other displays are of another class. Without a taskbar, as while
+        // Explorer restarts, the main display stands in until the new one announces itself.
+        nint taskbar = FindWindowW("Shell_TrayWnd", null);
+        nint display = taskbar == 0 ? MonitorFromPoint(default, MONITOR_DEFAULTTOPRIMARY) : MonitorFromWindow(taskbar, MONITOR_DEFAULTTONEAREST);
         // A display can go away in between, while the displays are being changed.
         return GetDpiForMonitor(display, MDT_EFFECTIVE_DPI, out uint dpi, out _) == 0 ? dpi : GetDpiForSystem();
     }
@@ -276,7 +282,7 @@ internal sealed class TrayIcon : IDisposable
     private const uint MF_STRING = 0x0000, MF_GRAYED = 0x0001, MF_POPUP = 0x0010, MF_SEPARATOR = 0x0800;
     private const uint TPM_RIGHTBUTTON = 0x0002, TPM_NONOTIFY = 0x0080, TPM_RETURNCMD = 0x0100;
     private const uint MSGFLT_ALLOW = 1;
-    private const uint MONITOR_DEFAULTTOPRIMARY = 1;
+    private const uint MONITOR_DEFAULTTOPRIMARY = 1, MONITOR_DEFAULTTONEAREST = 2;
     private const int MDT_EFFECTIVE_DPI = 0;
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
@@ -359,6 +365,12 @@ internal sealed class TrayIcon : IDisposable
 
     [DllImport("user32.dll")]
     private static extern bool GetCursorPos(out POINT point);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern nint FindWindowW(string className, string? windowName);
+
+    [DllImport("user32.dll")]
+    private static extern nint MonitorFromWindow(nint window, uint flags);
 
     [DllImport("user32.dll")]
     private static extern nint MonitorFromPoint(POINT point, uint flags);
