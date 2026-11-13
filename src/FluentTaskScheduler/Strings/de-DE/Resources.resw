@@ -541,10 +541,10 @@ Jetzt App neustarten?</value></data>
   <data name="Snooze.SuspendTriggers" xml:space="preserve"><value>Geplante Auslöser ebenfalls deaktivieren</value></data>
   <data name="Snooze.SuspendTriggersHint" xml:space="preserve"><value>Deaktiviert jede aktivierte Aufgabe über die Aufgabenplanungs-API und aktiviert genau diese Aufgaben wieder, wenn die Pause endet. Geschützte Systemaufgaben werden übersprungen.</value></data>
   <data name="Snooze.Banner.Suspended" xml:space="preserve"><value>Geplante Auslöser sind deaktiviert und manuelle Starts werden blockiert. Aufgaben werden reaktiviert, wenn die Pause endet.</value></data>
-  <data name="Snooze.Banner.ManualOnly" xml:space="preserve"><value>Über diese App gestartete Läufe werden blockiert. Windows löst geplante Auslöser weiterhin aus; um auch diese zu stoppen, beim Pausieren „Geplante Auslöser ebenfalls deaktivieren“ wählen.</value></data>
+  <data name="Snooze.Banner.ManualOnly" xml:space="preserve"><value>Über diese App gestartete Läufe werden blockiert. Windows löst geplante Auslöser weiterhin aus; um auch diese zu stoppen, wähle beim Pausieren „Geplante Auslöser ebenfalls deaktivieren“.</value></data>
   <data name="Snooze.Error.RunBlocked" xml:space="preserve"><value>„{0}“ wurde nicht gestartet, da die globale Pause aktiv ist.</value></data>
   <data name="Snooze.Error.BatchBlocked" xml:space="preserve"><value>{0} Aufgabe(n) wurden nicht gestartet, da die globale Pause aktiv ist.</value></data>
-  <data name="Snooze.Error.PastTime" xml:space="preserve"><value>Der Zeitpunkt muss in der Zukunft liegen.</value></data>
+  <data name="Snooze.Error.PastTime" xml:space="preserve"><value>Wähle einen Zeitpunkt in der Zukunft.</value></data>
   <data name="Snooze.Error.Resume" xml:space="preserve"><value>Alle Aufgaben konnten nicht fortgesetzt werden: </value></data>
   <data name="Snooze.Toast.Started.Title" xml:space="preserve"><value>Globale Pause aktiviert</value></data>
   <data name="Snooze.Toast.Ended.Title" xml:space="preserve"><value>Globale Pause beendet</value></data>
