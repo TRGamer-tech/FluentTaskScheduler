@@ -20,7 +20,7 @@ public sealed class SnoozeTests : IDisposable
     {
         _windows.CreateDaily("Held back");
         using var app = AppSession.Launch("snooze-all");
-        app.Require("SearchBox").AsTextBox().Enter("Held back");
+        app.Require("SearchBox").TypeText("Held back");
         AutomationElement row = app.Find(RowNamed("Held back"), 20000) ?? throw new InvalidOperationException("The task is not in the list.");
 
         app.ToolbarButton("SnoozeButton").Press();
@@ -47,7 +47,7 @@ public sealed class SnoozeTests : IDisposable
     {
         _windows.CreateDaily("Paused one");
         using var app = AppSession.Launch("snooze-task");
-        app.Require("SearchBox").AsTextBox().Enter("Paused one");
+        app.Require("SearchBox").TypeText("Paused one");
         AutomationElement row = app.Find(RowNamed("Paused one"), 20000) ?? throw new InvalidOperationException("The task is not in the list.");
 
         row.Click();
@@ -94,7 +94,7 @@ public sealed class SnoozeTests : IDisposable
     {
         _windows.CreateDaily("Paused until");
         using var app = AppSession.Launch("snooze-task-until");
-        app.Require("SearchBox").AsTextBox().Enter("Paused until");
+        app.Require("SearchBox").TypeText("Paused until");
         AutomationElement row = app.Find(RowNamed("Paused until"), 20000) ?? throw new InvalidOperationException("The task is not in the list.");
 
         row.Click();

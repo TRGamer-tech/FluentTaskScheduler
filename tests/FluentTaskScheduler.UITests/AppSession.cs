@@ -18,6 +18,8 @@ public sealed class AppSession : IDisposable
 {
     private readonly Application _app;
     private readonly UIA3Automation _automation;
+    private readonly Timer? _foregroundGuard;
+    private int _guarding;
     private int _shotIndex;
 
     public Window Window { get; }
@@ -36,12 +38,14 @@ public sealed class AppSession : IDisposable
         _windowHandle = window.Properties.NativeWindowHandle.Value;
         ArtifactsDir = artifactsDir;
         DataDir = dataDir;
+        if (Environment.GetEnvironmentVariable(CloseCoveringWindowsVariable) == "1")
+            _foregroundGuard = new Timer(_ => GuardForeground(), null, TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(500));
     }
 
     public UIA3Automation Automation => _automation;
 
     /// <summary>False once the window is hidden, as it is while the app lives in the notification area only.</summary>
-    public bool IsWindowVisible => IsWindowVisibleNative(_windowHandle);
+    public bool IsWindowVisible => TopLevelWindows.IsVisible(_windowHandle);
 
     /// <summary>Starts the app a second time, the way a user who cannot find its window would, and waits for that instance to end.</summary>
     public void StartAgain()
@@ -65,9 +69,6 @@ public sealed class AppSession : IDisposable
             return null; // being written right now
         }
     }
-
-    [System.Runtime.InteropServices.DllImport("user32.dll", EntryPoint = "IsWindowVisible")]
-    private static extern bool IsWindowVisibleNative(nint window);
 
     public static string ExePath =>
         Environment.GetEnvironmentVariable("FTS_APP_EXE")
@@ -121,8 +122,14 @@ public sealed class AppSession : IDisposable
         return startInfo;
     }
 
-    /// <summary>Set to 1 on a build machine to let the tests end programs whose windows lie over the app.</summary>
+    /// <summary>
+    /// Set to 1 on a build machine to let the tests end programs whose windows lie over the app,
+    /// and close dialogs of other programs that take the foreground.
+    /// </summary>
     private const string CloseCoveringWindowsVariable = "FTS_UI_CLOSE_COVERING_WINDOWS";
+
+    private const string DialogClass = "#32770";
+    private const string ConsoleClass = "ConsoleWindowClass";
 
     /// <summary>
     /// Mouse input goes to whatever is on top, keyboard input to the window in the foreground. A
@@ -132,12 +139,13 @@ public sealed class AppSession : IDisposable
     /// </summary>
     private static void BringToFront(UIA3Automation automation, Application app, Window window)
     {
+        nint handle = window.Properties.NativeWindowHandle.Value;
         for (int attempt = 0; attempt < 5; attempt++)
         {
-            window.SetForeground();
+            TopLevelWindows.BringToFront(handle);
             Thread.Sleep(500);
 
-            if (CloseForeignDialogInTheForeground(app)) continue;
+            if (CloseForeignDialogInTheForeground(app.ProcessId, handle)) continue;
 
             int owner = automation.FromPoint(window.BoundingRectangle.Center()).Properties.ProcessId.ValueOrDefault;
             if (owner == app.ProcessId) return;
@@ -164,32 +172,71 @@ public sealed class AppSession : IDisposable
     /// build machine's own console, which must go on.
     /// </summary>
     /// <returns>Whether a dialog was closed.</returns>
-    private static bool CloseForeignDialogInTheForeground(Application app)
+    private static bool CloseForeignDialogInTheForeground(int appProcess, nint appWindow)
     {
-        nint foreground = GetForegroundWindow();
-        GetWindowThreadProcessId(foreground, out uint owner);
-        if (foreground == 0 || owner == app.ProcessId || ClassName(foreground) != "#32770") return false;
+        nint foreground = TopLevelWindows.Foreground;
+        if (foreground == 0 || IsTheApps(foreground, appProcess, appWindow) || TopLevelWindows.ClassOf(foreground) != DialogClass) return false;
 
         if (Environment.GetEnvironmentVariable(CloseCoveringWindowsVariable) != "1")
         {
             throw new InvalidOperationException(
-                $"A dialog of process {owner} keeps the foreground, so keys would not reach the app. " +
+                $"A dialog of process {TopLevelWindows.ProcessOf(foreground)} keeps the foreground, so keys would not reach the app. " +
                 $"Close it, or set {CloseCoveringWindowsVariable}=1 to let the tests close such dialogs.");
         }
-
-        Console.WriteLine($"Closing a dialog of process {owner}: it keeps the foreground.");
-        PostMessageW(foreground, CloseMessage, 0, 0);
-        Thread.Sleep(500);
+        CloseForeignDialog(foreground);
         return true;
     }
 
-    private const uint CloseMessage = 0x0010; // WM_CLOSE
+    private static void CloseForeignDialog(nint dialog)
+    {
+        Console.WriteLine($"Closing \"{TopLevelWindows.TitleOf(dialog)}\" of process {TopLevelWindows.ProcessOf(dialog)}: it keeps the foreground.");
+        TopLevelWindows.Close(dialog);
+        Thread.Sleep(500);
+    }
 
-    [System.Runtime.InteropServices.DllImport("user32.dll")]
-    private static extern nint GetForegroundWindow();
+    /// <summary>Whether <paramref name="window"/> is the app's, or a dialog it opened, which another process may show.</summary>
+    private static bool IsTheApps(nint window, int appProcess, nint appWindow) =>
+        TopLevelWindows.ProcessOf(window) == appProcess || TopLevelWindows.RootOwnerOf(window) == appWindow;
 
-    [System.Runtime.InteropServices.DllImport("user32.dll")]
-    private static extern bool PostMessageW(nint window, uint message, nint wParam, nint lParam);
+    /// <summary>
+    /// A dialog of Windows or a console window of the build machine's own setup can also come up
+    /// while a test runs, take the foreground and with it the keys the test types. Where the build
+    /// machine lets the tests close what covers the app, such a dialog is closed, and the app's
+    /// window is brought back to the front. A console window is only stepped over: it can be the
+    /// build machine's own. Anything else, such as the taskbar, is left alone for tests to use.
+    /// </summary>
+    private void GuardForeground()
+    {
+        if (Interlocked.Exchange(ref _guarding, 1) == 1) return;
+        try
+        {
+            if (!TopLevelWindows.IsVisible(_windowHandle) || TopLevelWindows.IsMinimized(_windowHandle)) return;
+            nint foreground = TopLevelWindows.Foreground;
+            if (foreground == 0 || IsTheApps(foreground, _app.ProcessId, _windowHandle)) return;
+
+            switch (TopLevelWindows.ClassOf(foreground))
+            {
+                case DialogClass:
+                    CloseForeignDialog(foreground);
+                    break;
+                case ConsoleClass:
+                    Console.WriteLine($"Stepping over the console window \"{TopLevelWindows.TitleOf(foreground)}\": it took the foreground.");
+                    break;
+                default:
+                    return;
+            }
+            TopLevelWindows.BringToFront(_windowHandle);
+        }
+        catch (Exception ex)
+        {
+            // A failure on the timer's thread would end the whole test run.
+            Console.WriteLine($"Keeping the app's window in the foreground failed: {ex.Message}");
+        }
+        finally
+        {
+            Volatile.Write(ref _guarding, 0);
+        }
+    }
 
     /// <summary>
     /// Settings of someone who has seen the welcome tour and the release notes, with an English UI
@@ -315,69 +362,21 @@ public sealed class AppSession : IDisposable
     }
 
     // A visible top-level dialog window that the app's process shows or its window owns.
-    private nint FindDialogWindow()
-    {
-        nint found = 0;
-        EnumWindows((window, _) =>
-        {
-            if (!IsWindowVisibleNative(window)) return true;
-
-            if (ClassName(window) != "#32770") return true;
-
-            GetWindowThreadProcessId(window, out uint process);
-            if (process != _app.ProcessId && GetWindow(window, OwnerWindow) != _windowHandle) return true;
-
-            found = window;
-            return false;
-        }, 0);
-        return found;
-    }
-
-    private const uint OwnerWindow = 4; // GW_OWNER
-
-    [System.Runtime.InteropServices.DllImport("user32.dll")]
-    private static extern nint GetWindow(nint window, uint relation);
+    private nint FindDialogWindow() =>
+        TopLevelWindows.Visible().FirstOrDefault(window =>
+            TopLevelWindows.ClassOf(window) == DialogClass
+            && (TopLevelWindows.ProcessOf(window) == _app.ProcessId || TopLevelWindows.OwnerOf(window) == _windowHandle));
 
     // Class, title and program of every visible top-level window, to tell what a test met instead of what it expected.
-    private static List<string> VisibleWindows()
-    {
-        var windows = new List<string>();
-        EnumWindows((window, _) =>
+    private static IEnumerable<string> VisibleWindows() =>
+        TopLevelWindows.Visible().Select(window =>
         {
-            if (!IsWindowVisibleNative(window)) return true;
-            string className = ClassName(window);
-            var title = new StringBuilder(128);
-            GetWindowTextW(window, title, title.Capacity);
-            GetWindowThreadProcessId(window, out uint owner);
+            int owner = TopLevelWindows.ProcessOf(window);
             string program;
-            try { using var process = Process.GetProcessById((int)owner); program = process.ProcessName; }
+            try { using var process = Process.GetProcessById(owner); program = process.ProcessName; }
             catch (ArgumentException) { program = "?"; }
-            windows.Add($"{className} \"{title}\" ({program} {owner})");
-            return true;
-        }, 0);
-        return windows;
-    }
-
-    private delegate bool WindowVisitor(nint window, nint parameter);
-
-    [System.Runtime.InteropServices.DllImport("user32.dll")]
-    private static extern bool EnumWindows(WindowVisitor visitor, nint parameter);
-
-    [System.Runtime.InteropServices.DllImport("user32.dll")]
-    private static extern uint GetWindowThreadProcessId(nint window, out uint processId);
-
-    private static string ClassName(nint window)
-    {
-        var name = new StringBuilder(64);
-        GetClassNameW(window, name, name.Capacity);
-        return name.ToString();
-    }
-
-    [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
-    private static extern int GetClassNameW(nint window, StringBuilder className, int capacity);
-
-    [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
-    private static extern int GetWindowTextW(nint window, StringBuilder text, int capacity);
+            return $"{TopLevelWindows.ClassOf(window)} \"{TopLevelWindows.TitleOf(window)}\" ({program} {owner})";
+        });
 
     /// <summary>
     /// The text of a dialog the app is showing, or null if there is none. A dialog nobody asked
@@ -462,6 +461,9 @@ public sealed class AppSession : IDisposable
 
     public void Dispose()
     {
+        // A look at the foreground that is under way ends first; it could bring the window back.
+        _foregroundGuard?.DisposeAsync().AsTask().Wait(TimeSpan.FromSeconds(5));
+
         // What the window showed last, and what the app wrote into its logs, explain a failure
         // that happened inside the app better than any assertion can.
         if (!_app.HasExited) Snapshot("last");

@@ -105,6 +105,7 @@ public class ScriptEditorTests
         var script = app.Require("ScriptEditorText").AsTextBox();
         script.Text = "Get-Date\rGet-Item";
 
+        script.WaitForTheForeground();
         script.Focus();
         Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
         Keyboard.Type(VirtualKeyShort.TAB);

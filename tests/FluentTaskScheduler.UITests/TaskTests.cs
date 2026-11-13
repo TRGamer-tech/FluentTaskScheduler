@@ -20,7 +20,7 @@ public sealed class TaskTests : IDisposable
         _windows.CreateDaily("Made elsewhere");
         using var app = AppSession.Launch("listed");
 
-        app.Require("SearchBox").AsTextBox().Enter("Made elsewhere");
+        app.Require("SearchBox").TypeText("Made elsewhere");
         app.Snapshot("searched");
 
         Assert.True(app.Find(RowNamed("Made elsewhere"), 20000) != null, "The task created with schtasks is not in the list.");
@@ -102,13 +102,15 @@ public sealed class TaskTests : IDisposable
         app.Require("EditorProgram").AsTextBox().Text = "cmd.exe";
         var tags = app.Find(element => element.ControlType == ControlType.Edit && element.Parent?.AutomationId == "EditorTags")
                    ?? throw new InvalidOperationException("The tags box has no text box.");
-        tags.AsTextBox().Enter("backup, ni");
+        tags.TypeText("backup, ni");
         Wait(); // the box suggests once the typing pauses
         app.Snapshot("tag-suggested");
+        app.Window.WaitForTheForeground();
         Keyboard.Type(VirtualKeyShort.DOWN);
         Keyboard.Type(VirtualKeyShort.ENTER);
         Wait();
         app.Snapshot("tag-chosen");
+        app.Window.WaitForTheForeground();
         Keyboard.Type(VirtualKeyShort.ENTER);
 
         try
@@ -128,7 +130,7 @@ public sealed class TaskTests : IDisposable
         _windows.Create("Nightly", SystemTaskXml);
         using var app = AppSession.Launch("limit");
 
-        app.Require("SearchBox").AsTextBox().Enter("Nightly");
+        app.Require("SearchBox").TypeText("Nightly");
         var row = app.Find(RowNamed("Nightly"), 20000) ?? throw new InvalidOperationException("The task is not in the list.");
         OpenEditor(app, row);
         app.Expand("EditorSettings");
@@ -167,7 +169,7 @@ public sealed class TaskTests : IDisposable
         using var app = AppSession.Launch("live");
         OpenFolderlessList(app);
         Assert.True(app.Find(element => element.ControlType == ControlType.ListItem, 30000) != null, "The list stayed empty.");
-        app.Require("SearchBox").AsTextBox().Enter("Arrives later");
+        app.Require("SearchBox").TypeText("Arrives later");
         Assert.True(AppSession.Eventually(() => app.Find(RowNamed("Arrives later"), 500) == null), "A task of that name is already there.");
 
         _windows.CreateDaily("Arrives later");
@@ -199,7 +201,7 @@ public sealed class TaskTests : IDisposable
         using var history = new HistoryLog(switchOn: false);
         _windows.CreateDaily("Detailed");
         using var app = AppSession.Launch("details");
-        app.Require("SearchBox").AsTextBox().Enter("Detailed");
+        app.Require("SearchBox").TypeText("Detailed");
         AutomationElement Row() => app.Find(RowNamed("Detailed"), 20000) ?? throw new InvalidOperationException("The task is not in the list.");
 
         Row().Click();
@@ -241,7 +243,7 @@ public sealed class TaskTests : IDisposable
         _windows.CreateDaily("Seen narrow");
         // German has the longest texts.
         using var app = AppSession.Launch("details-narrow", AppSession.FirstRunDone(("Language", "de-DE")));
-        app.Require("SearchBox").AsTextBox().Enter("Seen narrow");
+        app.Require("SearchBox").TypeText("Seen narrow");
         (app.Find(RowNamed("Seen narrow"), 20000) ?? throw new InvalidOperationException("The task is not in the list.")).Click();
         app.Require("DetailsRunButton", 20000);
 

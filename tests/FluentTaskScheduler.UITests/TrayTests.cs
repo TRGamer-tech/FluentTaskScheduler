@@ -161,11 +161,11 @@ public class TrayTests
     private static AutomationElement? FindIcon(AppSession app)
     {
         // Windows puts more than the tooltip into the name, at least a leading blank.
-        AutomationElement? Search() => ShellElements(app).FirstOrDefault(element => element.ControlType == ControlType.Button && element.NameOrEmpty().Trim().StartsWith("FluentTaskScheduler"));
+        AutomationElement? Search() => ShellElements(app).FirstOrDefault(element => element.Is(ControlType.Button) && element.NameOrEmpty().Trim().StartsWith("FluentTaskScheduler"));
 
         if (Search() is { } visible) return visible;
         AutomationElement? arrow = ShellElements(app).FirstOrDefault(element =>
-            element.ControlType == ControlType.Button && (element.NameOrEmpty().Contains("Hidden Icons", StringComparison.OrdinalIgnoreCase) || element.NameOrEmpty().Contains("Chevron")));
+            element.Is(ControlType.Button) && (element.NameOrEmpty().Contains("Hidden Icons", StringComparison.OrdinalIgnoreCase) || element.NameOrEmpty().Contains("Chevron")));
         if (arrow is null) return null;
         arrow.Click();
         return Retry.WhileNull(Search, TimeSpan.FromSeconds(10)).Result;
@@ -173,16 +173,16 @@ public class TrayTests
 
     private static AutomationElement? MenuItem(AppSession app, string name) =>
         app.Automation.GetDesktop().FindAllChildren()
-            .Where(window => window.ControlType == ControlType.Menu || window.Properties.ClassName.ValueOrDefault == "#32768")
+            .Where(window => window.Is(ControlType.Menu) || window.ClassNameOrEmpty() == "#32768")
             .SelectMany(AppSession.Walk)
-            .FirstOrDefault(element => element.ControlType == ControlType.MenuItem && element.NameOrEmpty() == name);
+            .FirstOrDefault(element => element.Is(ControlType.MenuItem) && element.NameOrEmpty() == name);
 
     /// <summary>Everything in the taskbar and in the pop-ups of the shell, but not in ordinary app windows.</summary>
     private static IEnumerable<AutomationElement> ShellElements(AppSession app) =>
         app.Automation.GetDesktop().FindAllChildren()
-            .Where(window => window.Properties.ClassName.ValueOrDefault is "Shell_TrayWnd" or "NotifyIconOverflowWindow" or "TopLevelWindowForOverflowXamlIsland" or "Xaml_WindowedPopupClass")
+            .Where(window => window.ClassNameOrEmpty() is "Shell_TrayWnd" or "NotifyIconOverflowWindow" or "TopLevelWindowForOverflowXamlIsland" or "Xaml_WindowedPopupClass")
             .SelectMany(AppSession.Walk);
 
     private static string NotificationAreaNames(AppSession app) =>
-        string.Join(" | ", ShellElements(app).Select(element => $"{element.ControlType} '{element.NameOrEmpty()}'").Where(text => !text.EndsWith("''")).Take(80));
+        string.Join(" | ", ShellElements(app).Select(element => element.NameOrEmpty()).Where(name => name.Length > 0).Take(80));
 }
