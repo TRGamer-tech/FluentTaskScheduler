@@ -35,9 +35,17 @@ public sealed class FakeTaskHistory : ITaskHistory
                      .OrderByDescending(e => e.Time).ThenByDescending(e => e.RecordId).Take(maxCount).ToList();
     }
 
-    public IReadOnlyList<TaskRun> GetRuns(DateTimeOffset since, CancellationToken cancellation = default) => Unreadable
-        ? throw new HistoryUnavailableException("Microsoft-Windows-TaskScheduler/Operational", new UnauthorizedAccessException("Access is denied."))
-        : TaskRun.FromEvents(Events.Where(e => e.Time >= since));
+    /// <summary>Called by <see cref="GetRuns"/> on the reading thread before it reads, with the read's cancellation; block in it to make reading slow.</summary>
+    public Action<CancellationToken>? Reading { get; set; }
+
+    public IReadOnlyList<TaskRun> GetRuns(DateTimeOffset since, CancellationToken cancellation = default)
+    {
+        Reading?.Invoke(cancellation);
+        cancellation.ThrowIfCancellationRequested();
+        return Unreadable
+            ? throw new HistoryUnavailableException("Microsoft-Windows-TaskScheduler/Operational", new UnauthorizedAccessException("Access is denied."))
+            : TaskRun.FromEvents(Events.Where(e => e.Time >= since));
+    }
 
     public IReadOnlyList<SystemEvent> GetSystemEvents(DateTimeOffset around, TimeSpan margin, CancellationToken cancellation = default) =>
         SystemEvents.Where(e => (e.Time - around).Duration() <= margin).OrderBy(e => e.Time).ToList();

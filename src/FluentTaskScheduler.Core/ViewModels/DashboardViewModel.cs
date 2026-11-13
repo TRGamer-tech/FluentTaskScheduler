@@ -136,19 +136,21 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         if (IsLoading) return;
         IsLoading = true;
         _hasRead = true;
-
-        // Whatever is reported from here on may already be in the history that is about to be
-        // read, or not yet. It is kept and counted once.
-        _reported.Clear();
         try
         {
             DateTimeOffset since = _time.GetUtcNow() - DashboardFigures.Period;
+
+            // The history about to be read holds the runs reported so far, and has the newer word
+            // on them. A run reported from here on may be in it or not yet; it is kept.
+            List<KeyValuePair<string, TaskRun>> reportedBefore = [.. _reported];
             Task tasks = ReadTasksAsync();
             try
             {
                 IReadOnlyList<TaskRun> runs = await Task.Run(() => _history.GetRuns(since, _closing.Token), _closing.Token);
                 _recorded = [];
                 foreach (TaskRun run in runs) _recorded[DashboardFigures.KeyOf(run)] = run;
+                foreach (var (key, run) in reportedBefore)
+                    if (_reported.TryGetValue(key, out TaskRun? latest) && ReferenceEquals(latest, run)) _reported.Remove(key);
                 HistoryProblem = null;
             }
             catch (HistoryUnavailableException ex)
@@ -157,16 +159,17 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
                 HistoryProblem = Loc.Format("Details.History.Unavailable", ex.InnerException?.Message ?? ex.Message);
             }
             await tasks;
-            Present();
         }
         catch (OperationCanceledException)
         {
             // The window closed while the history was being read.
+            return;
         }
         finally
         {
             IsLoading = false;
         }
+        Present();
     }
 
     /// <summary>Asks Windows to record history from now on.</summary>
@@ -276,8 +279,14 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     }
 
     /// <summary>Works the figures out anew from what the dashboard holds, for the chosen category and tag.</summary>
+    /// <remarks>
+    /// Not while everything is read anew: figures worked out then would leave out what is still
+    /// being read. The load works them out once it has it all, with whatever came in meanwhile.
+    /// </remarks>
     private void Present()
     {
+        if (IsLoading) return;
+
         string? category = Chosen(Categories, CategoryIndex), tag = Chosen(Tags, TagIndex);
         List<TaskRow> tasks = _tasks
             .Where(task => category is null || string.Equals(task.Category, category, StringComparison.OrdinalIgnoreCase))

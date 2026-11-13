@@ -78,6 +78,75 @@ public sealed class DashboardViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task WhatHappensWhileEverythingIsFirstRead_IsShownWithIt_AndNothingIsShownBefore()
+    {
+        using var listed = new ManualResetEventSlim();
+        using var read = new ManualResetEventSlim();
+        _store.Listed = listed.Wait;
+        _history.Reading = _ => read.Wait();
+
+        Task showing = _dashboard.ShowAsync();
+        _stream.Complete(FakeTaskEventStream.Finished(Succeeds, RunStatus.Succeeded, ended: Now));
+        _snooze.RecordSuppressedRun(Fails, RunOrigin.Manual);
+        _dashboard.Filter = LogFilter.Succeeded;
+
+        Assert.True(_dashboard.IsLoading);
+        Assert.False(_dashboard.HasFigures);
+        Assert.Empty(_dashboard.Log);
+
+        listed.Set();
+        read.Set();
+        await showing;
+
+        Assert.Equal(3, Figures.TotalTasks);
+        Assert.Equal((8, 9), (Figures.SucceededRuns, Figures.FailedRuns));
+        Assert.Equal(8, _dashboard.Log.Count);
+        Assert.All(_dashboard.Log, entry => Assert.Equal(LogOutcome.Succeeded, entry.Outcome));
+    }
+
+    [Fact]
+    public async Task WhileEverythingIsReadAnew_TheFiguresStay_AndNoRunReportedMeanwhileIsLost()
+    {
+        await _dashboard.ShowAsync();
+
+        // A run ends; Task Scheduler logs it, and then it is reported.
+        TaskRun logged = FakeTaskEventStream.Finished(Succeeds, RunStatus.Succeeded, ended: Now);
+        _history.Events.Add(new TaskEvent { Kind = TaskEventKind.RunStarted, EventId = 100, Time = logged.Started!.Value, TaskPath = Succeeds, InstanceId = logged.InstanceId, RecordId = 500 });
+        _history.Events.Add(new TaskEvent { Kind = TaskEventKind.RunCompleted, EventId = 102, Time = Now, TaskPath = Succeeds, InstanceId = logged.InstanceId, RecordId = 501 });
+        _stream.Complete(logged);
+        LogEntry newest = _dashboard.Log[0];
+
+        using var read = new ManualResetEventSlim();
+        _history.Reading = _ => read.Wait();
+        Task loading = _dashboard.LoadAsync();
+        _stream.Complete(FakeTaskEventStream.Finished(Fails, RunStatus.Failed, resultCode: 3, ended: Now.AddSeconds(1)));
+
+        Assert.Equal((22, 8, 9), (Figures.RunsInPeriod, Figures.SucceededRuns, Figures.FailedRuns));
+        Assert.Same(newest, _dashboard.Log[0]);
+
+        read.Set();
+        await loading;
+
+        Assert.Equal((23, 8, 10), (Figures.RunsInPeriod, Figures.SucceededRuns, Figures.FailedRuns));
+        Assert.Equal(23, _dashboard.Log.Count);
+    }
+
+    [Fact]
+    public async Task ARefreshAskedForWhileEverythingIsRead_DoesNotReadItAllASecondTime()
+    {
+        using var read = new ManualResetEventSlim();
+        _history.Reading = _ => read.Wait();
+        Task showing = _dashboard.ShowAsync();
+
+        Task refreshing = _dashboard.LoadAsync();
+
+        Assert.True(refreshing.IsCompletedSuccessfully);
+        read.Set();
+        await showing;
+        Assert.Equal(1, _store.Listings);
+    }
+
+    [Fact]
     public async Task TheHoursOfTheRuns_AreThoseOfTheUsersClock()
     {
         await _dashboard.ShowAsync();
@@ -366,5 +435,18 @@ public sealed class DashboardViewModelTests : IDisposable
         Assert.Equal(0, ui.PostedCount);
         _dashboard.Dispose();
         Assert.Equal(0, _stream.Subscribers);
+    }
+
+    [Fact]
+    public async Task AWindowClosedWhileTheHistoryIsRead_EndsTheLoadQuietly()
+    {
+        _history.Reading = cancellation => cancellation.WaitHandle.WaitOne();
+        Task showing = _dashboard.ShowAsync();
+
+        _dashboard.Dispose();
+        await showing;
+
+        Assert.False(_dashboard.IsLoading);
+        Assert.False(_dashboard.HasFigures);
     }
 }
