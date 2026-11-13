@@ -17,7 +17,7 @@ public sealed class FakeSnoozeService : ISnoozeService
     /// <summary>Every request, in order, e.g. "SnoozeAll for 00:30:00", "SnoozeTask \Backup until restart" or "TaskMoved \A -> \B\A".</summary>
     public List<string> Calls { get; } = [];
 
-    /// <summary>When set, every request that may fail fails with this.</summary>
+    /// <summary>When set, every request fails with this.</summary>
     public Exception? Fails { get; set; }
 
     /// <summary>What <see cref="SnoozeTaskAsync"/> answers.</summary>

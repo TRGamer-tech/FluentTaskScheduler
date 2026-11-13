@@ -36,7 +36,7 @@ public sealed class SnoozeTests : IDisposable
         string? said = Retry.WhileNull(app.OpenDialogText, TimeSpan.FromSeconds(10)).Result;
         app.Snapshot("run-refused");
         Assert.True(said?.Contains("Tasks are snoozed") == true, $"Starting the task was not refused. The app says: {said ?? "nothing"}");
-        app.Require("CloseButton").Press();
+        (app.FindByName("OK", ControlType.Button) ?? throw new InvalidOperationException("The message has no OK button.")).Press();
 
         app.Require("SnoozeBannerResume").Press();
         Assert.True(Eventually(() => app.Find("SnoozeBannerResume", 300) is null), "The banner stayed after Resume.");
