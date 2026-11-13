@@ -76,6 +76,8 @@ public sealed class HistoryTextTests
         var keys = Enumerable.Range(1, 999).Select(HistoryText.LabelKey).OfType<string>()
             .Append("EventResult.Unknown")
             .Concat(Enum.GetValues<EventLevel>().Select(HistoryText.Level))
+            .Concat(Enum.GetValues<RunStatus>().Select(HistoryText.Status))
+            .Concat(Enum.GetValues<SystemEventKind>().Select(HistoryText.Label))
             .Distinct()
             .ToList();
         Assert.True(keys.Count > 25);
