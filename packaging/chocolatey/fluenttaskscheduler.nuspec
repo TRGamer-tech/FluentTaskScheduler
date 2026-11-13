@@ -24,16 +24,13 @@ scheduled tasks without the dated MMC snap-in.
 - Batch operations, smart search, folder management, import/export
 - ARM64 native support
 - System tray with running-task badge
-- Auto-updates via VeloPack
+- Auto-updates via Velopack
 - Full CLI interface (`--list`, `--run`, `--enable`, `--disable`, `--export-history`)
 
 **Requirements:** Windows 10 1809 (build 17763) or later.
     ]]></description>
     <tags>task-scheduler automation windows winui3 fluent productivity admin</tags>
     <releaseNotes>https://github.com/TRGamer-tech/FluentTaskScheduler/releases/tag/V1.9.0</releaseNotes>
-    <dependencies>
-      <!-- .NET 8 Desktop Runtime is bundled (self-contained build) — no extra dependency needed -->
-    </dependencies>
   </metadata>
   <files>
     <file src="tools\**" target="tools" />

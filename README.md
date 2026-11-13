@@ -39,8 +39,8 @@ If you like what this project is for, I would really appreciate a (optional!) do
 ## Installation instructions
 ### Manually
 Go to the [Releases Page](https://github.com/TRGamer-tech/FluentTaskScheduler/releases) and download the newest version. Two formats are available per architecture (x64 / ARM64):
-- **Setup MSI** — Traditional installer with per-user or machine-wide options.
-- **Portable ZIP** — Extract anywhere and run. No installation required.
+- **Setup MSI**: Traditional installer with per-user or machine-wide options.
+- **Portable ZIP**: Extract anywhere and run. No installation required.
 
 ### Winget
 ```
@@ -124,7 +124,7 @@ choco install fluenttaskscheduler
 - **ARM64 Support**: Native support for ARM64 devices.
 - **System Tray**: Minimize the app to the tray to keep your taskbar clean while the scheduler hums in the background. Disabled by default.
 - **Tray Badge**: See the number of currently running tasks at a glance directly on the tray icon.
-- **Multi-Window Tray Management**: Open multiple windows and manage them independently from the tray right-click menu — restore or close individual windows, or open a new one, all from a single tray icon.
+- **Multi-Window Tray Management**: Open multiple windows and manage them independently from the tray right-click menu: restore or close individual windows, or open a new one, all from a single tray icon.
 - **Tray Notification**: A toast notification appears the first time the app is minimized to tray, with a click action to restore the window instantly.
 - **Single Instance**: Launching the app a second time brings the existing window to the front instead of opening a duplicate.
 - **Run on Startup**: Option to launch automatically with Windows.
@@ -193,11 +193,11 @@ FluentTaskScheduler.exe --export-history "MyTaskName" --output "C:\logs\history.
 - **UI Architecture**: [WinUI 3](https://learn.microsoft.com/en-us/windows/apps/winui/winui3/) (Windows App SDK)
 - **Core Logic**: [TaskScheduler Managed Wrapper](https://github.com/dahall/TaskScheduler)
 - **CI/CD**: Fully automated GitHub Actions for x64 and ARM64 builds (thanks, TalyNone).
-- **Auto-Update**: [VeloPack](https://velopack.io/) for seamless in-app updates via GitHub Releases.
+- **Auto-Update**: [Velopack](https://velopack.io/) for seamless in-app updates via GitHub Releases.
 - **Architectures**: Support for x64 and ARM64.
 - **Language**: C#
 
-## Building from Source / Publishing with VeloPack / Winget / Choco / Scoop
+## Building from Source / Publishing with Velopack / Winget / Choco / Scoop
 
 See [CONTRIBUTING](CONTRIBUTING.md) for details
 

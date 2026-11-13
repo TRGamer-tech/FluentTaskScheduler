@@ -16,7 +16,7 @@ Description: |-
   FluentTaskScheduler is a professional-grade, modern alternative to the legacy Windows Task Scheduler.
   Built with WinUI 3 and .NET 8, it offers a clean Fluent Design interface for creating, editing, and
   monitoring scheduled tasks. Features include a live dashboard, task history charts, smart search,
-  folder management, batch operations, ARM64 support, system tray integration, auto-updates via VeloPack,
+  folder management, batch operations, ARM64 support, system tray integration, auto-updates via Velopack,
   and full CLI support.
 Moniker: fluenttaskscheduler
 Tags:
