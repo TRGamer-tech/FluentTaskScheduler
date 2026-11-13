@@ -68,7 +68,7 @@
                             Command="{x:Bind Snooze.ResumeCommand}"/>
                 </InfoBar.ActionButton>
             </InfoBar>
-            <InfoBar x:Name="SnoozeRestoreBar" Severity="Warning" IsClosable="False"
+            <InfoBar x:Name="SnoozeRestoreBar" Severity="Warning" IsClosable="True"
                      IsOpen="{x:Bind Snooze.HasPendingRestores, Mode=OneWay}" Visibility="{x:Bind Snooze.HasPendingRestores, Mode=OneWay}"
                      Title="{x:Bind l:Loc.Get('Snooze.Restore.Title')}"
                      Message="{x:Bind Snooze.PendingRestoresText, Mode=OneWay}">
