@@ -119,26 +119,14 @@ public sealed class FoldersViewModelTests : IDisposable
     }
 
     [Fact]
-    public async Task MovingAFolder_PutsItUnderTheNewParent()
-    {
-        await _folders.ReloadAsync();
-
-        await _folders.MoveIntoAsync(Node(@"\Reports"), @"\Jobs");
-
-        Assert.Equal([@"MoveFolder \Reports -> \Jobs\Reports"], _taskFolders.Calls);
-        Assert.NotNull(Find(_folders.Roots, @"\Jobs\Reports"));
-    }
-
-    [Fact]
-    public async Task RenamingOrMovingAFolder_TakesTheSnoozesOfItsTasksAlong()
+    public async Task RenamingAFolder_TakesTheSnoozesOfItsTasksAlong()
     {
         await _folders.ReloadAsync();
         _prompts.Text = "Work";
 
         await _folders.RenameAsync(Node(@"\Jobs"));
-        await _folders.MoveIntoAsync(Node(@"\Reports"), @"\Work");
 
-        Assert.Equal([@"FolderMoved \Jobs -> \Work", @"FolderMoved \Reports -> \Work\Reports"], _snooze.Calls);
+        Assert.Equal([@"FolderMoved \Jobs -> \Work"], _snooze.Calls);
     }
 
     [Fact]

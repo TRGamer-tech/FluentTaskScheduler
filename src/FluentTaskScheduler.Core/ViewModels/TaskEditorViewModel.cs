@@ -140,7 +140,6 @@ public sealed partial class TaskEditorViewModel : ObservableObject
     [ObservableProperty] private bool _enabled;
 
     public IReadOnlyList<string> SavedCategories => _settings.Current.SavedCategories;
-    public IReadOnlyList<string> SavedTags => _settings.Current.SavedTags;
 
     public ObservableCollection<TriggerViewModel> Triggers { get; }
     public ObservableCollection<ActionViewModel> Actions { get; }
@@ -221,8 +220,6 @@ public sealed partial class TaskEditorViewModel : ObservableObject
     private string _problems = "";
 
     public bool HasProblems => Problems.Length > 0;
-
-    [ObservableProperty] private bool _isSaving;
 
     // A list control reports -1 while it has nothing selected. That is not a choice.
     partial void OnPriorityIndexChanged(int oldValue, int newValue)
@@ -305,7 +302,6 @@ public sealed partial class TaskEditorViewModel : ObservableObject
         }
 
         string savedPath;
-        IsSaving = true;
         try
         {
             string? password = NeedsPassword ? Password : null;
@@ -343,10 +339,6 @@ public sealed partial class TaskEditorViewModel : ObservableObject
             Serilog.Log.Error(ex, "Task {Name} could not be saved", draft.Name);
             Problems = Loc.Get("Dialog.Error.SaveTaskFailedPrefix") + ex.Message;
             return false;
-        }
-        finally
-        {
-            IsSaving = false;
         }
 
         SavedPath = savedPath;

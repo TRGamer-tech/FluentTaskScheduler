@@ -94,10 +94,6 @@ public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewMode
         await MoveAsync(folder, TaskPaths.Combine(TaskPaths.ParentOf(folder.Path), name));
     }
 
-    /// <summary>Moves <paramref name="folder"/> with everything in it into <paramref name="newParentPath"/>.</summary>
-    public Task MoveIntoAsync(FolderNode folder, string newParentPath) =>
-        folder.IsRoot ? Task.CompletedTask : MoveAsync(folder, TaskPaths.Combine(newParentPath, folder.Name));
-
     /// <summary>Deletes <paramref name="folder"/> and all tasks and folders in it, after asking.</summary>
     public async Task DeleteAsync(FolderNode folder)
     {

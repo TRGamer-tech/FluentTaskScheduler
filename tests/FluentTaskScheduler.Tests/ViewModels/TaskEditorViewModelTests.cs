@@ -282,7 +282,6 @@ public sealed class TaskEditorViewModelTests : IDisposable
         Assert.False(await editor.SaveAsync());
 
         Assert.Equal(expected, editor.Problems);
-        Assert.False(editor.IsSaving);
     }
 
     [Fact]

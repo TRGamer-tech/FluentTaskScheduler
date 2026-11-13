@@ -154,9 +154,6 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
     public bool HasSeveralSelected => _selection.Count > 1;
     public string SelectionText => Loc.Format("Main.Batch.SelectedCountFormat", _selection.Count);
 
-    /// <summary>Paths of all tasks, for pickers.</summary>
-    public IReadOnlyCollection<string> AllTaskPaths => _all.Keys;
-
     partial void OnSearchTextChanged(string value) => Refilter();
     partial void OnStatusFilterIndexChanged(int value) => Refilter();
     partial void OnFolderPathChanged(string? value) => Refilter();
