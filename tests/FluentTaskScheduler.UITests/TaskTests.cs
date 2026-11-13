@@ -351,6 +351,35 @@ public sealed class TaskTests : IDisposable
             "The folder is still in the tree after deleting it.");
     }
 
+    [Fact]
+    public void TheList_OpensOnTheFolderChosenLast_AndRemembersAChoiceOfAllTasks()
+    {
+        _windows.CreateDaily("Chosen last time");
+        using var app = AppSession.Launch("last-folder", AppSession.FirstRunDone(("LastFolderPath", _windows.Folder)));
+
+        Assert.True(app.Find(RowNamed("Chosen last time"), 20000) != null, "The list does not show the task of the folder chosen last.");
+        app.Snapshot("opened");
+        int rows = AppSession.Walk(app.Require("TaskList")).Count(element => element.ControlType == ControlType.ListItem);
+        Assert.True(rows == 1, $"The list shows {rows} tasks instead of the one in the folder.");
+
+        app.Require("NavAllTasks").Press();
+        Assert.True(AppSession.Eventually(() => app.SavedSetting("LastFolderPath") == @"\"), "settings.json does not say that all tasks were chosen.");
+    }
+
+    [Fact]
+    public void TheTree_HighlightsTheFolderTheListOpensOn()
+    {
+        _windows.CreateDaily("Chosen last time");
+        using var app = AppSession.Launch("last-folder-tree", AppSession.FirstRunDone(("LastFolderPath", _windows.Folder)));
+
+        string name = _windows.Folder.TrimStart('\\');
+        var folder = app.Find(element => element.ControlType == ControlType.TreeItem && element.Name == name, 20000)
+                     ?? throw new InvalidOperationException("The folder is not in the tree.");
+        bool highlighted = AppSession.Eventually(() => folder.Patterns.SelectionItem.Pattern.IsSelected.Value);
+        app.Snapshot("tree");
+        Assert.True(highlighted, "The tree does not highlight the folder the list opened on.");
+    }
+
     private const string ForeignTaskXml = """
         <?xml version="1.0" encoding="UTF-16"?>
         <Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
