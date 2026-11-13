@@ -426,14 +426,6 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.Week.Fourth" xml:space="preserve"><value>Vierter</value></data>
   <data name="Dialog.Week.Last" xml:space="preserve"><value>Letzter</value></data>
 
-  <data name="Dialog.Weekday.Mon" xml:space="preserve"><value>Montag</value></data>
-  <data name="Dialog.Weekday.Tue" xml:space="preserve"><value>Dienstag</value></data>
-  <data name="Dialog.Weekday.Wed" xml:space="preserve"><value>Mittwoch</value></data>
-  <data name="Dialog.Weekday.Thu" xml:space="preserve"><value>Donnerstag</value></data>
-  <data name="Dialog.Weekday.Fri" xml:space="preserve"><value>Freitag</value></data>
-  <data name="Dialog.Weekday.Sat" xml:space="preserve"><value>Samstag</value></data>
-  <data name="Dialog.Weekday.Sun" xml:space="preserve"><value>Sonntag</value></data>
-
   <data name="Dialog.TriggerOn" xml:space="preserve"><value>Auslösen bei</value></data>
   <data name="Dialog.Sess.Lock" xml:space="preserve"><value>Arbeitsstation sperren</value></data>
   <data name="Dialog.Sess.Unlock" xml:space="preserve"><value>Arbeitsstation entsperren</value></data>

@@ -1,31 +1,24 @@
 using System.Collections.ObjectModel;
-using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluentTaskScheduler.Library;
 using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Scheduling;
-using DaysOfTheWeek = Microsoft.Win32.TaskScheduler.DaysOfTheWeek;
 
 namespace FluentTaskScheduler.ViewModels;
 
 /// <summary>A built-in task template as the library lists it.</summary>
-public sealed class TemplateCard(BuiltInTemplate template, IAsyncRelayCommand createTask)
+/// <param name="now">The current local time, from which the first start of the template's trigger is worked out.</param>
+public sealed class TemplateCard(BuiltInTemplate template, DateTime now, IAsyncRelayCommand createTask)
 {
-    private static readonly (DaysOfTheWeek Day, string Key)[] Weekdays =
-    [
-        (DaysOfTheWeek.Monday, "Mon"), (DaysOfTheWeek.Tuesday, "Tue"), (DaysOfTheWeek.Wednesday, "Wed"), (DaysOfTheWeek.Thursday, "Thu"),
-        (DaysOfTheWeek.Friday, "Fri"), (DaysOfTheWeek.Saturday, "Sat"), (DaysOfTheWeek.Sunday, "Sun")
-    ];
-
     public string Id => template.Id;
     public TemplateGroup Group => template.Group;
     public string Glyph => template.Glyph;
     public string Name => template.Template.Name;
     public string Description => template.Template.Description;
 
-    /// <summary>The program that runs and when, e.g. "defrag.exe · Weekly Sunday 02:00".</summary>
-    public string Summary { get; } = $"{template.Template.Command} · {Describe(template.Template)}";
+    /// <summary>The program that runs and when, in the words of the task editor, e.g. "defrag.exe · Weekly (Sun) at 2:00 AM".</summary>
+    public string Summary { get; } = $"{template.Template.Command} · {TriggerText.Describe(template.Template.ToDraft(now).Triggers[0])}";
 
     public string Note => template.Note;
     public bool HasNote => template.Note.Length > 0;
@@ -33,23 +26,6 @@ public sealed class TemplateCard(BuiltInTemplate template, IAsyncRelayCommand cr
 
     /// <summary>Opens the task editor with the task the template stands for.</summary>
     public IAsyncRelayCommand CreateTaskCommand => createTask;
-
-    private static string Describe(TaskTemplate template)
-    {
-        TriggerDraft trigger = template.Trigger;
-        string type = Loc.Get(TriggerText.TypeKey(trigger.Type));
-        string time = template.At?.ToString("t", CultureInfo.CurrentCulture) ?? "";
-        return trigger.Type switch
-        {
-            TriggerType.Daily => $"{type} {time}",
-            TriggerType.Weekly => $"{type} {DayNames(trigger.DaysOfWeek)} {time}",
-            TriggerType.SessionStateChange => Loc.Format("Trigger.SessionStateChange", Loc.Get(TriggerText.SessionChangeKey(trigger.SessionChange))),
-            _ => type
-        };
-    }
-
-    private static string DayNames(DaysOfTheWeek days) =>
-        string.Join(", ", Weekdays.Where(weekday => days.HasFlag(weekday.Day)).Select(weekday => Loc.Get("Dialog.Weekday." + weekday.Key)));
 }
 
 /// <summary>The templates of one group, under the group's heading.</summary>
@@ -93,8 +69,9 @@ public sealed partial class LibraryViewModel : ObservableObject, IDisposable
         _prompts = prompts;
         _time = time;
 
+        DateTime now = _time.GetLocalNow().DateTime;
         _allTemplates = BuiltInTemplates.Create()
-            .Select(template => new TemplateCard(template, new AsyncRelayCommand(() => CreateTaskAsync(template.Template))))
+            .Select(template => new TemplateCard(template, now, new AsyncRelayCommand(() => CreateTaskAsync(template.Template))))
             .ToList();
 
         _scripts.Changed += Scripts_Changed;

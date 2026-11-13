@@ -429,14 +429,6 @@
   <data name="Dialog.Week.Fourth" xml:space="preserve"><value>第四个</value></data>
   <data name="Dialog.Week.Last" xml:space="preserve"><value>最后一个</value></data>
 
-  <data name="Dialog.Weekday.Mon" xml:space="preserve"><value>星期一</value></data>
-  <data name="Dialog.Weekday.Tue" xml:space="preserve"><value>星期二</value></data>
-  <data name="Dialog.Weekday.Wed" xml:space="preserve"><value>星期三</value></data>
-  <data name="Dialog.Weekday.Thu" xml:space="preserve"><value>星期四</value></data>
-  <data name="Dialog.Weekday.Fri" xml:space="preserve"><value>星期五</value></data>
-  <data name="Dialog.Weekday.Sat" xml:space="preserve"><value>星期六</value></data>
-  <data name="Dialog.Weekday.Sun" xml:space="preserve"><value>星期日</value></data>
-
   <data name="Dialog.TriggerOn" xml:space="preserve"><value>触发于</value></data>
   <data name="Dialog.Sess.Lock" xml:space="preserve"><value>工作站锁定</value></data>
   <data name="Dialog.Sess.Unlock" xml:space="preserve"><value>工作站解锁</value></data>

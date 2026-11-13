@@ -1,7 +1,6 @@
 using System.Globalization;
 using FluentTaskScheduler.Library;
 using FluentTaskScheduler.Scheduling;
-using FluentTaskScheduler.Tests.Library;
 using FluentTaskScheduler.Tests.Processes;
 using FluentTaskScheduler.Tests.Support;
 using FluentTaskScheduler.ViewModels;
@@ -56,7 +55,7 @@ public sealed class LibraryViewModelTests : IDisposable
 
         TemplateCard defrag = Template(library, "Defrag");
         Assert.Equal(
-            ("Templates.Defrag.Name", "Templates.Defrag.Desc", "Templates.Defrag.Note", $"defrag.exe · Dialog.Trigger.Weekly Dialog.Weekday.Sun {twoOClock}"),
+            ("Templates.Defrag.Name", "Templates.Defrag.Desc", "Templates.Defrag.Note", $"defrag.exe · Dialog.Trigger.Weekly (Dialog.Day.Sun) Trigger.At {twoOClock}"),
             (defrag.Name, defrag.Description, defrag.Note, defrag.Summary));
         Assert.True(defrag.HasNote);
         Assert.True(defrag.RunsElevated);
@@ -66,24 +65,8 @@ public sealed class LibraryViewModelTests : IDisposable
         Assert.False(dnsFlush.HasNote);
         Assert.False(dnsFlush.RunsElevated);
 
-        Assert.StartsWith("powershell.exe · Dialog.Trigger.Daily ", Template(library, "TempCleanup").Summary);
+        Assert.StartsWith("powershell.exe · Dialog.Trigger.Daily Trigger.At ", Template(library, "TempCleanup").Summary);
         Assert.Equal("powershell.exe · Trigger.SessionStateChange", Template(library, "DisplayOff").Summary);
-    }
-
-    [Theory]
-    [MemberData(nameof(RepoFiles.Languages), MemberType = typeof(RepoFiles))]
-    public void TheWordsASummaryIsMadeOf_ExistInEveryLanguage(string language)
-    {
-        var texts = RepoFiles.Texts(language);
-        string[] needed =
-        [
-            "Dialog.Trigger.Daily", "Dialog.Trigger.Weekly", "Trigger.AtLogon", "Trigger.SessionStateChange", "Dialog.Sess.Lock",
-            "Dialog.Weekday.Mon", "Dialog.Weekday.Tue", "Dialog.Weekday.Wed", "Dialog.Weekday.Thu", "Dialog.Weekday.Fri", "Dialog.Weekday.Sat", "Dialog.Weekday.Sun"
-        ];
-
-        string[] missing = needed.Where(name => !texts.ContainsKey(name)).ToArray();
-        Assert.Empty(missing);
-        Assert.Contains("{0}", texts["Trigger.SessionStateChange"]);
     }
 
     [Fact]

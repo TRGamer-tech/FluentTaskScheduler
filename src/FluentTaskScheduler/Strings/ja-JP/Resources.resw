@@ -426,14 +426,6 @@
   <data name="Dialog.Week.Fourth" xml:space="preserve"><value>第4</value></data>
   <data name="Dialog.Week.Last" xml:space="preserve"><value>最終</value></data>
 
-  <data name="Dialog.Weekday.Mon" xml:space="preserve"><value>月曜日</value></data>
-  <data name="Dialog.Weekday.Tue" xml:space="preserve"><value>火曜日</value></data>
-  <data name="Dialog.Weekday.Wed" xml:space="preserve"><value>水曜日</value></data>
-  <data name="Dialog.Weekday.Thu" xml:space="preserve"><value>木曜日</value></data>
-  <data name="Dialog.Weekday.Fri" xml:space="preserve"><value>金曜日</value></data>
-  <data name="Dialog.Weekday.Sat" xml:space="preserve"><value>土曜日</value></data>
-  <data name="Dialog.Weekday.Sun" xml:space="preserve"><value>日曜日</value></data>
-
   <data name="Dialog.TriggerOn" xml:space="preserve"><value>トリガー条件</value></data>
   <data name="Dialog.Sess.Lock" xml:space="preserve"><value>ワークステーションのロック</value></data>
   <data name="Dialog.Sess.Unlock" xml:space="preserve"><value>ワークステーションのアンロック</value></data>

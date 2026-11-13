@@ -425,14 +425,6 @@ Restart now to apply the update?</value></data>
   <data name="Dialog.Week.Fourth" xml:space="preserve"><value>Fourth</value></data>
   <data name="Dialog.Week.Last" xml:space="preserve"><value>Last</value></data>
 
-  <data name="Dialog.Weekday.Mon" xml:space="preserve"><value>Monday</value></data>
-  <data name="Dialog.Weekday.Tue" xml:space="preserve"><value>Tuesday</value></data>
-  <data name="Dialog.Weekday.Wed" xml:space="preserve"><value>Wednesday</value></data>
-  <data name="Dialog.Weekday.Thu" xml:space="preserve"><value>Thursday</value></data>
-  <data name="Dialog.Weekday.Fri" xml:space="preserve"><value>Friday</value></data>
-  <data name="Dialog.Weekday.Sat" xml:space="preserve"><value>Saturday</value></data>
-  <data name="Dialog.Weekday.Sun" xml:space="preserve"><value>Sunday</value></data>
-
   <data name="Dialog.TriggerOn" xml:space="preserve"><value>Trigger on</value></data>
   <data name="Dialog.Sess.Lock" xml:space="preserve"><value>Workstation Lock</value></data>
   <data name="Dialog.Sess.Unlock" xml:space="preserve"><value>Workstation Unlock</value></data>
