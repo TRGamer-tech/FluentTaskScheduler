@@ -32,8 +32,8 @@ public sealed class SnoozeTextTests : IDisposable
         CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
         Loc.Use(key => key switch
         {
-            "Snooze.Status.EndsAt" => "Global Snooze Active (Ends at {0})",
-            "Snooze.Status.UntilReboot" => "Global Snooze Active (until next restart)",
+            "Snooze.Status.EndsAt" => "All tasks snoozed until {0}",
+            "Snooze.Status.UntilReboot" => "All tasks snoozed until restart or sign-out",
             "Task.Snooze.Status" => "Snoozed until {0}",
             "Task.Snooze.UntilRestart" => "Snoozed until restart or sign-out",
             _ => null
@@ -51,7 +51,7 @@ public sealed class SnoozeTextTests : IDisposable
     {
         var window = new SnoozeWindow(Now.AddHours(5.5));
 
-        Assert.Equal("Global Snooze Active (Ends at 14:30)", SnoozeText.AllTasks(window, _time));
+        Assert.Equal("All tasks snoozed until 14:30", SnoozeText.AllTasks(window, _time));
         Assert.Equal("Snoozed until 14:30", SnoozeText.OneTask(window, _time));
     }
 
@@ -60,7 +60,7 @@ public sealed class SnoozeTextTests : IDisposable
     {
         var window = new SnoozeWindow(Now.AddDays(2).AddHours(5.5));
 
-        Assert.Equal("Global Snooze Active (Ends at 03/12/2026 14:30)", SnoozeText.AllTasks(window, _time));
+        Assert.Equal("All tasks snoozed until 03/12/2026 14:30", SnoozeText.AllTasks(window, _time));
         Assert.Equal("Snoozed until 03/12/2026 14:30", SnoozeText.OneTask(window, _time));
     }
 
@@ -100,7 +100,7 @@ public sealed class SnoozeTextTests : IDisposable
     [Fact]
     public void ASnoozeUntilRestart_SaysSo()
     {
-        Assert.Equal("Global Snooze Active (until next restart)", SnoozeText.AllTasks(SnoozeWindow.UntilRestart, _time));
+        Assert.Equal("All tasks snoozed until restart or sign-out", SnoozeText.AllTasks(SnoozeWindow.UntilRestart, _time));
         Assert.Equal("Snoozed until restart or sign-out", SnoozeText.OneTask(SnoozeWindow.UntilRestart, _time));
     }
 

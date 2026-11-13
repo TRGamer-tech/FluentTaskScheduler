@@ -89,7 +89,7 @@
   <data name="Dialog.NewFolder.NamePlaceholder" xml:space="preserve"><value>Name</value></data>
   <data name="Dialog.RenameFolder.Title" xml:space="preserve"><value>Rename Folder</value></data>
   <data name="Dialog.DeleteFolder.Title" xml:space="preserve"><value>Delete Folder</value></data>
-  <data name="Dialog.DeleteFolder.ContentFormat" xml:space="preserve"><value>Delete '{0}' and ALL tasks and folders in it?</value></data>
+  <data name="Dialog.DeleteFolder.ContentFormat" xml:space="preserve"><value>Delete '{0}' with all the tasks and folders in it?</value></data>
   <data name="Dialog.UpdateAvailable.Title" xml:space="preserve"><value>Update Available</value></data>
   <data name="Dialog.UpdateAvailable.ContentFormat" xml:space="preserve"><value>Version {0} has been downloaded and is ready to install.
 Restart now to apply the update?</value></data>
@@ -134,12 +134,12 @@ Restart now to apply the update?</value></data>
   <data name="Settings.Import.Success.Content" xml:space="preserve"><value>The settings have been restored.</value></data>
   <data name="Settings.Import.Failed.Title" xml:space="preserve"><value>Import Failed</value></data>
   <data name="Settings.WhatsNew.Title" xml:space="preserve"><value>What's New</value></data>
-  <data name="Settings.WhatsNew.FetchFailed" xml:space="preserve"><value>Could not fetch release notes. Check your internet connection and try again.</value></data>
+  <data name="Settings.WhatsNew.FetchFailed" xml:space="preserve"><value>Could not fetch release notes from GitHub. Check your internet connection, or read them on the project's releases page.</value></data>
   <data name="Settings.UpdateError.ContentFormat" xml:space="preserve"><value>An error occurred while checking for updates:
 {0}</value></data>
   <data name="Settings.UpToDate.Content" xml:space="preserve"><value>You're already running the latest version.</value></data>
   <data name="Settings.Appearance.Theme.Title" xml:space="preserve"><value>App Theme</value></data>
-  <data name="Settings.Appearance.Theme.Description" xml:space="preserve"><value>Choose Light, Dark, or follow the system setting.</value></data>
+  <data name="Settings.Appearance.Theme.Description" xml:space="preserve"><value>Choose Light or Dark, or use the Windows setting.</value></data>
   <data name="Settings.Appearance.Mica.Title" xml:space="preserve"><value>Mica Effect</value></data>
   <data name="Settings.Appearance.Mica.Description" xml:space="preserve"><value>Apply the Mica translucent background material.</value></data>
   <data name="Settings.Appearance.Oled.Title" xml:space="preserve"><value>OLED Mode</value></data>
@@ -166,12 +166,12 @@ Restart now to apply the update?</value></data>
   <data name="ConditionStopBatterySwitch.Content" xml:space="preserve"><value>Stop if switching to battery power</value></data>
   <data name="ConditionSpecificNetwork.Text" xml:space="preserve"><value>Specific network:</value></data>
   <data name="Settings.Notif.Task.Title" xml:space="preserve"><value>Task Notifications</value></data>
-  <data name="Settings.Notif.Task.Desc" xml:space="preserve"><value>Show a toast when a task starts or fails.</value></data>
+  <data name="Settings.Notif.Task.Desc" xml:space="preserve"><value>Show a notification when the app starts a task, when a completion action cannot start one, when a snooze holds a run back, and when a snooze of all tasks begins or runs out. Turning this off also turns off reminders.</value></data>
   <data name="Settings.Notif.Reminders.Title" xml:space="preserve"><value>Upcoming Task Reminders</value></data>
-  <data name="Settings.Notif.Reminders.Desc" xml:space="preserve"><value>Show a reminder toast before a scheduled task is about to run.</value></data>
+  <data name="Settings.Notif.Reminders.Desc" xml:space="preserve"><value>Show a notification shortly before one of your tasks runs. Hidden tasks and Windows' own tasks are left out.</value></data>
   <data name="Settings.Notif.Timing.Title" xml:space="preserve"><value>Reminder Timing</value></data>
   <data name="Settings.Notif.Timing.Desc" xml:space="preserve"><value>How far in advance to send the reminder.</value></data>
-  <data name="Settings.Sys.Startup.Title" xml:space="preserve"><value>Run on Startup</value></data>
+  <data name="Settings.Sys.Startup.Title" xml:space="preserve"><value>Start with Windows</value></data>
   <data name="Settings.Sys.Startup.Desc" xml:space="preserve"><value>Automatically launch the app when you sign in to Windows.</value></data>
   <data name="Settings.Sys.Tray.Title" xml:space="preserve"><value>Close to Tray</value></data>
   <data name="Settings.Sys.Tray.Desc" xml:space="preserve"><value>Closing the window hides it to the system tray and keeps the app running, so that reminders, completion actions and snoozes keep working.</value></data>
@@ -180,7 +180,7 @@ Restart now to apply the update?</value></data>
   <data name="Settings.Sys.Hidden.Title" xml:space="preserve"><value>Show Hidden Tasks</value></data>
   <data name="Settings.Sys.Hidden.Desc" xml:space="preserve"><value>Display tasks that are marked as hidden in the Windows Task Scheduler.</value></data>
   <data name="Settings.Adv.Confirm.Title" xml:space="preserve"><value>Confirm Before Deleting</value></data>
-  <data name="Settings.Adv.Confirm.Desc" xml:space="preserve"><value>Show a confirmation dialog before removing a task.</value></data>
+  <data name="Settings.Adv.Confirm.Desc" xml:space="preserve"><value>Ask before deleting a task.</value></data>
   <data name="Settings.Adv.Logging.Title" xml:space="preserve"><value>Application Logging</value></data>
   <data name="Settings.Adv.Logging.Desc" xml:space="preserve"><value>Write what the app does and the errors it runs into to log files, for troubleshooting. A crash is always recorded.</value></data>
   <data name="Settings.Adv.SepLogs.Title" xml:space="preserve"><value>Separate Log Files</value></data>
@@ -205,7 +205,7 @@ Restart now to apply the update?</value></data>
   <data name="Settings.About.Update.Desc" xml:space="preserve"><value>Check if a newer version is available.</value></data>
   <data name="Settings.About.CheckBtn" xml:space="preserve"><value>Check</value></data>
   <data name="Settings.About.Onboard.Title" xml:space="preserve"><value>Welcome Tour</value></data>
-  <data name="Settings.About.Onboard.Desc" xml:space="preserve"><value>Take the tour from the first start again.</value></data>
+  <data name="Settings.About.Onboard.Desc" xml:space="preserve"><value>Take the tour shown at the first start again.</value></data>
   <data name="Dashboard.AllTags" xml:space="preserve"><value>All Tags</value></data>
   <data name="Dashboard.AllCategories" xml:space="preserve"><value>All Categories</value></data>
   <data name="Dialog.TaskName" xml:space="preserve"><value>Task Name</value></data>
@@ -214,17 +214,17 @@ Restart now to apply the update?</value></data>
   <data name="Dialog.Category" xml:space="preserve"><value>Category</value></data>
   <data name="Dialog.Tags" xml:space="preserve"><value>Tags</value></data>
   <data name="Dialog.Enabled" xml:space="preserve"><value>Enabled</value></data>
-  <data name="Dialog.TriggerType" xml:space="preserve"><value>Trigger Type</value></data>
+  <data name="Dialog.TriggerType" xml:space="preserve"><value>Trigger type</value></data>
   <data name="Dialog.Trigger.Daily" xml:space="preserve"><value>Daily</value></data>
   <data name="Dialog.Trigger.Weekly" xml:space="preserve"><value>Weekly</value></data>
   <data name="Dialog.Trigger.Monthly" xml:space="preserve"><value>Monthly</value></data>
-  <data name="Dialog.Trigger.Session" xml:space="preserve"><value>On a session change (lock, unlock, connect)</value></data>
+  <data name="Dialog.Trigger.Session" xml:space="preserve"><value>On a session change (lock, unlock, connect, disconnect)</value></data>
   <data name="Dialog.RandomDelay" xml:space="preserve"><value>Delay task for up to (random delay):</value></data>
-  <data name="Dialog.StopAfter" xml:space="preserve"><value>Stop task if runs longer than:</value></data>
+  <data name="Dialog.StopAfter" xml:space="preserve"><value>Stop the task if it runs longer than:</value></data>
   <data name="Dialog.ProgramScript" xml:space="preserve"><value>Program / Script</value></data>
   <data name="Dialog.Arguments" xml:space="preserve"><value>Arguments (optional)</value></data>
-  <data name="Dialog.WorkingDir" xml:space="preserve"><value>Run in (optional)</value></data>
-  <data name="Dialog.PsTip" xml:space="preserve"><value>Tip: For PowerShell scripts, use 'powershell.exe' as Program and '-ExecutionPolicy Bypass -File "C:\path\to\script.ps1"' as Arguments</value></data>
+  <data name="Dialog.WorkingDir" xml:space="preserve"><value>Start in (optional)</value></data>
+  <data name="Dialog.PsTip" xml:space="preserve"><value>Tip: for a PowerShell script, enter 'powershell.exe' as the program and '-ExecutionPolicy Bypass -File "C:\path\to\script.ps1"' as the arguments.</value></data>
   <data name="Dialog.HighPriv" xml:space="preserve"><value>Run with highest privileges</value></data>
   <data name="Dialog.Hidden" xml:space="preserve"><value>Hidden task</value></data>
   <data name="Dialog.DeleteExpired" xml:space="preserve"><value>Delete the task if it is not scheduled to run again</value></data>
@@ -241,13 +241,13 @@ Restart now to apply the update?</value></data>
   <data name="Dialog.RunAsSpecific" xml:space="preserve"><value>Run as specific user</value></data>
   <data name="Dialog.RunAsSystem" xml:space="preserve"><value>Run as SYSTEM (needs administrator rights)</value></data>
   <data name="Trigger.At" xml:space="preserve"><value>at</value></data>
-  <data name="Trigger.OnIdle" xml:space="preserve"><value>On Idle</value></data>
-  <data name="Trigger.AtLogon" xml:space="preserve"><value>At Logon</value></data>
-  <data name="Trigger.AtStartup" xml:space="preserve"><value>At Startup</value></data>
-  <data name="Trigger.SessionStateChange" xml:space="preserve"><value>At {0}</value></data>
+  <data name="Trigger.OnIdle" xml:space="preserve"><value>On idle</value></data>
+  <data name="Trigger.AtLogon" xml:space="preserve"><value>At logon</value></data>
+  <data name="Trigger.AtStartup" xml:space="preserve"><value>At startup</value></data>
+  <data name="Trigger.SessionStateChange" xml:space="preserve"><value>On a session change ({0})</value></data>
   <data name="Dialog.Ph.TaskName" xml:space="preserve"><value>Enter task name</value></data>
-  <data name="Dialog.Ph.Category" xml:space="preserve"><value>e.g. Work</value></data>
-  <data name="Dialog.Ph.Tags" xml:space="preserve"><value>e.g. urgent, sync (comma separated)</value></data>
+  <data name="Dialog.Ph.Category" xml:space="preserve"><value>e.g., Work</value></data>
+  <data name="Dialog.Ph.Tags" xml:space="preserve"><value>e.g., urgent, sync (separated by commas)</value></data>
   <data name="Dialog.Ph.Command" xml:space="preserve"><value>e.g., notepad.exe or C:\Scripts\myscript.ps1</value></data>
   <data name="Dialog.Ph.Args" xml:space="preserve"><value>e.g., /c echo hello or -File script.ps1</value></data>
   <data name="Dialog.Ph.WorkDir" xml:space="preserve"><value>e.g., C:\Scripts</value></data>
@@ -257,9 +257,9 @@ Restart now to apply the update?</value></data>
   <data name="Dialog.EventLog" xml:space="preserve"><value>Log</value></data>
   <data name="Dialog.EventSource" xml:space="preserve"><value>Source</value></data>
   <data name="Dialog.EventId" xml:space="preserve"><value>Event ID</value></data>
-  <data name="Dialog.Ph.EventLog" xml:space="preserve"><value>Application, System, Security, etc.</value></data>
-  <data name="Dialog.Ph.EventSource" xml:space="preserve"><value>e.g., VSS, Outlook (Optional)</value></data>
-  <data name="Dialog.Ph.EventId" xml:space="preserve"><value>e.g., 1000 (Optional)</value></data>
+  <data name="Dialog.Ph.EventLog" xml:space="preserve"><value>e.g., Application, System, Security</value></data>
+  <data name="Dialog.Ph.EventSource" xml:space="preserve"><value>e.g., VSS, Outlook (optional)</value></data>
+  <data name="Dialog.Ph.EventId" xml:space="preserve"><value>e.g., 1000 (optional)</value></data>
   <data name="Dialog.RecurEvery" xml:space="preserve"><value>Recur every</value></data>
   <data name="Dialog.Day.Mon" xml:space="preserve"><value>Mon</value></data>
   <data name="Dialog.Day.Tue" xml:space="preserve"><value>Tue</value></data>
@@ -285,8 +285,8 @@ Restart now to apply the update?</value></data>
   <data name="Dialog.Week.Third" xml:space="preserve"><value>Third</value></data>
   <data name="Dialog.Week.Fourth" xml:space="preserve"><value>Fourth</value></data>
   <data name="Dialog.Week.Last" xml:space="preserve"><value>Last</value></data>
-  <data name="Dialog.Sess.Lock" xml:space="preserve"><value>Workstation Lock</value></data>
-  <data name="Dialog.Sess.Unlock" xml:space="preserve"><value>Workstation Unlock</value></data>
+  <data name="Dialog.Sess.Lock" xml:space="preserve"><value>Workstation lock</value></data>
+  <data name="Dialog.Sess.Unlock" xml:space="preserve"><value>Workstation unlock</value></data>
   <data name="Dialog.Action.RunProg" xml:space="preserve"><value>Run Program</value></data>
   <data name="Dialog.Action.Email" xml:space="preserve"><value>Send Email</value></data>
   <data name="Dialog.Action.Notif" xml:space="preserve"><value>Display a Message</value></data>
@@ -301,7 +301,7 @@ Restart now to apply the update?</value></data>
   <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>Windows lists the known networks only to an administrator. Restart the app as administrator to choose one.</value></data>
   <data name="Settings.Theme.Light" xml:space="preserve"><value>Light</value></data>
   <data name="Settings.Theme.Dark" xml:space="preserve"><value>Dark</value></data>
-  <data name="Settings.Theme.System" xml:space="preserve"><value>System Default</value></data>
+  <data name="Settings.Theme.System" xml:space="preserve"><value>Use the Windows setting</value></data>
   <data name="Settings.Lead.1m" xml:space="preserve"><value>1 minute before</value></data>
   <data name="QuickActions.Description.Text" xml:space="preserve"><value>Run common system maintenance tasks with a single click.</value></data>
   <data name="QuickActions.FlushDNS.Title" xml:space="preserve"><value>Flush DNS</value></data>
@@ -335,28 +335,28 @@ Restart now to apply the update?</value></data>
   <data name="ScriptEditor.Status.Saved" xml:space="preserve"><value>[Saved to Library as '{0}']</value></data>
   <data name="Dialog.Crash.Title" xml:space="preserve"><value>Something went wrong</value></data>
   <data name="Dialog.Crash.Copy" xml:space="preserve"><value>Copy to Clipboard</value></data>
-  <data name="Snooze.Status.EndsAt" xml:space="preserve"><value>Global Snooze Active (Ends at {0})</value></data>
-  <data name="Snooze.Status.UntilReboot" xml:space="preserve"><value>Global Snooze Active (until next restart)</value></data>
+  <data name="Snooze.Status.EndsAt" xml:space="preserve"><value>All tasks snoozed until {0}</value></data>
+  <data name="Snooze.Status.UntilReboot" xml:space="preserve"><value>All tasks snoozed until restart or sign-out</value></data>
   <data name="Snooze.Menu.SnoozeAll" xml:space="preserve"><value>Snooze All Tasks...</value></data>
   <data name="Snooze.Menu.Resume" xml:space="preserve"><value>Resume All Tasks</value></data>
-  <data name="Snooze.Duration.30m" xml:space="preserve"><value>30 Minutes</value></data>
-  <data name="Snooze.Duration.1h" xml:space="preserve"><value>1 Hour</value></data>
-  <data name="Snooze.Duration.3h" xml:space="preserve"><value>3 Hours</value></data>
-  <data name="Snooze.Duration.Reboot" xml:space="preserve"><value>Until Next Reboot</value></data>
-  <data name="Snooze.Duration.Custom" xml:space="preserve"><value>Custom Time...</value></data>
+  <data name="Snooze.Duration.30m" xml:space="preserve"><value>30 minutes</value></data>
+  <data name="Snooze.Duration.1h" xml:space="preserve"><value>1 hour</value></data>
+  <data name="Snooze.Duration.3h" xml:space="preserve"><value>3 hours</value></data>
+  <data name="Snooze.Duration.Reboot" xml:space="preserve"><value>Until restart or sign-out</value></data>
+  <data name="Snooze.Duration.Custom" xml:space="preserve"><value>Custom time...</value></data>
   <data name="Snooze.Dialog.Title" xml:space="preserve"><value>Snooze All Tasks</value></data>
   <data name="Snooze.Dialog.Confirm" xml:space="preserve"><value>Snooze</value></data>
   <data name="Snooze.Dialog.Intro" xml:space="preserve"><value>While all tasks are snoozed, FluentTaskScheduler starts none of them, not even through completion actions.</value></data>
   <data name="Snooze.SuspendTriggers" xml:space="preserve"><value>Also suspend scheduled triggers</value></data>
   <data name="Snooze.SuspendTriggersHint" xml:space="preserve"><value>Disables every enabled task through the Task Scheduler API and re-enables exactly those tasks when the snooze ends. Protected system tasks are skipped.</value></data>
   <data name="Snooze.Banner.Suspended" xml:space="preserve"><value>Scheduled triggers are suspended and manual runs are blocked. Tasks are re-enabled when the snooze ends.</value></data>
-  <data name="Snooze.Banner.ManualOnly" xml:space="preserve"><value>Runs started from this app are blocked. Windows will still fire scheduled triggers - enable "Suspend scheduled triggers" when snoozing to stop those too.</value></data>
+  <data name="Snooze.Banner.ManualOnly" xml:space="preserve"><value>Runs started from this app are blocked, but Windows still starts tasks on their schedule. Choose "Also suspend scheduled triggers" when you snooze to stop those too.</value></data>
   <data name="Snooze.Error.BatchBlocked" xml:space="preserve"><value>{0} task(s) were not started because they are snoozed.</value></data>
   <data name="Snooze.Error.PastTime" xml:space="preserve"><value>Pick a time in the future.</value></data>
-  <data name="Snooze.Toast.Started.Title" xml:space="preserve"><value>Global Snooze Enabled</value></data>
-  <data name="Snooze.Toast.Ended.Title" xml:space="preserve"><value>Global Snooze Ended</value></data>
-  <data name="Snooze.Toast.Ended.Body" xml:space="preserve"><value>Scheduled tasks are running normally again.</value></data>
-  <data name="Snooze.Toast.Suppressed.Title" xml:space="preserve"><value>Run Suppressed: {0}</value></data>
+  <data name="Snooze.Toast.Started.Title" xml:space="preserve"><value>Snooze started</value></data>
+  <data name="Snooze.Toast.Ended.Title" xml:space="preserve"><value>Snooze ended</value></data>
+  <data name="Snooze.Toast.Ended.Body" xml:space="preserve"><value>Tasks run as usual again.</value></data>
+  <data name="Snooze.Toast.Suppressed.Title" xml:space="preserve"><value>Task not started: {0}</value></data>
   <data name="Snooze.Toast.Suppressed.Body" xml:space="preserve"><value>This task is snoozed, so it was not started.</value></data>
   <data name="Pipeline.SectionTitle" xml:space="preserve"><value>Completion Actions</value></data>
   <data name="Pipeline.EnableSwitch" xml:space="preserve"><value>Start other tasks when this task finishes</value></data>
@@ -368,22 +368,22 @@ Restart now to apply the update?</value></data>
   <data name="Dashboard.HeatmapTitle" xml:space="preserve"><value>Runs by hour of day</value></data>
   <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>Runs started between {0} and {1} in the last 7 days: {2}</value></data>
   <data name="Dashboard.PeakHour" xml:space="preserve"><value>Busiest hour:</value></data>
-  <data name="Dashboard.ExecutionStream" xml:space="preserve"><value>Execution log</value></data>
-  <data name="Dashboard.NoExecutionEntries" xml:space="preserve"><value>No runs recorded for this filter.</value></data>
+  <data name="Dashboard.ExecutionStream" xml:space="preserve"><value>Recent runs</value></data>
+  <data name="Dashboard.NoExecutionEntries" xml:space="preserve"><value>No runs match this filter.</value></data>
   <data name="Dashboard.Filter.All" xml:space="preserve"><value>All</value></data>
   <data name="Dashboard.Status.Snoozed" xml:space="preserve"><value>Snoozed</value></data>
   <data name="Templates.Info.Title" xml:space="preserve"><value>Nothing is created until you save</value></data>
   <data name="Templates.Info.Message" xml:space="preserve"><value>Review the command, arguments and trigger in the editor before saving: several templates delete files or change system settings, and some need administrator rights.</value></data>
-  <data name="Templates.Deploy" xml:space="preserve"><value>Deploy Template...</value></data>
+  <data name="Templates.Deploy" xml:space="preserve"><value>Create Task from Template...</value></data>
   <data name="Templates.Group.Maintenance" xml:space="preserve"><value>System Maintenance</value></data>
   <data name="Templates.Group.Developer" xml:space="preserve"><value>Developer Tools</value></data>
   <data name="Templates.Group.Power" xml:space="preserve"><value>Power &amp; Utility</value></data>
   <data name="Templates.TempCleanup.Name" xml:space="preserve"><value>Nightly Temp File Cleanup</value></data>
   <data name="Templates.TempCleanup.Desc" xml:space="preserve"><value>Deletes files older than 7 days from your temp folder. Files still in use are skipped.</value></data>
-  <data name="Templates.TempCleanup.Note" xml:space="preserve"><value>Deletes files permanently - review the age threshold before deploying.</value></data>
+  <data name="Templates.TempCleanup.Note" xml:space="preserve"><value>Deletes files permanently. Check the age threshold before saving.</value></data>
   <data name="Templates.UpdateHealth.Name" xml:space="preserve"><value>Windows Update Health Check</value></data>
   <data name="Templates.UpdateHealth.Desc" xml:space="preserve"><value>Writes the number of pending Windows updates and the date of the last installed update to a log file in your Documents folder.</value></data>
-  <data name="Templates.Defrag.Name" xml:space="preserve"><value>Disk Optimize (Defrag, TRIM)</value></data>
+  <data name="Templates.Defrag.Name" xml:space="preserve"><value>Optimize Drive (Defrag, TRIM)</value></data>
   <data name="Templates.Defrag.Desc" xml:space="preserve"><value>Runs the built-in Windows optimizer on drive C:. SSDs receive a TRIM/retrim, HDDs are defragmented.</value></data>
   <data name="Templates.Defrag.Note" xml:space="preserve"><value>Runs only when the PC is idle and on AC power. Change 'C:' if Windows is on another drive.</value></data>
   <data name="Templates.GitFetch.Name" xml:space="preserve"><value>Git Repository Fetch</value></data>
@@ -394,9 +394,9 @@ Restart now to apply the update?</value></data>
   <data name="Templates.DockerPrune.Note" xml:space="preserve"><value>Requires Docker Desktop to be running. Deletes unused Docker data permanently.</value></data>
   <data name="Templates.LogRotation.Name" xml:space="preserve"><value>Daily Log Rotation</value></data>
   <data name="Templates.LogRotation.Desc" xml:space="preserve"><value>Moves the *.log files that were last written before today into a dated ZIP archive and removes archives older than 30 days.</value></data>
-  <data name="Templates.LogRotation.Note" xml:space="preserve"><value>Change 'C:\Logs' to your own log directory before deploying.</value></data>
+  <data name="Templates.LogRotation.Note" xml:space="preserve"><value>Change 'C:\Logs' to your own log folder before saving.</value></data>
   <data name="Templates.IdleShutdown.Name" xml:space="preserve"><value>Auto-Shutdown at Night when Idle</value></data>
-  <data name="Templates.IdleShutdown.Desc" xml:space="preserve"><value>Shuts the PC down at night, but only after it has been idle - with a 60 second warning you can cancel.</value></data>
+  <data name="Templates.IdleShutdown.Desc" xml:space="preserve"><value>Shuts the PC down at night, but only after it has been idle, with a 60-second warning you can cancel.</value></data>
   <data name="Templates.IdleShutdown.Note" xml:space="preserve"><value>Shuts the machine down. Unsaved work in open apps may be lost.</value></data>
   <data name="Templates.BatterySaver.Name" xml:space="preserve"><value>Power Saver Plan at Logon</value></data>
   <data name="Templates.BatterySaver.Desc" xml:space="preserve"><value>Switches Windows to the Power saver plan every time you sign in. The plan stays active until you choose another one.</value></data>
@@ -451,7 +451,7 @@ Restart now to apply the update?</value></data>
   <data name="Templates.DnsFlush.Name" xml:space="preserve"><value>Flush DNS Cache at Logon</value></data>
   <data name="Templates.DnsFlush.Desc" xml:space="preserve"><value>Clears the DNS resolver cache when you sign in - useful when you switch networks or VPNs often.</value></data>
   <data name="Templates.NodePrune.Name" xml:space="preserve"><value>npm and pnpm Cache Prune</value></data>
-  <data name="Templates.NodePrune.Desc" xml:space="preserve"><value>Verifies and prunes the npm cache and removes stale pnpm store entries to reclaim several gigabytes.</value></data>
+  <data name="Templates.NodePrune.Desc" xml:space="preserve"><value>Verifies the npm cache, which removes data it no longer needs, and prunes the pnpm store if pnpm is installed.</value></data>
   <data name="Templates.NodePrune.Note" xml:space="preserve"><value>Requires Node.js on PATH.</value></data>
   <data name="Templates.ProjectBackup.Name" xml:space="preserve"><value>Nightly Project Folder Backup</value></data>
   <data name="Templates.ProjectBackup.Desc" xml:space="preserve"><value>Mirrors a project folder to a backup location with robocopy, skipping build output and dependency folders.</value></data>
@@ -464,8 +464,8 @@ Restart now to apply the update?</value></data>
   <data name="Templates.WeeklyReboot.Name" xml:space="preserve"><value>Weekly Restart when Idle</value></data>
   <data name="Templates.WeeklyReboot.Desc" xml:space="preserve"><value>Restarts the machine once a week during the night, but only while it is idle, to apply pending updates.</value></data>
   <data name="Templates.WeeklyReboot.Note" xml:space="preserve"><value>Restarts the machine. Unsaved work in open apps may be lost.</value></data>
-  <data name="EventResult.118" xml:space="preserve"><value>Boot Trigger</value></data>
-  <data name="EventResult.119" xml:space="preserve"><value>Logon Trigger</value></data>
+  <data name="EventResult.118" xml:space="preserve"><value>Triggered at Startup</value></data>
+  <data name="EventResult.119" xml:space="preserve"><value>Triggered at Logon</value></data>
   <data name="EventResult.140" xml:space="preserve"><value>Task Updated</value></data>
   <data name="EventResult.141" xml:space="preserve"><value>Task Deleted</value></data>
   <data name="EventResult.142" xml:space="preserve"><value>Task Disabled</value></data>
@@ -531,20 +531,20 @@ Restart now to apply the update?</value></data>
   <data name="Scripts.NetworkCheck.Description" xml:space="preserve"><value>Pings Google DNS to check internet connectivity.</value></data>
   <data name="Scripts.NetworkCheck.Name" xml:space="preserve"><value>Network Connectivity Check</value></data>
   <data name="Scripts.Reboot.Description" xml:space="preserve"><value>Restarts the computer after one hour.</value></data>
-  <data name="Scripts.Reboot.Name" xml:space="preserve"><value>Reboot Computer</value></data>
+  <data name="Scripts.Reboot.Name" xml:space="preserve"><value>Restart Computer</value></data>
   <data name="Scripts.RestartPrintSpooler.Description" xml:space="preserve"><value>Restarts the Print Spooler service to fix stuck print jobs.</value></data>
   <data name="Scripts.RestartPrintSpooler.Name" xml:space="preserve"><value>Restart Print Spooler</value></data>
   <data name="Scripts.Shutdown.Description" xml:space="preserve"><value>Shuts down the computer after one hour.</value></data>
-  <data name="Scripts.Shutdown.Name" xml:space="preserve"><value>Shutdown Computer</value></data>
+  <data name="Scripts.Shutdown.Name" xml:space="preserve"><value>Shut Down Computer</value></data>
   <data name="Scripts.SystemFileChecker.Description" xml:space="preserve"><value>Scans for and restores corrupted system files.</value></data>
   <data name="Scripts.SystemFileChecker.Name" xml:space="preserve"><value>System File Checker</value></data>
-  <data name="Scripts.SystemInfoReport.Description" xml:space="preserve"><value>Generates a detailed system report and saves it to a file.</value></data>
+  <data name="Scripts.SystemInfoReport.Description" xml:space="preserve"><value>Saves a detailed system report as SystemInfo.txt in your user folder.</value></data>
   <data name="Scripts.SystemInfoReport.Name" xml:space="preserve"><value>System Info Report</value></data>
   <data name="Task.Snooze.Label" xml:space="preserve"><value>Snooze</value></data>
   <data name="Task.Snooze.CustomIntro" xml:space="preserve"><value>Disable this task until:</value></data>
   <data name="Task.Snooze.Status" xml:space="preserve"><value>Snoozed until {0}</value></data>
-  <data name="Task.Snooze.Resume" xml:space="preserve"><value>Resume now</value></data>
-  <data name="Editor.Title.New" xml:space="preserve"><value>New task</value></data>
+  <data name="Task.Snooze.Resume" xml:space="preserve"><value>Resume Now</value></data>
+  <data name="Editor.Title.New" xml:space="preserve"><value>New Task</value></data>
   <data name="Editor.Title.Edit" xml:space="preserve"><value>Edit {0}</value></data>
   <data name="Editor.Section.Account" xml:space="preserve"><value>Account</value></data>
   <data name="Editor.Trigger.EveryNDays" xml:space="preserve"><value>every {0} days</value></data>
@@ -571,7 +571,7 @@ Restart now to apply the update?</value></data>
   <data name="Editor.Trigger.SessionChange" xml:space="preserve"><value>When</value></data>
   <data name="Editor.Trigger.CustomQuery" xml:space="preserve"><value>Custom query (XML)</value></data>
   <data name="Editor.Trigger.Unsupported" xml:space="preserve"><value>This kind of trigger cannot be edited here. It stays as it is.</value></data>
-  <data name="Editor.Ph.Duration" xml:space="preserve"><value>e.g. 15m, 1h 30m, 2d</value></data>
+  <data name="Editor.Ph.Duration" xml:space="preserve"><value>e.g., 15m, 1h 30m, 2d</value></data>
   <data name="Editor.Ph.NoRepetition" xml:space="preserve"><value>empty: no repetition</value></data>
   <data name="Editor.Ph.Indefinitely" xml:space="preserve"><value>empty: indefinitely</value></data>
   <data name="Editor.Ph.NoDelay" xml:space="preserve"><value>empty: no delay</value></data>
@@ -583,7 +583,7 @@ Restart now to apply the update?</value></data>
   <data name="Editor.CompletionActions.Add" xml:space="preserve"><value>Add</value></data>
   <data name="Editor.CompletionActions.Remove" xml:space="preserve"><value>Remove</value></data>
   <data name="Editor.CompletionActions.BothWays" xml:space="preserve"><value>A task is listed for success and for failure, so it starts after every run.</value></data>
-  <data name="Editor.Error.NameCharacters" xml:space="preserve"><value>The task name must not contain any of these characters: \ / : * ? " &lt; &gt; |</value></data>
+  <data name="Editor.Error.NameCharacters" xml:space="preserve"><value>A name must not contain any of these characters: \ / : * ? " &lt; &gt; |</value></data>
   <data name="Editor.Error.NoAction" xml:space="preserve"><value>The task needs at least one action.</value></data>
   <data name="Editor.Error.ActionWithoutProgram" xml:space="preserve"><value>Action {0}: enter the program or script to run.</value></data>
   <data name="Editor.Error.UserNameMissing" xml:space="preserve"><value>Enter the user the task should run as.</value></data>
@@ -600,7 +600,7 @@ Restart now to apply the update?</value></data>
   <data name="Editor.Error.TriggerNeedsStart" xml:space="preserve"><value>Trigger {0}: set the start date and time.</value></data>
   <data name="Editor.Error.TriggerEndsBeforeStart" xml:space="preserve"><value>Trigger {0}: it expires before it starts.</value></data>
   <data name="Editor.Error.RepetitionInterval" xml:space="preserve"><value>Trigger {0}: the repetition interval must be between one minute and 31 days.</value></data>
-  <data name="Editor.Error.RepetitionDuration" xml:space="preserve"><value>Trigger {0}: the repetition cannot last shorter than its interval.</value></data>
+  <data name="Editor.Error.RepetitionDuration" xml:space="preserve"><value>Trigger {0}: the repetition must last at least as long as its interval.</value></data>
   <data name="Editor.Error.RepetitionText" xml:space="preserve"><value>Trigger {0}: the repetition is not a duration. Write it like 15m, 1h 30m or 2d.</value></data>
   <data name="Editor.Error.RandomDelayText" xml:space="preserve"><value>Trigger {0}: the random delay is not a duration. Write it like 30s, 10m or 1h.</value></data>
   <data name="Editor.Error.EventIdText" xml:space="preserve"><value>Trigger {0}: the event ID must be a number.</value></data>
@@ -608,7 +608,7 @@ Restart now to apply the update?</value></data>
   <data name="Editor.Error.AccessDeniedNotElevated" xml:space="preserve"><value>Windows denied the change. It needs administrator rights: restart the app as administrator and try again.</value></data>
   <data name="Editor.Error.Account" xml:space="preserve"><value>Windows did not accept the account: {0}</value></data>
   <data name="Tasks.NotElevated.Title" xml:space="preserve"><value>Not all tasks are shown</value></data>
-  <data name="Tasks.NotElevated.Message" xml:space="preserve"><value>Tasks of other users and of Windows itself are only visible to an administrator.</value></data>
+  <data name="Tasks.NotElevated.Message" xml:space="preserve"><value>Tasks of other users and some of Windows' own tasks are only visible to an administrator.</value></data>
   <data name="Tasks.NotElevated.Restart" xml:space="preserve"><value>Restart as administrator</value></data>
   <data name="Tasks.LoadError.Title" xml:space="preserve"><value>The tasks could not be loaded</value></data>
   <data name="Tasks.Empty" xml:space="preserve"><value>No tasks to show here.</value></data>
@@ -620,13 +620,13 @@ Restart now to apply the update?</value></data>
   <data name="Tasks.File.TaskXml" xml:space="preserve"><value>Task XML</value></data>
   <data name="Tasks.Badge.Unreadable" xml:space="preserve"><value>Unreadable</value></data>
   <data name="Folders.Library" xml:space="preserve"><value>Task Scheduler Library</value></data>
-  <data name="Folders.Reload" xml:space="preserve"><value>Reload folders</value></data>
-  <data name="Tasks.MoveTo" xml:space="preserve"><value>Move to folder</value></data>
+  <data name="Folders.Reload" xml:space="preserve"><value>Refresh folders</value></data>
+  <data name="Tasks.MoveTo" xml:space="preserve"><value>Move to Folder</value></data>
   <data name="Import.Account.Header" xml:space="preserve"><value>Run the task as</value></data>
   <data name="Import.Account.Keep" xml:space="preserve"><value>The account from the file ({0})</value></data>
   <data name="Import.Account.Me" xml:space="preserve"><value>Me ({0})</value></data>
   <data name="Import.Account.Missing" xml:space="preserve"><value>The file names the account {0}, which does not exist on this computer.</value></data>
-  <data name="Import.Error.NotATask" xml:space="preserve"><value>'{0}' is not a task exported from Task Scheduler. {1}</value></data>
+  <data name="Import.Error.NotATask" xml:space="preserve"><value>'{0}' could not be read as an exported task. {1}</value></data>
   <data name="EventResult.101" xml:space="preserve"><value>Start Failed</value></data>
   <data name="EventResult.323" xml:space="preserve"><value>Stopped (new instance)</value></data>
   <data name="EventResult.324" xml:space="preserve"><value>Launch Queued</value></data>
@@ -640,7 +640,7 @@ Restart now to apply the update?</value></data>
   <data name="Toast.Upcoming.Soon" xml:space="preserve"><value>Scheduled to run in less than a minute.</value></data>
   <data name="Toast.Upcoming.Minutes" xml:space="preserve"><value>Scheduled to run in {0} minutes.</value></data>
   <data name="Toast.HiddenToTray.Title" xml:space="preserve"><value>FluentTaskScheduler is still running</value></data>
-  <data name="Toast.HiddenToTray.Body" xml:space="preserve"><value>The window was moved to the notification area. Select the icon there to bring it back.</value></data>
+  <data name="Toast.HiddenToTray.Body" xml:space="preserve"><value>The window was hidden in the system tray. Select the app's icon there to bring it back.</value></data>
   <data name="Tray.Open" xml:space="preserve"><value>Open FluentTaskScheduler</value></data>
   <data name="Tray.ShowWindowFormat" xml:space="preserve"><value>Show {0}</value></data>
   <data name="Details.NextRun" xml:space="preserve"><value>Next run</value></data>
@@ -652,7 +652,7 @@ Restart now to apply the update?</value></data>
   <data name="Details.Period.Yesterday" xml:space="preserve"><value>Yesterday</value></data>
   <data name="Details.Period.LastSevenDays" xml:space="preserve"><value>Last 7 days</value></data>
   <data name="Details.Period.Everything" xml:space="preserve"><value>All time</value></data>
-  <data name="Details.History.Reload" xml:space="preserve"><value>Reload</value></data>
+  <data name="Details.History.Reload" xml:space="preserve"><value>Refresh</value></data>
   <data name="Details.History.ExportCsv" xml:space="preserve"><value>Export CSV</value></data>
   <data name="Details.History.Copy" xml:space="preserve"><value>Copy</value></data>
   <data name="Details.Stat.Total" xml:space="preserve"><value>Total runs</value></data>
@@ -714,7 +714,7 @@ Restart now to apply the update?</value></data>
   <data name="Shortcuts.Edit" xml:space="preserve"><value>Edit the selected task</value></data>
   <data name="Shortcuts.Run" xml:space="preserve"><value>Run the selected tasks</value></data>
   <data name="Shortcuts.Delete" xml:space="preserve"><value>Delete the selected tasks</value></data>
-  <data name="Shortcuts.Refresh" xml:space="preserve"><value>Reload the task list</value></data>
+  <data name="Shortcuts.Refresh" xml:space="preserve"><value>Refresh the task list</value></data>
   <data name="Shortcuts.Help" xml:space="preserve"><value>Show this overview</value></data>
   <data name="Task.Snooze.UntilRestart" xml:space="preserve"><value>Snoozed until restart or sign-out</value></data>
   <data name="Settings.Appearance.Language.Windows" xml:space="preserve"><value>Use the Windows language</value></data>
@@ -726,10 +726,10 @@ Restart now to apply the update?</value></data>
   <data name="Settings.Adv.ErrorLogDesc" xml:space="preserve"><value>Operations that failed.</value></data>
   <data name="Settings.Adv.CrashLogDesc" xml:space="preserve"><value>Unexpected errors the app could not handle.</value></data>
   <data name="Settings.Adv.DataFolder.Title" xml:space="preserve"><value>Data Folder</value></data>
-  <data name="Settings.Adv.DataFolder.Desc" xml:space="preserve"><value>Open the folder with the log files, the settings and the other files of the app.</value></data>
+  <data name="Settings.Adv.DataFolder.Desc" xml:space="preserve"><value>Open the folder that holds the app's settings, log files and other data.</value></data>
   <data name="Settings.Adv.Logs.Empty" xml:space="preserve"><value>Nothing has been recorded in this log yet.</value></data>
   <data name="Settings.Adv.ExecHistory.Title" xml:space="preserve"><value>Execution History Log</value></data>
-  <data name="Settings.Adv.ExecHistory.Desc" xml:space="preserve"><value>Record every task run in files of the app, which keep it longer than the event log of the Windows Task Scheduler does.</value></data>
+  <data name="Settings.Adv.ExecHistory.Desc" xml:space="preserve"><value>While the app is running and Windows records task history, copy every finished run into the app's own files and keep them for 12 months. Windows overwrites its own history much sooner.</value></data>
   <data name="Settings.Adv.ExecHistoryFolder.Title" xml:space="preserve"><value>Execution History Folder</value></data>
   <data name="Settings.Adv.ExecHistoryFolder.Desc" xml:space="preserve"><value>Open the folder with the execution history files.</value></data>
   <data name="Settings.Data.FileType" xml:space="preserve"><value>Settings file</value></data>
@@ -741,7 +741,7 @@ Restart now to apply the update?</value></data>
 {0}
 
 {1}</value></data>
-  <data name="Settings.Import.Failed.NotSettingsFormat" xml:space="preserve"><value>This file does not contain settings of FluentTaskScheduler:
+  <data name="Settings.Import.Failed.NotSettingsFormat" xml:space="preserve"><value>This file does not contain FluentTaskScheduler settings:
 {0}</value></data>
   <data name="Settings.OpenFailedFormat" xml:space="preserve"><value>Windows could not open:
 {0}</value></data>
@@ -766,16 +766,16 @@ Restart now to apply the update?</value></data>
   <data name="Tour.Library.Title" xml:space="preserve"><value>Start from a template</value></data>
   <data name="Tour.Library.Body" xml:space="preserve"><value>The Library has ready-made tasks for common jobs and keeps your own scripts. Quick Actions run everyday maintenance with one click.</value></data>
   <data name="Tour.Admin.Title" xml:space="preserve"><value>Tasks that need administrator rights</value></data>
-  <data name="Tour.Admin.Body" xml:space="preserve"><value>Windows lets only administrators read or change some tasks. The app lists them, but cannot open them. Start the app as administrator to work with these tasks.</value></data>
+  <data name="Tour.Admin.Body" xml:space="preserve"><value>Windows shows some tasks only to administrators, and lets only administrators change others. Without administrator rights the app cannot list the former or change the latter. Start the app as administrator to work with all tasks.</value></data>
   <data name="Tour.Settings.Title" xml:space="preserve"><value>Make it yours</value></data>
-  <data name="Tour.Settings.Body" xml:space="preserve"><value>In Settings you choose the theme and the language, what you are notified about, whether the app starts with Windows, and more. The app looks for updates when it starts. You can take this tour again under Settings, About.</value></data>
+  <data name="Tour.Settings.Body" xml:space="preserve"><value>In Settings you choose the theme and the language, what you are notified about, whether the app starts with Windows, and more. The app looks for updates when it starts. You can take this tour again in Settings, under About.</value></data>
   <data name="WhatsNew.TitleFormat" xml:space="preserve"><value>What's new in version {0}</value></data>
   <data name="WhatsNew.ViewRelease" xml:space="preserve"><value>View this release on GitHub</value></data>
   <data name="Snooze.Error.NotRecorded" xml:space="preserve"><value>The snooze could not be saved, so nothing was changed. {0}</value></data>
   <data name="Snooze.Restore.MessageFormat" xml:space="preserve"><value>A snooze has ended, but these tasks could not be enabled again: {0}</value></data>
   <data name="Snooze.Restore.MoreFormat" xml:space="preserve"><value>{0} and {1} more</value></data>
   <data name="Snooze.Restore.AccessDenied" xml:space="preserve"><value>Windows refused access. A task that was snoozed while the app ran as administrator can only be enabled again with administrator rights.</value></data>
-  <data name="Snooze.Unreadable.MessageFormat" xml:space="preserve"><value>Tasks that an earlier snooze disabled may still be disabled without being listed here. Its record could not be read and was kept as {0}.</value></data>
+  <data name="Snooze.Unreadable.MessageFormat" xml:space="preserve"><value>The record of earlier snoozes could not be read and was kept as {0}. Tasks those snoozes disabled may still be disabled without being listed here.</value></data>
   <data name="Snooze.Dialog.Until" xml:space="preserve"><value>Snooze all tasks until:</value></data>
   <data name="Task.Snooze.AlreadyDisabled" xml:space="preserve"><value>This task is disabled already. A snooze would enable it when it ends, so the task was left as it is.</value></data>
   <data name="Snooze.Restore.Title" xml:space="preserve"><value>Some tasks are still disabled</value></data>
@@ -800,7 +800,7 @@ Restart now to apply the update?</value></data>
   <data name="Shortcuts.Key.Ctrl" xml:space="preserve"><value>Ctrl</value></data>
   <data name="Shortcuts.Key.Del" xml:space="preserve"><value>Del</value></data>
   <data name="Settings.Names.RemoveFormat" xml:space="preserve"><value>Remove {0}</value></data>
-  <data name="Templates.DeployFormat" xml:space="preserve"><value>Deploy template {0}</value></data>
+  <data name="Templates.DeployFormat" xml:space="preserve"><value>Create task from template {0}</value></data>
   <data name="Library.CreateTaskFromScriptFormat" xml:space="preserve"><value>Create task from script {0}</value></data>
   <data name="Library.EditScriptFormat" xml:space="preserve"><value>Edit script {0}</value></data>
   <data name="Library.DeleteScriptFormat" xml:space="preserve"><value>Delete script {0}</value></data>

@@ -9,7 +9,7 @@ public static class SnoozeText
 {
     /// <summary>
     /// The status of the snooze of all tasks as the banner, the tray icon and the notification
-    /// show it, e.g. "Global Snooze Active (Ends at 14:30)".
+    /// show it, e.g. "All tasks snoozed until 14:30".
     /// </summary>
     public static string AllTasks(SnoozeWindow window, TimeProvider time) =>
         window.Until is { } until

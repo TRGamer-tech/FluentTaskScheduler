@@ -73,7 +73,7 @@ public class SettingsTests
         app.Snapshot("top");
 
         Assert.Equal("English", ChoiceShownBy(app, "LanguageChoice"));
-        Assert.Equal("System Default", ChoiceShownBy(app, "ThemeChoice"));
+        Assert.Equal("Use the Windows setting", ChoiceShownBy(app, "ThemeChoice"));
         Assert.Equal("5 minutes before", ChoiceShownBy(app, "ReminderLeadChoice"));
     }
 

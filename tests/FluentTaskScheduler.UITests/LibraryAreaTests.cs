@@ -133,9 +133,9 @@ public class LibraryTests
         app.Require("NavScriptLibrary").Press();
 
         Assert.True(app.FindByName("Nightly Temp File Cleanup") != null, "The temp cleanup template is not listed.");
-        Assert.True(app.Require("Template.Defrag").IsEnabled, "The button that deploys a template is not available.");
+        Assert.True(app.Require("Template.Defrag").IsEnabled, "The button that creates a task from a template is not available.");
         // Every card has the same buttons; a screen reader tells them apart by what they act on.
-        Assert.Equal("Deploy template Nightly Temp File Cleanup", app.Require("Template.TempCleanup").Name);
+        Assert.Equal("Create task from template Nightly Temp File Cleanup", app.Require("Template.TempCleanup").Name);
         app.Snapshot("templates");
 
         app.Require("LibraryScriptsTab").Select();

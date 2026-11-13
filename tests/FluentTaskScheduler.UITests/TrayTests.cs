@@ -69,12 +69,12 @@ public class TrayTests
         app.Window.Close();
         Assert.True(AppSession.Eventually(() => !app.IsWindowVisible), "Closing did not hide the window.");
 
-        ChooseFromIconsMenu(app, "Snooze All Tasks...", "30 Minutes");
-        Assert.True(AppSession.Eventually(() => IconName(app).Contains("Global Snooze Active")),
+        ChooseFromIconsMenu(app, "Snooze All Tasks...", "30 minutes");
+        Assert.True(AppSession.Eventually(() => IconName(app).Contains("All tasks snoozed")),
             $"The icon's tooltip does not say that all tasks are snoozed: '{IconName(app)}'");
 
         ChooseFromIconsMenu(app, "Resume All Tasks");
-        Assert.True(AppSession.Eventually(() => IconName(app) is { Length: > 0 } name && !name.Contains("Global Snooze Active")),
+        Assert.True(AppSession.Eventually(() => IconName(app) is { Length: > 0 } name && !name.Contains("All tasks snoozed")),
             $"The icon's tooltip still says that all tasks are snoozed: '{IconName(app)}'");
 
         app.StartAgain();

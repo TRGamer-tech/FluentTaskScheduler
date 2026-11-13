@@ -150,7 +150,7 @@ public sealed class TaskTests : IDisposable
         app.ToolbarButton("ShortcutsButton").Press();
 
         Assert.True(app.Find(element => element.Name == "Ctrl+N", 10000) != null, "The overview did not open or does not list Ctrl+N.");
-        Assert.NotNull(app.FindByName("Reload the task list"));
+        Assert.NotNull(app.FindByName("Refresh the task list"));
         app.Snapshot("shortcuts");
     }
 

@@ -51,7 +51,7 @@ public sealed partial class SnoozeViewModel : ObservableObject, IDisposable
 
     public bool IsSnoozed => _state.Global is not null;
 
-    /// <summary>Until when all tasks are snoozed, e.g. "Global Snooze Active (Ends at 14:30)"; empty while they are not.</summary>
+    /// <summary>Until when all tasks are snoozed, e.g. "All tasks snoozed until 14:30"; empty while they are not.</summary>
     public string StatusText => _state.Global is { } global ? SnoozeText.AllTasks(global.Window, _time) : "";
 
     /// <summary>What the snooze stops: everything while it suspends the tasks' triggers, otherwise only the runs this app would start.</summary>
