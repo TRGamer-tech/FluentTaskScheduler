@@ -221,11 +221,15 @@ public sealed partial class TriggerViewModel : ObservableObject
             }
         }
 
+        // Without a time of day the start is only when the trigger becomes active. A time of day
+        // left over from the type the trigger had before would keep it idle until then.
+        DateTime? start = HasSchedule ? Moment(StartDate, StartTime, _source.Start) : _source.IsCalendarBased ? null : _source.Start;
+
         draft = _source with
         {
             Type = Type,
             Enabled = Enabled,
-            Start = HasSchedule ? Moment(StartDate, StartTime, _source.Start) : _source.Start,
+            Start = start,
             End = Expires ? Moment(EndDate, EndTime, _source.End) : null,
             DaysInterval = Count(DaysInterval, _source.DaysInterval),
             WeeksInterval = Count(WeeksInterval, _source.WeeksInterval),

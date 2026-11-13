@@ -18,6 +18,7 @@ public class TriggerViewModelTests
         new TriggerDraft { Type = TriggerType.Monthly, SourceIndex = 0, Start = Start, DaysOfMonth = 0b101, LastDayOfMonth = true, Months = MonthsOfTheYear.March | MonthsOfTheYear.December },
         new TriggerDraft { Type = TriggerType.Monthly, SourceIndex = 0, Start = Start, MonthlyByWeekday = true, Weeks = WhichWeek.SecondWeek | WhichWeek.LastWeek, DaysOfWeek = DaysOfTheWeek.Friday },
         new TriggerDraft { Type = TriggerType.AtLogon, SourceIndex = 0 },
+        new TriggerDraft { Type = TriggerType.AtLogon, SourceIndex = 0, Start = Start },
         new TriggerDraft { Type = TriggerType.AtStartup, SourceIndex = 0, End = Start },
         new TriggerDraft { Type = TriggerType.OnIdle, SourceIndex = 0 },
         new TriggerDraft { Type = TriggerType.Event, SourceIndex = 0, EventSubscription = EventQuery.Build("Application", "VSS", 8224) },
@@ -94,6 +95,36 @@ public class TriggerViewModelTests
 
         Assert.Equal(hasSchedule, trigger.HasSchedule);
         Assert.Equal(type, trigger.Type);
+    }
+
+    [Theory]
+    [InlineData(TriggerType.AtLogon)]
+    [InlineData(TriggerType.AtStartup)]
+    [InlineData(TriggerType.OnIdle)]
+    [InlineData(TriggerType.Event)]
+    [InlineData(TriggerType.SessionStateChange)]
+    public void ANewTriggerTurnedIntoOneWithoutATimeOfDay_IsActiveAtOnce(TriggerType type)
+    {
+        var trigger = new TriggerViewModel(NewTask.Trigger(new DateTime(2031, 5, 6, 10, 20, 0)))
+        {
+            TypeIndex = TriggerViewModel.Types.ToList().IndexOf(type),
+            EventLog = "System"
+        };
+
+        Assert.True(trigger.TryBuild(out TriggerDraft built, out string? problem), problem);
+        Assert.Null(built.Start);
+    }
+
+    [Fact]
+    public void ATriggerWithoutATimeOfDay_KeepsWhenItBecomesActive_AcrossSuchTypes()
+    {
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.AtLogon, SourceIndex = 0, Start = Start })
+        {
+            TypeIndex = TriggerViewModel.Types.ToList().IndexOf(TriggerType.OnIdle)
+        };
+
+        Assert.True(trigger.TryBuild(out TriggerDraft built, out _));
+        Assert.Equal(Start, built.Start);
     }
 
     [Fact]
