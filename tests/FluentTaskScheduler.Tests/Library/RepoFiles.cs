@@ -14,6 +14,9 @@ internal static class RepoFiles
     /// <summary>The scripts that ship with the app.</summary>
     public static string BuiltInScripts => Path.Combine(AppProject, "Assets", "Scripts.json");
 
+    /// <summary>The app's icon, which the notification area icon is drawn from.</summary>
+    public static string AppIcon => Path.Combine(AppProject, "Assets", "AppIcon.ico");
+
     public static TheoryData<string> Languages => new(AppLanguages.Supported);
 
     /// <summary>The texts of one language, by resource name.</summary>

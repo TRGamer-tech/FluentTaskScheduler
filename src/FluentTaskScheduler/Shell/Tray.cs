@@ -1,4 +1,5 @@
 using FluentTaskScheduler.Localization;
+using FluentTaskScheduler.NotificationArea;
 using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Settings;
 using FluentTaskScheduler.Snoozing;
@@ -149,7 +150,8 @@ internal sealed class Tray(WindowManager windows, ISettingsStore settings, ITask
         if (_icon is null) return;
         try
         {
-            _icon.SetIcon(TrayIconImage.Create(IconFile, _runningTasks, snoozed: snooze.State.Global is not null));
+            int size = TrayIconImage.SizeAt(_icon.Dpi);
+            _icon.SetIcon(TrayIconImage.Create(IconFile, size, _runningTasks, snoozed: snooze.State.Global is not null));
         }
         catch (Exception ex) when (ex is IOException or ArgumentException or System.Runtime.InteropServices.ExternalException)
         {

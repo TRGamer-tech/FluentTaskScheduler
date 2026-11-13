@@ -65,6 +65,9 @@ internal sealed class TrayIcon : IDisposable
     /// <summary>The user asked for the icon's menu. Answer with <see cref="ShowMenu"/>.</summary>
     public event Action? MenuRequested;
 
+    /// <summary>The DPI of the display with the notification area, which the icon is to be drawn for.</summary>
+    public uint Dpi { get; } = MainDisplayDpi();
+
     /// <summary>Uses <paramref name="icon"/> from now on and takes charge of destroying it.</summary>
     public void SetIcon(nint icon)
     {
@@ -215,6 +218,18 @@ internal sealed class TrayIcon : IDisposable
         return DefWindowProcW(window, message, wParam, lParam);
     }
 
+    /// <summary>
+    /// The DPI of the main display, whose taskbar has the notification area. It follows the
+    /// display scaling at once, where the system DPI of a running program stays as it was when
+    /// the program started.
+    /// </summary>
+    private static uint MainDisplayDpi()
+    {
+        nint display = MonitorFromPoint(default, MONITOR_DEFAULTTOPRIMARY);
+        // A display can go away in between, while the displays are being changed.
+        return GetDpiForMonitor(display, MDT_EFFECTIVE_DPI, out uint dpi, out _) == 0 ? dpi : GetDpiForSystem();
+    }
+
     public void Dispose()
     {
         Hide();
@@ -231,6 +246,8 @@ internal sealed class TrayIcon : IDisposable
     private const uint MF_STRING = 0x0000, MF_GRAYED = 0x0001, MF_POPUP = 0x0010, MF_SEPARATOR = 0x0800;
     private const uint TPM_RIGHTBUTTON = 0x0002, TPM_NONOTIFY = 0x0080, TPM_RETURNCMD = 0x0100;
     private const uint MSGFLT_ALLOW = 1;
+    private const uint MONITOR_DEFAULTTOPRIMARY = 1;
+    private const int MDT_EFFECTIVE_DPI = 0;
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     private struct WNDCLASSEXW
@@ -312,6 +329,15 @@ internal sealed class TrayIcon : IDisposable
 
     [DllImport("user32.dll")]
     private static extern bool GetCursorPos(out POINT point);
+
+    [DllImport("user32.dll")]
+    private static extern nint MonitorFromPoint(POINT point, uint flags);
+
+    [DllImport("shcore.dll")]
+    private static extern int GetDpiForMonitor(nint monitor, int dpiType, out uint dpiX, out uint dpiY);
+
+    [DllImport("user32.dll")]
+    private static extern uint GetDpiForSystem();
 
     [DllImport("user32.dll")]
     private static extern nint CreatePopupMenu();
