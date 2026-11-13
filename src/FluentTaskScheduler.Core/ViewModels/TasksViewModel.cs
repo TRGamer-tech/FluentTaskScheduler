@@ -589,22 +589,7 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
     }
 
     /// <summary>Brings <see cref="Tasks"/> in line with the filters and the sort order, moving as few rows as possible.</summary>
-    private void Refilter()
-    {
-        List<TaskRow> wanted = Ordered(_storeOrder.Select(path => _all[path]).Where(Matches)).ToList();
-
-        var keep = new HashSet<TaskRow>(wanted);
-        for (int i = Tasks.Count - 1; i >= 0; i--)
-            if (!keep.Contains(Tasks[i])) Tasks.RemoveAt(i);
-
-        for (int i = 0; i < wanted.Count; i++)
-        {
-            if (i < Tasks.Count && ReferenceEquals(Tasks[i], wanted[i])) continue;
-            int current = Tasks.IndexOf(wanted[i]);
-            if (current < 0) Tasks.Insert(i, wanted[i]);
-            else Tasks.Move(current, i);
-        }
-    }
+    private void Refilter() => Tasks.SyncWith(Ordered(_storeOrder.Select(path => _all[path]).Where(Matches)).ToList());
 
     private bool Matches(TaskRow row)
     {

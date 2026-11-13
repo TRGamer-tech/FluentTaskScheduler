@@ -298,10 +298,10 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         }
 
         Figures = DashboardFigures.From(tasks, runs, refused, Filter, _time.GetUtcNow(), _time.LocalTimeZone);
-        Show(Hours, Figures.Hours);
-        Show(Running, Figures.Running);
-        Show(Upcoming, Figures.Upcoming);
-        Show(Log, Figures.Log);
+        Hours.SyncWith(Figures.Hours);
+        Running.SyncWith(Figures.Running);
+        Upcoming.SyncWith(Figures.Upcoming);
+        Log.SyncWith(Figures.Log);
     }
 
     /// <summary>
@@ -314,8 +314,8 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         _choosing = true;
         try
         {
-            Show(Categories, [Categories[0], .. Sorted(_tasks.Select(task => task.Category))]);
-            Show(Tags, [Tags[0], .. Sorted(_tasks.SelectMany(task => task.Tags))]);
+            Categories.SyncWith([Categories[0], .. Sorted(_tasks.Select(task => task.Category))]);
+            Tags.SyncWith([Tags[0], .. Sorted(_tasks.SelectMany(task => task.Tags))]);
             CategoryIndex = PositionOf(Categories, category);
             TagIndex = PositionOf(Tags, tag);
         }
@@ -346,27 +346,5 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         for (int i = 1; i < choices.Count; i++)
             if (string.Equals(choices[i], value, StringComparison.OrdinalIgnoreCase)) return i;
         return 0;
-    }
-
-    /// <summary>Makes <paramref name="shown"/> equal to <paramref name="wanted"/> by removing, moving and inserting only what differs.</summary>
-    private static void Show<T>(ObservableCollection<T> shown, IReadOnlyList<T> wanted)
-    {
-        var keep = new HashSet<T>(wanted);
-        for (int i = shown.Count - 1; i >= 0; i--)
-            if (!keep.Contains(shown[i])) shown.RemoveAt(i);
-
-        for (int i = 0; i < wanted.Count; i++)
-        {
-            if (i < shown.Count && Equals(shown[i], wanted[i])) continue;
-
-            // Searched from here on: an entry that reads the same as one placed already is another one.
-            int current = -1;
-            for (int j = i + 1; j < shown.Count && current < 0; j++)
-                if (Equals(shown[j], wanted[i])) current = j;
-
-            if (current < 0) shown.Insert(i, wanted[i]);
-            else shown.Move(current, i);
-        }
-        while (shown.Count > wanted.Count) shown.RemoveAt(shown.Count - 1);
     }
 }
