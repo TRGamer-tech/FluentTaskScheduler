@@ -1,9 +1,11 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Security.Principal;
+using FluentTaskScheduler.Dialogs;
 using FluentTaskScheduler.History;
 using FluentTaskScheduler.Library;
 using FluentTaskScheduler.Localization;
+using FluentTaskScheduler.Logging;
 using FluentTaskScheduler.Notifications;
 using FluentTaskScheduler.Processes;
 using FluentTaskScheduler.Reminders;
@@ -11,6 +13,7 @@ using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Settings;
 using FluentTaskScheduler.Shell;
 using FluentTaskScheduler.Snoozing;
+using FluentTaskScheduler.Updates;
 using FluentTaskScheduler.ViewModels;
 using FluentTaskScheduler.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,6 +60,13 @@ public partial class App : Application, IAppLifetime, IDisposable
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         _services = ConfigureServices().BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
+
+        // The logger comes first and the settings it follows second: what goes wrong while the
+        // settings are read is then on record.
+        var logging = _services.GetRequiredService<AppLogging>();
+        Serilog.Log.Logger = logging.Logger;
+        logging.Follow(_services.GetRequiredService<ISettingsStore>());
+        Serilog.Log.Information("FluentTaskScheduler {Version} started", _services.GetRequiredService<AppInfo>().VersionText);
 
         // Before anything saves the settings: the snooze state of version 1.9 lived in the settings
         // file, and the first save in the new format drops what the snooze service has not taken over.
@@ -133,6 +143,13 @@ public partial class App : Application, IAppLifetime, IDisposable
         services.AddSingleton<IProcessRunner, ProcessRunner>();
         services.AddSingleton(provider => new ScriptStore(
             provider.GetRequiredService<AppPaths>(), Path.Combine(AppContext.BaseDirectory, "Assets", "Scripts.json")));
+        services.AddSingleton(new AppInfo(typeof(App).Assembly.GetName().Version!));
+        services.AddSingleton<AppLogging>();
+        services.AddSingleton<IStartWithWindows, RunKeyStartup>();
+        services.AddSingleton<ILauncher, ShellLauncher>();
+        services.AddSingleton<IReleaseNotesSource, GitHubReleaseNotes>();
+        services.AddSingleton<IUpdater, VelopackUpdater>();
+        services.AddSingleton<UpdateService>();
 
         // One per window
         services.AddScoped<WindowContext>();
@@ -152,6 +169,10 @@ public partial class App : Application, IAppLifetime, IDisposable
         services.AddScoped<ScriptEditorPage>();
         services.AddScoped<LibraryViewModel>();
         services.AddScoped<LibraryPage>();
+        services.AddScoped<IWelcomeDialogs, WelcomeDialogs>();
+        services.AddScoped<StartupFlow>();
+        services.AddScoped<SettingsViewModel>();
+        services.AddScoped<SettingsPage>();
 
         return services;
     }

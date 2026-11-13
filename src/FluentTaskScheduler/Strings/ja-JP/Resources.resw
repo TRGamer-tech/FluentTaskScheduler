@@ -200,7 +200,7 @@
 {0}</value></data>
   <data name="Settings.Export.Failed.Title" xml:space="preserve"><value>エクスポート失敗</value></data>
   <data name="Settings.Import.Success.Title" xml:space="preserve"><value>インポート成功</value></data>
-  <data name="Settings.Import.Success.Content" xml:space="preserve"><value>設定を復元しました。一部の変更は再起動後に適用されます。</value></data>
+  <data name="Settings.Import.Success.Content" xml:space="preserve"><value>設定を復元しました。</value></data>
   <data name="Settings.Import.Failed.Title" xml:space="preserve"><value>インポート失敗</value></data>
   <data name="Settings.WhatsNew.Title" xml:space="preserve"><value>新機能</value></data>
   <data name="Settings.WhatsNew.FetchFailed" xml:space="preserve"><value>リリースノートを取得できませんでした。インターネット接続を確認して、もう一度お試しください。</value></data>
@@ -276,9 +276,9 @@
   <data name="Settings.Notif.Timing.Title" xml:space="preserve"><value>リマインダーのタイミング</value></data>
   <data name="Settings.Notif.Timing.Desc" xml:space="preserve"><value>実行のどれくらい前に通知を送るか設定します。</value></data>
   <data name="Settings.Sys.Startup.Title" xml:space="preserve"><value>スタートアップ時に実行</value></data>
-  <data name="Settings.Sys.Startup.Desc" xml:space="preserve"><value>Windows ログイン時にアプリを自動的に起動します。</value></data>
-  <data name="Settings.Sys.Tray.Title" xml:space="preserve"><value>トレイに最小化</value></data>
-  <data name="Settings.Sys.Tray.Desc" xml:space="preserve"><value>閉じる代わりにシステムトレイに隠します。</value></data>
+  <data name="Settings.Sys.Startup.Desc" xml:space="preserve"><value>Windows へのサインイン時にアプリを自動的に起動します。</value></data>
+  <data name="Settings.Sys.Tray.Title" xml:space="preserve"><value>閉じたときにトレイに格納</value></data>
+  <data name="Settings.Sys.Tray.Desc" xml:space="preserve"><value>ウィンドウを閉じるとシステムトレイに隠し、アプリを実行したままにします。リマインダー、完了時アクション、スヌーズが引き続き動作します。</value></data>
   <data name="Settings.Sys.Smooth.Title" xml:space="preserve"><value>スムーズスクロール</value></data>
   <data name="Settings.Sys.Smooth.Desc" xml:space="preserve"><value>アプリ全体で慣性ベースのスクロールを有効にします。</value></data>
   <data name="Settings.Sys.Hidden.Title" xml:space="preserve"><value>非表示のタスクを表示</value></data>
@@ -286,20 +286,20 @@
   <data name="Settings.Adv.Confirm.Title" xml:space="preserve"><value>削除前に確認</value></data>
   <data name="Settings.Adv.Confirm.Desc" xml:space="preserve"><value>タスクを削除する前に確認ダイアログを表示します。</value></data>
   <data name="Settings.Adv.Logging.Title" xml:space="preserve"><value>アプリケーションログ</value></data>
-  <data name="Settings.Adv.Logging.Desc" xml:space="preserve"><value>トラブルシューティングのため、内部イベントとエラーをログファイルに記録します。</value></data>
+  <data name="Settings.Adv.Logging.Desc" xml:space="preserve"><value>トラブルシューティングのため、アプリの動作と発生したエラーをログファイルに記録します。クラッシュは常に記録されます。</value></data>
   <data name="Settings.Adv.SepLogs.Title" xml:space="preserve"><value>ログファイルを分ける</value></data>
-  <data name="Settings.Adv.SepLogs.Desc" xml:space="preserve"><value>エラーログとクラッシュログをメインログとは別のファイルに保存します。</value></data>
+  <data name="Settings.Adv.SepLogs.Desc" xml:space="preserve"><value>エラーをメインログではなく専用のファイルに記録します。</value></data>
   <data name="Settings.Adv.SpecLogs.Title" xml:space="preserve"><value>特定のログ</value></data>
   <data name="Settings.Adv.SpecLogs.Desc" xml:space="preserve"><value>エラーとクラッシュの記録に直接アクセスします。</value></data>
-  <data name="Settings.Adv.OpenLog" xml:space="preserve"><value>ログを開く</value></data>
+  <data name="Settings.Adv.OpenLog" xml:space="preserve"><value>アプリログ</value></data>
   <data name="Settings.Adv.ErrorLog" xml:space="preserve"><value>エラーログ</value></data>
   <data name="Settings.Adv.CrashLog" xml:space="preserve"><value>クラッシュログ</value></data>
   <data name="Settings.Data.Export.Title" xml:space="preserve"><value>設定のエクスポート</value></data>
   <data name="Settings.Data.Export.Desc" xml:space="preserve"><value>現在の設定を JSON ファイルに保存します。</value></data>
-  <data name="Settings.Data.ExportBtn" xml:space="preserve"><value>エクスポート</value></data>
+  <data name="Settings.Data.ExportBtn" xml:space="preserve"><value>エクスポート...</value></data>
   <data name="Settings.Data.Import.Title" xml:space="preserve"><value>設定のインポート</value></data>
   <data name="Settings.Data.Import.Desc" xml:space="preserve"><value>以前エクスポートしたファイルから設定を復元します。</value></data>
-  <data name="Settings.Data.ImportBtn" xml:space="preserve"><value>インポート</value></data>
+  <data name="Settings.Data.ImportBtn" xml:space="preserve"><value>インポート...</value></data>
   <data name="Settings.Cat.Manage.Title" xml:space="preserve"><value>カテゴリの管理</value></data>
   <data name="Settings.Cat.Manage.Desc" xml:space="preserve"><value>タスクの事前定義されたカテゴリ。</value></data>
   <data name="Settings.Cat.Placeholder" xml:space="preserve"><value>新しいカテゴリ名...</value></data>
@@ -313,8 +313,8 @@
   <data name="Settings.About.Update.Title" xml:space="preserve"><value>アップデートを確認</value></data>
   <data name="Settings.About.Update.Desc" xml:space="preserve"><value>新しいバージョンが利用可能か確認します。</value></data>
   <data name="Settings.About.CheckBtn" xml:space="preserve"><value>確認</value></data>
-  <data name="Settings.About.Onboard.Title" xml:space="preserve"><value>オンボーディング</value></data>
-  <data name="Settings.About.Onboard.Desc" xml:space="preserve"><value>初回起動時のウェルカムウォークスルーを再生します。</value></data>
+  <data name="Settings.About.Onboard.Title" xml:space="preserve"><value>ウェルカムツアー</value></data>
+  <data name="Settings.About.Onboard.Desc" xml:space="preserve"><value>初回起動時のツアーをもう一度表示します。</value></data>
   <data name="Settings.About.ViewAgain" xml:space="preserve"><value>もう一度見る</value></data>
   <data name="Settings.About.VersionFormat" xml:space="preserve"><value>バージョン {0}</value></data>
   <data name="Dashboard.AllTags" xml:space="preserve"><value>すべてのタグ</value></data>
@@ -792,7 +792,7 @@
   <data name="Onboarding.Step7.Title" xml:space="preserve"><value>お好みに合わせて調整</value></data>
   <data name="ScriptLibrary.DeleteTemplate.Content" xml:space="preserve"><value>「{0}」を削除しますか？</value></data>
   <data name="ScriptLibrary.DeleteTemplate.Title" xml:space="preserve"><value>スクリプトの削除</value></data>
-  <data name="Settings.UpdateApplyFailed.Content" xml:space="preserve"><value>更新の適用に失敗しました。詳細はログを確認するか、後でもう一度お試しください。</value></data>
+  <data name="Settings.UpdateApplyFailed.Content" xml:space="preserve"><value>アップデートをインストールできませんでした。詳細はログを確認するか、後でもう一度お試しください。</value></data>
   <data name="Snooze.IncludeMicrosoftTasks" xml:space="preserve"><value>Microsoft 独自の予約タスクも一時停止する (Defender、Windows Update、メンテナンスなど)</value></data>
   <data name="Snooze.IncludeMicrosoftTasksWarning" xml:space="preserve"><value>推奨されません。これらを無効にすると、スヌーズが終了するまで Windows のセキュリティ スキャン、更新、メンテナンスが妨げられる可能性があります。</value></data>
   <data name="Tray.CloseWindowFormat" xml:space="preserve"><value>{0} を閉じる</value></data>
@@ -1015,4 +1015,58 @@
   <data name="Shortcuts.Refresh" xml:space="preserve"><value>タスク一覧を再読み込み</value></data>
   <data name="Shortcuts.Help" xml:space="preserve"><value>この一覧を表示</value></data>
   <data name="Task.Snooze.UntilRestart" xml:space="preserve"><value>再起動またはサインアウトまでスヌーズ中</value></data>
+  <data name="Settings.Appearance.Language.Windows" xml:space="preserve"><value>Windows の言語を使用</value></data>
+  <data name="Settings.Lead.MinutesFormat" xml:space="preserve"><value>{0}分前</value></data>
+  <data name="Settings.Sys.Startup.Failed" xml:space="preserve"><value>Windows が変更を受け付けませんでした。スタートアップの設定は組織によって管理されている可能性があります。</value></data>
+  <data name="Settings.Sys.MinimizeToTray.Title" xml:space="preserve"><value>最小化したときもトレイに格納</value></data>
+  <data name="Settings.Sys.MinimizeToTray.Desc" xml:space="preserve"><value>ウィンドウを最小化したときもシステムトレイに隠します。</value></data>
+  <data name="Settings.Adv.OpenLogDesc" xml:space="preserve"><value>アプリの動作と警告の記録です。</value></data>
+  <data name="Settings.Adv.ErrorLogDesc" xml:space="preserve"><value>失敗した操作の記録です。</value></data>
+  <data name="Settings.Adv.CrashLogDesc" xml:space="preserve"><value>アプリが処理できなかった予期しないエラーの記録です。</value></data>
+  <data name="Settings.Adv.DataFolder.Title" xml:space="preserve"><value>データフォルダー</value></data>
+  <data name="Settings.Adv.DataFolder.Desc" xml:space="preserve"><value>ログファイル、設定、その他のアプリのファイルがあるフォルダーを開きます。</value></data>
+  <data name="Settings.Adv.Logs.Empty" xml:space="preserve"><value>このログにはまだ何も記録されていません。</value></data>
+  <data name="Settings.Adv.ExecHistory.Title" xml:space="preserve"><value>実行履歴ログ</value></data>
+  <data name="Settings.Adv.ExecHistory.Desc" xml:space="preserve"><value>すべてのタスクの実行をアプリのファイルに記録します。Windows タスクスケジューラのイベントログよりも長く保持されます。</value></data>
+  <data name="Settings.Adv.ExecHistoryFolder.Title" xml:space="preserve"><value>実行履歴フォルダー</value></data>
+  <data name="Settings.Adv.ExecHistoryFolder.Desc" xml:space="preserve"><value>実行履歴ファイルがあるフォルダーを開きます。</value></data>
+  <data name="Settings.Data.FileType" xml:space="preserve"><value>設定ファイル</value></data>
+  <data name="Settings.Export.Failed.ContentFormat" xml:space="preserve"><value>設定を次の場所に書き込めませんでした:
+{0}
+
+{1}</value></data>
+  <data name="Settings.Import.Failed.ContentFormat" xml:space="preserve"><value>ファイルを読み取れませんでした:
+{0}
+
+{1}</value></data>
+  <data name="Settings.Import.Failed.NotSettingsFormat" xml:space="preserve"><value>このファイルには FluentTaskScheduler の設定が含まれていません:
+{0}</value></data>
+  <data name="Settings.OpenFailedFormat" xml:space="preserve"><value>Windows で次の項目を開けませんでした:
+{0}</value></data>
+  <data name="Settings.Names.Remove" xml:space="preserve"><value>削除</value></data>
+  <data name="Settings.About.ReleaseNotes.Desc" xml:space="preserve"><value>このバージョンの変更点を表示します。</value></data>
+  <data name="Settings.About.Update.Checking" xml:space="preserve"><value>アップデートを確認しています...</value></data>
+  <data name="Settings.About.Update.ReadyFormat" xml:space="preserve"><value>バージョン {0} をダウンロードしました。アプリの再起動時にインストールされます。</value></data>
+  <data name="Settings.About.Update.Unavailable" xml:space="preserve"><value>このアプリは自動的に更新できません。winget、Scoop、Chocolatey など、インストールしたときと同じ方法で更新するか、GitHub から最新バージョンをダウンロードしてください。すべてのユーザー向けにインストールした場合は、アプリを管理者として実行している間だけ更新できます。</value></data>
+  <data name="Settings.About.Repository.Title" xml:space="preserve"><value>GitHub のソースコード</value></data>
+  <data name="Settings.About.Repository.Desc" xml:space="preserve"><value>FluentTaskScheduler はオープンソースです。ソースコードや新しいリリースを確認できます。</value></data>
+  <data name="Settings.About.Issue.Title" xml:space="preserve"><value>問題を報告</value></data>
+  <data name="Settings.About.Issue.Desc" xml:space="preserve"><value>不具合の報告や改善の提案ができます。</value></data>
+  <data name="Tour.Back" xml:space="preserve"><value>戻る</value></data>
+  <data name="Tour.Welcome.Title" xml:space="preserve"><value>スケジュールされたタスクをひとつの場所で</value></data>
+  <data name="Tour.Welcome.Body" xml:space="preserve"><value>FluentTaskScheduler は、Windows タスクスケジューラをモダンな画面で操作するためのアプリです。ここに表示されるタスクはすべて通常の Windows タスクで、アプリを閉じていてもスケジュールどおりに実行されます。</value></data>
+  <data name="Tour.Create.Title" xml:space="preserve"><value>最初のタスクを作成する</value></data>
+  <data name="Tour.Create.Body" xml:space="preserve"><value>「新規タスク」を選ぶと、プログラム、スクリプト、コマンドを自動的に実行できます。毎日、サインイン時、イベント発生時など、さまざまなタイミングを選べます。関連するタスクはフォルダーにまとめられます。</value></data>
+  <data name="Tour.History.Title" xml:space="preserve"><value>実行結果を確認する</value></data>
+  <data name="Tour.History.Body" xml:space="preserve"><value>タスクを選択すると、いつ実行されたか、成功したかどうか、現在実行中かどうかを確認できます。ダッシュボードでは、すべてのタスクの状況をまとめて確認できます。</value></data>
+  <data name="Tour.Automation.Title" xml:space="preserve"><value>タスクの連結と一時停止</value></data>
+  <data name="Tour.Automation.Body" xml:space="preserve"><value>完了時アクションを設定すると、タスクが成功または失敗したときに他のタスクを開始できます。少し休みたいときは、1 つのタスクまたはすべてのタスクをスヌーズできます。一定時間、次の再起動まで、または再開するまでのいずれかを選べます。どちらもアプリの実行中に動作します。アプリはシステムトレイでも実行されます。</value></data>
+  <data name="Tour.Library.Title" xml:space="preserve"><value>テンプレートから始める</value></data>
+  <data name="Tour.Library.Body" xml:space="preserve"><value>ライブラリには、よく使う作業向けの用意済みタスクがあり、自分のスクリプトも保存できます。クイックアクションでは、日常的なメンテナンスをワンクリックで実行できます。</value></data>
+  <data name="Tour.Admin.Title" xml:space="preserve"><value>管理者権限が必要なタスク</value></data>
+  <data name="Tour.Admin.Body" xml:space="preserve"><value>一部のタスクは、管理者だけが内容を確認または変更できます。そのようなタスクは一覧に表示されますが、開くことはできません。操作するには、アプリを管理者として起動してください。</value></data>
+  <data name="Tour.Settings.Title" xml:space="preserve"><value>自分好みに設定する</value></data>
+  <data name="Tour.Settings.Body" xml:space="preserve"><value>設定では、テーマや言語、通知の内容、Windows の起動時にアプリを起動するかどうかなどを選べます。アプリは起動時にアップデートを確認します。このツアーは、設定の「バージョン情報」からいつでも表示できます。</value></data>
+  <data name="WhatsNew.TitleFormat" xml:space="preserve"><value>バージョン {0} の新機能</value></data>
+  <data name="WhatsNew.ViewRelease" xml:space="preserve"><value>GitHub でこのリリースを表示</value></data>
 </root>

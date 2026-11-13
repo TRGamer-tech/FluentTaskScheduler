@@ -200,7 +200,7 @@ Jetzt App neustarten?</value></data>
 {0}</value></data>
   <data name="Settings.Export.Failed.Title" xml:space="preserve"><value>Export fehlgeschlagen</value></data>
   <data name="Settings.Import.Success.Title" xml:space="preserve"><value>Import erfolgreich</value></data>
-  <data name="Settings.Import.Success.Content" xml:space="preserve"><value>Einstellungen wurden wiederhergestellt. Einige Änderungen erfordern möglicherweise einen Neustart der App.</value></data>
+  <data name="Settings.Import.Success.Content" xml:space="preserve"><value>Die Einstellungen wurden wiederhergestellt.</value></data>
   <data name="Settings.Import.Failed.Title" xml:space="preserve"><value>Import fehlgeschlagen</value></data>
   <data name="Settings.WhatsNew.Title" xml:space="preserve"><value>Neuigkeiten</value></data>
   <data name="Settings.WhatsNew.FetchFailed" xml:space="preserve"><value>Konnte Versionshinweise nicht abrufen. Überprüfe deine Internetverbindung und versuche es erneut.</value></data>
@@ -276,9 +276,9 @@ Jetzt App neustarten?</value></data>
   <data name="Settings.Notif.Timing.Title" xml:space="preserve"><value>Erinnerungszeitpunkt</value></data>
   <data name="Settings.Notif.Timing.Desc" xml:space="preserve"><value>Wie weit im Voraus die Erinnerung gesendet werden soll.</value></data>
   <data name="Settings.Sys.Startup.Title" xml:space="preserve"><value>Beim Start ausführen</value></data>
-  <data name="Settings.Sys.Startup.Desc" xml:space="preserve"><value>Die App automatisch starten, wenn Sie sich bei Windows anmelden.</value></data>
-  <data name="Settings.Sys.Tray.Title" xml:space="preserve"><value>In den Infobereich minimieren</value></data>
-  <data name="Settings.Sys.Tray.Desc" xml:space="preserve"><value>Das Fenster in den Infobereich ausblenden, anstatt es zu schliessen.</value></data>
+  <data name="Settings.Sys.Startup.Desc" xml:space="preserve"><value>Die App automatisch starten, wenn du dich bei Windows anmeldest.</value></data>
+  <data name="Settings.Sys.Tray.Title" xml:space="preserve"><value>In den Infobereich schliessen</value></data>
+  <data name="Settings.Sys.Tray.Desc" xml:space="preserve"><value>Beim Schliessen wird das Fenster in den Infobereich ausgeblendet und die App läuft weiter, damit Erinnerungen, Abschlussaktionen und Pausen weiter funktionieren.</value></data>
   <data name="Settings.Sys.Smooth.Title" xml:space="preserve"><value>Sanftes Scrollen</value></data>
   <data name="Settings.Sys.Smooth.Desc" xml:space="preserve"><value>Trägheitsbasiertes Scrollen in der gesamten App aktivieren.</value></data>
   <data name="Settings.Sys.Hidden.Title" xml:space="preserve"><value>Versteckte Aufgaben anzeigen</value></data>
@@ -286,26 +286,26 @@ Jetzt App neustarten?</value></data>
   <data name="Settings.Adv.Confirm.Title" xml:space="preserve"><value>Vor dem Löschen bestätigen</value></data>
   <data name="Settings.Adv.Confirm.Desc" xml:space="preserve"><value>Einen Bestätigungsdialog anzeigen, bevor eine Aufgabe entfernt wird.</value></data>
   <data name="Settings.Adv.Logging.Title" xml:space="preserve"><value>Anwendungsprotokollierung</value></data>
-  <data name="Settings.Adv.Logging.Desc" xml:space="preserve"><value>Interne Ereignisse und Fehler in eine Protokolldatei zur Fehlerbehebung schreiben.</value></data>
+  <data name="Settings.Adv.Logging.Desc" xml:space="preserve"><value>Zur Fehlersuche in Protokolldateien schreiben, was die App tut und welche Fehler auftreten. Ein Absturz wird immer festgehalten.</value></data>
   <data name="Settings.Adv.SepLogs.Title" xml:space="preserve"><value>Getrennte Protokolldateien</value></data>
-  <data name="Settings.Adv.SepLogs.Desc" xml:space="preserve"><value>Fehler- und Absturzprotokolle in eigenen Dateien statt im Hauptprotokoll speichern.</value></data>
+  <data name="Settings.Adv.SepLogs.Desc" xml:space="preserve"><value>Fehler in eine eigene Datei statt ins Hauptprotokoll schreiben.</value></data>
   <data name="Settings.Adv.SpecLogs.Title" xml:space="preserve"><value>Spezifische Protokolle</value></data>
   <data name="Settings.Adv.SpecLogs.Desc" xml:space="preserve"><value>Direkter Zugriff auf Fehler- und Absturzaufzeichnungen.</value></data>
-  <data name="Settings.Adv.OpenLog" xml:space="preserve"><value>Protokoll öffnen</value></data>
+  <data name="Settings.Adv.OpenLog" xml:space="preserve"><value>Anwendungsprotokoll</value></data>
   <data name="Settings.Adv.ErrorLog" xml:space="preserve"><value>Fehlerprotokoll</value></data>
   <data name="Settings.Adv.CrashLog" xml:space="preserve"><value>Absturzprotokoll</value></data>
   <data name="Settings.Data.Export.Title" xml:space="preserve"><value>Einstellungen exportieren</value></data>
   <data name="Settings.Data.Export.Desc" xml:space="preserve"><value>Aktuelle Einstellungen in eine JSON-Datei speichern.</value></data>
-  <data name="Settings.Data.ExportBtn" xml:space="preserve"><value>Exportieren</value></data>
+  <data name="Settings.Data.ExportBtn" xml:space="preserve"><value>Exportieren...</value></data>
   <data name="Settings.Data.Import.Title" xml:space="preserve"><value>Einstellungen importieren</value></data>
   <data name="Settings.Data.Import.Desc" xml:space="preserve"><value>Einstellungen aus einer zuvor exportierten Datei wiederherstellen.</value></data>
-  <data name="Settings.Data.ImportBtn" xml:space="preserve"><value>Importieren</value></data>
+  <data name="Settings.Data.ImportBtn" xml:space="preserve"><value>Importieren...</value></data>
   <data name="Settings.Cat.Manage.Title" xml:space="preserve"><value>Kategorien verwalten</value></data>
-  <data name="Settings.Cat.Manage.Desc" xml:space="preserve"><value>Vordefinierte Kategorien für Ihre Aufgaben.</value></data>
+  <data name="Settings.Cat.Manage.Desc" xml:space="preserve"><value>Vordefinierte Kategorien für deine Aufgaben.</value></data>
   <data name="Settings.Cat.Placeholder" xml:space="preserve"><value>Neuer Kategoriename...</value></data>
   <data name="Settings.Cat.AddBtn" xml:space="preserve"><value>Hinzufügen</value></data>
   <data name="Settings.Tag.Manage.Title" xml:space="preserve"><value>Tags verwalten</value></data>
-  <data name="Settings.Tag.Manage.Desc" xml:space="preserve"><value>Vordefinierte Tags für Ihre Aufgaben.</value></data>
+  <data name="Settings.Tag.Manage.Desc" xml:space="preserve"><value>Vordefinierte Tags für deine Aufgaben.</value></data>
   <data name="Settings.Tag.Placeholder" xml:space="preserve"><value>Neuer Tagname...</value></data>
   <data name="Settings.Tag.AddBtn" xml:space="preserve"><value>Hinzufügen</value></data>
   <data name="Settings.About.App.Title" xml:space="preserve"><value>Fluent Task Scheduler</value></data>
@@ -313,8 +313,8 @@ Jetzt App neustarten?</value></data>
   <data name="Settings.About.Update.Title" xml:space="preserve"><value>Nach Updates suchen</value></data>
   <data name="Settings.About.Update.Desc" xml:space="preserve"><value>Prüfen, ob eine neuere Version verfügbar ist.</value></data>
   <data name="Settings.About.CheckBtn" xml:space="preserve"><value>Prüfen</value></data>
-  <data name="Settings.About.Onboard.Title" xml:space="preserve"><value>Einführung</value></data>
-  <data name="Settings.About.Onboard.Desc" xml:space="preserve"><value>Die Willkommensführung vom ersten Start erneut abspielen.</value></data>
+  <data name="Settings.About.Onboard.Title" xml:space="preserve"><value>Willkommenstour</value></data>
+  <data name="Settings.About.Onboard.Desc" xml:space="preserve"><value>Die Tour vom ersten Start noch einmal ansehen.</value></data>
   <data name="Settings.About.ViewAgain" xml:space="preserve"><value>Erneut ansehen</value></data>
   <data name="Settings.About.VersionFormat" xml:space="preserve"><value>Version {0}</value></data>
   <data name="Dashboard.AllTags" xml:space="preserve"><value>Alle Tags</value></data>
@@ -792,7 +792,7 @@ Jetzt App neustarten?</value></data>
   <data name="Onboarding.Step7.Title" xml:space="preserve"><value>Nach Ihren Wünschen anpassen</value></data>
   <data name="ScriptLibrary.DeleteTemplate.Content" xml:space="preserve"><value>„{0}“ löschen?</value></data>
   <data name="ScriptLibrary.DeleteTemplate.Title" xml:space="preserve"><value>Skript löschen</value></data>
-  <data name="Settings.UpdateApplyFailed.Content" xml:space="preserve"><value>Das Update konnte nicht angewendet werden. Überprüfen Sie das Protokoll für Details oder versuchen Sie es später erneut.</value></data>
+  <data name="Settings.UpdateApplyFailed.Content" xml:space="preserve"><value>Das Update konnte nicht installiert werden. Sieh im Protokoll nach oder versuche es später erneut.</value></data>
   <data name="Snooze.IncludeMicrosoftTasks" xml:space="preserve"><value>Auch Microsofts eigene geplante Aufgaben pausieren (Defender, Windows Update, Wartung...)</value></data>
   <data name="Snooze.IncludeMicrosoftTasksWarning" xml:space="preserve"><value>Nicht empfohlen: Das Deaktivieren dieser Aufgaben kann Windows-Sicherheitsscans, Updates und Wartung bis zum Ende der Pause beeinträchtigen.</value></data>
   <data name="Tray.CloseWindowFormat" xml:space="preserve"><value>{0} schliessen</value></data>
@@ -1015,4 +1015,58 @@ Jetzt App neustarten?</value></data>
   <data name="Shortcuts.Refresh" xml:space="preserve"><value>Aufgabenliste neu laden</value></data>
   <data name="Shortcuts.Help" xml:space="preserve"><value>Diese Übersicht anzeigen</value></data>
   <data name="Task.Snooze.UntilRestart" xml:space="preserve"><value>Schlummert bis zum Neustart oder zur Abmeldung</value></data>
+  <data name="Settings.Appearance.Language.Windows" xml:space="preserve"><value>Sprache von Windows verwenden</value></data>
+  <data name="Settings.Lead.MinutesFormat" xml:space="preserve"><value>{0} Minuten vorher</value></data>
+  <data name="Settings.Sys.Startup.Failed" xml:space="preserve"><value>Windows hat die Änderung nicht angenommen. Möglicherweise wird der Autostart von deiner Organisation verwaltet.</value></data>
+  <data name="Settings.Sys.MinimizeToTray.Title" xml:space="preserve"><value>In den Infobereich minimieren</value></data>
+  <data name="Settings.Sys.MinimizeToTray.Desc" xml:space="preserve"><value>Auch beim Minimieren wird das Fenster in den Infobereich ausgeblendet.</value></data>
+  <data name="Settings.Adv.OpenLogDesc" xml:space="preserve"><value>Was die App getan hat, samt ihren Warnungen.</value></data>
+  <data name="Settings.Adv.ErrorLogDesc" xml:space="preserve"><value>Vorgänge, die fehlgeschlagen sind.</value></data>
+  <data name="Settings.Adv.CrashLogDesc" xml:space="preserve"><value>Unerwartete Fehler, die die App nicht abfangen konnte.</value></data>
+  <data name="Settings.Adv.DataFolder.Title" xml:space="preserve"><value>Datenordner</value></data>
+  <data name="Settings.Adv.DataFolder.Desc" xml:space="preserve"><value>Den Ordner mit den Protokolldateien, den Einstellungen und den übrigen Dateien der App öffnen.</value></data>
+  <data name="Settings.Adv.Logs.Empty" xml:space="preserve"><value>In diesem Protokoll wurde noch nichts festgehalten.</value></data>
+  <data name="Settings.Adv.ExecHistory.Title" xml:space="preserve"><value>Ausführungsverlauf aufzeichnen</value></data>
+  <data name="Settings.Adv.ExecHistory.Desc" xml:space="preserve"><value>Jede Aufgabenausführung in Dateien der App festhalten, die sie länger aufbewahren als das Ereignisprotokoll der Windows-Aufgabenplanung.</value></data>
+  <data name="Settings.Adv.ExecHistoryFolder.Title" xml:space="preserve"><value>Ordner des Ausführungsverlaufs</value></data>
+  <data name="Settings.Adv.ExecHistoryFolder.Desc" xml:space="preserve"><value>Den Ordner mit den Dateien des Ausführungsverlaufs öffnen.</value></data>
+  <data name="Settings.Data.FileType" xml:space="preserve"><value>Einstellungsdatei</value></data>
+  <data name="Settings.Export.Failed.ContentFormat" xml:space="preserve"><value>Die Einstellungen konnten nicht geschrieben werden nach:
+{0}
+
+{1}</value></data>
+  <data name="Settings.Import.Failed.ContentFormat" xml:space="preserve"><value>Die Datei konnte nicht gelesen werden:
+{0}
+
+{1}</value></data>
+  <data name="Settings.Import.Failed.NotSettingsFormat" xml:space="preserve"><value>Diese Datei enthält keine Einstellungen von FluentTaskScheduler:
+{0}</value></data>
+  <data name="Settings.OpenFailedFormat" xml:space="preserve"><value>Windows konnte Folgendes nicht öffnen:
+{0}</value></data>
+  <data name="Settings.Names.Remove" xml:space="preserve"><value>Entfernen</value></data>
+  <data name="Settings.About.ReleaseNotes.Desc" xml:space="preserve"><value>Ansehen, was sich in dieser Version geändert hat.</value></data>
+  <data name="Settings.About.Update.Checking" xml:space="preserve"><value>Suche nach Updates...</value></data>
+  <data name="Settings.About.Update.ReadyFormat" xml:space="preserve"><value>Version {0} wurde heruntergeladen und wird beim Neustart der App installiert.</value></data>
+  <data name="Settings.About.Update.Unavailable" xml:space="preserve"><value>Diese Kopie der App kann sich nicht selbst aktualisieren. Aktualisiere sie so, wie du sie installiert hast, zum Beispiel mit winget, Scoop oder Chocolatey, oder lade die neueste Version von GitHub herunter. Eine Installation für alle Benutzer kann sich nur aktualisieren, während die App als Administrator läuft.</value></data>
+  <data name="Settings.About.Repository.Title" xml:space="preserve"><value>Quellcode auf GitHub</value></data>
+  <data name="Settings.About.Repository.Desc" xml:space="preserve"><value>FluentTaskScheduler ist Open Source. Sieh dir an, wie die App gemacht ist, und hol dir neue Versionen.</value></data>
+  <data name="Settings.About.Issue.Title" xml:space="preserve"><value>Problem melden</value></data>
+  <data name="Settings.About.Issue.Desc" xml:space="preserve"><value>Einen Fehler melden oder eine Verbesserung vorschlagen.</value></data>
+  <data name="Tour.Back" xml:space="preserve"><value>Zurück</value></data>
+  <data name="Tour.Welcome.Title" xml:space="preserve"><value>Alle geplanten Aufgaben an einem Ort</value></data>
+  <data name="Tour.Welcome.Body" xml:space="preserve"><value>FluentTaskScheduler ist eine moderne Oberfläche für die Windows-Aufgabenplanung. Jede Aufgabe, die du hier siehst, ist eine gewöhnliche Windows-Aufgabe: Sie läuft auch dann nach Plan, wenn die App geschlossen ist.</value></data>
+  <data name="Tour.Create.Title" xml:space="preserve"><value>Erstelle deine erste Aufgabe</value></data>
+  <data name="Tour.Create.Body" xml:space="preserve"><value>Mit „Neue Aufgabe“ lässt du ein Programm, ein Skript oder einen Befehl automatisch ausführen: täglich, bei der Anmeldung, bei einem Ereignis und mehr. Ordner halten zusammen, was zusammengehört.</value></data>
+  <data name="Tour.History.Title" xml:space="preserve"><value>Sieh nach, was passiert ist</value></data>
+  <data name="Tour.History.Body" xml:space="preserve"><value>Wähle eine Aufgabe aus, um zu sehen, wann sie lief, ob sie erfolgreich war und ob sie gerade läuft. Das Dashboard fasst das für alle deine Aufgaben zusammen.</value></data>
+  <data name="Tour.Automation.Title" xml:space="preserve"><value>Aufgaben verketten und pausieren</value></data>
+  <data name="Tour.Automation.Body" xml:space="preserve"><value>Abschlussaktionen starten andere Aufgaben, wenn eine Aufgabe erfolgreich war oder fehlgeschlagen ist. Brauchst du eine Pause? Pausiere eine Aufgabe oder alle: für eine feste Zeit, bis zum nächsten Neustart oder bis du sie fortsetzt. Beides funktioniert, solange die App läuft, auch im Infobereich.</value></data>
+  <data name="Tour.Library.Title" xml:space="preserve"><value>Mit einer Vorlage beginnen</value></data>
+  <data name="Tour.Library.Body" xml:space="preserve"><value>Die Bibliothek enthält fertige Aufgaben für gängige Zwecke und bewahrt deine eigenen Skripte auf. Schnellaktionen erledigen alltägliche Wartung mit einem Klick.</value></data>
+  <data name="Tour.Admin.Title" xml:space="preserve"><value>Aufgaben, die Administratorrechte brauchen</value></data>
+  <data name="Tour.Admin.Body" xml:space="preserve"><value>Manche Aufgaben darf nur ein Administrator lesen oder ändern. Die App listet sie auf, kann sie aber nicht öffnen. Starte die App als Administrator, um mit diesen Aufgaben zu arbeiten.</value></data>
+  <data name="Tour.Settings.Title" xml:space="preserve"><value>Richte es dir ein</value></data>
+  <data name="Tour.Settings.Body" xml:space="preserve"><value>In den Einstellungen wählst du Design und Sprache, worüber du benachrichtigt wirst, ob die App mit Windows startet und mehr. Beim Start sucht die App nach Updates. Diese Tour findest du jederzeit unter Einstellungen, Über.</value></data>
+  <data name="WhatsNew.TitleFormat" xml:space="preserve"><value>Neu in Version {0}</value></data>
+  <data name="WhatsNew.ViewRelease" xml:space="preserve"><value>Diese Version auf GitHub ansehen</value></data>
 </root>

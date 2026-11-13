@@ -32,7 +32,13 @@ public static class Program
             try
             {
                 VelopackApp.Build()
-                    .OnBeforeUninstallFastCallback(_ => Shell.ToastNotifier.RemoveRegistration())
+                    .OnBeforeUninstallFastCallback(_ =>
+                    {
+                        // What the app left in Windows outside its own folders: its start at sign-in
+                        // and what showing notifications registered.
+                        new Settings.RunKeyStartup().TrySetEnabled(false);
+                        Shell.ToastNotifier.RemoveRegistration();
+                    })
                     .Run();
             }
             catch (Exception ex)

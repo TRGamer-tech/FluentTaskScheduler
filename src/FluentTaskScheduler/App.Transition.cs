@@ -1,7 +1,4 @@
-using System.ComponentModel;
-using System.Diagnostics;
 using FluentTaskScheduler.Services;
-using FluentTaskScheduler.Settings;
 using FluentTaskScheduler.Shell;
 using FluentTaskScheduler.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,41 +18,6 @@ public partial class App
     public static IShellNavigator? Navigator =>
         (m_window?.Content as ShellPage);
 
-    public void ApplyTheme(ElementTheme theme)
-    {
-        var old = Container.GetRequiredService<ISettingsService>();
-        _services!.GetRequiredService<ISettingsStore>().Update(settings => settings with
-        {
-            Theme = theme switch { ElementTheme.Light => AppTheme.Light, ElementTheme.Dark => AppTheme.Dark, _ => AppTheme.Default },
-            IsOledMode = old.IsOledMode,
-            IsMicaEnabled = old.IsMicaEnabled
-        });
-    }
-
-    public void ApplySmoothScrolling(bool enable) =>
-        _services!.GetRequiredService<ISettingsStore>().Update(settings => settings with { SmoothScrolling = enable });
-
-    // Completion actions and the execution history log read their switch from the new store.
-    public void ApplyTaskPipelines(bool enable) =>
-        _services!.GetRequiredService<ISettingsStore>().Update(settings => settings with { EnableTaskPipelines = enable });
-
-    public void ApplyExecutionHistoryLog(bool enable) =>
-        _services!.GetRequiredService<ISettingsStore>().Update(settings => settings with { EnableExecutionHistoryLog = enable });
-
-    public void OpenExecutionHistoryFolder()
-    {
-        string folder = _services!.GetRequiredService<AppPaths>().ExecutionHistoryFolder;
-        try
-        {
-            Directory.CreateDirectory(folder);
-            Process.Start(new ProcessStartInfo(folder) { UseShellExecute = true })?.Dispose();
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or Win32Exception)
-        {
-            Serilog.Log.Warning(ex, "The execution history folder {Folder} could not be opened", folder);
-        }
-    }
-
     private static void StartLegacyServices()
     {
         var services = new ServiceCollection();
@@ -68,7 +30,6 @@ public partial class App
         services.AddSingleton<ITaskService, TaskServiceWrapper>();
         Container = services.BuildServiceProvider();
 
-        LoggingConfig.Initialize();
         LocalizationService.Initialize();
     }
 }

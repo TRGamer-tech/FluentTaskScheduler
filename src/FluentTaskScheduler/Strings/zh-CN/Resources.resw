@@ -203,7 +203,7 @@
 {0}</value></data>
   <data name="Settings.Export.Failed.Title" xml:space="preserve"><value>导出失败</value></data>
   <data name="Settings.Import.Success.Title" xml:space="preserve"><value>导入成功</value></data>
-  <data name="Settings.Import.Success.Content" xml:space="preserve"><value>设置已恢复。部分更改可能需要重启应用。</value></data>
+  <data name="Settings.Import.Success.Content" xml:space="preserve"><value>设置已恢复。</value></data>
   <data name="Settings.Import.Failed.Title" xml:space="preserve"><value>导入失败</value></data>
   <data name="Settings.WhatsNew.Title" xml:space="preserve"><value>更新内容</value></data>
   <data name="Settings.WhatsNew.FetchFailed" xml:space="preserve"><value>无法获取发行说明。请检查网络后重试。</value></data>
@@ -280,8 +280,8 @@
   <data name="Settings.Notif.Timing.Desc" xml:space="preserve"><value>提前多久发送提醒。</value></data>
   <data name="Settings.Sys.Startup.Title" xml:space="preserve"><value>开机启动</value></data>
   <data name="Settings.Sys.Startup.Desc" xml:space="preserve"><value>登录 Windows 时自动启动应用。</value></data>
-  <data name="Settings.Sys.Tray.Title" xml:space="preserve"><value>最小化到托盘</value></data>
-  <data name="Settings.Sys.Tray.Desc" xml:space="preserve"><value>将窗口隐藏到系统托盘而不是关闭。</value></data>
+  <data name="Settings.Sys.Tray.Title" xml:space="preserve"><value>关闭时隐藏到托盘</value></data>
+  <data name="Settings.Sys.Tray.Desc" xml:space="preserve"><value>关闭窗口时将其隐藏到系统托盘并保持应用运行，以便提醒、完成后操作和暂停功能继续工作。</value></data>
   <data name="Settings.Sys.Smooth.Title" xml:space="preserve"><value>平滑滚动</value></data>
   <data name="Settings.Sys.Smooth.Desc" xml:space="preserve"><value>在整个应用中启用惯性滚动。</value></data>
   <data name="Settings.Sys.Hidden.Title" xml:space="preserve"><value>显示隐藏任务</value></data>
@@ -289,20 +289,20 @@
   <data name="Settings.Adv.Confirm.Title" xml:space="preserve"><value>删除前确认</value></data>
   <data name="Settings.Adv.Confirm.Desc" xml:space="preserve"><value>删除任务前显示确认对话框。</value></data>
   <data name="Settings.Adv.Logging.Title" xml:space="preserve"><value>应用日志记录</value></data>
-  <data name="Settings.Adv.Logging.Desc" xml:space="preserve"><value>将内部事件和错误写入日志文件以便排查问题。</value></data>
+  <data name="Settings.Adv.Logging.Desc" xml:space="preserve"><value>将应用的运行情况和遇到的错误写入日志文件，以便排查问题。崩溃始终会被记录。</value></data>
   <data name="Settings.Adv.SepLogs.Title" xml:space="preserve"><value>独立日志文件</value></data>
-  <data name="Settings.Adv.SepLogs.Desc" xml:space="preserve"><value>将错误和崩溃日志存储在单独的文件中。</value></data>
+  <data name="Settings.Adv.SepLogs.Desc" xml:space="preserve"><value>将错误写入单独的文件，而不是主日志。</value></data>
   <data name="Settings.Adv.SpecLogs.Title" xml:space="preserve"><value>专用日志</value></data>
   <data name="Settings.Adv.SpecLogs.Desc" xml:space="preserve"><value>直接访问错误和崩溃记录。</value></data>
-  <data name="Settings.Adv.OpenLog" xml:space="preserve"><value>打开日志</value></data>
+  <data name="Settings.Adv.OpenLog" xml:space="preserve"><value>应用日志</value></data>
   <data name="Settings.Adv.ErrorLog" xml:space="preserve"><value>错误日志</value></data>
   <data name="Settings.Adv.CrashLog" xml:space="preserve"><value>崩溃日志</value></data>
   <data name="Settings.Data.Export.Title" xml:space="preserve"><value>导出设置</value></data>
   <data name="Settings.Data.Export.Desc" xml:space="preserve"><value>将当前设置保存到 JSON 文件。</value></data>
-  <data name="Settings.Data.ExportBtn" xml:space="preserve"><value>导出</value></data>
+  <data name="Settings.Data.ExportBtn" xml:space="preserve"><value>导出...</value></data>
   <data name="Settings.Data.Import.Title" xml:space="preserve"><value>导入设置</value></data>
   <data name="Settings.Data.Import.Desc" xml:space="preserve"><value>从之前导出的文件恢复设置。</value></data>
-  <data name="Settings.Data.ImportBtn" xml:space="preserve"><value>导入</value></data>
+  <data name="Settings.Data.ImportBtn" xml:space="preserve"><value>导入...</value></data>
   <data name="Settings.Cat.Manage.Title" xml:space="preserve"><value>管理分类</value></data>
   <data name="Settings.Cat.Manage.Desc" xml:space="preserve"><value>任务的预定义分类。</value></data>
   <data name="Settings.Cat.Placeholder" xml:space="preserve"><value>新分类名称...</value></data>
@@ -316,8 +316,8 @@
   <data name="Settings.About.Update.Title" xml:space="preserve"><value>检查更新</value></data>
   <data name="Settings.About.Update.Desc" xml:space="preserve"><value>检查是否有更新版本可用。</value></data>
   <data name="Settings.About.CheckBtn" xml:space="preserve"><value>检查</value></data>
-  <data name="Settings.About.Onboard.Title" xml:space="preserve"><value>新手引导</value></data>
-  <data name="Settings.About.Onboard.Desc" xml:space="preserve"><value>重新播放首次启动时的欢迎引导。</value></data>
+  <data name="Settings.About.Onboard.Title" xml:space="preserve"><value>欢迎导览</value></data>
+  <data name="Settings.About.Onboard.Desc" xml:space="preserve"><value>再次查看首次启动时的导览。</value></data>
   <data name="Settings.About.ViewAgain" xml:space="preserve"><value>再次查看</value></data>
   <data name="Settings.About.VersionFormat" xml:space="preserve"><value>版本 {0}</value></data>
   <data name="Dashboard.AllTags" xml:space="preserve"><value>全部标签</value></data>
@@ -795,7 +795,7 @@
   <data name="Onboarding.Step7.Title" xml:space="preserve"><value>按您的喜好进行调整</value></data>
   <data name="ScriptLibrary.DeleteTemplate.Content" xml:space="preserve"><value>删除“{0}”？</value></data>
   <data name="ScriptLibrary.DeleteTemplate.Title" xml:space="preserve"><value>删除脚本</value></data>
-  <data name="Settings.UpdateApplyFailed.Content" xml:space="preserve"><value>应用更新失败。请查看日志了解详细信息,或稍后重试。</value></data>
+  <data name="Settings.UpdateApplyFailed.Content" xml:space="preserve"><value>无法安装更新。请查看日志了解详细信息，或稍后重试。</value></data>
   <data name="Snooze.IncludeMicrosoftTasks" xml:space="preserve"><value>同时暂停 Microsoft 自身的计划任务(Defender、Windows 更新、维护等)</value></data>
   <data name="Snooze.IncludeMicrosoftTasksWarning" xml:space="preserve"><value>不建议这样做:禁用这些任务可能会在暂停结束前影响 Windows 安全扫描、更新和维护。</value></data>
   <data name="Tray.CloseWindowFormat" xml:space="preserve"><value>关闭 {0}</value></data>
@@ -1018,6 +1018,60 @@
   <data name="Shortcuts.Refresh" xml:space="preserve"><value>重新加载任务列表</value></data>
   <data name="Shortcuts.Help" xml:space="preserve"><value>显示此概览</value></data>
   <data name="Task.Snooze.UntilRestart" xml:space="preserve"><value>已暂停至重启或注销</value></data>
+  <data name="Settings.Appearance.Language.Windows" xml:space="preserve"><value>使用 Windows 的语言</value></data>
+  <data name="Settings.Lead.MinutesFormat" xml:space="preserve"><value>提前 {0} 分钟</value></data>
+  <data name="Settings.Sys.Startup.Failed" xml:space="preserve"><value>Windows 未接受此更改。开机启动设置可能由你的组织管理。</value></data>
+  <data name="Settings.Sys.MinimizeToTray.Title" xml:space="preserve"><value>最小化时隐藏到托盘</value></data>
+  <data name="Settings.Sys.MinimizeToTray.Desc" xml:space="preserve"><value>最小化窗口时也将其隐藏到系统托盘。</value></data>
+  <data name="Settings.Adv.OpenLogDesc" xml:space="preserve"><value>应用的运行记录，包括警告。</value></data>
+  <data name="Settings.Adv.ErrorLogDesc" xml:space="preserve"><value>失败的操作记录。</value></data>
+  <data name="Settings.Adv.CrashLogDesc" xml:space="preserve"><value>应用未能处理的意外错误。</value></data>
+  <data name="Settings.Adv.DataFolder.Title" xml:space="preserve"><value>数据文件夹</value></data>
+  <data name="Settings.Adv.DataFolder.Desc" xml:space="preserve"><value>打开包含日志文件、设置和应用其他文件的文件夹。</value></data>
+  <data name="Settings.Adv.Logs.Empty" xml:space="preserve"><value>此日志中尚无任何记录。</value></data>
+  <data name="Settings.Adv.ExecHistory.Title" xml:space="preserve"><value>执行历史日志</value></data>
+  <data name="Settings.Adv.ExecHistory.Desc" xml:space="preserve"><value>将每次任务运行记录到应用的文件中，保留时间比 Windows 任务计划程序的事件日志更长。</value></data>
+  <data name="Settings.Adv.ExecHistoryFolder.Title" xml:space="preserve"><value>执行历史文件夹</value></data>
+  <data name="Settings.Adv.ExecHistoryFolder.Desc" xml:space="preserve"><value>打开存放执行历史文件的文件夹。</value></data>
+  <data name="Settings.Data.FileType" xml:space="preserve"><value>设置文件</value></data>
+  <data name="Settings.Export.Failed.ContentFormat" xml:space="preserve"><value>无法将设置写入：
+{0}
+
+{1}</value></data>
+  <data name="Settings.Import.Failed.ContentFormat" xml:space="preserve"><value>无法读取文件：
+{0}
+
+{1}</value></data>
+  <data name="Settings.Import.Failed.NotSettingsFormat" xml:space="preserve"><value>此文件不包含 FluentTaskScheduler 的设置：
+{0}</value></data>
+  <data name="Settings.OpenFailedFormat" xml:space="preserve"><value>Windows 无法打开：
+{0}</value></data>
+  <data name="Settings.Names.Remove" xml:space="preserve"><value>删除</value></data>
+  <data name="Settings.About.ReleaseNotes.Desc" xml:space="preserve"><value>查看此版本的更改内容。</value></data>
+  <data name="Settings.About.Update.Checking" xml:space="preserve"><value>正在检查更新...</value></data>
+  <data name="Settings.About.Update.ReadyFormat" xml:space="preserve"><value>版本 {0} 已下载，将在应用重启时安装。</value></data>
+  <data name="Settings.About.Update.Unavailable" xml:space="preserve"><value>此应用副本无法自行更新。请按安装时的方式更新，例如使用 winget、Scoop 或 Chocolatey，或从 GitHub 下载最新版本。为所有用户安装的应用只有在以管理员身份运行时才能自行更新。</value></data>
+  <data name="Settings.About.Repository.Title" xml:space="preserve"><value>GitHub 上的源代码</value></data>
+  <data name="Settings.About.Repository.Desc" xml:space="preserve"><value>FluentTaskScheduler 是开源软件。可以查看源代码并获取新版本。</value></data>
+  <data name="Settings.About.Issue.Title" xml:space="preserve"><value>报告问题</value></data>
+  <data name="Settings.About.Issue.Desc" xml:space="preserve"><value>报告错误或提出改进建议。</value></data>
+  <data name="Tour.Back" xml:space="preserve"><value>上一步</value></data>
+  <data name="Tour.Welcome.Title" xml:space="preserve"><value>在一处管理所有计划任务</value></data>
+  <data name="Tour.Welcome.Body" xml:space="preserve"><value>FluentTaskScheduler 为 Windows 任务计划程序提供了现代化的界面。这里显示的每个任务都是普通的 Windows 任务：即使关闭应用，它们也会按计划运行。</value></data>
+  <data name="Tour.Create.Title" xml:space="preserve"><value>创建你的第一个任务</value></data>
+  <data name="Tour.Create.Body" xml:space="preserve"><value>选择“新建任务”，即可让程序、脚本或命令自动运行：每天、登录时、发生某个事件时等等。文件夹可以把相关的任务放在一起。</value></data>
+  <data name="Tour.History.Title" xml:space="preserve"><value>查看运行情况</value></data>
+  <data name="Tour.History.Body" xml:space="preserve"><value>选择一个任务，即可查看它何时运行、是否成功以及当前是否正在运行。仪表盘会汇总所有任务的情况。</value></data>
+  <data name="Tour.Automation.Title" xml:space="preserve"><value>链接任务与暂停任务</value></data>
+  <data name="Tour.Automation.Body" xml:space="preserve"><value>完成后操作可以在任务成功或失败时启动其他任务。需要休息一下？可以暂停单个任务或所有任务：固定时长、直到下次重启，或直到你手动恢复。这两项功能在应用运行期间有效，应用也可以在系统托盘中运行。</value></data>
+  <data name="Tour.Library.Title" xml:space="preserve"><value>从模板开始</value></data>
+  <data name="Tour.Library.Body" xml:space="preserve"><value>库中提供了适用于常见用途的现成任务，也可以保存你自己的脚本。快速操作只需单击一次即可完成日常维护。</value></data>
+  <data name="Tour.Admin.Title" xml:space="preserve"><value>需要管理员权限的任务</value></data>
+  <data name="Tour.Admin.Body" xml:space="preserve"><value>有些任务只有管理员才能查看或更改。应用会列出这些任务，但无法打开它们。要处理这些任务，请以管理员身份启动应用。</value></data>
+  <data name="Tour.Settings.Title" xml:space="preserve"><value>按你的喜好设置</value></data>
+  <data name="Tour.Settings.Body" xml:space="preserve"><value>在设置中，你可以选择主题和语言、接收哪些通知、应用是否随 Windows 启动等等。应用启动时会检查更新。你可以随时在“设置”的“关于”中再次查看此导览。</value></data>
+  <data name="WhatsNew.TitleFormat" xml:space="preserve"><value>版本 {0} 的新增内容</value></data>
+  <data name="WhatsNew.ViewRelease" xml:space="preserve"><value>在 GitHub 上查看此版本</value></data>
 </root>
 
 

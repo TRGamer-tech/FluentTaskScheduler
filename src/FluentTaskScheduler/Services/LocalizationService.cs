@@ -116,7 +116,6 @@ namespace FluentTaskScheduler.Services
         private static void ApplyLanguage(string language, bool raiseEvent)
         {
             _currentLanguage = language;
-            Settings.Language = language;
 
             try
             {

@@ -67,8 +67,20 @@ public sealed class ScriptedFilePicker : IFilePicker
 {
     public string? Choice { get; set; }
 
-    public Task<string?> PickOpenFileAsync(string title, string typeName, string extension) => Task.FromResult(Choice);
-    public Task<string?> PickSaveFileAsync(string title, string typeName, string extension, string suggestedFileName) => Task.FromResult(Choice);
+    /// <summary>What each picker was opened for, e.g. "open xml" or "save csv History".</summary>
+    public List<string> Asked { get; } = [];
+
+    public Task<string?> PickOpenFileAsync(string title, string typeName, string extension)
+    {
+        Asked.Add($"open {extension}");
+        return Task.FromResult(Choice);
+    }
+
+    public Task<string?> PickSaveFileAsync(string title, string typeName, string extension, string suggestedFileName)
+    {
+        Asked.Add($"save {extension} {suggestedFileName}");
+        return Task.FromResult(Choice);
+    }
 }
 
 public sealed class FakeAppLifetime : IAppLifetime

@@ -200,7 +200,7 @@ Restart now to apply the update?</value></data>
 {0}</value></data>
   <data name="Settings.Export.Failed.Title" xml:space="preserve"><value>Export Failed</value></data>
   <data name="Settings.Import.Success.Title" xml:space="preserve"><value>Import Successful</value></data>
-  <data name="Settings.Import.Success.Content" xml:space="preserve"><value>Settings have been restored. Some changes may require an app restart.</value></data>
+  <data name="Settings.Import.Success.Content" xml:space="preserve"><value>The settings have been restored.</value></data>
   <data name="Settings.Import.Failed.Title" xml:space="preserve"><value>Import Failed</value></data>
   <data name="Settings.WhatsNew.Title" xml:space="preserve"><value>What's New</value></data>
   <data name="Settings.WhatsNew.FetchFailed" xml:space="preserve"><value>Could not fetch release notes. Check your internet connection and try again.</value></data>
@@ -277,8 +277,8 @@ Restart now to apply the update?</value></data>
   <data name="Settings.Notif.Timing.Desc" xml:space="preserve"><value>How far in advance to send the reminder.</value></data>
   <data name="Settings.Sys.Startup.Title" xml:space="preserve"><value>Run on Startup</value></data>
   <data name="Settings.Sys.Startup.Desc" xml:space="preserve"><value>Automatically launch the app when you sign in to Windows.</value></data>
-  <data name="Settings.Sys.Tray.Title" xml:space="preserve"><value>Minimize to Tray</value></data>
-  <data name="Settings.Sys.Tray.Desc" xml:space="preserve"><value>Hide the window to the system tray instead of closing.</value></data>
+  <data name="Settings.Sys.Tray.Title" xml:space="preserve"><value>Close to Tray</value></data>
+  <data name="Settings.Sys.Tray.Desc" xml:space="preserve"><value>Closing the window hides it to the system tray and keeps the app running, so that reminders, completion actions and snoozes keep working.</value></data>
   <data name="Settings.Sys.Smooth.Title" xml:space="preserve"><value>Smooth Scrolling</value></data>
   <data name="Settings.Sys.Smooth.Desc" xml:space="preserve"><value>Enable inertia-based scrolling throughout the app.</value></data>
   <data name="Settings.Sys.Hidden.Title" xml:space="preserve"><value>Show Hidden Tasks</value></data>
@@ -286,20 +286,20 @@ Restart now to apply the update?</value></data>
   <data name="Settings.Adv.Confirm.Title" xml:space="preserve"><value>Confirm Before Deleting</value></data>
   <data name="Settings.Adv.Confirm.Desc" xml:space="preserve"><value>Show a confirmation dialog before removing a task.</value></data>
   <data name="Settings.Adv.Logging.Title" xml:space="preserve"><value>Application Logging</value></data>
-  <data name="Settings.Adv.Logging.Desc" xml:space="preserve"><value>Write internal events and errors to a log file for troubleshooting.</value></data>
+  <data name="Settings.Adv.Logging.Desc" xml:space="preserve"><value>Write what the app does and the errors it runs into to log files, for troubleshooting. A crash is always recorded.</value></data>
   <data name="Settings.Adv.SepLogs.Title" xml:space="preserve"><value>Separate Log Files</value></data>
-  <data name="Settings.Adv.SepLogs.Desc" xml:space="preserve"><value>Store error and crash logs in dedicated files instead of the main log.</value></data>
+  <data name="Settings.Adv.SepLogs.Desc" xml:space="preserve"><value>Write errors to a file of their own instead of the main log.</value></data>
   <data name="Settings.Adv.SpecLogs.Title" xml:space="preserve"><value>Specific Logs</value></data>
   <data name="Settings.Adv.SpecLogs.Desc" xml:space="preserve"><value>Direct access to error and crash records.</value></data>
-  <data name="Settings.Adv.OpenLog" xml:space="preserve"><value>Open Log</value></data>
+  <data name="Settings.Adv.OpenLog" xml:space="preserve"><value>App Log</value></data>
   <data name="Settings.Adv.ErrorLog" xml:space="preserve"><value>Error Log</value></data>
   <data name="Settings.Adv.CrashLog" xml:space="preserve"><value>Crash Log</value></data>
   <data name="Settings.Data.Export.Title" xml:space="preserve"><value>Export Settings</value></data>
   <data name="Settings.Data.Export.Desc" xml:space="preserve"><value>Save your current settings to a JSON file.</value></data>
-  <data name="Settings.Data.ExportBtn" xml:space="preserve"><value>Export</value></data>
+  <data name="Settings.Data.ExportBtn" xml:space="preserve"><value>Export...</value></data>
   <data name="Settings.Data.Import.Title" xml:space="preserve"><value>Import Settings</value></data>
   <data name="Settings.Data.Import.Desc" xml:space="preserve"><value>Restore settings from a previously exported file.</value></data>
-  <data name="Settings.Data.ImportBtn" xml:space="preserve"><value>Import</value></data>
+  <data name="Settings.Data.ImportBtn" xml:space="preserve"><value>Import...</value></data>
   <data name="Settings.Cat.Manage.Title" xml:space="preserve"><value>Manage Categories</value></data>
   <data name="Settings.Cat.Manage.Desc" xml:space="preserve"><value>Predefined categories for your tasks.</value></data>
   <data name="Settings.Cat.Placeholder" xml:space="preserve"><value>New category name...</value></data>
@@ -313,8 +313,8 @@ Restart now to apply the update?</value></data>
   <data name="Settings.About.Update.Title" xml:space="preserve"><value>Check for Updates</value></data>
   <data name="Settings.About.Update.Desc" xml:space="preserve"><value>Check if a newer version is available.</value></data>
   <data name="Settings.About.CheckBtn" xml:space="preserve"><value>Check</value></data>
-  <data name="Settings.About.Onboard.Title" xml:space="preserve"><value>Onboarding</value></data>
-  <data name="Settings.About.Onboard.Desc" xml:space="preserve"><value>Replay the welcome walkthrough from first launch.</value></data>
+  <data name="Settings.About.Onboard.Title" xml:space="preserve"><value>Welcome Tour</value></data>
+  <data name="Settings.About.Onboard.Desc" xml:space="preserve"><value>Take the tour from the first start again.</value></data>
   <data name="Settings.About.ViewAgain" xml:space="preserve"><value>View Again</value></data>
   <data name="Dashboard.AllTags" xml:space="preserve"><value>All Tags</value></data>
   <data name="Dashboard.AllCategories" xml:space="preserve"><value>All Categories</value></data>
@@ -792,7 +792,7 @@ Restart now to apply the update?</value></data>
   <data name="Onboarding.Step7.Title" xml:space="preserve"><value>Tune it to your liking</value></data>
   <data name="ScriptLibrary.DeleteTemplate.Content" xml:space="preserve"><value>Delete '{0}'?</value></data>
   <data name="ScriptLibrary.DeleteTemplate.Title" xml:space="preserve"><value>Delete Script</value></data>
-  <data name="Settings.UpdateApplyFailed.Content" xml:space="preserve"><value>Failed to apply the update. Check the log for details, or try again later.</value></data>
+  <data name="Settings.UpdateApplyFailed.Content" xml:space="preserve"><value>The update could not be installed. Check the log for details, or try again later.</value></data>
   <data name="Snooze.IncludeMicrosoftTasks" xml:space="preserve"><value>Also suspend Microsoft's own scheduled tasks (Defender, Windows Update, maintenance...)</value></data>
   <data name="Snooze.IncludeMicrosoftTasksWarning" xml:space="preserve"><value>Not recommended: disabling these can break Windows security scans, updates, and maintenance until the snooze ends.</value></data>
   <data name="Tray.CloseWindowFormat" xml:space="preserve"><value>Close {0}</value></data>
@@ -1015,5 +1015,59 @@ Restart now to apply the update?</value></data>
   <data name="Shortcuts.Refresh" xml:space="preserve"><value>Reload the task list</value></data>
   <data name="Shortcuts.Help" xml:space="preserve"><value>Show this overview</value></data>
   <data name="Task.Snooze.UntilRestart" xml:space="preserve"><value>Snoozed until restart or sign-out</value></data>
+  <data name="Settings.Appearance.Language.Windows" xml:space="preserve"><value>Use the Windows language</value></data>
+  <data name="Settings.Lead.MinutesFormat" xml:space="preserve"><value>{0} minutes before</value></data>
+  <data name="Settings.Sys.Startup.Failed" xml:space="preserve"><value>Windows did not accept the change. Starting with Windows may be managed by your organization.</value></data>
+  <data name="Settings.Sys.MinimizeToTray.Title" xml:space="preserve"><value>Minimize to Tray</value></data>
+  <data name="Settings.Sys.MinimizeToTray.Desc" xml:space="preserve"><value>Minimizing the window hides it to the system tray as well.</value></data>
+  <data name="Settings.Adv.OpenLogDesc" xml:space="preserve"><value>What the app did, including its warnings.</value></data>
+  <data name="Settings.Adv.ErrorLogDesc" xml:space="preserve"><value>Operations that failed.</value></data>
+  <data name="Settings.Adv.CrashLogDesc" xml:space="preserve"><value>Unexpected errors the app could not handle.</value></data>
+  <data name="Settings.Adv.DataFolder.Title" xml:space="preserve"><value>Data Folder</value></data>
+  <data name="Settings.Adv.DataFolder.Desc" xml:space="preserve"><value>Open the folder with the log files, the settings and the other files of the app.</value></data>
+  <data name="Settings.Adv.Logs.Empty" xml:space="preserve"><value>Nothing has been recorded in this log yet.</value></data>
+  <data name="Settings.Adv.ExecHistory.Title" xml:space="preserve"><value>Execution History Log</value></data>
+  <data name="Settings.Adv.ExecHistory.Desc" xml:space="preserve"><value>Record every task run in files of the app, which keep it longer than the event log of the Windows Task Scheduler does.</value></data>
+  <data name="Settings.Adv.ExecHistoryFolder.Title" xml:space="preserve"><value>Execution History Folder</value></data>
+  <data name="Settings.Adv.ExecHistoryFolder.Desc" xml:space="preserve"><value>Open the folder with the execution history files.</value></data>
+  <data name="Settings.Data.FileType" xml:space="preserve"><value>Settings file</value></data>
+  <data name="Settings.Export.Failed.ContentFormat" xml:space="preserve"><value>The settings could not be written to:
+{0}
+
+{1}</value></data>
+  <data name="Settings.Import.Failed.ContentFormat" xml:space="preserve"><value>The file could not be read:
+{0}
+
+{1}</value></data>
+  <data name="Settings.Import.Failed.NotSettingsFormat" xml:space="preserve"><value>This file does not contain settings of FluentTaskScheduler:
+{0}</value></data>
+  <data name="Settings.OpenFailedFormat" xml:space="preserve"><value>Windows could not open:
+{0}</value></data>
+  <data name="Settings.Names.Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="Settings.About.ReleaseNotes.Desc" xml:space="preserve"><value>See what changed in this version.</value></data>
+  <data name="Settings.About.Update.Checking" xml:space="preserve"><value>Checking for updates...</value></data>
+  <data name="Settings.About.Update.ReadyFormat" xml:space="preserve"><value>Version {0} has been downloaded and will be installed when the app restarts.</value></data>
+  <data name="Settings.About.Update.Unavailable" xml:space="preserve"><value>This copy of the app cannot update itself. Update it the way you installed it, for example with winget, Scoop or Chocolatey, or download the latest version from GitHub. An installation for all users can only update itself while the app runs as administrator.</value></data>
+  <data name="Settings.About.Repository.Title" xml:space="preserve"><value>Source Code on GitHub</value></data>
+  <data name="Settings.About.Repository.Desc" xml:space="preserve"><value>FluentTaskScheduler is open source. See how it is made and get new releases.</value></data>
+  <data name="Settings.About.Issue.Title" xml:space="preserve"><value>Report a Problem</value></data>
+  <data name="Settings.About.Issue.Desc" xml:space="preserve"><value>Tell the developers about a bug or suggest an improvement.</value></data>
+  <data name="Tour.Back" xml:space="preserve"><value>Back</value></data>
+  <data name="Tour.Welcome.Title" xml:space="preserve"><value>Your scheduled tasks in one place</value></data>
+  <data name="Tour.Welcome.Body" xml:space="preserve"><value>FluentTaskScheduler is a modern front end for the Windows Task Scheduler. Every task you see here is a regular Windows task: it keeps running on schedule when the app is closed.</value></data>
+  <data name="Tour.Create.Title" xml:space="preserve"><value>Create your first task</value></data>
+  <data name="Tour.Create.Body" xml:space="preserve"><value>Choose New Task to run a program, a script or a command automatically: every day, when you sign in, when an event occurs, and more. Folders keep tasks that belong together in one place.</value></data>
+  <data name="Tour.History.Title" xml:space="preserve"><value>See what happened</value></data>
+  <data name="Tour.History.Body" xml:space="preserve"><value>Select a task to see when it ran, whether it succeeded, and whether it is running right now. The Dashboard sums this up for all your tasks.</value></data>
+  <data name="Tour.Automation.Title" xml:space="preserve"><value>Chain tasks and pause them</value></data>
+  <data name="Tour.Automation.Body" xml:space="preserve"><value>Completion actions start other tasks when a task succeeds or fails. Need a break? Snooze one task or all of them: for a set time, until the next restart, or until you resume them. Both work while the app is running, which it also does in the system tray.</value></data>
+  <data name="Tour.Library.Title" xml:space="preserve"><value>Start from a template</value></data>
+  <data name="Tour.Library.Body" xml:space="preserve"><value>The Library has ready-made tasks for common jobs and keeps your own scripts. Quick Actions run everyday maintenance with one click.</value></data>
+  <data name="Tour.Admin.Title" xml:space="preserve"><value>Tasks that need administrator rights</value></data>
+  <data name="Tour.Admin.Body" xml:space="preserve"><value>Windows lets only administrators read or change some tasks. The app lists them, but cannot open them. Start the app as administrator to work with these tasks.</value></data>
+  <data name="Tour.Settings.Title" xml:space="preserve"><value>Make it yours</value></data>
+  <data name="Tour.Settings.Body" xml:space="preserve"><value>In Settings you choose the theme and the language, what you are notified about, whether the app starts with Windows, and more. The app looks for updates when it starts. You can take this tour again under Settings, About.</value></data>
+  <data name="WhatsNew.TitleFormat" xml:space="preserve"><value>What's new in version {0}</value></data>
+  <data name="WhatsNew.ViewRelease" xml:space="preserve"><value>View this release on GitHub</value></data>
 </root>
 

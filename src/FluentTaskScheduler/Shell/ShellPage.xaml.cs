@@ -28,7 +28,7 @@ public sealed partial class ShellPage : Page, IShellNavigator
         ["QuickActions"] = new(typeof(QuickActionsPage), "Main.Header.QuickActions"),
         ["ScriptLibrary"] = new(typeof(LibraryPage), "Main.Header.Library"),
         ["ScriptEditor"] = new(typeof(ScriptEditorPage), "Main.Header.ScriptEditor.Text"),
-        ["Settings"] = new(typeof(SettingsPage), "Main.Header.Settings", CreatedByFrame: true)
+        ["Settings"] = new(typeof(SettingsPage), "Main.Header.Settings")
     };
 
     // What the pane's entries take up, so the folder tree above them can use the rest.
@@ -49,6 +49,7 @@ public sealed partial class ShellPage : Page, IShellNavigator
         Folders.ViewModel = folders;
         SizeChanged += (_, e) => Folders.MaxHeight = Math.Max(120, e.NewSize.Height - HeightOfPaneEntries);
         Loaded += async (_, _) => await folders.ReloadAsync();
+        Loaded += async (_, _) => await windowServices.GetRequiredService<StartupFlow>().RunAsync();
     }
 
     /// <summary>The element that acts as the window's title bar.</summary>

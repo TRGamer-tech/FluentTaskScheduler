@@ -1,0 +1,57 @@
+<ContentDialog
+    x:Class="FluentTaskScheduler.Dialogs.WelcomeTourDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:l="using:FluentTaskScheduler.Localization"
+    xmlns:local="using:FluentTaskScheduler.Dialogs"
+    xmlns:vm="using:FluentTaskScheduler.ViewModels"
+    Style="{StaticResource DefaultContentDialogStyle}"
+    Title="{x:Bind l:Loc.Get('Onboarding.Step1.Title')}"
+    PrimaryButtonText="{x:Bind l:Loc.Get('Tour.Back')}"
+    SecondaryButtonText="{x:Bind ViewModel.NextText, Mode=OneWay}"
+    CloseButtonText="{x:Bind l:Loc.Get('Dialog.Common.Close')}"
+    IsPrimaryButtonEnabled="{x:Bind ViewModel.CanGoBack, Mode=OneWay}"
+    DefaultButton="Secondary"
+    PrimaryButtonClick="Back_Click"
+    SecondaryButtonClick="Next_Click">
+
+    <!-- All three buttons are there on every slide, in the dialog's own button row, so none of
+         them moves. Should the window be too small for a slide, the slide scrolls. -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Spacing="16">
+            <!-- Every slide is laid out in the same cell, and only the current one can be seen.
+                 The cell is as tall as the tallest slide, in whatever language and text size, so
+                 the dialog keeps its height from slide to slide. -->
+            <ItemsControl ItemsSource="{x:Bind ViewModel.Slides}" IsTabStop="False">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Grid/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:TourSlide">
+                        <StackPanel Spacing="12" Opacity="{x:Bind local:WelcomeTourDialog.OpacityOf(IsCurrent), Mode=OneWay}">
+                            <Border Height="96"
+                                    CornerRadius="{ThemeResource OverlayCornerRadius}"
+                                    Background="{ThemeResource AccentFillColorDefaultBrush}">
+                                <FontIcon Glyph="{x:Bind Glyph}" FontSize="40"
+                                          Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"/>
+                            </Border>
+                            <TextBlock Text="{x:Bind Title}" TextWrapping="Wrap"
+                                       Style="{StaticResource BodyStrongTextBlockStyle}"
+                                       AutomationProperties.AutomationId="TourSlideTitle"
+                                       AutomationProperties.AccessibilityView="{x:Bind local:WelcomeTourDialog.ViewOf(IsCurrent), Mode=OneWay}"/>
+                            <TextBlock Text="{x:Bind Body}" TextWrapping="Wrap"
+                                       AutomationProperties.AutomationId="TourSlideBody"
+                                       AutomationProperties.AccessibilityView="{x:Bind local:WelcomeTourDialog.ViewOf(IsCurrent), Mode=OneWay}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <PipsPager HorizontalAlignment="Center"
+                       NumberOfPages="{x:Bind ViewModel.SlideCount}"
+                       SelectedPageIndex="{x:Bind ViewModel.Index, Mode=TwoWay}"/>
+        </StackPanel>
+    </ScrollViewer>
+</ContentDialog>
