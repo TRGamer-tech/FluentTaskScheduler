@@ -63,12 +63,12 @@
   <data name="TriggerTitle.Text" xml:space="preserve"><value>Trigger</value></data>
   <data name="ConditionsTitle.Text" xml:space="preserve"><value>Bedingungen</value></data>
   <data name="ConditionIdle.Content" xml:space="preserve"><value>Computer im Leerlauf</value></data>
-  <data name="ConditionAC.Content" xml:space="preserve"><value>Computer am Stromnetz angeschlossen</value></data>
+  <data name="ConditionAC.Content" xml:space="preserve"><value>Computer im Netzbetrieb</value></data>
   <data name="ConditionNetwork.Content" xml:space="preserve"><value>Netzwerk verfügbar</value></data>
-  <data name="ConditionWake.Content" xml:space="preserve"><value>Computer zum Ausführen der Aufgabe aufwecken</value></data>
+  <data name="ConditionWake.Content" xml:space="preserve"><value>Computer zum Ausführen der Aufgabe reaktivieren</value></data>
   <data name="SettingsTitle.Text" xml:space="preserve"><value>Einstellungen</value></data>
   <data name="RunIfMissed.Content" xml:space="preserve"><value>Aufgabe so bald wie möglich nach verpasstem Start ausführen</value></data>
-  <data name="RestartOnFailure.Content" xml:space="preserve"><value>Bei Fehler, jede ... neustarten:</value></data>
+  <data name="RestartOnFailure.Content" xml:space="preserve"><value>Falls die Aufgabe fehlschlägt, neu starten alle:</value></data>
   <data name="App.WindowTitle" xml:space="preserve"><value>FluentTaskScheduler</value></data>
   <data name="Dialog.Common.OK" xml:space="preserve"><value>OK</value></data>
   <data name="Dialog.Common.Close" xml:space="preserve"><value>Schliessen</value></data>
@@ -81,7 +81,7 @@
   <data name="Dialog.Common.Save" xml:space="preserve"><value>Speichern</value></data>
   <data name="Dialog.Error.Title" xml:space="preserve"><value>Fehler</value></data>
   <data name="Dialog.ConfirmDelete.Title" xml:space="preserve"><value>Löschen bestätigen</value></data>
-  <data name="Dialog.DeleteTask.ContentFormat" xml:space="preserve"><value>Bist du sicher, dass du '{0}' löschen möchtest?</value></data>
+  <data name="Dialog.DeleteTask.ContentFormat" xml:space="preserve"><value>Bist du sicher, dass du „{0}“ löschen möchtest?</value></data>
   <data name="Dialog.BatchDelete.ContentFormat" xml:space="preserve"><value>{0} Aufgaben löschen?</value></data>
   <data name="Dialog.ImportTask.Title" xml:space="preserve"><value>Aufgabe importieren</value></data>
   <data name="Dialog.ImportTask.SelectFolder" xml:space="preserve"><value>Wähle den Ordner aus, in den diese Aufgabe importiert werden soll:</value></data>
@@ -92,8 +92,8 @@
   <data name="Dialog.DeleteFolder.ContentFormat" xml:space="preserve"><value>„{0}“ mit allen Aufgaben und Ordnern darin löschen?</value></data>
   <data name="Dialog.UpdateAvailable.Title" xml:space="preserve"><value>Update verfügbar</value></data>
   <data name="Dialog.UpdateAvailable.ContentFormat" xml:space="preserve"><value>Version {0} wurde heruntergeladen und kann installiert werden.
-Jetzt App neustarten?</value></data>
-  <data name="Dialog.UpdateAvailable.RestartNow" xml:space="preserve"><value>Neustarten</value></data>
+Jetzt neu starten, um das Update zu installieren?</value></data>
+  <data name="Dialog.UpdateAvailable.RestartNow" xml:space="preserve"><value>Jetzt neu starten</value></data>
   <data name="Main.Nav.Dashboard" xml:space="preserve"><value>Dashboard</value></data>
   <data name="Main.Nav.NewTask" xml:space="preserve"><value>Neue Aufgabe</value></data>
   <data name="Main.Nav.AllTasks" xml:space="preserve"><value>Alle Aufgaben</value></data>
@@ -107,8 +107,8 @@ Jetzt App neustarten?</value></data>
   <data name="Main.Toolbar.SortActiveFormat" xml:space="preserve"><value>Sortierung: {1} {0}</value></data>
   <data name="Main.Sort.Name" xml:space="preserve"><value>Name</value></data>
   <data name="Main.Sort.Status" xml:space="preserve"><value>Status</value></data>
-  <data name="Main.Sort.NextRun" xml:space="preserve"><value>Nächster Start</value></data>
-  <data name="Main.Sort.LastRun" xml:space="preserve"><value>Letzter Start</value></data>
+  <data name="Main.Sort.NextRun" xml:space="preserve"><value>Nächste Ausführung</value></data>
+  <data name="Main.Sort.LastRun" xml:space="preserve"><value>Letzte Ausführung</value></data>
   <data name="Main.Sort.Clear" xml:space="preserve"><value>Sortierung zurücksetzen</value></data>
   <data name="Main.Task.RunNow" xml:space="preserve"><value>Ausführen</value></data>
   <data name="Main.Task.Stop" xml:space="preserve"><value>Beenden</value></data>
@@ -135,7 +135,7 @@ Jetzt App neustarten?</value></data>
   <data name="Settings.Import.Failed.Title" xml:space="preserve"><value>Import fehlgeschlagen</value></data>
   <data name="Settings.WhatsNew.Title" xml:space="preserve"><value>Neuigkeiten</value></data>
   <data name="Settings.WhatsNew.FetchFailed" xml:space="preserve"><value>Die Versionshinweise konnten nicht von GitHub abgerufen werden. Überprüfe deine Internetverbindung oder lies sie auf der Release-Seite des Projekts.</value></data>
-  <data name="Settings.UpdateError.ContentFormat" xml:space="preserve"><value>Ein Fehler ist beim Überprüfen auf Updates aufgetreten:
+  <data name="Settings.UpdateError.ContentFormat" xml:space="preserve"><value>Bei der Suche nach Updates ist ein Fehler aufgetreten:
 {0}</value></data>
   <data name="Settings.UpToDate.Content" xml:space="preserve"><value>Du verwendest bereits die neueste Version.</value></data>
   <data name="Settings.Appearance.Theme.Title" xml:space="preserve"><value>App-Design</value></data>
@@ -147,7 +147,7 @@ Jetzt App neustarten?</value></data>
   <data name="DashboardFilterCategory.Text" xml:space="preserve"><value>Nach Kategorie filtern</value></data>
   <data name="DashboardFilterTag.Text" xml:space="preserve"><value>Nach Tag filtern</value></data>
   <data name="DashboardTotalTasks.Text" xml:space="preserve"><value>Aufgaben gesamt</value></data>
-  <data name="DashboardHealthScore.Text" xml:space="preserve"><value>Bewertung</value></data>
+  <data name="DashboardHealthScore.Text" xml:space="preserve"><value>Erfolgsquote</value></data>
   <data name="DashboardCurrentlyRunning.Text" xml:space="preserve"><value>Aktuell ausgeführte Aufgaben</value></data>
   <data name="DashboardNoRunningTasks.Text" xml:space="preserve"><value>Zurzeit wird keine Aufgabe ausgeführt</value></data>
   <data name="DashboardUpcomingSchedule.Text" xml:space="preserve"><value>Nächste Starts</value></data>
@@ -164,7 +164,7 @@ Jetzt App neustarten?</value></data>
   <data name="ConditionIdleFor.Text" xml:space="preserve"><value>Im Leerlauf seit:</value></data>
   <data name="ConditionStopOnIdleEnd.Content" xml:space="preserve"><value>Beenden, wenn Leerlauf endet</value></data>
   <data name="ConditionStopBatterySwitch.Content" xml:space="preserve"><value>Beenden, wenn auf Akkubetrieb gewechselt wird</value></data>
-  <data name="ConditionSpecificNetwork.Text" xml:space="preserve"><value>Spezifisches Netzwerk:</value></data>
+  <data name="ConditionSpecificNetwork.Text" xml:space="preserve"><value>Bestimmtes Netzwerk:</value></data>
   <data name="Settings.Notif.Task.Title" xml:space="preserve"><value>Aufgabenbenachrichtigungen</value></data>
   <data name="Settings.Notif.Task.Desc" xml:space="preserve"><value>Eine Benachrichtigung anzeigen, wenn die App eine Aufgabe startet, wenn eine Abschlussaktion keine starten kann, wenn eine Pause eine Ausführung zurückhält und wenn eine Pause aller Aufgaben beginnt oder abläuft. Ist dies aus, gibt es auch keine Erinnerungen.</value></data>
   <data name="Settings.Notif.Reminders.Title" xml:space="preserve"><value>Erinnerungen für anstehende Aufgaben</value></data>
@@ -177,10 +177,10 @@ Jetzt App neustarten?</value></data>
   <data name="Settings.Sys.Tray.Desc" xml:space="preserve"><value>Beim Schliessen wird das Fenster in den Infobereich ausgeblendet und die App läuft weiter, damit Erinnerungen, Abschlussaktionen und Pausen weiter funktionieren.</value></data>
   <data name="Settings.Sys.Smooth.Title" xml:space="preserve"><value>Sanftes Scrollen</value></data>
   <data name="Settings.Sys.Smooth.Desc" xml:space="preserve"><value>Trägheitsbasiertes Scrollen in der gesamten App aktivieren.</value></data>
-  <data name="Settings.Sys.Hidden.Title" xml:space="preserve"><value>Versteckte Aufgaben anzeigen</value></data>
-  <data name="Settings.Sys.Hidden.Desc" xml:space="preserve"><value>Aufgaben anzeigen, die in der Windows-Aufgabenplanung als versteckt markiert sind.</value></data>
+  <data name="Settings.Sys.Hidden.Title" xml:space="preserve"><value>Ausgeblendete Aufgaben anzeigen</value></data>
+  <data name="Settings.Sys.Hidden.Desc" xml:space="preserve"><value>Aufgaben anzeigen, die in der Windows-Aufgabenplanung als ausgeblendet markiert sind.</value></data>
   <data name="Settings.Adv.Confirm.Title" xml:space="preserve"><value>Vor dem Löschen bestätigen</value></data>
-  <data name="Settings.Adv.Confirm.Desc" xml:space="preserve"><value>Einen Bestätigungsdialog anzeigen, bevor eine Aufgabe entfernt wird.</value></data>
+  <data name="Settings.Adv.Confirm.Desc" xml:space="preserve"><value>Vor dem Löschen einer Aufgabe nachfragen.</value></data>
   <data name="Settings.Adv.Logging.Title" xml:space="preserve"><value>Anwendungsprotokollierung</value></data>
   <data name="Settings.Adv.Logging.Desc" xml:space="preserve"><value>Zur Fehlersuche in Protokolldateien schreiben, was die App tut und welche Fehler auftreten. Ein Absturz wird immer festgehalten.</value></data>
   <data name="Settings.Adv.SepLogs.Title" xml:space="preserve"><value>Getrennte Protokolldateien</value></data>
@@ -224,16 +224,16 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.StopAfter" xml:space="preserve"><value>Aufgabe beenden, wenn sie länger läuft als:</value></data>
   <data name="Dialog.ProgramScript" xml:space="preserve"><value>Programm / Skript</value></data>
   <data name="Dialog.Arguments" xml:space="preserve"><value>Argumente (optional)</value></data>
-  <data name="Dialog.WorkingDir" xml:space="preserve"><value>Ausführen in (optional)</value></data>
-  <data name="Dialog.PsTip" xml:space="preserve"><value>Tipp: Verwende für Powershell-Skripte 'powershell.exe' als Programm und '-ExecutionPolicy Bypass -File "C:\Pfad\zum\Skript.ps1"' als Argumente</value></data>
-  <data name="Dialog.HighPriv" xml:space="preserve"><value>Mit höchsten Berechtigungen ausführen</value></data>
-  <data name="Dialog.Hidden" xml:space="preserve"><value>Versteckte Aufgabe</value></data>
+  <data name="Dialog.WorkingDir" xml:space="preserve"><value>Starten in (optional)</value></data>
+  <data name="Dialog.PsTip" xml:space="preserve"><value>Tipp: Gib für ein PowerShell-Skript 'powershell.exe' als Programm und '-ExecutionPolicy Bypass -File "C:\Pfad\zum\Skript.ps1"' als Argumente ein.</value></data>
+  <data name="Dialog.HighPriv" xml:space="preserve"><value>Mit höchsten Privilegien ausführen</value></data>
+  <data name="Dialog.Hidden" xml:space="preserve"><value>Ausgeblendete Aufgabe</value></data>
   <data name="Dialog.DeleteExpired" xml:space="preserve"><value>Aufgabe löschen, wenn sie nicht erneut geplant ist</value></data>
   <data name="Dialog.HardTerminate" xml:space="preserve"><value>Erzwungenes Beenden der Aufgabe erlauben</value></data>
   <data name="Dialog.MultiInstance" xml:space="preserve"><value>Wenn die Aufgabe bereits ausgeführt wird:</value></data>
   <data name="Dialog.Multi.Ignore" xml:space="preserve"><value>Keine neue Instanz starten</value></data>
   <data name="Dialog.Multi.Parallel" xml:space="preserve"><value>Neue Instanz parallel ausführen</value></data>
-  <data name="Dialog.Multi.Queue" xml:space="preserve"><value>Neue Instanz in Warteschlange stellen</value></data>
+  <data name="Dialog.Multi.Queue" xml:space="preserve"><value>Neue Instanz in die Warteschlange stellen</value></data>
   <data name="Dialog.Multi.Stop" xml:space="preserve"><value>Vorhandene Instanz beenden</value></data>
   <data name="Dialog.Priority" xml:space="preserve"><value>Aufgabenpriorität:</value></data>
   <data name="Dialog.RestartUpTo" xml:space="preserve"><value>Neustart versuchen bis zu:</value></data>
@@ -246,21 +246,21 @@ Jetzt App neustarten?</value></data>
   <data name="Trigger.AtStartup" xml:space="preserve"><value>Beim Systemstart</value></data>
   <data name="Trigger.SessionStateChange" xml:space="preserve"><value>Bei {0}</value></data>
   <data name="Dialog.Ph.TaskName" xml:space="preserve"><value>Aufgabenname eingeben</value></data>
-  <data name="Dialog.Ph.Category" xml:space="preserve"><value>z.B. Arbeit</value></data>
-  <data name="Dialog.Ph.Tags" xml:space="preserve"><value>z.B. dringend, synchronisieren (kommagetrennt)</value></data>
-  <data name="Dialog.Ph.Command" xml:space="preserve"><value>z.B. notepad.exe oder C:\Scripts\myscript.ps1</value></data>
-  <data name="Dialog.Ph.Args" xml:space="preserve"><value>z.B. /c echo hallo oder -File script.ps1</value></data>
-  <data name="Dialog.Ph.WorkDir" xml:space="preserve"><value>z.B. C:\Scripts</value></data>
-  <data name="Dialog.Ph.Idle" xml:space="preserve"><value>z.B. 10m</value></data>
-  <data name="Dialog.Ph.Username" xml:space="preserve"><value>DOMAIN\Benutzername oder benutzer@domain.com</value></data>
+  <data name="Dialog.Ph.Category" xml:space="preserve"><value>z. B. Arbeit</value></data>
+  <data name="Dialog.Ph.Tags" xml:space="preserve"><value>z. B. dringend, Synchronisierung (kommagetrennt)</value></data>
+  <data name="Dialog.Ph.Command" xml:space="preserve"><value>z. B. notepad.exe oder C:\Scripts\myscript.ps1</value></data>
+  <data name="Dialog.Ph.Args" xml:space="preserve"><value>z. B. /c echo hallo oder -File script.ps1</value></data>
+  <data name="Dialog.Ph.WorkDir" xml:space="preserve"><value>z. B. C:\Scripts</value></data>
+  <data name="Dialog.Ph.Idle" xml:space="preserve"><value>z. B. 10m</value></data>
+  <data name="Dialog.Ph.Username" xml:space="preserve"><value>DOMÄNE\Benutzername oder benutzername@domain.com</value></data>
   <data name="Dialog.UsernameHeader" xml:space="preserve"><value>Benutzername</value></data>
   <data name="Dialog.EventLog" xml:space="preserve"><value>Protokoll</value></data>
   <data name="Dialog.EventSource" xml:space="preserve"><value>Quelle</value></data>
   <data name="Dialog.EventId" xml:space="preserve"><value>Ereignis-ID</value></data>
-  <data name="Dialog.Ph.EventLog" xml:space="preserve"><value>Application, System, Security usw.</value></data>
-  <data name="Dialog.Ph.EventSource" xml:space="preserve"><value>z.B. VSS, Outlook (Optional)</value></data>
-  <data name="Dialog.Ph.EventId" xml:space="preserve"><value>z.B. 1000 (Optional)</value></data>
-  <data name="Dialog.RecurEvery" xml:space="preserve"><value>Wiederholen alle</value></data>
+  <data name="Dialog.Ph.EventLog" xml:space="preserve"><value>z. B. Application, System, Security</value></data>
+  <data name="Dialog.Ph.EventSource" xml:space="preserve"><value>z. B. VSS, Outlook (optional)</value></data>
+  <data name="Dialog.Ph.EventId" xml:space="preserve"><value>z. B. 1000 (optional)</value></data>
+  <data name="Dialog.RecurEvery" xml:space="preserve"><value>Ausführen alle</value></data>
   <data name="Dialog.Day.Mon" xml:space="preserve"><value>Mo</value></data>
   <data name="Dialog.Day.Tue" xml:space="preserve"><value>Di</value></data>
   <data name="Dialog.Day.Wed" xml:space="preserve"><value>Mi</value></data>
@@ -285,8 +285,8 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.Week.Third" xml:space="preserve"><value>Dritte</value></data>
   <data name="Dialog.Week.Fourth" xml:space="preserve"><value>Vierte</value></data>
   <data name="Dialog.Week.Last" xml:space="preserve"><value>Letzte</value></data>
-  <data name="Dialog.Sess.Lock" xml:space="preserve"><value>Arbeitsstation sperren</value></data>
-  <data name="Dialog.Sess.Unlock" xml:space="preserve"><value>Arbeitsstation entsperren</value></data>
+  <data name="Dialog.Sess.Lock" xml:space="preserve"><value>Sperrung der Arbeitsstation</value></data>
+  <data name="Dialog.Sess.Unlock" xml:space="preserve"><value>Entsperrung der Arbeitsstation</value></data>
   <data name="Dialog.Action.RunProg" xml:space="preserve"><value>Programm starten</value></data>
   <data name="Dialog.Action.Email" xml:space="preserve"><value>E-Mail senden</value></data>
   <data name="Dialog.Action.Notif" xml:space="preserve"><value>Meldung anzeigen</value></data>
@@ -305,16 +305,16 @@ Jetzt App neustarten?</value></data>
   <data name="Settings.Lead.1m" xml:space="preserve"><value>1 Minute vorher</value></data>
   <data name="QuickActions.Description.Text" xml:space="preserve"><value>Führe gängige Systemwartungsaufgaben mit einem Klick aus.</value></data>
   <data name="QuickActions.FlushDNS.Title" xml:space="preserve"><value>DNS-Cache leeren</value></data>
-  <data name="QuickActions.FlushDNS.Desc" xml:space="preserve"><value>Löscht den DNS-Auflösungscache.</value></data>
+  <data name="QuickActions.FlushDNS.Desc" xml:space="preserve"><value>Leert den DNS-Auflösungscache.</value></data>
   <data name="QuickActions.ClearTemp.Title" xml:space="preserve"><value>Temporäre Dateien löschen</value></data>
-  <data name="QuickActions.ClearTemp.Desc" xml:space="preserve"><value>Löscht alles in deinem Temp-Ordner, was nicht in Verwendung ist.</value></data>
+  <data name="QuickActions.ClearTemp.Desc" xml:space="preserve"><value>Löscht alles in deinem Temp-Ordner, was gerade nicht verwendet wird.</value></data>
   <data name="QuickActions.RestartExplorer.Title" xml:space="preserve"><value>Explorer neu starten</value></data>
-  <data name="QuickActions.RestartExplorer.Desc" xml:space="preserve"><value>Startet den Windows Explorer-Prozess neu.</value></data>
+  <data name="QuickActions.RestartExplorer.Desc" xml:space="preserve"><value>Startet den Windows-Explorer-Prozess neu.</value></data>
   <data name="QuickActions.IPReleaseRenew.Title" xml:space="preserve"><value>IP-Adresse erneuern</value></data>
-  <data name="QuickActions.IPReleaseRenew.Desc" xml:space="preserve"><value>Fordert beim DHCP-Server für alle Netzwerkadapter eine neue Lease der IP-Adresse an.</value></data>
+  <data name="QuickActions.IPReleaseRenew.Desc" xml:space="preserve"><value>Erneuert beim DHCP-Server die Lease der IP-Adressen aller Netzwerkadapter.</value></data>
   <data name="QuickActions.SfcScannow.Title" xml:space="preserve"><value>Systemdateiprüfung (SFC)</value></data>
   <data name="QuickActions.SfcScannow.Desc" xml:space="preserve"><value>Prüft die Systemdateien und repariert beschädigte. Das kann eine Weile dauern.</value></data>
-  <data name="QuickActions.DismHealth.Title" xml:space="preserve"><value>DISM-Gesundheitsprüfung</value></data>
+  <data name="QuickActions.DismHealth.Title" xml:space="preserve"><value>DISM-Integritätsprüfung</value></data>
   <data name="QuickActions.DismHealth.Desc" xml:space="preserve"><value>Prüft, ob der Komponentenspeicher als beschädigt markiert ist.</value></data>
   <data name="QuickActions.RunBtn" xml:space="preserve"><value>Ausführen</value></data>
   <data name="QuickActions.Status.Running" xml:space="preserve"><value>Wird ausgeführt...</value></data>
@@ -331,7 +331,7 @@ Jetzt App neustarten?</value></data>
   <data name="ScriptEditor_CodeEditor.Header" xml:space="preserve"><value>PowerShell-Skript</value></data>
   <data name="ScriptEditor.Status.Starting" xml:space="preserve"><value>[PowerShell wird gestartet...]</value></data>
   <data name="ScriptEditor.Status.Stopped" xml:space="preserve"><value>[Vom Benutzer gestoppt]</value></data>
-  <data name="ScriptEditor.Status.Saved" xml:space="preserve"><value>[In Bibliothek als '{0}' gespeichert]</value></data>
+  <data name="ScriptEditor.Status.Saved" xml:space="preserve"><value>[In Bibliothek als „{0}“ gespeichert]</value></data>
   <data name="Dialog.Crash.Title" xml:space="preserve"><value>Etwas ist schiefgelaufen</value></data>
   <data name="Dialog.Crash.Copy" xml:space="preserve"><value>In die Zwischenablage kopieren</value></data>
   <data name="Main.Header.QuickActions" xml:space="preserve"><value>Schnellaktionen</value></data>
@@ -347,10 +347,10 @@ Jetzt App neustarten?</value></data>
   <data name="Snooze.Dialog.Title" xml:space="preserve"><value>Alle Aufgaben pausieren</value></data>
   <data name="Snooze.Dialog.Confirm" xml:space="preserve"><value>Pausieren</value></data>
   <data name="Snooze.Dialog.Intro" xml:space="preserve"><value>Solange alle Aufgaben pausiert sind, startet FluentTaskScheduler keine davon, auch nicht über Abschlussaktionen.</value></data>
-  <data name="Snooze.SuspendTriggers" xml:space="preserve"><value>Geplante Auslöser ebenfalls deaktivieren</value></data>
+  <data name="Snooze.SuspendTriggers" xml:space="preserve"><value>Geplante Trigger ebenfalls deaktivieren</value></data>
   <data name="Snooze.SuspendTriggersHint" xml:space="preserve"><value>Deaktiviert jede aktivierte Aufgabe über die Aufgabenplanungs-API und aktiviert genau diese Aufgaben wieder, wenn die Pause endet. Geschützte Systemaufgaben werden übersprungen.</value></data>
-  <data name="Snooze.Banner.Suspended" xml:space="preserve"><value>Geplante Auslöser sind deaktiviert und manuelle Starts werden blockiert. Aufgaben werden reaktiviert, wenn die Pause endet.</value></data>
-  <data name="Snooze.Banner.ManualOnly" xml:space="preserve"><value>Über diese App gestartete Läufe werden blockiert. Windows löst geplante Auslöser weiterhin aus; um auch diese zu stoppen, wähle beim Pausieren „Geplante Auslöser ebenfalls deaktivieren“.</value></data>
+  <data name="Snooze.Banner.Suspended" xml:space="preserve"><value>Geplante Trigger sind deaktiviert und manuelle Starts werden blockiert. Aufgaben werden reaktiviert, wenn die Pause endet.</value></data>
+  <data name="Snooze.Banner.ManualOnly" xml:space="preserve"><value>Starts aus dieser App werden blockiert, aber Windows startet Aufgaben weiterhin nach Plan. Um auch das zu verhindern, wähle beim Pausieren „Geplante Trigger ebenfalls deaktivieren“.</value></data>
   <data name="Snooze.Error.BatchBlocked" xml:space="preserve"><value>{0} Aufgabe(n) wurden nicht gestartet, weil sie pausiert sind.</value></data>
   <data name="Snooze.Error.PastTime" xml:space="preserve"><value>Wähle einen Zeitpunkt in der Zukunft.</value></data>
   <data name="Snooze.Toast.Started.Title" xml:space="preserve"><value>Pause gestartet</value></data>
@@ -367,7 +367,7 @@ Jetzt App neustarten?</value></data>
   <data name="Dashboard.AvgDuration" xml:space="preserve"><value>Durchschnittliche Dauer</value></data>
   <data name="Dashboard.HeatmapTitle" xml:space="preserve"><value>Ausführungen nach Tageszeit</value></data>
   <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>In den letzten 7 Tagen zwischen {0} und {1} gestartete Ausführungen: {2}</value></data>
-  <data name="Dashboard.PeakHour" xml:space="preserve"><value>Stärkste Stunde:</value></data>
+  <data name="Dashboard.PeakHour" xml:space="preserve"><value>Aktivste Stunde:</value></data>
   <data name="Dashboard.ExecutionStream" xml:space="preserve"><value>Letzte Ausführungen</value></data>
   <data name="Dashboard.NoExecutionEntries" xml:space="preserve"><value>Keine Ausführungen entsprechen diesem Filter.</value></data>
   <data name="Dashboard.Filter.All" xml:space="preserve"><value>Alle</value></data>
@@ -381,7 +381,7 @@ Jetzt App neustarten?</value></data>
   <data name="Templates.TempCleanup.Name" xml:space="preserve"><value>Nächtliche Temp-Dateibereinigung</value></data>
   <data name="Templates.TempCleanup.Desc" xml:space="preserve"><value>Löscht Dateien, die älter als 7 Tage sind, aus deinem Temp-Ordner. Noch verwendete Dateien werden übersprungen.</value></data>
   <data name="Templates.TempCleanup.Note" xml:space="preserve"><value>Löscht Dateien dauerhaft. Überprüfe die Altersgrenze vor dem Speichern.</value></data>
-  <data name="Templates.UpdateHealth.Name" xml:space="preserve"><value>Windows Update-Statusprüfung</value></data>
+  <data name="Templates.UpdateHealth.Name" xml:space="preserve"><value>Windows-Update-Statusprüfung</value></data>
   <data name="Templates.UpdateHealth.Desc" xml:space="preserve"><value>Schreibt die Anzahl ausstehender Windows-Updates und das Datum des zuletzt installierten Updates in eine Protokolldatei in deinem Dokumente-Ordner.</value></data>
   <data name="Templates.Defrag.Name" xml:space="preserve"><value>Datenträgeroptimierung (Defrag, TRIM)</value></data>
   <data name="Templates.Defrag.Desc" xml:space="preserve"><value>Führt den integrierten Windows-Optimierer auf Laufwerk C: aus. SSDs erhalten ein TRIM/Retrim, HDDs werden defragmentiert.</value></data>
@@ -403,7 +403,7 @@ Jetzt App neustarten?</value></data>
   <data name="Templates.BatterySaver.Note" xml:space="preserve"><value>Geräte mit Modern Standby haben nur den Plan „Ausbalanciert“; dort schlägt die Aufgabe fehl.</value></data>
   <data name="Templates.RecycleBin.Name" xml:space="preserve"><value>Papierkorb wöchentlich leeren</value></data>
   <data name="Templates.RecycleBin.Desc" xml:space="preserve"><value>Leert den Papierkorb des aktuellen Benutzers einmal pro Woche ohne Bestätigungsabfrage.</value></data>
-  <data name="Templates.RecycleBin.Note" xml:space="preserve"><value>Gelöschte Elemente werden nach dem Leeren des Papierkorbs unwiederbringlich.</value></data>
+  <data name="Templates.RecycleBin.Note" xml:space="preserve"><value>Nach dem Leeren des Papierkorbs lassen sich die gelöschten Elemente nicht mehr wiederherstellen.</value></data>
   <data name="Dialog.Common.On" xml:space="preserve"><value>Ein</value></data>
   <data name="Dialog.Common.Off" xml:space="preserve"><value>Aus</value></data>
   <data name="Settings.Sys.Pipelines.Title" xml:space="preserve"><value>Abschlussaktionen</value></data>
@@ -444,11 +444,11 @@ Jetzt App neustarten?</value></data>
   <data name="Templates.RestorePoint.Name" xml:space="preserve"><value>Wöchentlicher Systemwiederherstellungspunkt</value></data>
   <data name="Templates.RestorePoint.Desc" xml:space="preserve"><value>Erstellt einmal pro Woche einen benannten Systemwiederherstellungspunkt, damit du immer ein aktuelles Rollback-Ziel hast.</value></data>
   <data name="Templates.RestorePoint.Note" xml:space="preserve"><value>Der Systemschutz muss für das Systemlaufwerk aktiviert sein.</value></data>
-  <data name="Templates.SystemScan.Name" xml:space="preserve"><value>Systemdateiprüfung</value></data>
+  <data name="Templates.SystemScan.Name" xml:space="preserve"><value>Integritätsprüfung der Systemdateien</value></data>
   <data name="Templates.SystemScan.Desc" xml:space="preserve"><value>Führt eine DISM-Reparatur des Komponentenspeichers gefolgt von der Systemdateiprüfung aus und schreibt die Exitcodes beider in eine Protokolldatei in deinem Dokumente-Ordner.</value></data>
   <data name="Templates.SystemScan.Note" xml:space="preserve"><value>Kann 15 Minuten oder länger laufen.</value></data>
   <data name="Templates.DnsFlush.Name" xml:space="preserve"><value>DNS-Cache bei Anmeldung leeren</value></data>
-  <data name="Templates.DnsFlush.Desc" xml:space="preserve"><value>Leert den DNS-Auflösungs-Cache bei der Anmeldung - nützlich, wenn du häufig Netzwerke oder VPNs wechselst.</value></data>
+  <data name="Templates.DnsFlush.Desc" xml:space="preserve"><value>Leert den DNS-Auflösungscache bei der Anmeldung - nützlich, wenn du häufig Netzwerke oder VPNs wechselst.</value></data>
   <data name="Templates.NodePrune.Name" xml:space="preserve"><value>npm- und pnpm-Cache bereinigen</value></data>
   <data name="Templates.NodePrune.Desc" xml:space="preserve"><value>Überprüft den npm-Cache, wobei nicht mehr benötigte Daten entfernt werden, und bereinigt den pnpm-Store, falls pnpm installiert ist.</value></data>
   <data name="Templates.NodePrune.Note" xml:space="preserve"><value>Erfordert Node.js im PATH.</value></data>
@@ -477,9 +477,9 @@ Jetzt App neustarten?</value></data>
   <data name="Library.Search.NoScripts" xml:space="preserve"><value>Keine Skripte entsprechen deiner Suche.</value></data>
   <data name="App.WindowTitleSuffixFormat" xml:space="preserve"><value>Fenster {0}</value></data>
   <data name="Dialog.Error.EmptyName" xml:space="preserve"><value>Der Aufgabenname darf nicht leer sein.</value></data>
-  <data name="Dialog.Error.InvalidIdleDuration" xml:space="preserve"><value>"{0}" ist keine Dauer für die Leerlaufzeit. Schreib sie wie 10m oder 1h.</value></data>
-  <data name="Dialog.Error.InvalidRestartInterval" xml:space="preserve"><value>"{0}" ist keine Dauer für das Neustartintervall. Schreib sie wie 1m oder 30m.</value></data>
-  <data name="Dialog.Error.InvalidStopAfter" xml:space="preserve"><value>"{0}" ist keine Dauer für die längste Laufzeit. Schreib sie wie 90m, 12h oder 3d.</value></data>
+  <data name="Dialog.Error.InvalidIdleDuration" xml:space="preserve"><value>„{0}“ ist keine Dauer für die Leerlaufzeit. Gib sie z. B. als 10m oder 1h ein.</value></data>
+  <data name="Dialog.Error.InvalidRestartInterval" xml:space="preserve"><value>„{0}“ ist keine Dauer für das Neustartintervall. Gib sie z. B. als 1m oder 30m ein.</value></data>
+  <data name="Dialog.Error.InvalidStopAfter" xml:space="preserve"><value>„{0}“ ist keine Dauer für die längste Laufzeit. Gib sie z. B. als 90m, 12h oder 3d ein.</value></data>
   <data name="Dialog.Error.SaveTaskFailedPrefix" xml:space="preserve"><value>Aufgabe konnte nicht gespeichert werden: </value></data>
   <data name="Dialog.GetStarted" xml:space="preserve"><value>Los geht's</value></data>
   <data name="Dialog.Next" xml:space="preserve"><value>Weiter</value></data>
@@ -492,7 +492,7 @@ Jetzt App neustarten?</value></data>
   <data name="Main.Batch.Enable" xml:space="preserve"><value>Aktivieren</value></data>
   <data name="Main.Batch.Run" xml:space="preserve"><value>Ausführen</value></data>
   <data name="Main.Batch.SelectedCountFormat" xml:space="preserve"><value>{0} ausgewählt</value></data>
-  <data name="Main.Batch.Stop" xml:space="preserve"><value>Stopp</value></data>
+  <data name="Main.Batch.Stop" xml:space="preserve"><value>Beenden</value></data>
   <data name="Main.Badge.Chained" xml:space="preserve"><value>Verkettet</value></data>
   <data name="Main.Badge.FilterByCategory" xml:space="preserve"><value>Nach dieser Kategorie filtern</value></data>
   <data name="Main.Badge.Hidden" xml:space="preserve"><value>Ausgeblendet</value></data>
@@ -517,7 +517,7 @@ Jetzt App neustarten?</value></data>
   <data name="Scripts.BatteryReport.Name" xml:space="preserve"><value>Akkubericht</value></data>
   <data name="Scripts.CheckDisk.Description" xml:space="preserve"><value>Prüft das Laufwerk C: auf Fehler, ohne sie zu beheben (auch im laufenden Betrieb sicher).</value></data>
   <data name="Scripts.CheckDisk.Name" xml:space="preserve"><value>Datenträgerprüfung (nur Scan)</value></data>
-  <data name="Scripts.ClearTempFolder.Description" xml:space="preserve"><value>Löscht alles im Temp-Ordner des aktuellen Benutzers, was nicht in Verwendung ist, um Speicherplatz freizugeben.</value></data>
+  <data name="Scripts.ClearTempFolder.Description" xml:space="preserve"><value>Löscht alles im Temp-Ordner des aktuellen Benutzers, was gerade nicht verwendet wird, um Speicherplatz freizugeben.</value></data>
   <data name="Scripts.ClearTempFolder.Name" xml:space="preserve"><value>Temp-Ordner leeren</value></data>
   <data name="Scripts.DiskCleanup.Description" xml:space="preserve"><value>Führt die Datenträgerbereinigung mit den Optionen aus, die du einmalig mit „cleanmgr /sageset:1“ gespeichert hast.</value></data>
   <data name="Scripts.DiskCleanup.Name" xml:space="preserve"><value>Datenträgerbereinigung (System)</value></data>
@@ -581,7 +581,7 @@ Jetzt App neustarten?</value></data>
   <data name="Editor.AllFiles" xml:space="preserve"><value>Alle Dateien</value></data>
   <data name="Editor.CompletionActions.Add" xml:space="preserve"><value>Hinzufügen</value></data>
   <data name="Editor.CompletionActions.Remove" xml:space="preserve"><value>Entfernen</value></data>
-  <data name="Editor.CompletionActions.BothWays" xml:space="preserve"><value>Eine Aufgabe steht bei Erfolg und bei Fehler, sie startet also nach jedem Lauf.</value></data>
+  <data name="Editor.CompletionActions.BothWays" xml:space="preserve"><value>Eine Aufgabe ist sowohl bei Erfolg als auch bei Fehler eingetragen und startet daher nach jeder Ausführung.</value></data>
   <data name="Editor.Error.NameCharacters" xml:space="preserve"><value>Ein Name darf keines dieser Zeichen enthalten: \ / : * ? " &lt; &gt; |</value></data>
   <data name="Editor.Error.NoAction" xml:space="preserve"><value>Die Aufgabe braucht mindestens eine Aktion.</value></data>
   <data name="Editor.Error.ActionWithoutProgram" xml:space="preserve"><value>Aktion {0}: Gib das Programm oder Skript an, das ausgeführt werden soll.</value></data>
@@ -600,11 +600,11 @@ Jetzt App neustarten?</value></data>
   <data name="Editor.Error.TriggerEndsBeforeStart" xml:space="preserve"><value>Trigger {0}: Er läuft ab, bevor er beginnt.</value></data>
   <data name="Editor.Error.RepetitionInterval" xml:space="preserve"><value>Trigger {0}: Das Wiederholungsintervall muss zwischen einer Minute und 31 Tagen liegen.</value></data>
   <data name="Editor.Error.RepetitionDuration" xml:space="preserve"><value>Trigger {0}: Die Wiederholung kann nicht kürzer dauern als ihr Intervall.</value></data>
-  <data name="Editor.Error.RepetitionText" xml:space="preserve"><value>Trigger {0}: Die Wiederholung ist keine Dauer. Schreib sie wie 15m, 1h 30m oder 2d.</value></data>
-  <data name="Editor.Error.RandomDelayText" xml:space="preserve"><value>Trigger {0}: Die zufällige Verzögerung ist keine Dauer. Schreib sie wie 30s, 10m oder 1h.</value></data>
+  <data name="Editor.Error.RepetitionText" xml:space="preserve"><value>Trigger {0}: Die Wiederholung ist keine Dauer. Gib sie z. B. als 15m, 1h 30m oder 2d ein.</value></data>
+  <data name="Editor.Error.RandomDelayText" xml:space="preserve"><value>Trigger {0}: Die zufällige Verzögerung ist keine Dauer. Gib sie z. B. als 30s, 10m oder 1h ein.</value></data>
   <data name="Editor.Error.EventIdText" xml:space="preserve"><value>Trigger {0}: Die Ereignis-ID muss eine Zahl sein.</value></data>
   <data name="Editor.Error.AccessDenied" xml:space="preserve"><value>Windows hat die Änderung verweigert. Die Aufgabe ist möglicherweise geschützt.</value></data>
-  <data name="Editor.Error.AccessDeniedNotElevated" xml:space="preserve"><value>Windows hat die Änderung verweigert. Sie braucht Administratorrechte: Starte die App als Administrator neu und versuch es noch einmal.</value></data>
+  <data name="Editor.Error.AccessDeniedNotElevated" xml:space="preserve"><value>Windows hat die Änderung verweigert. Dafür sind Administratorrechte nötig: Starte die App als Administrator neu und versuch es noch einmal.</value></data>
   <data name="Editor.Error.Account" xml:space="preserve"><value>Windows hat das Konto nicht akzeptiert: {0}</value></data>
   <data name="Tasks.NotElevated.Title" xml:space="preserve"><value>Es werden nicht alle Aufgaben angezeigt</value></data>
   <data name="Tasks.NotElevated.Message" xml:space="preserve"><value>Aufgaben anderer Benutzer und einige Aufgaben von Windows selbst sind nur für Administratoren sichtbar.</value></data>
@@ -612,9 +612,9 @@ Jetzt App neustarten?</value></data>
   <data name="Tasks.LoadError.Title" xml:space="preserve"><value>Die Aufgaben konnten nicht geladen werden</value></data>
   <data name="Tasks.Empty" xml:space="preserve"><value>Hier gibt es keine Aufgaben.</value></data>
   <data name="Tasks.NextRunFormat" xml:space="preserve"><value>Nächste Ausführung: {0}</value></data>
-  <data name="Tasks.Error.Denied" xml:space="preserve"><value>'{0}': Windows hat den Zugriff verweigert.</value></data>
-  <data name="Tasks.Error.DeniedNotElevated" xml:space="preserve"><value>'{0}': Dafür sind Administratorrechte nötig. Starte die App als Administrator neu und versuch es noch einmal.</value></data>
-  <data name="Tasks.Error.Gone" xml:space="preserve"><value>'{0}' gibt es nicht mehr.</value></data>
+  <data name="Tasks.Error.Denied" xml:space="preserve"><value>„{0}“: Windows hat den Zugriff verweigert.</value></data>
+  <data name="Tasks.Error.DeniedNotElevated" xml:space="preserve"><value>„{0}“: Dafür sind Administratorrechte nötig. Starte die App als Administrator neu und versuch es noch einmal.</value></data>
+  <data name="Tasks.Error.Gone" xml:space="preserve"><value>„{0}“ gibt es nicht mehr.</value></data>
   <data name="Tasks.Snoozed.Title" xml:space="preserve"><value>Aufgaben sind pausiert</value></data>
   <data name="Tasks.File.TaskXml" xml:space="preserve"><value>Aufgaben-XML</value></data>
   <data name="Tasks.Badge.Unreadable" xml:space="preserve"><value>Nicht lesbar</value></data>
@@ -662,7 +662,7 @@ Jetzt App neustarten?</value></data>
   <data name="Details.History.Off.Title" xml:space="preserve"><value>Windows zeichnet keinen Aufgabenverlauf auf</value></data>
   <data name="Details.History.Off.Message" xml:space="preserve"><value>Ausführungen hinterlassen keine Spur, bis der Verlauf eingeschaltet wird. Früher Aufgezeichnetes wird weiterhin angezeigt.</value></data>
   <data name="Details.History.SwitchOn" xml:space="preserve"><value>Einschalten</value></data>
-  <data name="Details.History.SwitchOnDenied" xml:space="preserve"><value>Zum Einschalten des Verlaufs sind Administratorrechte nötig. Die App als Administrator neu starten und erneut versuchen.</value></data>
+  <data name="Details.History.SwitchOnDenied" xml:space="preserve"><value>Zum Einschalten des Verlaufs sind Administratorrechte nötig. Starte die App als Administrator neu und versuch es noch einmal.</value></data>
   <data name="Details.History.SwitchOnFailed" xml:space="preserve"><value>Der Verlauf konnte nicht eingeschaltet werden. Einzelheiten stehen im Protokoll der App.</value></data>
   <data name="Details.History.Unavailable" xml:space="preserve"><value>Der Verlauf konnte nicht gelesen werden: {0}</value></data>
   <data name="Details.History.ResultFormat" xml:space="preserve"><value>Ergebnis: {0}</value></data>
@@ -691,7 +691,7 @@ Jetzt App neustarten?</value></data>
   <data name="QuickActions.NotElevated" xml:space="preserve"><value>Die App läuft ohne Administratorrechte, daher sind einige Aktionen nicht verfügbar.</value></data>
   <data name="QuickActions.Status.ExitCode" xml:space="preserve"><value>Fehlgeschlagen (Exitcode {0})</value></data>
   <data name="QuickActions.Status.Cancelled" xml:space="preserve"><value>Abgebrochen</value></data>
-  <data name="QuickActions.ClearTemp.Confirm" xml:space="preserve"><value>Alles in deinem Temp-Ordner löschen? Dateien, die in Verwendung sind, werden übersprungen.</value></data>
+  <data name="QuickActions.ClearTemp.Confirm" xml:space="preserve"><value>Alles in deinem Temp-Ordner löschen? Gerade verwendete Dateien werden übersprungen.</value></data>
   <data name="QuickActions.RestartExplorer.Confirm" xml:space="preserve"><value>Windows-Explorer neu starten? Geöffnete Ordnerfenster werden geschlossen, und die Taskleiste verschwindet kurz.</value></data>
   <data name="ScriptEditor.CopyOutput" xml:space="preserve"><value>Ausgabe kopieren</value></data>
   <data name="ScriptEditor.Status.ExitCode" xml:space="preserve"><value>[Mit Code {0} beendet]</value></data>
@@ -732,7 +732,7 @@ Jetzt App neustarten?</value></data>
   <data name="Settings.Adv.ExecHistoryFolder.Title" xml:space="preserve"><value>Ordner des Ausführungsverlaufs</value></data>
   <data name="Settings.Adv.ExecHistoryFolder.Desc" xml:space="preserve"><value>Den Ordner mit den Dateien des Ausführungsverlaufs öffnen.</value></data>
   <data name="Settings.Data.FileType" xml:space="preserve"><value>Einstellungsdatei</value></data>
-  <data name="Settings.Export.Failed.ContentFormat" xml:space="preserve"><value>Die Einstellungen konnten nicht geschrieben werden nach:
+  <data name="Settings.Export.Failed.ContentFormat" xml:space="preserve"><value>Die Einstellungen konnten nicht in diese Datei geschrieben werden:
 {0}
 
 {1}</value></data>
@@ -767,7 +767,7 @@ Jetzt App neustarten?</value></data>
   <data name="Tour.Admin.Title" xml:space="preserve"><value>Aufgaben, die Administratorrechte brauchen</value></data>
   <data name="Tour.Admin.Body" xml:space="preserve"><value>Manche Aufgaben zeigt Windows nur Administratoren, andere dürfen nur Administratoren ändern. Ohne Administratorrechte kann die App die einen nicht auflisten und die anderen nicht ändern. Starte die App als Administrator, um mit allen Aufgaben zu arbeiten.</value></data>
   <data name="Tour.Settings.Title" xml:space="preserve"><value>Richte es dir ein</value></data>
-  <data name="Tour.Settings.Body" xml:space="preserve"><value>In den Einstellungen wählst du Design und Sprache, worüber du benachrichtigt wirst, ob die App mit Windows startet und mehr. Beim Start sucht die App nach Updates. Diese Tour findest du jederzeit unter Einstellungen, Über.</value></data>
+  <data name="Tour.Settings.Body" xml:space="preserve"><value>In den Einstellungen wählst du Design und Sprache, worüber du benachrichtigt wirst, ob die App mit Windows startet und mehr. Beim Start sucht die App nach Updates. Diese Tour findest du jederzeit in den Einstellungen unter „Über“.</value></data>
   <data name="WhatsNew.TitleFormat" xml:space="preserve"><value>Neu in Version {0}</value></data>
   <data name="WhatsNew.ViewRelease" xml:space="preserve"><value>Diese Version auf GitHub ansehen</value></data>
   <data name="Snooze.Error.NotRecorded" xml:space="preserve"><value>Die Pause konnte nicht gespeichert werden, deshalb wurde nichts geändert. {0}</value></data>
@@ -776,7 +776,7 @@ Jetzt App neustarten?</value></data>
   <data name="Snooze.Restore.AccessDenied" xml:space="preserve"><value>Windows hat den Zugriff verweigert. Eine Aufgabe, die pausiert wurde, während die App als Administrator lief, lässt sich nur mit Administratorrechten wieder aktivieren.</value></data>
   <data name="Snooze.Unreadable.MessageFormat" xml:space="preserve"><value>Aufgaben, die eine frühere Pause deaktiviert hat, sind womöglich noch deaktiviert, ohne hier zu erscheinen. Die Aufzeichnung darüber konnte nicht gelesen werden und wurde als {0} aufbewahrt.</value></data>
   <data name="Snooze.Dialog.Until" xml:space="preserve"><value>Alle Aufgaben pausieren bis:</value></data>
-  <data name="Task.Snooze.AlreadyDisabled" xml:space="preserve"><value>Diese Aufgabe ist bereits deaktiviert. Eine Pause würde sie an ihrem Ende aktivieren, deshalb bleibt die Aufgabe, wie sie ist.</value></data>
+  <data name="Task.Snooze.AlreadyDisabled" xml:space="preserve"><value>Diese Aufgabe ist bereits deaktiviert. Am Ende einer Pause würde sie aktiviert, deshalb bleibt die Aufgabe, wie sie ist.</value></data>
   <data name="Snooze.Restore.Title" xml:space="preserve"><value>Einige Aufgaben sind noch deaktiviert</value></data>
   <data name="Snooze.Restore.Retry" xml:space="preserve"><value>Erneut versuchen</value></data>
   <data name="Snooze.Unreadable.Title" xml:space="preserve"><value>Frühere Pausen konnten nicht gelesen werden</value></data>
