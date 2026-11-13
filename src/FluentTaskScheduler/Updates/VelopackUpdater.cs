@@ -37,8 +37,13 @@ public sealed class VelopackUpdater : IUpdater
         return update.TargetFullRelease.Version.ToString();
     }
 
-    // No release is named: the installer takes the newest one that has been downloaded.
-    public Task StartInstallerAsync() => Manager.WaitExitThenApplyUpdatesAsync(null, silent: false, restart: true);
+    // Starts the updater, which waits for this process to end. No release is named: it installs
+    // the newest one that has been downloaded.
+    public Task StartInstallerAsync()
+    {
+        Manager.WaitExitThenApplyUpdates(null, silent: false, restart: true, []);
+        return Task.CompletedTask;
+    }
 
     private UpdateManager Manager => _manager ?? throw new InvalidOperationException("This copy of the app cannot update itself.");
 }

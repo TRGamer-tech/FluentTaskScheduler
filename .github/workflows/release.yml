@@ -19,7 +19,7 @@ permissions:
 env:
   # The Velopack command line tool. Without a version the newest one would be installed, which
   # is not necessarily one that understands the Velopack package the app references.
-  VPK_VERSION: 0.0.1444-gc245055
+  VPK_VERSION: 1.2.161
 
 jobs:
   package:
@@ -78,8 +78,8 @@ jobs:
           -p publish
           -e FluentTaskScheduler.exe
           --msi --instLocation Either
-          --msiBanner Assets/MSI-Banner.bmp
-          --msiLogo Assets/MSI-Logo.bmp
+          --msiTopBanner Assets/MSI-Logo.bmp
+          --msiDialogBackground Assets/MSI-Banner.bmp
 
       # Package managers and the README link to these exact names, and release downloads are
       # case-sensitive. The update feed (releases.*.json) and the update package keep the names

@@ -45,7 +45,7 @@
         <PackageReference Include="Serilog" Version="4.4.0" />
         <PackageReference Include="System.Drawing.Common" Version="8.0.10" />
         <PackageReference Include="TaskScheduler" Version="2.12.2" />
-        <PackageReference Include="Velopack" Version="0.0.1298" />
+        <PackageReference Include="Velopack" Version="1.2.161" />
     </ItemGroup>
 
 </Project>
