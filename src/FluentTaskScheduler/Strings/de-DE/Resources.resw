@@ -74,7 +74,7 @@
   <data name="BrowseButton.Content" xml:space="preserve"><value>Durchsuchen...</value></data>
   <data name="ArgumentsHeader.Header" xml:space="preserve"><value>Argumente (optional)</value></data>
   <data name="DialogTitle.Text" xml:space="preserve"><value>Aufgabe hinzufügen oder bearbeiten</value></data>
-  <data name="TriggerTitle.Text" xml:space="preserve"><value>Auslöser</value></data>
+  <data name="TriggerTitle.Text" xml:space="preserve"><value>Trigger</value></data>
   <data name="TriggerTypeHeader.Header" xml:space="preserve"><value>Typ</value></data>
   <data name="TimeHeader.Header" xml:space="preserve"><value>Uhrzeit (HH:mm)</value></data>
   <data name="RepetitionTitle.Text" xml:space="preserve"><value>Wiederholung</value></data>

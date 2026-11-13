@@ -38,13 +38,17 @@ public sealed class TaskTests : IDisposable
         Toggle(app, "Wed");
         Toggle(app, "Fri");
 
-        // A new trigger starts on the hour; seven steps down in the minutes make it :07.
+        // A new trigger starts on the hour; picking 05 in the minutes makes it five past.
         var timeButton = app.Find(element => element.AutomationId == "FlyoutButton" && element.Parent?.AutomationId == "TriggerStartTime")
                          ?? throw new InvalidOperationException("The time picker has no button.");
         timeButton.Patterns.Invoke.Pattern.Invoke();
         var accept = app.Require("AcceptButton");
-        app.Require("MinuteLoopingSelector").Focus();
-        for (int i = 0; i < 7; i++) Keyboard.Type(VirtualKeyShort.DOWN);
+        var fivePast = app.Find(element => element.ControlType == ControlType.ListItem && element.Name == "05"
+                                           && element.Parent?.AutomationId == "MinuteLoopingSelector")
+                       ?? throw new InvalidOperationException("The minutes do not offer 05.");
+        if (fivePast.Patterns.SelectionItem.IsSupported) fivePast.Patterns.SelectionItem.Pattern.Select();
+        else fivePast.Click();
+        Wait();
         app.Snapshot("time-picker");
         accept.Patterns.Invoke.Pattern.Invoke();
         Wait();
@@ -68,7 +72,7 @@ public sealed class TaskTests : IDisposable
             Assert.DoesNotContain("Tuesday", trigger);
 
             DateTime start = DateTime.Parse(WindowsTasks.Root.Value(name, "Triggers", "CalendarTrigger", "StartBoundary")!);
-            Assert.Equal(7, start.Minute);
+            Assert.Equal(5, start.Minute);
             Assert.Equal(0, start.Second);
         }
         finally
@@ -178,7 +182,7 @@ public sealed class TaskTests : IDisposable
     private const string ForeignTaskXml = """
         <?xml version="1.0" encoding="UTF-16"?>
         <Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
-          <RegistrationInfo><Author>OTHERPC\\someone</Author></RegistrationInfo>
+          <RegistrationInfo><Author>OTHERPC\someone</Author></RegistrationInfo>
           <Triggers><TimeTrigger><StartBoundary>2031-05-06T07:08:00</StartBoundary><Enabled>true</Enabled></TimeTrigger></Triggers>
           <Principals>
             <Principal id="Author">

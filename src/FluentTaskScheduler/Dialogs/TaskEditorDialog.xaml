@@ -61,7 +61,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <ListView x:Name="EditorTriggers" MinHeight="72" MaxHeight="140" SelectionMode="Single"
+                <ListView x:Name="EditorTriggers" MinHeight="44" MaxHeight="140" SelectionMode="Single"
                           BorderThickness="1" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" CornerRadius="4"
                           ItemsSource="{x:Bind ViewModel.Triggers}"
                           SelectedItem="{x:Bind ViewModel.SelectedTrigger, Mode=TwoWay}">
@@ -107,7 +107,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <ListView x:Name="EditorActions" MinHeight="72" MaxHeight="140" SelectionMode="Single"
+                <ListView x:Name="EditorActions" MinHeight="44" MaxHeight="140" SelectionMode="Single"
                           BorderThickness="1" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" CornerRadius="4"
                           ItemsSource="{x:Bind ViewModel.Actions}"
                           SelectedItem="{x:Bind ViewModel.SelectedAction, Mode=TwoWay}">
