@@ -434,6 +434,22 @@ public sealed class FoldersViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task AWindowWhoseFolderIsGone_FallsBackToAllTasks_WithoutForgettingAnotherWindowsChoice()
+    {
+        await _folders.ReloadAsync();
+        _folders.Choose(Node(@"\Reports"));
+        var (_, other) = await OpenWindowAsync();
+        other.Choose(Find(other.Roots, @"\Jobs")!);
+
+        // Deleted outside the app; this window finds out when it reads the folders again.
+        _taskFolders.Delete(@"\Reports");
+        await _folders.ReloadAsync();
+
+        Assert.Null(_tasks.FolderPath);
+        Assert.Equal(@"\Jobs", _settings.Current.LastFolderPath);
+    }
+
+    [Fact]
     public async Task WhileTheFoldersCannotBeRead_TheChosenFolderIsShownAndKept()
     {
         _settings.Update(s => s with { LastFolderPath = @"\Jobs" });
