@@ -51,9 +51,17 @@ public sealed class DashboardTests : IDisposable
         app.Snapshot("logged");
         Assert.True(entry != null, "The run of the task did not appear in the dashboard's log.");
 
-        // The log is the last part of the page; focus brings the entry into view for the click.
-        entry.Focus();
-        Assert.True(Retry.WhileFalse(() => !entry.IsOffscreen, TimeSpan.FromSeconds(10), ignoreException: true).Success, "The entry could not be brought into view.");
+        // The log is the last part of the page, below what the window shows. The page scrolls and
+        // the list does not, so the page is scrolled until the whole entry is in view.
+        AutomationElement page = app.Require("DashboardScroller");
+        bool inView = Retry.WhileFalse(() =>
+        {
+            if (!entry.IsOffscreen && entry.BoundingRectangle.Bottom < page.BoundingRectangle.Bottom) return true;
+            page.Patterns.Scroll.Pattern.Scroll(ScrollAmount.NoAmount, ScrollAmount.SmallIncrement);
+            return false;
+        }, TimeSpan.FromSeconds(30), TimeSpan.FromMilliseconds(100), ignoreException: true).Success;
+        app.Snapshot("in-view");
+        Assert.True(inView, "The entry could not be scrolled into view.");
         entry.Click();
 
         Assert.True(app.Find(e => e.AutomationId == "PageTitle" && e.Name == "Scheduled Tasks", 20000) != null, "The entry did not lead to the task list.");
