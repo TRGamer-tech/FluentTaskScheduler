@@ -58,6 +58,10 @@ public sealed class WindowsTasks : IDisposable
     /// <summary>Starts the task now, from outside the app.</summary>
     public void Start(string name) => Run($"/Run /TN \"{PathOf(name)}\"");
 
+    /// <summary>Whether the task is running: schtasks /Run only asks Task Scheduler to start it.</summary>
+    public bool IsRunning(string name) =>
+        RunScript($"$scheduler.GetFolder('\\{Folder.TrimStart('\\')}').GetTask('{name}').State").Trim() == "4"; // TASK_STATE_RUNNING
+
     /// <summary>The task's definition as Task Scheduler stores it.</summary>
     public XElement Definition(string name)
     {

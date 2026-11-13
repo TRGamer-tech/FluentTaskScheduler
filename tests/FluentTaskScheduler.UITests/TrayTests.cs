@@ -1,5 +1,9 @@
+using System.Drawing;
+using System.Drawing.Drawing2D;
 using FlaUI.Core.AutomationElements;
+using FlaUI.Core.Capturing;
 using FlaUI.Core.Definitions;
+using FlaUI.Core.Input;
 using FlaUI.Core.Tools;
 
 namespace FluentTaskScheduler.UITests;
@@ -60,18 +64,25 @@ public class TrayTests
 
     /// <summary>
     /// The snooze keeps the default of not suspending triggers, so it disables none of the
-    /// machine's tasks. Notifications are off: one could lie over the icon or its menu.
+    /// machine's tasks. Notifications are off: one could lie over the icon or its menu. A task
+    /// runs meanwhile, so that the pictures of the icon the test leaves show a count as well.
     /// </summary>
     [Fact]
     public void SnoozingAllTasksFromTheIconsMenu_ShowsInItsTooltip_AndResumingThereEndsIt()
     {
+        using var tasks = new WindowsTasks();
+        tasks.Create("Running", RunningTaskXml);
+        tasks.Start("Running");
+        Assert.True(AppSession.Eventually(() => tasks.IsRunning("Running")), "The task that is to be counted did not start.");
         using var app = AppSession.Launch("tray-snooze", AppSession.FirstRunDone(("ShowNotifications", false), ("HasSeenTrayHint", true)));
         app.Window.Close();
         Assert.True(AppSession.Eventually(() => !app.IsWindowVisible), "Closing did not hide the window.");
+        SaveIconPicture(app, "running");
 
         ChooseFromIconsMenu(app, "Snooze All Tasks...", "30 minutes");
         Assert.True(AppSession.Eventually(() => IconName(app).Contains("All tasks snoozed")),
             $"The icon's tooltip does not say that all tasks are snoozed: '{IconName(app)}'");
+        SaveIconPicture(app, "snoozed");
 
         ChooseFromIconsMenu(app, "Resume All Tasks");
         Assert.True(AppSession.Eventually(() => IconName(app) is { Length: > 0 } name && !name.Contains("All tasks snoozed")),
@@ -81,6 +92,39 @@ public class TrayTests
         Assert.True(AppSession.Eventually(() => app.IsWindowVisible), "Starting the app again did not bring the window back.");
         app.Require("SearchBox", 20000);
         Assert.True(app.Find("SnoozeBannerResume", 2000) is null, "The window still says that all tasks are snoozed.");
+    }
+
+    /// <summary>Runs for two minutes as SYSTEM, which has no desktop: a console window of its own would come up over the taskbar.</summary>
+    private const string RunningTaskXml = """
+        <?xml version="1.0" encoding="UTF-16"?>
+        <Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+          <Principals><Principal id="Author"><UserId>S-1-5-18</UserId></Principal></Principals>
+          <Settings><DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries></Settings>
+          <Actions Context="Author"><Exec><Command>ping</Command><Arguments>-n 120 127.0.0.1</Arguments></Exec></Actions>
+        </Task>
+        """;
+
+    /// <summary>
+    /// Leaves a picture of the icon as the notification area shows it, and one eight times as
+    /// large, for whoever checks by eye that its marks can be read at the size Windows shows it at.
+    /// </summary>
+    private static void SaveIconPicture(AppSession app, string name)
+    {
+        AutomationElement icon = FindIcon(app) ?? throw new InvalidOperationException("The app has no icon in the notification area. Found there: " + NotificationAreaNames(app));
+        // A pointer over the icon would highlight it and bring up its tooltip.
+        Mouse.MoveTo(app.Screen.Center());
+        Thread.Sleep(600); // the hidden icons may just have opened, the icon just been drawn anew
+
+        using CaptureImage picture = Capture.Element(icon);
+        picture.ToFile(Path.Combine(app.ArtifactsDir, $"icon-{name}.png"));
+        using var enlarged = new Bitmap(picture.Bitmap.Width * 8, picture.Bitmap.Height * 8);
+        using (Graphics graphics = Graphics.FromImage(enlarged))
+        {
+            graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+            graphics.PixelOffsetMode = PixelOffsetMode.Half;
+            graphics.DrawImage(picture.Bitmap, 0, 0, enlarged.Width, enlarged.Height);
+        }
+        enlarged.Save(Path.Combine(app.ArtifactsDir, $"icon-{name}-x8.png"));
     }
 
     /// <summary>Opens the icon's menu and chooses the entry at the end of <paramref name="path"/>, opening the submenus named before it.</summary>
