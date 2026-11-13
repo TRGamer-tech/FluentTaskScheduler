@@ -155,6 +155,21 @@ public sealed class LibraryViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task AScriptThatCannotBeDeleted_IsReported_AndStaysListed()
+    {
+        LibraryScript mine = _store.Save(null, "Mine", "", "Get-Date");
+        LibraryViewModel library = NewLibrary();
+        // The shorter list is written next to the old one first, and a folder in that place cannot be written.
+        Directory.CreateDirectory(Path.Combine(_folder.Paths.ScriptsFolder, "scripts.json.tmp"));
+
+        await Script(library, "Mine").DeleteCommand.ExecuteAsync(null);
+
+        Assert.Equal("Error: Library.Scripts.DeleteFailed", _prompts.Shown.Last());
+        Assert.Contains(library.Scripts, card => card.Id == mine.Id);
+        Assert.Contains(_store.GetScripts(), script => script.Id == mine.Id);
+    }
+
+    [Fact]
     public async Task EditingAScript_PutsItIntoTheScriptEditor_AndShowsTheEditor()
     {
         _store.Save(null, "Mine", "My own script.", "Get-Date");
@@ -223,5 +238,20 @@ public sealed class LibraryViewModelTests : IDisposable
         Assert.Equal("Library.Scripts.ListSetAside", library.ScriptsProblem);
         Assert.True(library.HasScriptsProblem);
         Assert.Equal(["Scripts.Ping.Name", "Scripts.Reboot.Name"], library.Scripts.Select(card => card.Name));
+    }
+
+    [Fact]
+    public void ScriptsThatCannotBeListed_AreReported_InsteadOfTheList()
+    {
+        // The scripts version 1.9 left behind are moved into the scripts folder, where there is a file instead.
+        File.WriteAllText(_folder.Paths.ScriptsFolder, "a file where the folder should be");
+        File.WriteAllText(_folder.File("user_templates.json"), """[{ "Name": "Old", "Command": "cmd.exe" }]""");
+
+        LibraryViewModel library = NewLibrary();
+
+        Assert.Equal("Library.Scripts.LoadFailed", library.ScriptsProblem);
+        Assert.True(library.HasScriptsProblem);
+        Assert.Empty(library.Scripts);
+        Assert.True(library.HasNoScripts);
     }
 }

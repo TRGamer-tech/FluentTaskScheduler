@@ -66,18 +66,27 @@ public class NameListViewModelTests
     public void ANameThatWasRemoved_CanBeAddedAgain()
     {
         _list.NewName = "Work";
+        int notified = 0;
+        _list.AddCommand.CanExecuteChanged += (_, _) => notified++;
+
         _list.RemoveCommand.Execute("Work");
 
+        Assert.Equal(1, notified);
         Assert.True(_list.AddCommand.CanExecute(null));
     }
 
     [Fact]
-    public void Refresh_TakesOverAListThatWasChangedElsewhere()
+    public void Refresh_TakesOverAListThatWasChangedElsewhere_AndTheAddButtonFollows()
     {
+        _list.NewName = "Maintenance";
+        int notified = 0;
+        _list.AddCommand.CanExecuteChanged += (_, _) => notified++;
         _stored = ["Maintenance"];
 
         _list.Refresh();
 
         Assert.Equal(["Maintenance"], _list.Items);
+        Assert.Equal(1, notified);
+        Assert.False(_list.AddCommand.CanExecute(null));
     }
 }
