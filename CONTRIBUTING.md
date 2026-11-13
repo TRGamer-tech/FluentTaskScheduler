@@ -32,7 +32,8 @@ dotnet test tests/FluentTaskScheduler.Tests
 dotnet publish src/FluentTaskScheduler -c Release -p:Platform=x64 -o publish
 
 # The UI tests, against that build. They need an elevated terminal and take over mouse and
-# keyboard while they run. Their tasks are in folders named FtsUiTests_*.
+# keyboard while they run. Whatever they create in Task Scheduler is in a folder, or under
+# a name, that begins with FtsUiTests_.
 $env:FTS_APP_EXE = "$PWD\publish\FluentTaskScheduler.exe"
 dotnet test tests/FluentTaskScheduler.UITests
 ```

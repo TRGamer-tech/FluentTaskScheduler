@@ -12,10 +12,11 @@ public sealed class HistoryLog : IDisposable
 
     private readonly bool _wasOn;
 
-    public HistoryLog()
+    /// <param name="switchOn">False for a test that has the app switch the log on: it is then only put back.</param>
+    public HistoryLog(bool switchOn = true)
     {
         _wasOn = Wevtutil($"gl {Name}").Contains("enabled: true", StringComparison.OrdinalIgnoreCase);
-        if (!_wasOn) Wevtutil($"sl {Name} /e:true");
+        if (switchOn && !_wasOn) Wevtutil($"sl {Name} /e:true");
     }
 
     public void Dispose()

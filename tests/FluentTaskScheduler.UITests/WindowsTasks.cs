@@ -18,7 +18,10 @@ public sealed class WindowsTasks : IDisposable
 
     private WindowsTasks(string folder) => Folder = folder;
 
-    /// <summary>The top folder, where the app puts a new task when no folder is selected. Nothing is cleaned up here.</summary>
+    /// <summary>
+    /// The top folder, where the app puts a new task when no folder is selected. Nothing is cleaned
+    /// up here: a test deletes its task itself, and gives it a name of its own, beginning with FtsUiTests_.
+    /// </summary>
     public static WindowsTasks Root { get; } = new("");
 
     public string Folder { get; }

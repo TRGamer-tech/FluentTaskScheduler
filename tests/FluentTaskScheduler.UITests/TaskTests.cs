@@ -25,11 +25,12 @@ public sealed class TaskTests : IDisposable
     [Fact]
     public void ANewWeeklyTask_IsSavedWithTheChosenDaysAndTime()
     {
+        string name = "FtsUiTests_Weekly_" + Guid.NewGuid().ToString("N")[..8];
         using var app = AppSession.Launch("weekly");
         OpenFolderlessList(app);
 
         app.ToolbarButton("NewTaskButton").Press();
-        app.Require("EditorName", 20000).AsTextBox().Text = "Weekly report";
+        app.Require("EditorName", 20000).AsTextBox().Text = name;
         app.Snapshot("editor-new");
 
         app.Require("TriggerTypeBox").AsComboBox().Select(2); // one time, daily, weekly, ...
@@ -55,7 +56,6 @@ public sealed class TaskTests : IDisposable
         app.Snapshot("editor-filled");
         app.Require("PrimaryButton").AsButton().Invoke();
 
-        string name = "Weekly report";
         try
         {
             Assert.True(AppSession.Eventually(() => WindowsTasks.Root.Exists(name)), "The task was not created. " + ProblemsShown(app));
@@ -152,6 +152,7 @@ public sealed class TaskTests : IDisposable
     [Fact]
     public void ATasksDetails_ShowWhatItRuns_AndAfterARunWhatBecameOfIt()
     {
+        using var history = new HistoryLog(switchOn: false);
         _windows.CreateDaily("Detailed");
         using var app = AppSession.Launch("details");
         app.Require("SearchBox").AsTextBox().Enter("Detailed");
@@ -222,7 +223,8 @@ public sealed class TaskTests : IDisposable
     [Fact]
     public void ATaskExportedForAnAccountUnknownHere_IsImportedForTheCurrentUser()
     {
-        const string name = "Foreign task";
+        // The dialog names the task after the file.
+        string name = "FtsUiTests_Foreign_" + Guid.NewGuid().ToString("N")[..8];
         string file = Path.Combine(Path.GetTempPath(), name + ".xml");
         File.WriteAllText(file, ForeignTaskXml, System.Text.Encoding.Unicode);
         using var app = AppSession.Launch("import");
@@ -255,7 +257,8 @@ public sealed class TaskTests : IDisposable
     [Fact]
     public void AFolder_CanBeCreatedAndDeletedFromTheTree()
     {
-        string name = "FtsUiFolder" + Guid.NewGuid().ToString("N")[..6];
+        // The test's own folder, which is removed afterwards if the test does not get to delete it.
+        string name = _windows.Folder.TrimStart('\\');
         using var app = AppSession.Launch("folders");
 
         app.Require("NewFolderButton").Press();
