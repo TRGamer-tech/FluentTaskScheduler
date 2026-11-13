@@ -15,12 +15,26 @@ namespace FluentTaskScheduler.ViewModels;
 /// The history is read when the page first comes on screen. From then on the dashboard follows
 /// what Task Scheduler reports: a run that starts or ends is added to what it has, and its task
 /// is read again shortly after; when a task is registered, changed or deleted, all of them are.
-/// Off screen it only takes note of the runs; all tasks are read again when it comes back.
+/// A task is also read again once its next run time has gone by, which nothing reports while
+/// Windows records no history. Off screen it only takes note of the runs; all tasks are read
+/// again when it comes back.
 /// </remarks>
 public sealed partial class DashboardViewModel : ObservableObject, IDisposable
 {
     /// <summary>How long the dashboard waits after a report before it reads the tasks again, so that reports that come together cost one read.</summary>
     internal static readonly TimeSpan RefreshDelay = TimeSpan.FromMilliseconds(500);
+
+    /// <summary>
+    /// How long after a task's next run time the dashboard reads the task again. By then Task
+    /// Scheduler has started the run, or let the start go by, and moved on to the run after.
+    /// </summary>
+    internal static readonly TimeSpan PastStartDelay = TimeSpan.FromSeconds(5);
+
+    /// <summary>
+    /// A timer stands still while the computer sleeps, so the wait for a start time is cut into
+    /// steps of this length. After waking up, the start times that went by are noticed within one.
+    /// </summary>
+    private static readonly TimeSpan LongestWait = TimeSpan.FromMinutes(1);
 
     private readonly ITaskStore _store;
     private readonly ITaskHistory _history;
@@ -30,6 +44,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     private readonly IUiThread _ui;
     private readonly TimeProvider _time;
     private readonly ITimer _refreshTimer;
+    private readonly ITimer _startTimer;
     private readonly CancellationTokenSource _closing = new();
 
     private IReadOnlyList<TaskRow> _tasks = [];
@@ -43,10 +58,13 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     private Dictionary<string, TaskRun> _recorded = [];
     private readonly Dictionary<string, TaskRun> _reported = [];
 
-    // What the next refresh reads again: the tasks whose runs were reported, or all tasks once
-    // one was registered, changed or deleted.
-    private readonly HashSet<string> _tasksThatRan = new(StringComparer.OrdinalIgnoreCase);
+    // What the next refresh reads again: the tasks whose runs were reported or whose start times
+    // went by, or all tasks once one was registered, changed or deleted.
+    private readonly HashSet<string> _tasksToRead = new(StringComparer.OrdinalIgnoreCase);
     private bool _tasksChanged;
+
+    // The start times up to this moment are dealt with: their tasks are read after them.
+    private DateTimeOffset _startsDealtWith;
 
     private readonly ReadQueue _reads = new();
     private bool _isShown, _hasRead, _refreshPlanned, _choosing;
@@ -62,6 +80,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         _ui = ui;
         _time = time;
         _refreshTimer = time.CreateTimer(_ => ui.Post(() => PendingRefresh = RefreshAsync()), null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+        _startTimer = time.CreateTimer(_ => ui.Post(CheckStartTimes), null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
         Categories.Add(Loc.Get("Dashboard.AllCategories"));
         Tags.Add(Loc.Get("Dashboard.AllTags"));
         _stream.RunStarted += OnRunReported;
@@ -132,13 +151,21 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     public Task ShowAsync()
     {
         _isShown = true;
+
+        // All tasks are read now. A start time that went by before then is one Task Scheduler has
+        // moved on from, or does not move on from; reading again would change nothing.
+        _startsDealtWith = _time.GetUtcNow() - PastStartDelay;
         if (!_hasRead) return LoadAsync();
         _tasksChanged = true;
         return RefreshAsync();
     }
 
     /// <summary>Tells the dashboard that its page left the screen.</summary>
-    public void Hide() => _isShown = false;
+    public void Hide()
+    {
+        _isShown = false;
+        _startTimer.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+    }
 
     /// <summary>Reads the tasks and the history of the last seven days anew, and shows what they add up to.</summary>
     [RelayCommand]
@@ -204,6 +231,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         _stream.TaskChanged -= OnTaskChanged;
         _snooze.Changed -= OnSnoozeChanged;
         _refreshTimer.Dispose();
+        _startTimer.Dispose();
         _closing.Cancel();
     }
 
@@ -215,7 +243,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         if (_closing.IsCancellationRequested) return;
         Remember(run);
         if (!_isShown) return;
-        _tasksThatRan.Add(run.TaskPath);
+        _tasksToRead.Add(run.TaskPath);
         Present();
         PlanRefresh();
     });
@@ -231,6 +259,27 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     {
         if (!_closing.IsCancellationRequested && _isShown) Present();
     });
+
+    // When a task's start time comes, Task Scheduler moves its next run time on. Nothing reports
+    // that while Windows records no history, nor a start that Task Scheduler let go by.
+    private void CheckStartTimes()
+    {
+        if (_closing.IsCancellationRequested || !_isShown) return;
+
+        DateTimeOffset now = _time.GetUtcNow(), until = now - PastStartDelay;
+        List<string> wentBy = _tasks
+            .Where(task => DashboardFigures.NextStartOf(task, _time.LocalTimeZone) is { } start && start > _startsDealtWith && start <= until)
+            .Select(task => task.Path)
+            .ToList();
+        _startsDealtWith = until;
+        if (wentBy.Count == 0)
+        {
+            WatchStartTimes(now);
+            return;
+        }
+        _tasksToRead.UnionWith(wentBy);
+        PlanRefresh();
+    }
 
     private void Remember(TaskRun run)
     {
@@ -267,9 +316,9 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     internal Task PendingRefresh { get; private set; } = Task.CompletedTask;
 
     /// <summary>
-    /// Reads again what the reports since the last refresh concern: the tasks that ran, whose
-    /// states and run times have moved on, or all tasks once one was registered, changed or
-    /// deleted. The runs themselves are known already.
+    /// Reads again what has changed since the last refresh: the tasks that ran or whose start
+    /// times went by, whose states and run times have moved on, or all tasks once one was
+    /// registered, changed or deleted. The runs themselves are known already.
     /// </summary>
     private async Task RefreshAsync()
     {
@@ -278,9 +327,9 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         // A refresh planned just before the page left the screen is done when it comes back.
         if (_closing.IsCancellationRequested || !_isShown) return;
 
-        List<string> ran = [.. _tasksThatRan];
+        List<string> paths = [.. _tasksToRead];
         bool changed = _tasksChanged;
-        _tasksThatRan.Clear();
+        _tasksToRead.Clear();
         _tasksChanged = false;
 
         // The figures are worked out in turn with the reads, so that figures worked out from these
@@ -289,7 +338,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         {
             try
             {
-                await (changed ? ReadAllTasksAsync() : ReadTasksAsync(ran));
+                await (changed ? ReadAllTasksAsync() : ReadTasksAsync(paths));
                 Present();
             }
             catch (Exception ex)
@@ -344,7 +393,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         catch (Exception ex)
         {
             // Whatever went wrong: the dashboard keeps what it has until the next report or refresh.
-            Serilog.Log.Warning(ex, "The tasks that ran could not be read again for the dashboard");
+            Serilog.Log.Warning(ex, "The tasks that ran or were due to could not be read again for the dashboard");
             return;
         }
 
@@ -382,11 +431,31 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
             refused = refused.Where(start => paths.Contains(start.TaskPath));
         }
 
-        Figures = DashboardFigures.From(tasks, runs, refused, Filter, _time.GetUtcNow(), _time.LocalTimeZone);
+        DateTimeOffset now = _time.GetUtcNow();
+        Figures = DashboardFigures.From(tasks, runs, refused, Filter, now, _time.LocalTimeZone);
         Hours.SyncWith(Figures.Hours);
         Running.SyncWith(Figures.Running);
         Upcoming.SyncWith(Figures.Upcoming);
         Log.SyncWith(Figures.Log);
+        WatchStartTimes(now);
+    }
+
+    /// <summary>
+    /// Sets the clock for the next start time to go by, of all tasks and not only of those chosen,
+    /// as the choice can change meanwhile.
+    /// </summary>
+    private void WatchStartTimes(DateTimeOffset now)
+    {
+        DateTimeOffset? next = _tasks.Select(task => DashboardFigures.NextStartOf(task, _time.LocalTimeZone)).Where(start => start > _startsDealtWith).Min();
+        if (!_isShown || next is not { } start)
+        {
+            _startTimer.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+            return;
+        }
+
+        TimeSpan wait = start + PastStartDelay - now;
+        if (wait < TimeSpan.Zero) wait = TimeSpan.Zero;
+        _startTimer.Change(wait < LongestWait ? wait : LongestWait, Timeout.InfiniteTimeSpan);
     }
 
     /// <summary>

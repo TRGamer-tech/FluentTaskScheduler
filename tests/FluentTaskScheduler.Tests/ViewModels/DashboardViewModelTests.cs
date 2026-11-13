@@ -1,4 +1,5 @@
 using System.Collections.Specialized;
+using System.Globalization;
 using FluentTaskScheduler.History;
 using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Settings;
@@ -57,6 +58,9 @@ public sealed class DashboardViewModelTests : IDisposable
         _time.Advance(DashboardViewModel.RefreshDelay);
         await _dashboard.PendingRefresh;
     }
+
+    /// <summary>A time of the tests' day where the user is, an hour ahead of UTC: it is 16:00 there now.</summary>
+    private static DateTime At(int hour, int minute) => new(2026, 11, 13, hour, minute, 0);
 
     [Fact]
     public async Task ComingOnScreen_CountsTheTasks_AndTheRunsOfTheLastSevenDays()
@@ -392,6 +396,78 @@ public sealed class DashboardViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task AStartTimeThatWentBy_IsNoLongerUpcoming_AndItsTaskIsReadAgain()
+    {
+        // Windows records no history, so nothing reports the start at 16:05.
+        _history.State = LogState.Disabled;
+        _store.SetRunTimes(Succeeds, last: null, next: At(16, 5))
+              .SetRunTimes(Fails, last: null, next: At(18, 0));
+        await _dashboard.ShowAsync();
+        Assert.Equal([Succeeds, Fails], _dashboard.Upcoming.Select(line => line.TaskPath));
+
+        _store.SetRunTimes(Succeeds, last: At(16, 5), next: At(17, 5));
+        _time.Advance(TimeSpan.FromMinutes(5) + DashboardViewModel.PastStartDelay);
+        await AfterTheRefreshDelayAsync();
+
+        Assert.Equal(
+            [(Succeeds, At(17, 5).ToString("t", CultureInfo.CurrentCulture)), (Fails, At(18, 0).ToString("t", CultureInfo.CurrentCulture))],
+            _dashboard.Upcoming.Select(line => (line.TaskPath, line.Text)));
+        Assert.Equal([Succeeds], _store.TasksRead);
+        Assert.Equal(1, _store.Listings);
+    }
+
+    [Fact]
+    public async Task ATaskWhoseStartGoesByUnreported_IsReadAgain_AlsoWhileOtherRunsAreReported()
+    {
+        _store.SetRunTimes(Succeeds, last: null, next: At(16, 5));
+        await _dashboard.ShowAsync();
+
+        // Task Scheduler lets the start go by, as when the run before is still going on, and
+        // reports nothing of it. Another task's run is reported a moment later.
+        _store.SetRunTimes(Succeeds, last: null, next: At(17, 5));
+        _time.Advance(TimeSpan.FromMinutes(5) + TimeSpan.FromSeconds(1));
+        _stream.Complete(FakeTaskEventStream.Finished(Fails, RunStatus.Failed, resultCode: 3, ended: _time.GetUtcNow()));
+        await AfterTheRefreshDelayAsync();
+        Assert.Empty(_dashboard.Upcoming);
+
+        _time.Advance(DashboardViewModel.PastStartDelay);
+        await AfterTheRefreshDelayAsync();
+
+        Assert.Equal([Fails, Succeeds], _store.TasksRead);
+        Assert.Equal(Succeeds, Assert.Single(_dashboard.Upcoming).TaskPath);
+    }
+
+    [Fact]
+    public async Task AStartTimeTaskSchedulerDoesNotMoveOnFrom_IsReadAgainOnlyOnce()
+    {
+        // One start time went by before the tasks are read, the other goes by while they are shown.
+        _store.SetRunTimes(Fails, last: null, next: At(15, 30))
+              .SetRunTimes(Succeeds, last: null, next: At(16, 5));
+        await _dashboard.ShowAsync();
+
+        _time.Advance(TimeSpan.FromMinutes(5) + DashboardViewModel.PastStartDelay);
+        await AfterTheRefreshDelayAsync();
+        _time.Advance(TimeSpan.FromHours(1));
+        await AfterTheRefreshDelayAsync();
+
+        Assert.Equal([Succeeds], _store.TasksRead);
+        Assert.Empty(_dashboard.Upcoming);
+    }
+
+    [Fact]
+    public async Task OffScreen_NoTaskIsReadWhenItsStartTimeGoesBy()
+    {
+        _store.SetRunTimes(Succeeds, last: null, next: At(16, 5));
+        await _dashboard.ShowAsync();
+        _dashboard.Hide();
+
+        _time.Advance(TimeSpan.FromMinutes(5) + DashboardViewModel.PastStartDelay);
+        await AfterTheRefreshDelayAsync();
+
+        Assert.Empty(_store.TasksRead);
+    }
+
+    [Fact]
     public async Task RunsThatEndedMoreThanSevenDaysAgo_NoLongerCount()
     {
         await _dashboard.ShowAsync();
@@ -542,12 +618,13 @@ public sealed class DashboardViewModelTests : IDisposable
     {
         var ui = new BusyUiThread();
         using DashboardViewModel closing = NewDashboard(ui);
+        _store.SetRunTimes(Succeeds, last: null, next: At(16, 5));
         await closing.ShowAsync();
         _stream.Complete(FakeTaskEventStream.Finished(Succeeds, RunStatus.Succeeded, ended: Now));
 
         closing.Dispose();
         ui.RunPosted();
-        _time.Advance(DashboardViewModel.RefreshDelay);
+        _time.Advance(TimeSpan.FromMinutes(10));
         _snooze.RecordSuppressedRun(Succeeds, RunOrigin.Manual);
 
         Assert.Equal(7, closing.Figures.SucceededRuns);

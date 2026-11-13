@@ -285,6 +285,21 @@ public sealed class DashboardFiguresTests
     }
 
     [Fact]
+    public void AStartTimeThatWentBy_IsNotUpcoming()
+    {
+        // It is 14:30 where the user is and 12:30 in UTC; Task Scheduler gives the user's time.
+        var tasks = new[]
+        {
+            new TaskRow(@"\WentBy") { IsEnabled = true, State = TaskRowState.Ready, NextRunTime = new DateTime(2031, 5, 9, 14, 0, 0) },
+            new TaskRow(@"\Soon") { IsEnabled = true, State = TaskRowState.Ready, NextRunTime = new DateTime(2031, 5, 9, 14, 45, 0) }
+        };
+
+        var figures = DashboardFigures.From(tasks, [], [], LogFilter.All, Now, Zone);
+
+        Assert.Equal([@"\Soon"], figures.Upcoming.Select(line => line.TaskPath));
+    }
+
+    [Fact]
     public void ALineOrAnEntry_IsAnnouncedByItsTaskName()
     {
         Assert.Equal("Backup", new TaskLine(@"\Jobs\Backup", "14:00").ToString());

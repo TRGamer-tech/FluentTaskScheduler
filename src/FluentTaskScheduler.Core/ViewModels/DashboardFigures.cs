@@ -145,7 +145,7 @@ public sealed record DashboardFigures
     /// <summary>The running tasks, the one that started last first.</summary>
     public IReadOnlyList<TaskLine> Running { get; private init; } = [];
 
-    /// <summary>The next tasks to run, soonest first.</summary>
+    /// <summary>The next tasks to run, soonest first. A start time that has gone by is not upcoming any more.</summary>
     public IReadOnlyList<TaskLine> Upcoming { get; private init; } = [];
 
     /// <summary>The runs and refused starts that pass the log's filter, newest first.</summary>
@@ -217,7 +217,7 @@ public sealed record DashboardFigures
                 .OrderByDescending(task => task.LastRunTime)
                 .Select(task => new TaskLine(task.Path, task.LastRunTime is { } start ? Loc.Format("Dashboard.Running.Since", TimeText(start)) : ""))
                 .ToList(),
-            Upcoming = tasks.Where(task => task.IsEnabled && task.NextRunTime is not null)
+            Upcoming = tasks.Where(task => NextStartOf(task, zone) > now)
                 .OrderBy(task => task.NextRunTime)
                 .Take(MostUpcoming)
                 .Select(task => new TaskLine(task.Path, TimeText(task.NextRunTime!.Value)))
@@ -232,6 +232,15 @@ public sealed record DashboardFigures
 
     /// <summary>True for a run that ended after <paramref name="moment"/>, and for one that is still going on.</summary>
     internal static bool EndsAfter(TaskRun run, DateTimeOffset moment) => run.Ended is not { } ended || ended >= moment;
+
+    /// <summary>When a task is to run next; null for one that is disabled or not going to run again.</summary>
+    /// <remarks>Task Scheduler gives the time of day in the user's time zone, without an offset.</remarks>
+    internal static DateTimeOffset? NextStartOf(TaskRow task, TimeZoneInfo zone)
+    {
+        if (!task.IsEnabled || task.NextRunTime is not { } next) return null;
+        next = DateTime.SpecifyKind(next, DateTimeKind.Unspecified);
+        return new DateTimeOffset(next, zone.GetUtcOffset(next));
+    }
 
     /// <summary>Where a run stands in time: at its end, or at its start while it is going on.</summary>
     private static DateTimeOffset MomentOf(TaskRun run) => run.Ended ?? run.Started ?? run.Events[0].Time;
