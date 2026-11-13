@@ -12,6 +12,7 @@ public sealed class FakeTaskStore : ITaskStore
 {
     private readonly Dictionary<string, TaskDraft> _tasks = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _running = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, (DateTime? Last, DateTime? Next)> _runTimes = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>Tasks Windows would refuse to change or start.</summary>
     public HashSet<string> Protected { get; } = new(StringComparer.OrdinalIgnoreCase);
@@ -31,12 +32,24 @@ public sealed class FakeTaskStore : ITaskStore
         return this;
     }
 
+    /// <summary>Sets when the task last ran and will run next, as the task list shows it.</summary>
+    public FakeTaskStore SetRunTimes(string path, DateTime? last, DateTime? next)
+    {
+        _runTimes[path] = (last, next);
+        return this;
+    }
+
+    /// <summary>When set, listing the tasks fails with this, as when the Task Scheduler service is not reachable.</summary>
+    public Exception? ListingFails { get; set; }
+
     public bool IsEnabled(string path) => Get(path).Enabled;
     public bool IsRunning(string path) => _running.Contains(path);
     public IEnumerable<string> Paths => _tasks.Keys;
 
-    public IReadOnlyList<TaskRow> GetTasks() => _tasks.Select(entry => new TaskRow(entry.Key)
+    public IReadOnlyList<TaskRow> GetTasks() => ListingFails is { } failure ? throw failure : _tasks.Select(entry => new TaskRow(entry.Key)
     {
+        LastRunTime = _runTimes.GetValueOrDefault(entry.Key).Last,
+        NextRunTime = _runTimes.GetValueOrDefault(entry.Key).Next,
         IsEnabled = entry.Value.Enabled,
         State = StateOf(entry.Key),
         IsHidden = entry.Value.Hidden,

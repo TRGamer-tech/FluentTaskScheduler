@@ -84,3 +84,13 @@ public sealed class FakeNetworkProfiles(params NetworkProfile[] profiles) : INet
 {
     public IReadOnlyList<NetworkProfile> GetAll() => profiles;
 }
+
+/// <summary>A snooze that is on or off as the test says, and remembers the runs it refused.</summary>
+public sealed class FakeSnoozeGate : ISnoozeGate
+{
+    public bool Snoozed { get; set; }
+    public List<string> Suppressed { get; } = [];
+
+    public bool BlocksRun(string taskPath) => Snoozed;
+    public void RecordSuppressedRun(string taskPath, RunOrigin origin) => Suppressed.Add($"{taskPath} ({origin})");
+}

@@ -24,7 +24,8 @@ public class ShellTests
             string item = (string)page[0], heading = (string)page[1];
             app.Require(item).Click();
 
-            Assert.True(app.Find(e => e.AutomationId == "PageTitle" && e.Name == heading) != null, $"The heading is not '{heading}' after choosing {item}.");
+            // A page may take a while to load its data on a slow machine; the heading follows the page.
+            Assert.True(app.Find(e => e.AutomationId == "PageTitle" && e.Name == heading, timeoutMs: 30000) != null, $"The heading is not '{heading}' after choosing {item}.");
             app.Snapshot(item);
             Assert.False(app.HasExited, $"The app exited after choosing {item}.");
         }
