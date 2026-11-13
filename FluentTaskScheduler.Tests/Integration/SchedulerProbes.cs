@@ -18,6 +18,7 @@ namespace FluentTaskScheduler.Tests.Integration
     /// They record how the library and the current services behave; the findings are printed to
     /// the test output rather than asserted.
     /// </summary>
+    [Collection("StaticServices")]
     public class SchedulerProbes
     {
         private readonly ITestOutputHelper _out;

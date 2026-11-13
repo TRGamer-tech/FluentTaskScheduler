@@ -25,13 +25,14 @@ jobs:
           -c Release
           -p:Platform=x64
           --logger "trx;LogFileName=test-results.trx"
+          --blame
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v5
         with:
           name: test-results
-          path: FluentTaskScheduler.Tests/TestResults/test-results.trx
+          path: FluentTaskScheduler.Tests/TestResults/
 
   ui-tests:
     runs-on: windows-latest
