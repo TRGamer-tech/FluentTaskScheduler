@@ -367,7 +367,7 @@
   <data name="Dashboard.HealthCaption" xml:space="preserve"><value>過去7日間に終了した実行のうち、成功した実行の割合。停止した実行は含みません。</value></data>
   <data name="Dashboard.AvgDuration" xml:space="preserve"><value>平均実行時間</value></data>
   <data name="Dashboard.HeatmapTitle" xml:space="preserve"><value>時間帯別の実行回数</value></data>
-  <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>{0} - 過去7日間で{1}回実行</value></data>
+  <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>過去 7 日間に {0}～{1} の間に開始された実行: {2} 回</value></data>
   <data name="Dashboard.PeakHour" xml:space="preserve"><value>最も多い時間帯:</value></data>
   <data name="Dashboard.ExecutionStream" xml:space="preserve"><value>実行ログ</value></data>
   <data name="Dashboard.NoExecutionEntries" xml:space="preserve"><value>このフィルターに該当する実行はありません。</value></data>

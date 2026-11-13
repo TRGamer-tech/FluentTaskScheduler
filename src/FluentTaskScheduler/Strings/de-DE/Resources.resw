@@ -367,7 +367,7 @@ Jetzt App neustarten?</value></data>
   <data name="Dashboard.HealthCaption" xml:space="preserve"><value>Anteil der erfolgreichen unter den Läufen, die in den letzten 7 Tagen geendet haben. Gestoppte Läufe zählen nicht mit.</value></data>
   <data name="Dashboard.AvgDuration" xml:space="preserve"><value>Durchschnittliche Dauer</value></data>
   <data name="Dashboard.HeatmapTitle" xml:space="preserve"><value>Ausführungen nach Tageszeit</value></data>
-  <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>{0} - {1} Lauf/Läufe in den letzten 7 Tagen</value></data>
+  <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>In den letzten 7 Tagen zwischen {0} und {1} gestartete Ausführungen: {2}</value></data>
   <data name="Dashboard.PeakHour" xml:space="preserve"><value>Stärkste Stunde:</value></data>
   <data name="Dashboard.ExecutionStream" xml:space="preserve"><value>Ausführungsprotokoll</value></data>
   <data name="Dashboard.NoExecutionEntries" xml:space="preserve"><value>Für diesen Filter sind keine Läufe erfasst.</value></data>

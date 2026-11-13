@@ -368,7 +368,7 @@
   <data name="Dashboard.HealthCaption" xml:space="preserve"><value>过去 7 天内结束的运行中成功运行的占比。已停止的运行不计入。</value></data>
   <data name="Dashboard.AvgDuration" xml:space="preserve"><value>平均耗时</value></data>
   <data name="Dashboard.HeatmapTitle" xml:space="preserve"><value>按小时统计的运行次数</value></data>
-  <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>{0} - 过去 7 天内运行 {1} 次</value></data>
+  <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>过去 7 天内在 {0} 至 {1} 之间开始的运行：{2} 次</value></data>
   <data name="Dashboard.PeakHour" xml:space="preserve"><value>最繁忙时段：</value></data>
   <data name="Dashboard.ExecutionStream" xml:space="preserve"><value>执行日志</value></data>
   <data name="Dashboard.NoExecutionEntries" xml:space="preserve"><value>此筛选条件下没有记录的运行。</value></data>

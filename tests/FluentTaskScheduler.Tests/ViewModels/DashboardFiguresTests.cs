@@ -317,7 +317,7 @@ public sealed class DashboardNotesTests : IDisposable
         "Dashboard.Health.Note" => "{0} succeeded, {1} failed",
         "Dashboard.Runs.Note" => "{0} in the last 24 hours",
         "Dashboard.Duration.Note" => "Longest: {0} ({1})",
-        "Dashboard.Heatmap.CellTooltip" => "{0} - {1} run(s) in the last 7 days",
+        "Dashboard.Heatmap.CellTooltip" => "Runs started between {0} and {1} in the last 7 days: {2}",
         _ => null
     });
 
@@ -363,7 +363,8 @@ public sealed class DashboardNotesTests : IDisposable
             var figures = DashboardFigures.From([], runs, [], LogFilter.All, now, TimeZoneInfo.Utc);
 
             Assert.Equal("6:00 PM", figures.BusiestHour);
-            Assert.Equal("6:00 PM - 1 run(s) in the last 7 days", figures.Hours[18].Description);
+            Assert.Equal("Runs started between 6:00 PM and 7:00 PM in the last 7 days: 1", figures.Hours[18].Description);
+            Assert.Equal("Runs started between 11:00 PM and 12:00 AM in the last 7 days: 0", figures.Hours[23].Description);
             Assert.Equal(["12:00 AM", "6:00 AM", "12:00 PM", "6:00 PM"], new[] { 0, 6, 12, 18 }.Select(DashboardFigures.HourText));
         }
         finally

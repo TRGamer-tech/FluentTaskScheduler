@@ -210,7 +210,7 @@ public sealed record DashboardFigures
                 hour,
                 count,
                 count == 0 ? 0 : LightestShade + (1 - LightestShade) * count / busiest,
-                Loc.Format("Dashboard.Heatmap.CellTooltip", HourText(hour), count))).ToList(),
+                Loc.Format("Dashboard.Heatmap.CellTooltip", HourText(hour), HourText(hour + 1), count))).ToList(),
             BusiestHour = busiest == 0 ? "-" : HourText(Array.IndexOf(perHour, busiest)),
 
             Running = tasks.Where(task => task.State == TaskRowState.Running)
@@ -227,7 +227,7 @@ public sealed record DashboardFigures
     }
 
     /// <summary>An hour of the day the way the user's region writes times, e.g. "6:00 PM" or "18:00".</summary>
-    public static string HourText(int hour) => new DateTime(2000, 1, 1, hour, 0, 0).ToString("t", CultureInfo.CurrentCulture);
+    public static string HourText(int hour) => new DateTime(2000, 1, 1, hour % 24, 0, 0).ToString("t", CultureInfo.CurrentCulture);
 
     /// <summary>What tells one run from another: its instance, or for a start that failed without one, the task and the moment.</summary>
     internal static string KeyOf(TaskRun run) =>
