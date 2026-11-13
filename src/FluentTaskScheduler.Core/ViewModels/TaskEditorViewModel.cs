@@ -5,19 +5,21 @@ using CommunityToolkit.Mvvm.Input;
 using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Settings;
+using FluentTaskScheduler.Snoozing;
 using TaskInstancesPolicy = Microsoft.Win32.TaskScheduler.TaskInstancesPolicy;
 
 namespace FluentTaskScheduler.ViewModels;
 
 /// <summary>Creates task editors for one window.</summary>
-public sealed class TaskEditorFactory(ITaskStore store, ISettingsStore settings, IAppLifetime app, IFilePicker files, INetworkProfiles networks, TimeProvider time)
+public sealed class TaskEditorFactory(ITaskStore store, ISettingsStore settings, IAppLifetime app, IFilePicker files, INetworkProfiles networks,
+    TimeProvider time, ISnoozeService snooze)
 {
     /// <param name="source">The task as it was loaded, or what a new task starts out as.</param>
     /// <param name="folderPath">The folder the task is in, or a new task is created in.</param>
     /// <param name="originalPath">Path of the task being edited; null for a new task.</param>
     /// <param name="otherTasks">Paths of the other tasks, which this one can start when it finishes.</param>
     public TaskEditorViewModel Create(TaskDraft source, string folderPath, string? originalPath, IEnumerable<string> otherTasks) =>
-        new(store, settings, app, files, networks, time, source, folderPath, originalPath, otherTasks);
+        new(store, settings, app, files, networks, time, snooze, source, folderPath, originalPath, otherTasks);
 }
 
 /// <summary>
@@ -46,6 +48,7 @@ public sealed partial class TaskEditorViewModel : ObservableObject
     private readonly IAppLifetime _app;
     private readonly IFilePicker _files;
     private readonly TimeProvider _time;
+    private readonly ISnoozeService _snooze;
     private readonly TaskDraft _source;
     private readonly string _folderPath;
     private readonly string? _originalPath;
@@ -53,13 +56,14 @@ public sealed partial class TaskEditorViewModel : ObservableObject
     private readonly List<NetworkProfile> _networks;
 
     internal TaskEditorViewModel(ITaskStore store, ISettingsStore settings, IAppLifetime app, IFilePicker files, INetworkProfiles networks,
-        TimeProvider time, TaskDraft source, string folderPath, string? originalPath, IEnumerable<string> otherTasks)
+        TimeProvider time, ISnoozeService snooze, TaskDraft source, string folderPath, string? originalPath, IEnumerable<string> otherTasks)
     {
         _store = store;
         _settings = settings;
         _app = app;
         _files = files;
         _time = time;
+        _snooze = snooze;
         _source = source;
         _folderPath = folderPath;
         _originalPath = originalPath;
@@ -298,11 +302,12 @@ public sealed partial class TaskEditorViewModel : ObservableObject
             return false;
         }
 
+        string savedPath;
         IsSaving = true;
         try
         {
             string? password = NeedsPassword ? Password : null;
-            SavedPath = await Task.Run(() => _store.Save(draft, _folderPath, _originalPath, password));
+            savedPath = await Task.Run(() => _store.Save(draft, _folderPath, _originalPath, password));
         }
         catch (TaskAccessDeniedException)
         {
@@ -325,6 +330,11 @@ public sealed partial class TaskEditorViewModel : ObservableObject
         {
             IsSaving = false;
         }
+
+        SavedPath = savedPath;
+        // A snooze knows its task only by the path, and a new name is a new path.
+        if (_originalPath is not null && !string.Equals(_originalPath, savedPath, StringComparison.OrdinalIgnoreCase))
+            await _snooze.TaskMovedAsync(_originalPath, savedPath);
 
         Problems = "";
         RememberCategoryAndTags(draft);

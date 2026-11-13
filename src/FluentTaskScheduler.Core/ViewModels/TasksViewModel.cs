@@ -6,6 +6,7 @@ using FluentTaskScheduler.History;
 using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Settings;
+using FluentTaskScheduler.Snoozing;
 
 namespace FluentTaskScheduler.ViewModels;
 
@@ -62,6 +63,7 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
     private readonly TaskEditorFactory _editors;
     private readonly ITaskFolders _folders;
     private readonly ITaskEventStream _stream;
+    private readonly ISnoozeService _snooze;
 
     // Every task, by path. The rows in here are the ones shown: a reload updates them in place,
     // so selection and scroll position survive it.
@@ -76,7 +78,8 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
     private bool _disposed;
 
     public TasksViewModel(ITaskStore store, ITaskRunner runner, ISettingsStore settings, IPrompts prompts, IFilePicker files,
-        IAppLifetime app, IUiThread ui, TimeProvider time, TaskEditorFactory editors, ITaskFolders folders, ITaskEventStream stream)
+        IAppLifetime app, IUiThread ui, TimeProvider time, TaskEditorFactory editors, ITaskFolders folders, ITaskEventStream stream,
+        ISnoozeService snooze)
     {
         _folders = folders;
         _store = store;
@@ -89,6 +92,7 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
         _time = time;
         _editors = editors;
         _stream = stream;
+        _snooze = snooze;
         _watchTimer = time.CreateTimer(_ => ui.Post(() => _ = CheckWatchedAsync()), null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
         _reloadTimer = time.CreateTimer(_ => ui.Post(ReloadAfterChange), null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
         _settings.Changed += OnSettingsChanged;
@@ -313,7 +317,9 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
         {
             try
             {
-                await Task.Run(() => _folders.MoveTask(task.Path, folderPath));
+                string newPath = await Task.Run(() => _folders.MoveTask(task.Path, folderPath));
+                // A snooze knows its task only by the path.
+                await _snooze.TaskMovedAsync(task.Path, newPath);
             }
             catch (Exception ex) when (IsTaskFailure(ex))
             {

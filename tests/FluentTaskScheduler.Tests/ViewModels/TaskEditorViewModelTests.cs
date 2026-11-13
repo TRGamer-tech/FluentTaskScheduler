@@ -18,6 +18,7 @@ public sealed class TaskEditorViewModelTests : IDisposable
     private readonly FakeAppLifetime _app = new() { IsElevated = true };
     private readonly ScriptedFilePicker _files = new();
     private readonly FakeTimeProvider _time = new(new DateTimeOffset(2031, 5, 6, 14, 17, 0, TimeSpan.Zero));
+    private readonly FakeSnoozeService _snooze = new();
     private readonly SettingsStore _settings;
 
     public TaskEditorViewModelTests() => _settings = new SettingsStore(_folder.Paths, _time);
@@ -29,7 +30,7 @@ public sealed class TaskEditorViewModelTests : IDisposable
     }
 
     private TaskEditorViewModel Edit(TaskDraft task, string? path = @"\Jobs\Nightly", params string[] otherTasks) =>
-        new TaskEditorFactory(_store, _settings, _app, _files, new FakeNetworkProfiles(new NetworkProfile(HomeNetwork, "Home")), _time)
+        new TaskEditorFactory(_store, _settings, _app, _files, new FakeNetworkProfiles(new NetworkProfile(HomeNetwork, "Home")), _time, _snooze)
             .Create(task, @"\Jobs", path, otherTasks);
 
     /// <summary>A task with nothing left at its default, as an administrator might have set it up elsewhere.</summary>
@@ -213,6 +214,44 @@ public sealed class TaskEditorViewModelTests : IDisposable
         Assert.Contains("Finance", _settings.Current.SavedCategories);
         Assert.Contains("pdf", _settings.Current.SavedTags);
         Assert.False(editor.HasProblems);
+        Assert.Empty(_snooze.Calls);
+    }
+
+    [Fact]
+    public async Task RenamingATask_TakesItsSnoozeAlong()
+    {
+        _store.Add(@"\Jobs\Nightly");
+        var editor = Edit(Elaborate());
+        editor.Name = "Daily";
+
+        Assert.True(await editor.SaveAsync());
+
+        Assert.Equal(@"\Jobs\Daily", editor.SavedPath);
+        Assert.Equal([@"TaskMoved \Jobs\Nightly -> \Jobs\Daily"], _snooze.Calls);
+    }
+
+    [Fact]
+    public async Task SavingATaskUnderItsName_LeavesItsSnoozeAlone()
+    {
+        _store.Add(@"\Jobs\Nightly");
+        var editor = Edit(Elaborate());
+        editor.Description = "Copies the week's work";
+
+        Assert.True(await editor.SaveAsync());
+
+        Assert.Empty(_snooze.Calls);
+    }
+
+    [Fact]
+    public async Task ARenameWindowsRefuses_LeavesTheSnoozeWithTheTask()
+    {
+        _store.Add(@"\Jobs\Nightly").Protected.Add(@"\Jobs\Nightly");
+        var editor = Edit(Elaborate());
+        editor.Name = "Daily";
+
+        Assert.False(await editor.SaveAsync());
+
+        Assert.Empty(_snooze.Calls);
     }
 
     [Fact]

@@ -14,6 +14,7 @@ public sealed class FoldersViewModelTests : IDisposable
     private readonly ScriptedPrompts _prompts = new();
     private readonly FakeAppLifetime _app = new() { IsElevated = true };
     private readonly FakeTimeProvider _time = new();
+    private readonly FakeSnoozeService _snooze = new();
     private readonly SettingsStore _settings;
     private readonly TasksViewModel _tasks;
     private readonly FoldersViewModel _folders;
@@ -23,9 +24,9 @@ public sealed class FoldersViewModelTests : IDisposable
         _settings = new SettingsStore(_folder.Paths, _time);
         var files = new ScriptedFilePicker();
         _tasks = new TasksViewModel(_store, new TaskRunner(_store, new FakeSnoozeGate(), new RecordingNotifier()), _settings, _prompts, files, _app,
-            new InlineUiThread(), _time, new TaskEditorFactory(_store, _settings, _app, files, new FakeNetworkProfiles(), _time), _taskFolders,
-            new FakeTaskEventStream());
-        _folders = new FoldersViewModel(_taskFolders, _tasks, _prompts, _app);
+            new InlineUiThread(), _time, new TaskEditorFactory(_store, _settings, _app, files, new FakeNetworkProfiles(), _time, _snooze), _taskFolders,
+            new FakeTaskEventStream(), _snooze);
+        _folders = new FoldersViewModel(_taskFolders, _tasks, _prompts, _app, _snooze);
     }
 
     public void Dispose()
@@ -126,6 +127,30 @@ public sealed class FoldersViewModelTests : IDisposable
 
         Assert.Equal([@"MoveFolder \Reports -> \Jobs\Reports"], _taskFolders.Calls);
         Assert.NotNull(Find(_folders.Roots, @"\Jobs\Reports"));
+    }
+
+    [Fact]
+    public async Task RenamingOrMovingAFolder_TakesTheSnoozesOfItsTasksAlong()
+    {
+        await _folders.ReloadAsync();
+        _prompts.Text = "Work";
+
+        await _folders.RenameAsync(Node(@"\Jobs"));
+        await _folders.MoveIntoAsync(Node(@"\Reports"), @"\Work");
+
+        Assert.Equal([@"FolderMoved \Jobs -> \Work", @"FolderMoved \Reports -> \Work\Reports"], _snooze.Calls);
+    }
+
+    [Fact]
+    public async Task AFolderThatCannotBeRenamed_KeepsTheSnoozesOfItsTasksWhereTheyAre()
+    {
+        await _folders.ReloadAsync();
+        _taskFolders.Fails = new TaskAccessDeniedException(@"\Jobs", new UnauthorizedAccessException());
+        _prompts.Text = "Work";
+
+        await _folders.RenameAsync(Node(@"\Jobs"));
+
+        Assert.Empty(_snooze.Calls);
     }
 
     [Fact]

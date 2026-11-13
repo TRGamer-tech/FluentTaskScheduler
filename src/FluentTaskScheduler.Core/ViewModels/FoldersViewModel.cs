@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Scheduling;
+using FluentTaskScheduler.Snoozing;
 
 namespace FluentTaskScheduler.ViewModels;
 
@@ -19,7 +20,7 @@ public sealed partial class FolderNode(string path, string name) : ObservableObj
 }
 
 /// <summary>The tree of task folders of one window, and what can be done with folders.</summary>
-public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewModel tasks, IPrompts prompts, IAppLifetime app) : ObservableObject
+public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewModel tasks, IPrompts prompts, IAppLifetime app, ISnoozeService snooze) : ObservableObject
 {
     /// <summary>The top of the tree: the one node that stands for the whole library.</summary>
     public ObservableCollection<FolderNode> Roots { get; } = [];
@@ -111,6 +112,8 @@ public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewMode
     private async Task MoveAsync(FolderNode folder, string newPath)
     {
         if (!await TryAsync(() => folders.MoveFolder(folder.Path, newPath))) return;
+        // Snoozes know their tasks only by their paths, and those have changed with the folder's.
+        await snooze.FolderMovedAsync(folder.Path, newPath);
         await AfterChangeAsync(folder.Path, newPath);
     }
 

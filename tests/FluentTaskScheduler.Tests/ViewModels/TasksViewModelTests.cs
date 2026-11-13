@@ -19,6 +19,8 @@ public sealed class TasksViewModelTests : IDisposable
     private readonly FakeAppLifetime _app = new() { IsElevated = true };
     private readonly FakeTimeProvider _time = new(new DateTimeOffset(2031, 5, 6, 14, 17, 0, TimeSpan.Zero));
     private readonly FakeTaskEventStream _stream = new();
+    private readonly FakeTaskFolders _taskFolders = new(@"\Reports", @"\Reports\Old");
+    private readonly FakeSnoozeService _snoozeService = new();
     private readonly SettingsStore _settings;
     private readonly TasksViewModel _tasks;
 
@@ -42,8 +44,8 @@ public sealed class TasksViewModelTests : IDisposable
 
     private TasksViewModel NewViewModel(IUiThread ui) =>
         new(_store, new TaskRunner(_store, _snooze, _notifier), _settings, _prompts, _files, _app, ui, _time,
-            new TaskEditorFactory(_store, _settings, _app, _files, new FakeNetworkProfiles(), _time),
-            new FakeTaskFolders(@"\Reports", @"\Reports\Old"), _stream);
+            new TaskEditorFactory(_store, _settings, _app, _files, new FakeNetworkProfiles(), _time, _snoozeService),
+            _taskFolders, _stream, _snoozeService);
 
     private string[] Shown => _tasks.Tasks.Select(row => row.Path).ToArray();
     private TaskRow Row(string path) => _tasks.Find(path)!;
@@ -446,6 +448,29 @@ public sealed class TasksViewModelTests : IDisposable
         await _tasks.DeleteCommand.ExecuteAsync(Row(@"\Backup"));
 
         Assert.Contains(@"\Backup", Shown);
+        Assert.Equal(["Error: Tasks.Error.Denied"], _prompts.Shown);
+    }
+
+    [Fact]
+    public async Task MovingTasksToAnotherFolder_TakesTheirSnoozesAlong()
+    {
+        await _tasks.ReloadAsync();
+        _tasks.Select([Row(@"\Backup"), Row(@"\cleanup")]);
+
+        await _tasks.MoveToFolderAsync(null, @"\Reports\Old");
+
+        Assert.Equal([@"TaskMoved \Backup -> \Reports\Old\Backup", @"TaskMoved \cleanup -> \Reports\Old\cleanup"], _snoozeService.Calls);
+    }
+
+    [Fact]
+    public async Task ATaskThatCannotBeMoved_KeepsItsSnoozeWhereItIs()
+    {
+        await _tasks.ReloadAsync();
+        _taskFolders.Fails = new TaskAccessDeniedException(@"\Backup", new UnauthorizedAccessException());
+
+        await _tasks.MoveToFolderAsync(Row(@"\Backup"), @"\Reports");
+
+        Assert.Empty(_snoozeService.Calls);
         Assert.Equal(["Error: Tasks.Error.Denied"], _prompts.Shown);
     }
 
