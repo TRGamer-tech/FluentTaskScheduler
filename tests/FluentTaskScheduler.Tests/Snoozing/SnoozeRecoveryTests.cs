@@ -1,3 +1,4 @@
+using System.Globalization;
 using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Snoozing;
 using FluentTaskScheduler.Tests.Support;
@@ -396,6 +397,23 @@ public sealed class SnoozeRecoveryTests : SnoozeTestBase
         Assert.NotNull(second.State.WindowOf(A));
         Assert.Null(second.State.UnreadableStateFile);
         Assert.Equal("damaged", File.ReadAllText(kept));
+    }
+
+    [Fact]
+    public void TheNameADamagedStateFileIsKeptUnder_IsTheSameWhateverTheUsersCalendar()
+    {
+        File.WriteAllText(StateFile, "damaged");
+        CultureInfo before = CultureInfo.CurrentCulture;
+        // Its calendar counts the years of the Buddhist era, in which 2026 is 2569.
+        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("th-TH");
+        try
+        {
+            Assert.Equal(Folder.File("snooze.unreadable-20260310-090000.json"), NewService().State.UnreadableStateFile);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = before;
+        }
     }
 
     [Fact]

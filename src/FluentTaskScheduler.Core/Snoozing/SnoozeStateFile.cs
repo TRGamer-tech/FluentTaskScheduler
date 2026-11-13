@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -118,7 +119,8 @@ internal sealed class SnoozeStateFile
 
     private string SetAside(DateTimeOffset now)
     {
-        string kept = Path.ChangeExtension(_path, $".unreadable-{now.UtcDateTime:yyyyMMdd-HHmmss}.json");
+        string stamp = now.UtcDateTime.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture);
+        string kept = Path.ChangeExtension(_path, $".unreadable-{stamp}.json");
         try
         {
             File.Move(_path, kept, overwrite: true);
