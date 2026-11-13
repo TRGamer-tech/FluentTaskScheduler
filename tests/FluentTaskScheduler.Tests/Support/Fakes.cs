@@ -1,4 +1,5 @@
 using FluentTaskScheduler.Notifications;
+using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.ViewModels;
 
 namespace FluentTaskScheduler.Tests.Support;
@@ -50,4 +51,36 @@ public sealed class ScriptedPrompts : IPrompts
         Shown.Add($"{title}: {message} [{confirmText}]");
         return Task.FromResult(Confirm);
     }
+}
+
+/// <summary>Hands out the file it was told to; null means the user cancels.</summary>
+public sealed class ScriptedFilePicker : IFilePicker
+{
+    public string? Choice { get; set; }
+
+    public Task<string?> PickOpenFileAsync(string title, string typeName, string extension) => Task.FromResult(Choice);
+    public Task<string?> PickSaveFileAsync(string title, string typeName, string extension, string suggestedFileName) => Task.FromResult(Choice);
+}
+
+public sealed class FakeAppLifetime : IAppLifetime
+{
+    public bool IsElevated { get; set; }
+    public bool ExitRequested { get; private set; }
+    public bool RestartElevatedRequested { get; private set; }
+
+    /// <summary>What <see cref="RestartElevated"/> answers: false stands for a declined consent prompt.</summary>
+    public bool UserConsents { get; set; } = true;
+
+    public void Exit() => ExitRequested = true;
+
+    public bool RestartElevated()
+    {
+        RestartElevatedRequested = true;
+        return UserConsents;
+    }
+}
+
+public sealed class FakeNetworkProfiles(params NetworkProfile[] profiles) : INetworkProfiles
+{
+    public IReadOnlyList<NetworkProfile> GetAll() => profiles;
 }

@@ -19,6 +19,9 @@ public sealed class FakeTaskStore : ITaskStore
     /// <summary>Every call that changed or started something, in order, e.g. "Run \Backup" or "SetEnabled \Backup False".</summary>
     public List<string> Calls { get; } = [];
 
+    /// <summary>The password the last <see cref="Save"/> was given.</summary>
+    public string? LastPassword { get; private set; }
+
     /// <summary>Called before each operation with its name and task path; throw from it to make the operation fail.</summary>
     public Action<string, string>? Before { get; set; }
 
@@ -56,6 +59,7 @@ public sealed class FakeTaskStore : ITaskStore
     {
         string path = folderPath.TrimEnd('\\') + "\\" + draft.Name;
         Change("Save", originalPath ?? path, mustExist: originalPath is not null);
+        LastPassword = password;
         if (originalPath is not null && !string.Equals(originalPath, path, StringComparison.OrdinalIgnoreCase))
         {
             _tasks.Remove(originalPath);
