@@ -41,11 +41,15 @@ public sealed class ConsoleCodePageTests : IDisposable
         byte[] switched = await Record("chcp after chcp 65001", Command($"\"{Chcp}\" 65001 >nul & \"{Chcp}\""));
         byte[] echo = await Record("echo", Command($"echo {Text}"));
         byte[] echoAfterSwitch = await Record("echo after chcp 65001, by the same cmd", Command($"\"{Chcp}\" 65001 >nul & echo {Text}"));
+        // The text comes as an argument, so that how cmd decodes the batch file itself plays no part.
+        string batchFile = _folder.File("chcp-then-echo.cmd");
+        File.WriteAllText(batchFile, $"@\"{Chcp}\" 65001 >nul\r\n@echo %~1\r\n");
+        await Record("echo on the line after chcp 65001, by the same cmd running a batch file", Command($"\"{batchFile}\" \"{Text}\""));
         await Record("echo by a cmd started after chcp 65001", WindowsTools.InUtf8Console(Cmd, $"/d /c echo {Text}"));
         await Record("echo by cmd /u", new ProcessRequest(Cmd, $"/d /u /c echo {Text}"));
 
         File.WriteAllText(_folder.File(Text + ".txt"), "");
-        await RecordWithAndWithoutSwitch("where", WindowsTools.InSystemFolder("where.exe"), $"/r \"{_folder.Path}\" *");
+        await RecordWithAndWithoutSwitch("where", WindowsTools.InSystemFolder("where.exe"), $"/r \"{_folder.Path}\" *.txt");
         await RecordWithAndWithoutSwitch("PowerShell", WindowsTools.PowerShell, $"-NoProfile -NonInteractive -Command \"Write-Output '{Text}'\"");
         // DISM names its log file when it fails, as it does at once for an image that does not exist.
         await RecordWithAndWithoutSwitch("DISM", WindowsTools.InSystemFolder("Dism.exe"),
