@@ -1,8 +1,10 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using FluentTaskScheduler.History;
+using FluentTaskScheduler.Library;
 using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Notifications;
+using FluentTaskScheduler.Processes;
 using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Settings;
 using FluentTaskScheduler.Shell;
@@ -95,6 +97,9 @@ public partial class App : Application, IAppLifetime, IDisposable
         services.AddSingleton<WindowManager>();
         services.AddSingleton<AppAppearance>();
         services.AddSingleton<Tray>();
+        services.AddSingleton<IProcessRunner, ProcessRunner>();
+        services.AddSingleton(provider => new ScriptStore(
+            provider.GetRequiredService<AppPaths>(), Path.Combine(AppContext.BaseDirectory, "Assets", "Scripts.json")));
 
         // One per window
         services.AddScoped<WindowContext>();
@@ -108,6 +113,12 @@ public partial class App : Application, IAppLifetime, IDisposable
         services.AddScoped<TasksViewModel>();
         services.AddScoped<FoldersViewModel>();
         services.AddScoped<TasksPage>();
+        services.AddScoped<QuickActionsViewModel>();
+        services.AddScoped<QuickActionsPage>();
+        services.AddScoped<ScriptEditorViewModel>();
+        services.AddScoped<ScriptEditorPage>();
+        services.AddScoped<LibraryViewModel>();
+        services.AddScoped<LibraryPage>();
 
         return services;
     }

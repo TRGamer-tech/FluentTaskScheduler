@@ -240,16 +240,16 @@ Jetzt App neustarten?</value></data>
   <data name="DashboardFailure.Text" xml:space="preserve"><value>Fehlgeschlagen</value></data>
 
   <data name="ScriptLibraryTitle.Text" xml:space="preserve"><value>Skriptbibliothek</value></data>
-  <data name="ScriptLibraryCreateBtn.Content" xml:space="preserve"><value>+ Neue Vorlage</value></data>
-  <data name="ScriptLibraryDeleteBtn.ToolTipService.ToolTip" xml:space="preserve"><value>Vorlage löschen</value></data>
-  <data name="ScriptLibraryUseTemplateBtn.Content" xml:space="preserve"><value>Aufgabe aus Vorlage erstellen</value></data>
+  <data name="ScriptLibraryCreateBtn.Content" xml:space="preserve"><value>Neues Skript</value></data>
+  <data name="ScriptLibraryDeleteBtn.ToolTipService.ToolTip" xml:space="preserve"><value>Skript löschen</value></data>
+  <data name="ScriptLibraryUseTemplateBtn.Content" xml:space="preserve"><value>Aufgabe aus Skript erstellen...</value></data>
   <data name="ScriptLibraryNewTemplateDialog.Title" xml:space="preserve"><value>Neue Vorlage</value></data>
   <data name="ScriptLibrarySaveBtn.PrimaryButtonText" xml:space="preserve"><value>Speichern</value></data>
   <data name="ScriptLibraryCancelBtn.CloseButtonText" xml:space="preserve"><value>Abbrechen</value></data>
   <data name="ScriptLibraryNameHeader.Header" xml:space="preserve"><value>Name</value></data>
   <data name="ScriptLibraryNamePlaceholder.PlaceholderText" xml:space="preserve"><value>z. B. Bereinigungsskript</value></data>
   <data name="ScriptLibraryDescHeader.Header" xml:space="preserve"><value>Beschreibung</value></data>
-  <data name="ScriptLibraryDescPlaceholder.PlaceholderText" xml:space="preserve"><value>Was macht diese Vorlage?</value></data>
+  <data name="ScriptLibraryDescPlaceholder.PlaceholderText" xml:space="preserve"><value>Was macht dieses Skript?</value></data>
   <data name="ScriptLibraryCommandHeader.Header" xml:space="preserve"><value>Befehl</value></data>
   <data name="ScriptLibraryCommandPlaceholder.PlaceholderText" xml:space="preserve"><value>z. B. powershell.exe</value></data>
   <data name="ScriptLibraryArgsHeader.Header" xml:space="preserve"><value>Argumente</value></data>
@@ -485,19 +485,19 @@ Jetzt App neustarten?</value></data>
   <data name="Settings.Lead.15m" xml:space="preserve"><value>15 Minuten vorher</value></data>
   <data name="Settings.Lead.30m" xml:space="preserve"><value>30 Minuten vorher</value></data>
   <data name="QuickActions.Title.Text" xml:space="preserve"><value>Schnellaktionen</value></data>
-  <data name="QuickActions.Description.Text" xml:space="preserve"><value>Führen Sie gängige Systemwartungsaufgaben mit einem Klick aus.</value></data>
+  <data name="QuickActions.Description.Text" xml:space="preserve"><value>Führe gängige Systemwartungsaufgaben mit einem Klick aus.</value></data>
   <data name="QuickActions.FlushDNS.Title" xml:space="preserve"><value>DNS-Cache leeren</value></data>
   <data name="QuickActions.FlushDNS.Desc" xml:space="preserve"><value>Löscht den DNS-Auflösungscache.</value></data>
   <data name="QuickActions.ClearTemp.Title" xml:space="preserve"><value>Temporäre Dateien löschen</value></data>
-  <data name="QuickActions.ClearTemp.Desc" xml:space="preserve"><value>Löscht Dateien aus den temporären Ordnern.</value></data>
+  <data name="QuickActions.ClearTemp.Desc" xml:space="preserve"><value>Löscht alles in deinem Temp-Ordner, was nicht in Verwendung ist.</value></data>
   <data name="QuickActions.RestartExplorer.Title" xml:space="preserve"><value>Explorer neu starten</value></data>
   <data name="QuickActions.RestartExplorer.Desc" xml:space="preserve"><value>Startet den Windows Explorer-Prozess neu.</value></data>
   <data name="QuickActions.IPReleaseRenew.Title" xml:space="preserve"><value>IP-Adresse erneuern</value></data>
-  <data name="QuickActions.IPReleaseRenew.Desc" xml:space="preserve"><value>Gibt die aktuelle IP-Adresse frei und erneuert sie.</value></data>
+  <data name="QuickActions.IPReleaseRenew.Desc" xml:space="preserve"><value>Fordert beim DHCP-Server für alle Netzwerkadapter eine neue Lease der IP-Adresse an.</value></data>
   <data name="QuickActions.SfcScannow.Title" xml:space="preserve"><value>Systemdateiprüfung (SFC)</value></data>
-  <data name="QuickActions.SfcScannow.Desc" xml:space="preserve"><value>Scannt und repariert beschädigte Systemdateien (erfordert Admin).</value></data>
+  <data name="QuickActions.SfcScannow.Desc" xml:space="preserve"><value>Prüft die Systemdateien und repariert beschädigte. Das kann eine Weile dauern.</value></data>
   <data name="QuickActions.DismHealth.Title" xml:space="preserve"><value>DISM-Gesundheitsprüfung</value></data>
-  <data name="QuickActions.DismHealth.Desc" xml:space="preserve"><value>Prüft auf Beschädigungen im Komponentenspeicher (erfordert Admin).</value></data>
+  <data name="QuickActions.DismHealth.Desc" xml:space="preserve"><value>Prüft, ob der Komponentenspeicher als beschädigt markiert ist.</value></data>
   <data name="QuickActions.RunBtn" xml:space="preserve"><value>Ausführen</value></data>
   <data name="QuickActions.Status.Running" xml:space="preserve"><value>Wird ausgeführt...</value></data>
   <data name="QuickActions.Status.Success" xml:space="preserve"><value>Erfolgreich</value></data>
@@ -509,7 +509,7 @@ Jetzt App neustarten?</value></data>
   <data name="ScriptEditor_SaveBtn.Label" xml:space="preserve"><value>In Bibliothek speichern</value></data>
   <data name="ScriptEditor_ClearBtn.Label" xml:space="preserve"><value>Konsole leeren</value></data>
   <data name="ScriptEditor_OutputHeader.Text" xml:space="preserve"><value>Ausgabekonsole</value></data>
-  <data name="ScriptEditor_CodeEditor.PlaceholderText" xml:space="preserve"><value>Schreib hier Dein PowerShell-Skript...</value></data>
+  <data name="ScriptEditor_CodeEditor.PlaceholderText" xml:space="preserve"><value>Schreib hier dein PowerShell-Skript...</value></data>
   <data name="ScriptEditor_CodeEditor.Header" xml:space="preserve"><value>PowerShell-Skript</value></data>
   <data name="ScriptEditor.Status.Starting" xml:space="preserve"><value>[PowerShell wird gestartet...]</value></data>
   <data name="ScriptEditor.Status.Stopped" xml:space="preserve"><value>[Vom Benutzer gestoppt]</value></data>
@@ -601,35 +601,35 @@ Jetzt App neustarten?</value></data>
   <data name="Templates.Subtitle" xml:space="preserve"><value>Einsatzbereite Vorlagen für gängige Automatisierungsaufgaben. Das Bereitstellen einer Vorlage öffnet den Aufgaben-Editor vorausgefüllt mit Befehl, Argumenten und einem empfohlenen Zeitplan.</value></data>
   <data name="Templates.Info.Title" xml:space="preserve"><value>Es wird erst etwas erstellt, wenn du speicherst</value></data>
   <data name="Templates.Info.Message" xml:space="preserve"><value>Überprüfe Befehl, Argumente und Auslöser im Editor, bevor du speicherst - einige Vorlagen löschen Dateien oder ändern den Systemzustand, manche benötigen Administratorrechte.</value></data>
-  <data name="Templates.Deploy" xml:space="preserve"><value>Vorlage bereitstellen</value></data>
+  <data name="Templates.Deploy" xml:space="preserve"><value>Vorlage bereitstellen...</value></data>
   <data name="Templates.Error.Deploy" xml:space="preserve"><value>Diese Vorlage konnte nicht geöffnet werden: </value></data>
   <data name="Templates.Group.Maintenance" xml:space="preserve"><value>Systemwartung</value></data>
   <data name="Templates.Group.Developer" xml:space="preserve"><value>Entwicklertools</value></data>
   <data name="Templates.Group.Power" xml:space="preserve"><value>Energie &amp; Dienstprogramme</value></data>
   <data name="Templates.TempCleanup.Name" xml:space="preserve"><value>Nächtliche Temp-Dateibereinigung</value></data>
-  <data name="Templates.TempCleanup.Desc" xml:space="preserve"><value>Löscht Dateien, die älter als 7 Tage sind, aus dem Benutzer- und dem Windows-Temp-Ordner. Noch verwendete Dateien werden übersprungen.</value></data>
+  <data name="Templates.TempCleanup.Desc" xml:space="preserve"><value>Löscht Dateien, die älter als 7 Tage sind, aus deinem Temp-Ordner. Noch verwendete Dateien werden übersprungen.</value></data>
   <data name="Templates.TempCleanup.Note" xml:space="preserve"><value>Löscht Dateien dauerhaft - überprüfe die Altersgrenze, bevor du bereitstellst.</value></data>
   <data name="Templates.UpdateHealth.Name" xml:space="preserve"><value>Windows Update-Statusprüfung</value></data>
-  <data name="Templates.UpdateHealth.Desc" xml:space="preserve"><value>Meldet ausstehende Windows-Updates und das Datum der letzten erfolgreichen Installation in eine Protokolldatei in deinem Dokumente-Ordner.</value></data>
+  <data name="Templates.UpdateHealth.Desc" xml:space="preserve"><value>Schreibt die Anzahl ausstehender Windows-Updates und das Datum des zuletzt installierten Updates in eine Protokolldatei in deinem Dokumente-Ordner.</value></data>
   <data name="Templates.UpdateHealth.Note" xml:space="preserve"><value>Erfordert Administratorrechte, um den Update-Agent abzufragen.</value></data>
-  <data name="Templates.Defrag.Name" xml:space="preserve"><value>Datenträgeroptimierung (Defrag / TRIM)</value></data>
-  <data name="Templates.Defrag.Desc" xml:space="preserve"><value>Führt den integrierten Windows-Optimierer auf dem Systemlaufwerk aus. SSDs erhalten ein TRIM/Retrim, HDDs werden defragmentiert.</value></data>
-  <data name="Templates.Defrag.Note" xml:space="preserve"><value>Erfordert Administratorrechte. Läuft nur, wenn der PC im Leerlauf ist und am Stromnetz hängt.</value></data>
-  <data name="Templates.GitFetch.Name" xml:space="preserve"><value>Git-Repository abrufen / sichern</value></data>
+  <data name="Templates.Defrag.Name" xml:space="preserve"><value>Datenträgeroptimierung (Defrag, TRIM)</value></data>
+  <data name="Templates.Defrag.Desc" xml:space="preserve"><value>Führt den integrierten Windows-Optimierer auf Laufwerk C: aus. SSDs erhalten ein TRIM/Retrim, HDDs werden defragmentiert.</value></data>
+  <data name="Templates.Defrag.Note" xml:space="preserve"><value>Läuft nur, wenn der PC im Leerlauf ist und am Stromnetz hängt. Ändere „C:“, falls Windows auf einem anderen Laufwerk liegt.</value></data>
+  <data name="Templates.GitFetch.Name" xml:space="preserve"><value>Git-Repositorys abrufen</value></data>
   <data name="Templates.GitFetch.Desc" xml:space="preserve"><value>Ruft mit Bereinigung alle Remotes für jedes Git-Repository ab, das in einem von dir gewählten Ordner gefunden wird. Passe den Pfad vor dem Speichern an.</value></data>
   <data name="Templates.GitFetch.Note" xml:space="preserve"><value>Ändere „C:\Repos“ in dein eigenes Repository-Stammverzeichnis und stelle sicher, dass Git im PATH liegt.</value></data>
   <data name="Templates.DockerPrune.Name" xml:space="preserve"><value>Docker-System bereinigen</value></data>
   <data name="Templates.DockerPrune.Desc" xml:space="preserve"><value>Entfernt gestoppte Container, ungenutzte Netzwerke, verwaiste Images und den Build-Cache, um Speicherplatz freizugeben.</value></data>
   <data name="Templates.DockerPrune.Note" xml:space="preserve"><value>Erfordert, dass Docker Desktop läuft. Löscht ungenutzte Docker-Daten dauerhaft.</value></data>
   <data name="Templates.LogRotation.Name" xml:space="preserve"><value>Tägliche Log-Rotation</value></data>
-  <data name="Templates.LogRotation.Desc" xml:space="preserve"><value>Komprimiert die *.log-Dateien von gestern in ein datiertes ZIP-Archiv und entfernt Archive, die älter als 30 Tage sind.</value></data>
+  <data name="Templates.LogRotation.Desc" xml:space="preserve"><value>Verschiebt die *.log-Dateien, die zuletzt vor dem heutigen Tag geschrieben wurden, in ein datiertes ZIP-Archiv und entfernt Archive, die älter als 30 Tage sind.</value></data>
   <data name="Templates.LogRotation.Note" xml:space="preserve"><value>Ändere „C:\Logs“ in dein eigenes Log-Verzeichnis, bevor du bereitstellst.</value></data>
   <data name="Templates.IdleShutdown.Name" xml:space="preserve"><value>Automatisches Herunterfahren nachts bei Leerlauf</value></data>
   <data name="Templates.IdleShutdown.Desc" xml:space="preserve"><value>Fährt den PC nachts herunter, aber erst nach einer Leerlaufphase - mit einer 60-Sekunden-Warnung, die du abbrechen kannst.</value></data>
   <data name="Templates.IdleShutdown.Note" xml:space="preserve"><value>Fährt den Rechner herunter. Ungespeicherte Arbeit in geöffneten Apps kann verloren gehen.</value></data>
-  <data name="Templates.BatterySaver.Name" xml:space="preserve"><value>Energiesparmodus-Aufgabenpause</value></data>
-  <data name="Templates.BatterySaver.Desc" xml:space="preserve"><value>Wechselt bei der Anmeldung zum Energiesparplan von Windows, damit Hintergrundarbeit im Akkubetrieb gedrosselt wird.</value></data>
-  <data name="Templates.BatterySaver.Note" xml:space="preserve"><value>Kombiniere dies mit dem Schalter für die globale Pause, um eigene Aufgaben im Akkubetrieb zu pausieren.</value></data>
+  <data name="Templates.BatterySaver.Name" xml:space="preserve"><value>Energiesparmodus bei Anmeldung</value></data>
+  <data name="Templates.BatterySaver.Desc" xml:space="preserve"><value>Wechselt bei jeder Anmeldung zum Windows-Energiesparplan „Energiesparmodus“. Der Plan bleibt aktiv, bis du einen anderen wählst.</value></data>
+  <data name="Templates.BatterySaver.Note" xml:space="preserve"><value>Geräte mit Modern Standby haben nur den Plan „Ausbalanciert“; dort schlägt die Aufgabe fehl.</value></data>
   <data name="Templates.RecycleBin.Name" xml:space="preserve"><value>Papierkorb wöchentlich leeren</value></data>
   <data name="Templates.RecycleBin.Desc" xml:space="preserve"><value>Leert den Papierkorb des aktuellen Benutzers einmal pro Woche ohne Bestätigungsabfrage.</value></data>
   <data name="Templates.RecycleBin.Note" xml:space="preserve"><value>Gelöschte Elemente werden nach dem Leeren des Papierkorbs unwiederbringlich.</value></data>
@@ -686,14 +686,14 @@ Jetzt App neustarten?</value></data>
   <data name="EventMsg.322" xml:space="preserve"><value>Die Aufgabenplanung hat die Aufgabe „{0}“ nicht gestartet, da bereits eine Instanz läuft.</value></data>
   <data name="Templates.RestorePoint.Name" xml:space="preserve"><value>Wöchentlicher Systemwiederherstellungspunkt</value></data>
   <data name="Templates.RestorePoint.Desc" xml:space="preserve"><value>Erstellt einmal pro Woche einen benannten Systemwiederherstellungspunkt, damit du immer ein aktuelles Rollback-Ziel hast.</value></data>
-  <data name="Templates.RestorePoint.Note" xml:space="preserve"><value>Erfordert Administratorrechte und aktivierten Systemschutz.</value></data>
+  <data name="Templates.RestorePoint.Note" xml:space="preserve"><value>Der Systemschutz muss für das Systemlaufwerk aktiviert sein.</value></data>
   <data name="Templates.SystemScan.Name" xml:space="preserve"><value>Systemdateiprüfung</value></data>
-  <data name="Templates.SystemScan.Desc" xml:space="preserve"><value>Führt eine DISM-Reparatur des Komponentenspeichers gefolgt von der Systemdateiprüfung aus und schreibt das Ergebnis in eine Protokolldatei in deinem Dokumente-Ordner.</value></data>
-  <data name="Templates.SystemScan.Note" xml:space="preserve"><value>Erfordert Administratorrechte und kann 15+ Minuten laufen.</value></data>
+  <data name="Templates.SystemScan.Desc" xml:space="preserve"><value>Führt eine DISM-Reparatur des Komponentenspeichers gefolgt von der Systemdateiprüfung aus und schreibt die Exitcodes beider in eine Protokolldatei in deinem Dokumente-Ordner.</value></data>
+  <data name="Templates.SystemScan.Note" xml:space="preserve"><value>Kann 15 Minuten oder länger laufen.</value></data>
   <data name="Templates.DnsFlush.Name" xml:space="preserve"><value>DNS-Cache bei Anmeldung leeren</value></data>
   <data name="Templates.DnsFlush.Desc" xml:space="preserve"><value>Leert den DNS-Auflösungs-Cache bei der Anmeldung - nützlich, wenn du häufig Netzwerke oder VPNs wechselst.</value></data>
   <data name="Templates.DnsFlush.Note" xml:space="preserve"><value>Erfordert Administratorrechte.</value></data>
-  <data name="Templates.NodePrune.Name" xml:space="preserve"><value>npm-/pnpm-Cache bereinigen</value></data>
+  <data name="Templates.NodePrune.Name" xml:space="preserve"><value>npm- und pnpm-Cache bereinigen</value></data>
   <data name="Templates.NodePrune.Desc" xml:space="preserve"><value>Überprüft und bereinigt den npm-Cache und entfernt veraltete pnpm-Store-Einträge, um mehrere Gigabyte zurückzugewinnen.</value></data>
   <data name="Templates.NodePrune.Note" xml:space="preserve"><value>Erfordert Node.js im PATH.</value></data>
   <data name="Templates.ProjectBackup.Name" xml:space="preserve"><value>Nächtliche Projektordner-Sicherung</value></data>
@@ -701,7 +701,7 @@ Jetzt App neustarten?</value></data>
   <data name="Templates.ProjectBackup.Note" xml:space="preserve"><value>/MIR löscht Dateien im Ziel, die im Quellordner nicht mehr existieren. Überprüfe zuerst beide Pfade.</value></data>
   <data name="Templates.DevServerRestart.Name" xml:space="preserve"><value>Windows-Dienst nächtlich neu starten</value></data>
   <data name="Templates.DevServerRestart.Desc" xml:space="preserve"><value>Startet einen langlaufenden Dienst (Build-Agent, Datenbank, lokaler Server) neu, um Speicherlecks zu beseitigen. Ändere den Dienstnamen vor dem Speichern.</value></data>
-  <data name="Templates.DevServerRestart.Note" xml:space="preserve"><value>Erfordert Administratorrechte. Ersetze „MSSQLSERVER“ durch deinen eigenen Dienstnamen.</value></data>
+  <data name="Templates.DevServerRestart.Note" xml:space="preserve"><value>Ersetze „YourServiceName“ durch den Namen des Dienstes.</value></data>
   <data name="Templates.DisplayOff.Name" xml:space="preserve"><value>Bildschirme bei Sperrung ausschalten</value></data>
   <data name="Templates.DisplayOff.Desc" xml:space="preserve"><value>Schaltet die Monitore aus, sobald du den Arbeitsplatz sperrst, statt auf das Energie-Timeout zu warten.</value></data>
   <data name="Templates.DisplayOff.Note" xml:space="preserve"><value>Stelle den Sitzungsstatus des Auslösers im Editor auf „Sperren“, falls noch nicht geschehen.</value></data>
@@ -790,7 +790,7 @@ Jetzt App neustarten?</value></data>
   <data name="Onboarding.Step6.Title" xml:space="preserve"><value>Vorhandene Aufgaben entdecken</value></data>
   <data name="Onboarding.Step7.Body" xml:space="preserve"><value>Gehen Sie zu den Einstellungen, um Mica-Hintergrund zu aktivieren, in die Taskleiste zu minimieren, die Protokollierung zu konfigurieren, den Start mit Windows einzurichten und mehr.</value></data>
   <data name="Onboarding.Step7.Title" xml:space="preserve"><value>Nach Ihren Wünschen anpassen</value></data>
-  <data name="ScriptLibrary.DeleteTemplate.Content" xml:space="preserve"><value>„{0}" löschen?</value></data>
+  <data name="ScriptLibrary.DeleteTemplate.Content" xml:space="preserve"><value>„{0}“ löschen?</value></data>
   <data name="ScriptLibrary.DeleteTemplate.Title" xml:space="preserve"><value>Skript löschen</value></data>
   <data name="Settings.UpdateApplyFailed.Content" xml:space="preserve"><value>Das Update konnte nicht angewendet werden. Überprüfen Sie das Protokoll für Details oder versuchen Sie es später erneut.</value></data>
   <data name="Snooze.IncludeMicrosoftTasks" xml:space="preserve"><value>Auch Microsofts eigene geplante Aufgaben pausieren (Defender, Windows Update, Wartung...)</value></data>
@@ -809,17 +809,17 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.Trigger.__Unsupported" xml:space="preserve"><value>Nicht unterstützter Trigger</value></data>
   <data name="Main.FoldersHeader" xml:space="preserve"><value>Ordner</value></data>
   <data name="Main.Nav.ScriptEditor" xml:space="preserve"><value>Skript-Editor</value></data>
-  <data name="Scripts.BatteryReport.Description" xml:space="preserve"><value>Erstellt einen Bericht zum Akkuzustand in Ihrem Benutzerordner.</value></data>
+  <data name="Scripts.BatteryReport.Description" xml:space="preserve"><value>Erstellt einen Bericht zum Akkuzustand in deinem Benutzerordner.</value></data>
   <data name="Scripts.BatteryReport.Name" xml:space="preserve"><value>Akkubericht</value></data>
   <data name="Scripts.CheckDisk.Description" xml:space="preserve"><value>Prüft das Laufwerk C: auf Fehler, ohne sie zu beheben (auch im laufenden Betrieb sicher).</value></data>
   <data name="Scripts.CheckDisk.Name" xml:space="preserve"><value>Datenträgerprüfung (nur Scan)</value></data>
-  <data name="Scripts.ClearTempFolder.Description" xml:space="preserve"><value>Löscht alle Dateien im Temp-Ordner des aktuellen Benutzers, um Speicherplatz freizugeben.</value></data>
+  <data name="Scripts.ClearTempFolder.Description" xml:space="preserve"><value>Löscht alles im Temp-Ordner des aktuellen Benutzers, was nicht in Verwendung ist, um Speicherplatz freizugeben.</value></data>
   <data name="Scripts.ClearTempFolder.Name" xml:space="preserve"><value>Temp-Ordner leeren</value></data>
-  <data name="Scripts.DiskCleanup.Description" xml:space="preserve"><value>Führt die Datenträgerbereinigung auf dem Systemlaufwerk aus.</value></data>
+  <data name="Scripts.DiskCleanup.Description" xml:space="preserve"><value>Führt die Datenträgerbereinigung mit den Optionen aus, die du einmalig mit „cleanmgr /sageset:1“ gespeichert hast.</value></data>
   <data name="Scripts.DiskCleanup.Name" xml:space="preserve"><value>Datenträgerbereinigung (System)</value></data>
   <data name="Scripts.EmptyRecycleBin.Description" xml:space="preserve"><value>Löscht alle Elemente im Papierkorb endgültig.</value></data>
   <data name="Scripts.EmptyRecycleBin.Name" xml:space="preserve"><value>Papierkorb leeren</value></data>
-  <data name="Scripts.ExportIpConfig.Description" xml:space="preserve"><value>Speichert die vollständigen IP-Konfigurationsdetails in Ihrem Benutzerordner.</value></data>
+  <data name="Scripts.ExportIpConfig.Description" xml:space="preserve"><value>Speichert die vollständigen IP-Konfigurationsdetails in deinem Benutzerordner.</value></data>
   <data name="Scripts.ExportIpConfig.Name" xml:space="preserve"><value>IP-Konfiguration exportieren</value></data>
   <data name="Scripts.FlushDns.Description" xml:space="preserve"><value>Leert den DNS-Auflösungscache.</value></data>
   <data name="Scripts.FlushDns.Name" xml:space="preserve"><value>DNS-Cache leeren</value></data>
@@ -985,4 +985,27 @@ Jetzt App neustarten?</value></data>
   <data name="SystemEvent.Resume" xml:space="preserve"><value>Computer aus dem Energiesparmodus aufgewacht</value></data>
   <data name="SystemEvent.Logon" xml:space="preserve"><value>Ein Benutzer hat sich angemeldet</value></data>
   <data name="SystemEvent.Logoff" xml:space="preserve"><value>Ein Benutzer hat sich abgemeldet</value></data>
+  <data name="Elevation.Required" xml:space="preserve"><value>Erfordert Administratorrechte</value></data>
+  <data name="QuickActions.NotElevated" xml:space="preserve"><value>Die App läuft ohne Administratorrechte, daher sind einige Aktionen nicht verfügbar.</value></data>
+  <data name="QuickActions.RestartElevated" xml:space="preserve"><value>Als Administrator neu starten</value></data>
+  <data name="QuickActions.Status.ExitCode" xml:space="preserve"><value>Fehlgeschlagen (Exitcode {0})</value></data>
+  <data name="QuickActions.Status.Cancelled" xml:space="preserve"><value>Abgebrochen</value></data>
+  <data name="QuickActions.ClearTemp.Confirm" xml:space="preserve"><value>Alles in deinem Temp-Ordner löschen? Dateien, die in Verwendung sind, werden übersprungen.</value></data>
+  <data name="QuickActions.RestartExplorer.Confirm" xml:space="preserve"><value>Windows-Explorer neu starten? Geöffnete Ordnerfenster werden geschlossen, und die Taskleiste verschwindet kurz.</value></data>
+  <data name="ScriptEditor.CopyOutput" xml:space="preserve"><value>Ausgabe kopieren</value></data>
+  <data name="ScriptEditor.Status.ExitCode" xml:space="preserve"><value>[Mit Code {0} beendet]</value></data>
+  <data name="ScriptEditor.Error.Start" xml:space="preserve"><value>Das Skript konnte nicht gestartet werden: {0}</value></data>
+  <data name="ScriptEditor.Error.Save" xml:space="preserve"><value>Das Skript konnte nicht gespeichert werden: {0}</value></data>
+  <data name="ScriptEditor.Error.Open" xml:space="preserve"><value>Das Skript „{0}“ konnte nicht geöffnet werden: {1}</value></data>
+  <data name="ScriptEditor.Error.NameTaken" xml:space="preserve"><value>Ein anderes Skript trägt bereits den Namen „{0}“. Wähle einen anderen Namen.</value></data>
+  <data name="ScriptEditor.Discard.Title" xml:space="preserve"><value>Änderungen verwerfen?</value></data>
+  <data name="ScriptEditor.Discard.Message" xml:space="preserve"><value>Das Skript im Editor enthält Änderungen, die nicht gespeichert wurden.</value></data>
+  <data name="ScriptEditor.Discard.Confirm" xml:space="preserve"><value>Verwerfen</value></data>
+  <data name="Library.EditScript" xml:space="preserve"><value>Skript bearbeiten</value></data>
+  <data name="ScriptLibrary.DeleteScript.TasksWarning" xml:space="preserve"><value>Aufgaben, die aus diesem Skript erstellt wurden, führen seine Datei aus und schlagen fehl, sobald sie gelöscht ist.</value></data>
+  <data name="Library.Scripts.ListSetAside" xml:space="preserve"><value>Die Liste deiner gespeicherten Skripte konnte nicht gelesen werden. Sie wurde als {0} aufbewahrt, und die Bibliothek hat eine neue begonnen.</value></data>
+  <data name="Library.Scripts.LoadFailed" xml:space="preserve"><value>Deine gespeicherten Skripte konnten nicht gelesen werden: {0}</value></data>
+  <data name="Library.Scripts.DeleteFailed" xml:space="preserve"><value>Das Skript konnte nicht gelöscht werden: {0}</value></data>
+  <data name="Templates.IdleShutdown.Comment" xml:space="preserve"><value>Geplantes Herunterfahren. Zum Abbrechen ausführen: shutdown /a</value></data>
+  <data name="Templates.WeeklyReboot.Comment" xml:space="preserve"><value>Geplanter Neustart. Zum Abbrechen ausführen: shutdown /a</value></data>
 </root>

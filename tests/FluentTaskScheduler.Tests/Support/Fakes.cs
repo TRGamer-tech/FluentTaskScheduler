@@ -148,3 +148,42 @@ public sealed class FakeTaskFolders(params string[] folders) : ITaskFolders
         Calls.Add(call);
     }
 }
+
+/// <summary>Records where a view model sent the window, and answers a request for a new task from a script.</summary>
+public sealed class RecordingNavigator : IShellNavigator
+{
+    /// <summary>What was asked for, in order, e.g. "ShowScriptEditor" or "ShowTask \Backup".</summary>
+    public List<string> Calls { get; } = [];
+
+    /// <summary>The drafts the task editor was opened with.</summary>
+    public List<TaskDraft> Drafts { get; } = [];
+
+    /// <summary>The path <see cref="CreateTaskAsync"/> reports; null as if the user cancelled the editor.</summary>
+    public string? CreatedTaskPath { get; set; }
+
+    public void ShowTask(string taskPath) => Calls.Add($"ShowTask {taskPath}");
+
+    public Task<string?> CreateTaskAsync(TaskDraft template)
+    {
+        Calls.Add($"CreateTask {template.Name}");
+        Drafts.Add(template);
+        return Task.FromResult(CreatedTaskPath);
+    }
+
+    public void ShowScriptEditor() => Calls.Add("ShowScriptEditor");
+}
+
+/// <summary>A UI thread that is busy until the test lets it run what was posted to it.</summary>
+public sealed class BusyUiThread : IUiThread
+{
+    private readonly Queue<Action> _posted = new();
+
+    public int PostedCount => _posted.Count;
+
+    public void Post(Action action) => _posted.Enqueue(action);
+
+    public void RunPosted()
+    {
+        while (_posted.TryDequeue(out Action? action)) action();
+    }
+}

@@ -1,104 +1,78 @@
 [
   {
     "Id": "SystemFileChecker",
-    "Name": "System File Checker",
-    "Description": "Scans for and restores corrupted system files.",
-    "Command": "sfc",
+    "Command": "sfc.exe",
     "Arguments": "/scannow",
     "RunAsAdmin": true
   },
   {
     "Id": "DiskCleanup",
-    "Name": "Disk Cleanup (System)",
-    "Description": "Runs Disk Cleanup on the system drive.",
     "Command": "cleanmgr.exe",
-    "Arguments": "/d c: /sageset:1",
+    "Arguments": "/sagerun:1",
     "RunAsAdmin": true
   },
   {
     "Id": "CheckDisk",
-    "Name": "Check Disk (Scan Only)",
-    "Description": "Scans the C: drive for errors without fixing them (safe to run while in use).",
-    "Command": "chkdsk",
-    "Arguments": "c: /scan",
+    "Command": "chkdsk.exe",
+    "Arguments": "C: /scan",
     "RunAsAdmin": true
   },
   {
     "Id": "ClearTempFolder",
-    "Name": "Clear Temp Folder",
-    "Description": "Deletes all files in the current user's Temp folder to free up space.",
     "Command": "powershell.exe",
-    "Arguments": "-ExecutionPolicy Bypass -Command \"Remove-Item -Path $env:TEMP\\* -Recurse -Force -ErrorAction SilentlyContinue\"",
+    "Arguments": "-NoProfile -NonInteractive -ExecutionPolicy Bypass -WindowStyle Hidden -Command \"Remove-Item -Path (Join-Path $env:TEMP '*') -Recurse -Force -ErrorAction SilentlyContinue; exit 0\"",
     "RunAsAdmin": false
   },
   {
     "Id": "SystemInfoReport",
-    "Name": "System Info Report",
-    "Description": "Generates a detailed system report and saves it to a file.",
     "Command": "cmd.exe",
     "Arguments": "/c systeminfo > \"%USERPROFILE%\\SystemInfo.txt\"",
     "RunAsAdmin": false
   },
   {
     "Id": "NetworkCheck",
-    "Name": "Network Connectivity Check",
-    "Description": "Pings Google DNS to check internet connectivity.",
     "Command": "ping.exe",
     "Arguments": "8.8.8.8 -n 4",
     "RunAsAdmin": false
   },
   {
     "Id": "FlushDns",
-    "Name": "Flush DNS Cache",
-    "Description": "Clears the DNS resolver cache.",
     "Command": "ipconfig.exe",
     "Arguments": "/flushdns",
     "RunAsAdmin": false
   },
   {
     "Id": "Shutdown",
-    "Name": "Shutdown Computer",
-    "Description": "Shuts down the computer after one hour.",
     "Command": "shutdown.exe",
     "Arguments": "/s /t 3600",
-    "RunAsAdmin": true
+    "RunAsAdmin": false
   },
   {
     "Id": "Reboot",
-    "Name": "Reboot Computer",
-    "Description": "Restarts the computer after one hour.",
     "Command": "shutdown.exe",
     "Arguments": "/r /t 3600",
-    "RunAsAdmin": true
+    "RunAsAdmin": false
   },
   {
     "Id": "RestartPrintSpooler",
-    "Name": "Restart Print Spooler",
-    "Description": "Restarts the Print Spooler service to fix stuck print jobs.",
     "Command": "powershell.exe",
-    "Arguments": "-ExecutionPolicy Bypass -Command \"Restart-Service -Name Spooler -Force\"",
+    "Arguments": "-NoProfile -NonInteractive -ExecutionPolicy Bypass -WindowStyle Hidden -Command \"Restart-Service -Name Spooler -Force\"",
     "RunAsAdmin": true
   },
   {
     "Id": "BatteryReport",
-    "Name": "Battery Report",
-    "Description": "Generates a battery health report in your user folder.",
     "Command": "cmd.exe",
     "Arguments": "/c powercfg /batteryreport /output \"%USERPROFILE%\\battery-report.html\"",
-    "RunAsAdmin": true
+    "RunAsAdmin": false
   },
   {
     "Id": "EmptyRecycleBin",
-    "Name": "Empty Recycle Bin",
-    "Description": "Permanently deletes all items in the Recycle Bin.",
     "Command": "powershell.exe",
-    "Arguments": "-ExecutionPolicy Bypass -Command \"Clear-RecycleBin -Force -ErrorAction SilentlyContinue\"",
+    "Arguments": "-NoProfile -NonInteractive -ExecutionPolicy Bypass -WindowStyle Hidden -Command \"Clear-RecycleBin -Force -ErrorAction SilentlyContinue; exit 0\"",
     "RunAsAdmin": false
   },
   {
     "Id": "ExportIpConfig",
-    "Name": "Export IP Configuration",
-    "Description": "Saves full IP configuration details to your user folder.",
     "Command": "cmd.exe",
     "Arguments": "/c ipconfig /all > \"%USERPROFILE%\\ipconfig.txt\"",
     "RunAsAdmin": false

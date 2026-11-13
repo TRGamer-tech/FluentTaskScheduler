@@ -25,9 +25,9 @@ public sealed partial class ShellPage : Page, IShellNavigator
     {
         ["Tasks"] = new(typeof(TasksPage), "Main.Header.ScheduledTasks"),
         ["Dashboard"] = new(typeof(DashboardPage), "Main.Header.Dashboard", CreatedByFrame: true),
-        ["QuickActions"] = new(typeof(QuickActionsPage), "Main.Header.QuickActions", CreatedByFrame: true),
-        ["ScriptLibrary"] = new(typeof(ScriptLibraryPage), "Main.Header.Library", CreatedByFrame: true),
-        ["ScriptEditor"] = new(typeof(ScriptEditorPage), "Main.Header.ScriptEditor.Text", CreatedByFrame: true),
+        ["QuickActions"] = new(typeof(QuickActionsPage), "Main.Header.QuickActions"),
+        ["ScriptLibrary"] = new(typeof(LibraryPage), "Main.Header.Library"),
+        ["ScriptEditor"] = new(typeof(ScriptEditorPage), "Main.Header.ScriptEditor.Text"),
         ["Settings"] = new(typeof(SettingsPage), "Main.Header.Settings", CreatedByFrame: true)
     };
 
@@ -78,6 +78,8 @@ public sealed partial class ShellPage : Page, IShellNavigator
         Navigate("Tasks");
         return _windowServices.GetRequiredService<TasksPage>().CreateTaskAsync(template);
     }
+
+    public void ShowScriptEditor() => Navigate("ScriptEditor");
 
     private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {

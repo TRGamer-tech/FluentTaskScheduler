@@ -240,16 +240,16 @@
   <data name="DashboardFailure.Text" xml:space="preserve"><value>失敗</value></data>
 
   <data name="ScriptLibraryTitle.Text" xml:space="preserve"><value>スクリプトライブラリ</value></data>
-  <data name="ScriptLibraryCreateBtn.Content" xml:space="preserve"><value>+ 新規テンプレート</value></data>
-  <data name="ScriptLibraryDeleteBtn.ToolTipService.ToolTip" xml:space="preserve"><value>テンプレートを削除</value></data>
-  <data name="ScriptLibraryUseTemplateBtn.Content" xml:space="preserve"><value>このテンプレートを使用してタスクを作成</value></data>
+  <data name="ScriptLibraryCreateBtn.Content" xml:space="preserve"><value>新しいスクリプト</value></data>
+  <data name="ScriptLibraryDeleteBtn.ToolTipService.ToolTip" xml:space="preserve"><value>スクリプトを削除</value></data>
+  <data name="ScriptLibraryUseTemplateBtn.Content" xml:space="preserve"><value>スクリプトからタスクを作成...</value></data>
   <data name="ScriptLibraryNewTemplateDialog.Title" xml:space="preserve"><value>新規テンプレート</value></data>
   <data name="ScriptLibrarySaveBtn.PrimaryButtonText" xml:space="preserve"><value>保存</value></data>
   <data name="ScriptLibraryCancelBtn.CloseButtonText" xml:space="preserve"><value>キャンセル</value></data>
   <data name="ScriptLibraryNameHeader.Header" xml:space="preserve"><value>名前</value></data>
   <data name="ScriptLibraryNamePlaceholder.PlaceholderText" xml:space="preserve"><value>例: クリーンアップスクリプト</value></data>
   <data name="ScriptLibraryDescHeader.Header" xml:space="preserve"><value>説明</value></data>
-  <data name="ScriptLibraryDescPlaceholder.PlaceholderText" xml:space="preserve"><value>このテンプレートは何をしますか？</value></data>
+  <data name="ScriptLibraryDescPlaceholder.PlaceholderText" xml:space="preserve"><value>このスクリプトは何をしますか？</value></data>
   <data name="ScriptLibraryCommandHeader.Header" xml:space="preserve"><value>コマンド</value></data>
   <data name="ScriptLibraryCommandPlaceholder.PlaceholderText" xml:space="preserve"><value>例: powershell.exe</value></data>
   <data name="ScriptLibraryArgsHeader.Header" xml:space="preserve"><value>引数</value></data>
@@ -489,21 +489,21 @@
   <data name="QuickActions.FlushDNS.Title" xml:space="preserve"><value>DNSキャッシュのクリア</value></data>
   <data name="QuickActions.FlushDNS.Desc" xml:space="preserve"><value>DNSリゾルバーキャッシュを消去します。</value></data>
   <data name="QuickActions.ClearTemp.Title" xml:space="preserve"><value>一時ファイルのクリーンアップ</value></data>
-  <data name="QuickActions.ClearTemp.Desc" xml:space="preserve"><value>一時フォルダーからファイルを削除します。</value></data>
+  <data name="QuickActions.ClearTemp.Desc" xml:space="preserve"><value>一時フォルダー内の使用中でないものをすべて削除します。</value></data>
   <data name="QuickActions.RestartExplorer.Title" xml:space="preserve"><value>エクスプローラーの再起動</value></data>
   <data name="QuickActions.RestartExplorer.Desc" xml:space="preserve"><value>Windowsエクスプローラーのプロセスを再起動します。</value></data>
   <data name="QuickActions.IPReleaseRenew.Title" xml:space="preserve"><value>IPアドレスの更新</value></data>
-  <data name="QuickActions.IPReleaseRenew.Desc" xml:space="preserve"><value>現在のIPアドレスを解放して更新します。</value></data>
+  <data name="QuickActions.IPReleaseRenew.Desc" xml:space="preserve"><value>すべてのネットワークアダプターについて、DHCP サーバーに IP アドレスのリースの更新を要求します。</value></data>
   <data name="QuickActions.SfcScannow.Title" xml:space="preserve"><value>システムファイルチェッカー (SFC)</value></data>
-  <data name="QuickActions.SfcScannow.Desc" xml:space="preserve"><value>破損したシステムファイルをスキャンして修復します（管理者権限が必要）。</value></data>
+  <data name="QuickActions.SfcScannow.Desc" xml:space="preserve"><value>破損したシステムファイルをスキャンして修復します。しばらく時間がかかることがあります。</value></data>
   <data name="QuickActions.DismHealth.Title" xml:space="preserve"><value>DISMヘルスチェック</value></data>
-  <data name="QuickActions.DismHealth.Desc" xml:space="preserve"><value>コンポーネントストアの破損をチェックします（管理者権限が必要）。</value></data>
+  <data name="QuickActions.DismHealth.Desc" xml:space="preserve"><value>コンポーネントストアが破損としてマークされていないかを確認します。</value></data>
   <data name="QuickActions.RunBtn" xml:space="preserve"><value>実行</value></data>
   <data name="QuickActions.Status.Running" xml:space="preserve"><value>実行中...</value></data>
   <data name="QuickActions.Status.Success" xml:space="preserve"><value>成功</value></data>
   <data name="QuickActions.Status.Error" xml:space="preserve"><value>エラー</value></data>
   <data name="Main.Nav.QuickActions" xml:space="preserve"><value>クイックアクション</value></data>
-  <data name="Main.Header.ScriptEditor.Text" xml:space="preserve"><value>スクリプトエディタ</value></data>
+  <data name="Main.Header.ScriptEditor.Text" xml:space="preserve"><value>スクリプト エディター</value></data>
   <data name="ScriptEditor_RunBtn.Label" xml:space="preserve"><value>実行</value></data>
   <data name="ScriptEditor_StopBtn.Label" xml:space="preserve"><value>停止</value></data>
   <data name="ScriptEditor_SaveBtn.Label" xml:space="preserve"><value>ライブラリに保存</value></data>
@@ -601,35 +601,35 @@
   <data name="Templates.Subtitle" xml:space="preserve"><value>一般的な自動化作業向けの、すぐに使えるプリセットです。テンプレートを展開すると、コマンド・引数・推奨スケジュールが入力された状態でタスクエディターが開きます。</value></data>
   <data name="Templates.Info.Title" xml:space="preserve"><value>保存するまで何も作成されません</value></data>
   <data name="Templates.Info.Message" xml:space="preserve"><value>保存する前にエディターでコマンド・引数・トリガーを確認してください。一部のテンプレートはファイルを削除したりシステム状態を変更したりします。管理者権限が必要なものもあります。</value></data>
-  <data name="Templates.Deploy" xml:space="preserve"><value>テンプレートを展開</value></data>
+  <data name="Templates.Deploy" xml:space="preserve"><value>テンプレートを展開...</value></data>
   <data name="Templates.Error.Deploy" xml:space="preserve"><value>このテンプレートを開けませんでした: </value></data>
   <data name="Templates.Group.Maintenance" xml:space="preserve"><value>システムメンテナンス</value></data>
   <data name="Templates.Group.Developer" xml:space="preserve"><value>開発者ツール</value></data>
   <data name="Templates.Group.Power" xml:space="preserve"><value>電源とユーティリティ</value></data>
   <data name="Templates.TempCleanup.Name" xml:space="preserve"><value>夜間の一時ファイルクリーンアップ</value></data>
-  <data name="Templates.TempCleanup.Desc" xml:space="preserve"><value>ユーザーおよび Windows の一時フォルダーから7日以上経過したファイルを削除します。使用中のファイルはスキップされます。</value></data>
+  <data name="Templates.TempCleanup.Desc" xml:space="preserve"><value>ユーザーの一時フォルダーから7日以上経過したファイルを削除します。使用中のファイルはスキップされます。</value></data>
   <data name="Templates.TempCleanup.Note" xml:space="preserve"><value>ファイルを完全に削除します。展開前に経過日数のしきい値を確認してください。</value></data>
   <data name="Templates.UpdateHealth.Name" xml:space="preserve"><value>Windows Update ヘルスチェック</value></data>
-  <data name="Templates.UpdateHealth.Desc" xml:space="preserve"><value>保留中の Windows Update と最後に成功したインストール日を、ドキュメントフォルダー内のログファイルに記録します。</value></data>
+  <data name="Templates.UpdateHealth.Desc" xml:space="preserve"><value>保留中の Windows Update の件数と最後にインストールされた更新の日付を、ドキュメントフォルダー内のログファイルに記録します。</value></data>
   <data name="Templates.UpdateHealth.Note" xml:space="preserve"><value>更新エージェントに問い合わせるには管理者権限が必要です。</value></data>
-  <data name="Templates.Defrag.Name" xml:space="preserve"><value>ディスク最適化（デフラグ / TRIM）</value></data>
-  <data name="Templates.Defrag.Desc" xml:space="preserve"><value>システムドライブで Windows 標準の最適化を実行します。SSD には TRIM/再TRIM が、HDD にはデフラグが行われます。</value></data>
-  <data name="Templates.Defrag.Note" xml:space="preserve"><value>管理者権限が必要です。PC がアイドル状態かつ AC 電源接続時のみ実行されます。</value></data>
-  <data name="Templates.GitFetch.Name" xml:space="preserve"><value>Git リポジトリの取得 / バックアップ</value></data>
+  <data name="Templates.Defrag.Name" xml:space="preserve"><value>ディスク最適化（デフラグ・TRIM）</value></data>
+  <data name="Templates.Defrag.Desc" xml:space="preserve"><value>C: ドライブで Windows 標準の最適化を実行します。SSD には TRIM/再TRIM が、HDD にはデフラグが行われます。</value></data>
+  <data name="Templates.Defrag.Note" xml:space="preserve"><value>PC がアイドル状態かつ AC 電源接続時のみ実行されます。Windows が別のドライブにある場合は「C:」を変更してください。</value></data>
+  <data name="Templates.GitFetch.Name" xml:space="preserve"><value>Git リポジトリの取得</value></data>
   <data name="Templates.GitFetch.Desc" xml:space="preserve"><value>選択したフォルダー配下で見つかったすべての Git リポジトリについて、プルーニングを行いながら全リモートを fetch します。保存前にパスを編集してください。</value></data>
   <data name="Templates.GitFetch.Note" xml:space="preserve"><value>「C:\Repos」を自分のリポジトリのルートに変更し、git が PATH に含まれていることを確認してください。</value></data>
   <data name="Templates.DockerPrune.Name" xml:space="preserve"><value>Docker システムのプルーニング</value></data>
   <data name="Templates.DockerPrune.Desc" xml:space="preserve"><value>停止中のコンテナー、未使用のネットワーク、不要なイメージ、ビルドキャッシュを削除してディスク容量を確保します。</value></data>
   <data name="Templates.DockerPrune.Note" xml:space="preserve"><value>Docker Desktop の実行が必要です。未使用の Docker データを完全に削除します。</value></data>
   <data name="Templates.LogRotation.Name" xml:space="preserve"><value>毎日のログローテーション</value></data>
-  <data name="Templates.LogRotation.Desc" xml:space="preserve"><value>前日の *.log ファイルを日付付きの ZIP アーカイブに圧縮し、30日以上経過したアーカイブを削除します。</value></data>
+  <data name="Templates.LogRotation.Desc" xml:space="preserve"><value>今日より前に最後に書き込まれた *.log ファイルを日付付きの ZIP アーカイブに移動し、30日以上経過したアーカイブを削除します。</value></data>
   <data name="Templates.LogRotation.Note" xml:space="preserve"><value>展開前に「C:\Logs」を自分のログディレクトリに変更してください。</value></data>
   <data name="Templates.IdleShutdown.Name" xml:space="preserve"><value>夜間アイドル時の自動シャットダウン</value></data>
   <data name="Templates.IdleShutdown.Desc" xml:space="preserve"><value>夜間、PC がアイドル状態になった後にのみシャットダウンします。60秒間の警告表示中にキャンセルできます。</value></data>
   <data name="Templates.IdleShutdown.Note" xml:space="preserve"><value>コンピューターがシャットダウンします。開いているアプリの未保存の作業は失われる可能性があります。</value></data>
-  <data name="Templates.BatterySaver.Name" xml:space="preserve"><value>バッテリーセーバー時のタスク一時停止</value></data>
-  <data name="Templates.BatterySaver.Desc" xml:space="preserve"><value>サインイン時に Windows を省電力プランに切り替え、バッテリー駆動時のバックグラウンド処理を抑制します。</value></data>
-  <data name="Templates.BatterySaver.Note" xml:space="preserve"><value>グローバルスヌーズと組み合わせて使うと、バッテリー駆動時に自分のタスクも一時停止できます。</value></data>
+  <data name="Templates.BatterySaver.Name" xml:space="preserve"><value>サインイン時に省電力プランへ切り替え</value></data>
+  <data name="Templates.BatterySaver.Desc" xml:space="preserve"><value>サインインするたびに Windows を省電力プランに切り替えます。別のプランを選ぶまで、このプランが有効なままです。</value></data>
+  <data name="Templates.BatterySaver.Note" xml:space="preserve"><value>モダンスタンバイ対応のデバイスには「バランス」プランしかないため、そこではタスクが失敗します。</value></data>
   <data name="Templates.RecycleBin.Name" xml:space="preserve"><value>ごみ箱を毎週空にする</value></data>
   <data name="Templates.RecycleBin.Desc" xml:space="preserve"><value>確認プロンプトなしで、現在のユーザーのごみ箱を週に1回空にします。</value></data>
   <data name="Templates.RecycleBin.Note" xml:space="preserve"><value>ごみ箱を空にすると、削除された項目は復元できなくなります。</value></data>
@@ -686,14 +686,14 @@
   <data name="EventMsg.322" xml:space="preserve"><value>既にインスタンスが実行中のため、タスクスケジューラはタスク「{0}」を起動しませんでした。</value></data>
   <data name="Templates.RestorePoint.Name" xml:space="preserve"><value>毎週のシステム復元ポイント</value></data>
   <data name="Templates.RestorePoint.Desc" xml:space="preserve"><value>週に1回、名前付きのシステム復元ポイントを作成し、常に最近のロールバック先を確保します。</value></data>
-  <data name="Templates.RestorePoint.Note" xml:space="preserve"><value>管理者権限とシステムの保護の有効化が必要です。</value></data>
+  <data name="Templates.RestorePoint.Note" xml:space="preserve"><value>システムドライブでシステムの保護が有効になっている必要があります。</value></data>
   <data name="Templates.SystemScan.Name" xml:space="preserve"><value>システムファイルの整合性スキャン</value></data>
-  <data name="Templates.SystemScan.Desc" xml:space="preserve"><value>DISM によるコンポーネントストアの修復に続けてシステムファイルチェッカーを実行し、結果をドキュメントフォルダー内のログに記録します。</value></data>
-  <data name="Templates.SystemScan.Note" xml:space="preserve"><value>管理者権限が必要で、15分以上かかる場合があります。</value></data>
+  <data name="Templates.SystemScan.Desc" xml:space="preserve"><value>DISM によるコンポーネントストアの修復に続けてシステムファイルチェッカーを実行し、両方の終了コードをドキュメントフォルダー内のログに記録します。</value></data>
+  <data name="Templates.SystemScan.Note" xml:space="preserve"><value>15分以上かかる場合があります。</value></data>
   <data name="Templates.DnsFlush.Name" xml:space="preserve"><value>サインイン時に DNS キャッシュをクリア</value></data>
   <data name="Templates.DnsFlush.Desc" xml:space="preserve"><value>サインイン時に DNS リゾルバーキャッシュをクリアします。ネットワークや VPN を頻繁に切り替える場合に便利です。</value></data>
   <data name="Templates.DnsFlush.Note" xml:space="preserve"><value>管理者権限が必要です。</value></data>
-  <data name="Templates.NodePrune.Name" xml:space="preserve"><value>npm / pnpm キャッシュのクリーンアップ</value></data>
+  <data name="Templates.NodePrune.Name" xml:space="preserve"><value>npm・pnpm キャッシュのクリーンアップ</value></data>
   <data name="Templates.NodePrune.Desc" xml:space="preserve"><value>npm キャッシュを検証・整理し、古い pnpm ストアのエントリを削除して数ギガバイトの容量を回収します。</value></data>
   <data name="Templates.NodePrune.Note" xml:space="preserve"><value>PATH に Node.js が必要です。</value></data>
   <data name="Templates.ProjectBackup.Name" xml:space="preserve"><value>夜間のプロジェクトフォルダーバックアップ</value></data>
@@ -701,7 +701,7 @@
   <data name="Templates.ProjectBackup.Note" xml:space="preserve"><value>/MIR はコピー元に存在しなくなったコピー先のファイルを削除します。まず両方のパスを確認してください。</value></data>
   <data name="Templates.DevServerRestart.Name" xml:space="preserve"><value>Windows サービスを毎晩再起動</value></data>
   <data name="Templates.DevServerRestart.Desc" xml:space="preserve"><value>長時間稼働するサービス（ビルドエージェント、データベース、ローカルサーバーなど）を再起動してリークを解消します。保存前にサービス名を変更してください。</value></data>
-  <data name="Templates.DevServerRestart.Note" xml:space="preserve"><value>管理者権限が必要です。「MSSQLSERVER」を自分のサービス名に置き換えてください。</value></data>
+  <data name="Templates.DevServerRestart.Note" xml:space="preserve"><value>「YourServiceName」をサービスの名前に置き換えてください。</value></data>
   <data name="Templates.DisplayOff.Name" xml:space="preserve"><value>ロック時にディスプレイをオフにする</value></data>
   <data name="Templates.DisplayOff.Desc" xml:space="preserve"><value>電源タイムアウトを待たずに、ワークステーションをロックした時点でモニターをオフにします。</value></data>
   <data name="Templates.DisplayOff.Note" xml:space="preserve"><value>まだの場合は、エディターでトリガーのセッション状態を「ロック」に設定してください。</value></data>
@@ -790,7 +790,7 @@
   <data name="Onboarding.Step6.Title" xml:space="preserve"><value>既存のタスクを検出</value></data>
   <data name="Onboarding.Step7.Body" xml:space="preserve"><value>設定画面では、Mica の背景効果の有効化、トレイへの最小化、ログの設定、スタートアップ時の起動などを構成できます。</value></data>
   <data name="Onboarding.Step7.Title" xml:space="preserve"><value>お好みに合わせて調整</value></data>
-  <data name="ScriptLibrary.DeleteTemplate.Content" xml:space="preserve"><value>「{0}」を削除しますか?</value></data>
+  <data name="ScriptLibrary.DeleteTemplate.Content" xml:space="preserve"><value>「{0}」を削除しますか？</value></data>
   <data name="ScriptLibrary.DeleteTemplate.Title" xml:space="preserve"><value>スクリプトの削除</value></data>
   <data name="Settings.UpdateApplyFailed.Content" xml:space="preserve"><value>更新の適用に失敗しました。詳細はログを確認するか、後でもう一度お試しください。</value></data>
   <data name="Snooze.IncludeMicrosoftTasks" xml:space="preserve"><value>Microsoft 独自の予約タスクも一時停止する (Defender、Windows Update、メンテナンスなど)</value></data>
@@ -813,9 +813,9 @@
   <data name="Scripts.BatteryReport.Name" xml:space="preserve"><value>バッテリー レポート</value></data>
   <data name="Scripts.CheckDisk.Description" xml:space="preserve"><value>C: ドライブのエラーを修復せずにスキャンします (使用中でも安全です)。</value></data>
   <data name="Scripts.CheckDisk.Name" xml:space="preserve"><value>チェック ディスク (スキャンのみ)</value></data>
-  <data name="Scripts.ClearTempFolder.Description" xml:space="preserve"><value>現在のユーザーの Temp フォルダー内のすべてのファイルを削除して空き容量を増やします。</value></data>
+  <data name="Scripts.ClearTempFolder.Description" xml:space="preserve"><value>現在のユーザーの Temp フォルダー内の使用中でないものをすべて削除して空き容量を増やします。</value></data>
   <data name="Scripts.ClearTempFolder.Name" xml:space="preserve"><value>Temp フォルダーを消去</value></data>
-  <data name="Scripts.DiskCleanup.Description" xml:space="preserve"><value>システム ドライブでディスク クリーンアップを実行します。</value></data>
+  <data name="Scripts.DiskCleanup.Description" xml:space="preserve"><value>「cleanmgr /sageset:1」を一度実行して保存したオプションで、ディスク クリーンアップを実行します。</value></data>
   <data name="Scripts.DiskCleanup.Name" xml:space="preserve"><value>ディスク クリーンアップ (システム)</value></data>
   <data name="Scripts.EmptyRecycleBin.Description" xml:space="preserve"><value>ごみ箱内のすべての項目を完全に削除します。</value></data>
   <data name="Scripts.EmptyRecycleBin.Name" xml:space="preserve"><value>ごみ箱を空にする</value></data>
@@ -985,4 +985,27 @@
   <data name="SystemEvent.Resume" xml:space="preserve"><value>コンピューターがスリープから復帰しました</value></data>
   <data name="SystemEvent.Logon" xml:space="preserve"><value>ユーザーがログオンしました</value></data>
   <data name="SystemEvent.Logoff" xml:space="preserve"><value>ユーザーがログオフしました</value></data>
+  <data name="Elevation.Required" xml:space="preserve"><value>管理者権限が必要です</value></data>
+  <data name="QuickActions.NotElevated" xml:space="preserve"><value>アプリが管理者権限なしで実行されているため、一部のアクションは利用できません。</value></data>
+  <data name="QuickActions.RestartElevated" xml:space="preserve"><value>管理者として再起動</value></data>
+  <data name="QuickActions.Status.ExitCode" xml:space="preserve"><value>失敗 (終了コード {0})</value></data>
+  <data name="QuickActions.Status.Cancelled" xml:space="preserve"><value>中止しました</value></data>
+  <data name="QuickActions.ClearTemp.Confirm" xml:space="preserve"><value>一時フォルダー内のすべてのファイルを削除しますか？使用中のファイルはスキップされます。</value></data>
+  <data name="QuickActions.RestartExplorer.Confirm" xml:space="preserve"><value>Windows エクスプローラーを再起動しますか？開いているフォルダーウィンドウは閉じられ、タスクバーが一時的に消えます。</value></data>
+  <data name="ScriptEditor.CopyOutput" xml:space="preserve"><value>出力をコピー</value></data>
+  <data name="ScriptEditor.Status.ExitCode" xml:space="preserve"><value>[終了コード {0} で終了しました]</value></data>
+  <data name="ScriptEditor.Error.Start" xml:space="preserve"><value>スクリプトを開始できませんでした: {0}</value></data>
+  <data name="ScriptEditor.Error.Save" xml:space="preserve"><value>スクリプトを保存できませんでした: {0}</value></data>
+  <data name="ScriptEditor.Error.Open" xml:space="preserve"><value>スクリプト「{0}」を開けませんでした: {1}</value></data>
+  <data name="ScriptEditor.Error.NameTaken" xml:space="preserve"><value>「{0}」という名前のスクリプトが既にあります。別の名前を選んでください。</value></data>
+  <data name="ScriptEditor.Discard.Title" xml:space="preserve"><value>変更を破棄しますか？</value></data>
+  <data name="ScriptEditor.Discard.Message" xml:space="preserve"><value>エディター内のスクリプトには保存されていない変更があります。</value></data>
+  <data name="ScriptEditor.Discard.Confirm" xml:space="preserve"><value>破棄</value></data>
+  <data name="Library.EditScript" xml:space="preserve"><value>スクリプトを編集</value></data>
+  <data name="ScriptLibrary.DeleteScript.TasksWarning" xml:space="preserve"><value>このスクリプトから作成されたタスクはそのファイルを実行するため、削除すると失敗するようになります。</value></data>
+  <data name="Library.Scripts.ListSetAside" xml:space="preserve"><value>保存済みスクリプトの一覧を読み込めませんでした。一覧は {0} として保管され、ライブラリは新しい一覧を作成しました。</value></data>
+  <data name="Library.Scripts.LoadFailed" xml:space="preserve"><value>保存済みスクリプトを読み込めませんでした: {0}</value></data>
+  <data name="Library.Scripts.DeleteFailed" xml:space="preserve"><value>スクリプトを削除できませんでした: {0}</value></data>
+  <data name="Templates.IdleShutdown.Comment" xml:space="preserve"><value>スケジュールされたシャットダウンです。キャンセルするには shutdown /a を実行してください。</value></data>
+  <data name="Templates.WeeklyReboot.Comment" xml:space="preserve"><value>スケジュールされた再起動です。キャンセルするには shutdown /a を実行してください。</value></data>
 </root>

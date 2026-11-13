@@ -243,16 +243,16 @@
   <data name="DashboardFailure.Text" xml:space="preserve"><value>失败</value></data>
 
   <data name="ScriptLibraryTitle.Text" xml:space="preserve"><value>脚本库</value></data>
-  <data name="ScriptLibraryCreateBtn.Content" xml:space="preserve"><value>+ 新建模板</value></data>
-  <data name="ScriptLibraryDeleteBtn.ToolTipService.ToolTip" xml:space="preserve"><value>删除模板</value></data>
-  <data name="ScriptLibraryUseTemplateBtn.Content" xml:space="preserve"><value>使用此模板创建任务</value></data>
+  <data name="ScriptLibraryCreateBtn.Content" xml:space="preserve"><value>新建脚本</value></data>
+  <data name="ScriptLibraryDeleteBtn.ToolTipService.ToolTip" xml:space="preserve"><value>删除脚本</value></data>
+  <data name="ScriptLibraryUseTemplateBtn.Content" xml:space="preserve"><value>从脚本创建任务...</value></data>
   <data name="ScriptLibraryNewTemplateDialog.Title" xml:space="preserve"><value>新建模板</value></data>
   <data name="ScriptLibrarySaveBtn.PrimaryButtonText" xml:space="preserve"><value>保存</value></data>
   <data name="ScriptLibraryCancelBtn.CloseButtonText" xml:space="preserve"><value>取消</value></data>
   <data name="ScriptLibraryNameHeader.Header" xml:space="preserve"><value>名称</value></data>
   <data name="ScriptLibraryNamePlaceholder.PlaceholderText" xml:space="preserve"><value>例如：清理脚本</value></data>
   <data name="ScriptLibraryDescHeader.Header" xml:space="preserve"><value>描述</value></data>
-  <data name="ScriptLibraryDescPlaceholder.PlaceholderText" xml:space="preserve"><value>这个模板用于做什么？</value></data>
+  <data name="ScriptLibraryDescPlaceholder.PlaceholderText" xml:space="preserve"><value>这个脚本用于做什么？</value></data>
   <data name="ScriptLibraryCommandHeader.Header" xml:space="preserve"><value>命令</value></data>
   <data name="ScriptLibraryCommandPlaceholder.PlaceholderText" xml:space="preserve"><value>例如：powershell.exe</value></data>
   <data name="ScriptLibraryArgsHeader.Header" xml:space="preserve"><value>参数</value></data>
@@ -492,15 +492,15 @@
   <data name="QuickActions.FlushDNS.Title" xml:space="preserve"><value>刷新 DNS</value></data>
   <data name="QuickActions.FlushDNS.Desc" xml:space="preserve"><value>清除 DNS 解析器缓存。</value></data>
   <data name="QuickActions.ClearTemp.Title" xml:space="preserve"><value>清理临时文件</value></data>
-  <data name="QuickActions.ClearTemp.Desc" xml:space="preserve"><value>删除临时文件夹中的文件。</value></data>
+  <data name="QuickActions.ClearTemp.Desc" xml:space="preserve"><value>删除临时文件夹中所有未被占用的内容。</value></data>
   <data name="QuickActions.RestartExplorer.Title" xml:space="preserve"><value>重启资源管理器</value></data>
   <data name="QuickActions.RestartExplorer.Desc" xml:space="preserve"><value>重新启动 Windows 资源管理器进程。</value></data>
   <data name="QuickActions.IPReleaseRenew.Title" xml:space="preserve"><value>续订 IP 地址</value></data>
-  <data name="QuickActions.IPReleaseRenew.Desc" xml:space="preserve"><value>释放并续订当前的 IP 地址。</value></data>
+  <data name="QuickActions.IPReleaseRenew.Desc" xml:space="preserve"><value>向 DHCP 服务器请求续订所有网络适配器的 IP 地址租约。</value></data>
   <data name="QuickActions.SfcScannow.Title" xml:space="preserve"><value>系统文件检查器 (SFC)</value></data>
-  <data name="QuickActions.SfcScannow.Desc" xml:space="preserve"><value>扫描并修复损坏的系统文件（需要管理员权限）。</value></data>
+  <data name="QuickActions.SfcScannow.Desc" xml:space="preserve"><value>扫描并修复损坏的系统文件。可能需要一些时间。</value></data>
   <data name="QuickActions.DismHealth.Title" xml:space="preserve"><value>DISM 健康检查</value></data>
-  <data name="QuickActions.DismHealth.Desc" xml:space="preserve"><value>检查组件存储是否存在损坏（需要管理员权限）。</value></data>
+  <data name="QuickActions.DismHealth.Desc" xml:space="preserve"><value>检查组件存储是否被标记为已损坏。</value></data>
   <data name="QuickActions.RunBtn" xml:space="preserve"><value>运行</value></data>
   <data name="QuickActions.Status.Running" xml:space="preserve"><value>正在运行...</value></data>
   <data name="QuickActions.Status.Success" xml:space="preserve"><value>成功</value></data>
@@ -603,36 +603,36 @@
   <data name="Templates.Title" xml:space="preserve"><value>任务模板库</value></data>
   <data name="Templates.Subtitle" xml:space="preserve"><value>适用于常见自动化工作的现成预设。部署模板会打开任务编辑器，并预先填入命令、参数和推荐的计划。</value></data>
   <data name="Templates.Info.Title" xml:space="preserve"><value>保存前不会创建任何内容</value></data>
-  <data name="Templates.Info.Message" xml:space="preserve"><value>保存前请在编辑器中检查命令、参数和触发器 —— 部分模板会删除文件或更改系统状态，某些还需要管理员权限。</value></data>
-  <data name="Templates.Deploy" xml:space="preserve"><value>部署模板</value></data>
+  <data name="Templates.Info.Message" xml:space="preserve"><value>保存前请在编辑器中检查命令、参数和触发器：部分模板会删除文件或更改系统状态，某些还需要管理员权限。</value></data>
+  <data name="Templates.Deploy" xml:space="preserve"><value>部署模板...</value></data>
   <data name="Templates.Error.Deploy" xml:space="preserve"><value>无法打开此模板：</value></data>
   <data name="Templates.Group.Maintenance" xml:space="preserve"><value>系统维护</value></data>
   <data name="Templates.Group.Developer" xml:space="preserve"><value>开发者工具</value></data>
   <data name="Templates.Group.Power" xml:space="preserve"><value>电源与实用工具</value></data>
   <data name="Templates.TempCleanup.Name" xml:space="preserve"><value>夜间临时文件清理</value></data>
-  <data name="Templates.TempCleanup.Desc" xml:space="preserve"><value>删除用户和 Windows 临时文件夹中超过 7 天的文件。仍在使用中的文件将被跳过。</value></data>
-  <data name="Templates.TempCleanup.Note" xml:space="preserve"><value>将永久删除文件 —— 部署前请检查年限阈值。</value></data>
+  <data name="Templates.TempCleanup.Desc" xml:space="preserve"><value>删除你的临时文件夹中超过 7 天的文件。仍在使用中的文件将被跳过。</value></data>
+  <data name="Templates.TempCleanup.Note" xml:space="preserve"><value>将永久删除文件，部署前请检查年限阈值。</value></data>
   <data name="Templates.UpdateHealth.Name" xml:space="preserve"><value>Windows 更新健康检查</value></data>
-  <data name="Templates.UpdateHealth.Desc" xml:space="preserve"><value>将待处理的 Windows 更新和上次成功安装的日期记录到“文档”文件夹中的日志文件。</value></data>
+  <data name="Templates.UpdateHealth.Desc" xml:space="preserve"><value>将待处理的 Windows 更新数量和最近一次安装更新的日期记录到“文档”文件夹中的日志文件。</value></data>
   <data name="Templates.UpdateHealth.Note" xml:space="preserve"><value>查询更新代理需要管理员权限。</value></data>
-  <data name="Templates.Defrag.Name" xml:space="preserve"><value>磁盘优化（碎片整理 / TRIM）</value></data>
-  <data name="Templates.Defrag.Desc" xml:space="preserve"><value>在系统驱动器上运行 Windows 内置优化程序。SSD 将执行 TRIM/重新 TRIM，HDD 将进行碎片整理。</value></data>
-  <data name="Templates.Defrag.Note" xml:space="preserve"><value>需要管理员权限。仅在电脑空闲且接通交流电源时运行。</value></data>
-  <data name="Templates.GitFetch.Name" xml:space="preserve"><value>Git 仓库拉取 / 备份</value></data>
+  <data name="Templates.Defrag.Name" xml:space="preserve"><value>磁盘优化（碎片整理、TRIM）</value></data>
+  <data name="Templates.Defrag.Desc" xml:space="preserve"><value>在 C: 驱动器上运行 Windows 内置优化程序。SSD 将执行 TRIM/重新 TRIM，HDD 将进行碎片整理。</value></data>
+  <data name="Templates.Defrag.Note" xml:space="preserve"><value>仅在电脑空闲且接通交流电源时运行。如果 Windows 安装在其他驱动器，请修改“C:”。</value></data>
+  <data name="Templates.GitFetch.Name" xml:space="preserve"><value>Git 仓库拉取</value></data>
   <data name="Templates.GitFetch.Desc" xml:space="preserve"><value>对指定文件夹下找到的每个 Git 仓库执行带清理的全部远程拉取。保存前请编辑路径。</value></data>
   <data name="Templates.GitFetch.Note" xml:space="preserve"><value>请将“C:\Repos”改为你自己的仓库根目录，并确保 git 已加入 PATH。</value></data>
   <data name="Templates.DockerPrune.Name" xml:space="preserve"><value>Docker 系统清理</value></data>
   <data name="Templates.DockerPrune.Desc" xml:space="preserve"><value>删除已停止的容器、未使用的网络、悬空镜像和构建缓存，以回收磁盘空间。</value></data>
   <data name="Templates.DockerPrune.Note" xml:space="preserve"><value>需要 Docker Desktop 正在运行。将永久删除未使用的 Docker 数据。</value></data>
   <data name="Templates.LogRotation.Name" xml:space="preserve"><value>每日日志轮转</value></data>
-  <data name="Templates.LogRotation.Desc" xml:space="preserve"><value>将前一天的 *.log 文件压缩为带日期的 ZIP 归档，并删除超过 30 天的归档。</value></data>
+  <data name="Templates.LogRotation.Desc" xml:space="preserve"><value>将最后写入时间早于今天的 *.log 文件移入带日期的 ZIP 归档，并删除超过 30 天的归档。</value></data>
   <data name="Templates.LogRotation.Note" xml:space="preserve"><value>部署前请将“C:\Logs”改为你自己的日志目录。</value></data>
   <data name="Templates.IdleShutdown.Name" xml:space="preserve"><value>夜间空闲自动关机</value></data>
-  <data name="Templates.IdleShutdown.Desc" xml:space="preserve"><value>在夜间且电脑已空闲后才关机 —— 关机前会有 60 秒警告，可随时取消。</value></data>
+  <data name="Templates.IdleShutdown.Desc" xml:space="preserve"><value>在夜间且电脑已空闲后才关机，关机前会有 60 秒警告，可随时取消。</value></data>
   <data name="Templates.IdleShutdown.Note" xml:space="preserve"><value>将关闭计算机。打开的应用中未保存的工作可能会丢失。</value></data>
-  <data name="Templates.BatterySaver.Name" xml:space="preserve"><value>省电模式下暂停任务</value></data>
-  <data name="Templates.BatterySaver.Desc" xml:space="preserve"><value>登录时将 Windows 切换为节能计划，以便在使用电池时限制后台工作。</value></data>
-  <data name="Templates.BatterySaver.Note" xml:space="preserve"><value>可与全局暂停开关配合使用，在使用电池时同时暂停你自己的任务。</value></data>
+  <data name="Templates.BatterySaver.Name" xml:space="preserve"><value>登录时切换到节能计划</value></data>
+  <data name="Templates.BatterySaver.Desc" xml:space="preserve"><value>每次登录时将 Windows 切换为节能计划。在你选择其他计划之前，该计划会一直生效。</value></data>
+  <data name="Templates.BatterySaver.Note" xml:space="preserve"><value>支持现代待机的设备只有“平衡”计划，任务在这些设备上会失败。</value></data>
   <data name="Templates.RecycleBin.Name" xml:space="preserve"><value>每周清空回收站</value></data>
   <data name="Templates.RecycleBin.Desc" xml:space="preserve"><value>每周为当前用户清空一次回收站，且不显示确认提示。</value></data>
   <data name="Templates.RecycleBin.Note" xml:space="preserve"><value>回收站清空后，已删除的项目将无法恢复。</value></data>
@@ -689,14 +689,14 @@
   <data name="EventMsg.322" xml:space="preserve"><value>由于已有实例在运行，任务计划程序未启动任务“{0}”。</value></data>
   <data name="Templates.RestorePoint.Name" xml:space="preserve"><value>每周系统还原点</value></data>
   <data name="Templates.RestorePoint.Desc" xml:space="preserve"><value>每周创建一个命名的系统还原点，让你始终拥有一个近期的回滚目标。</value></data>
-  <data name="Templates.RestorePoint.Note" xml:space="preserve"><value>需要管理员权限，并需启用系统保护。</value></data>
+  <data name="Templates.RestorePoint.Note" xml:space="preserve"><value>系统驱动器必须已启用系统保护。</value></data>
   <data name="Templates.SystemScan.Name" xml:space="preserve"><value>系统文件完整性扫描</value></data>
-  <data name="Templates.SystemScan.Desc" xml:space="preserve"><value>先运行 DISM 组件存储修复，再运行系统文件检查器，并将结果写入“文档”文件夹中的日志。</value></data>
-  <data name="Templates.SystemScan.Note" xml:space="preserve"><value>需要管理员权限，运行时间可能超过 15 分钟。</value></data>
+  <data name="Templates.SystemScan.Desc" xml:space="preserve"><value>先运行 DISM 组件存储修复，再运行系统文件检查器，并将两者的退出代码写入“文档”文件夹中的日志。</value></data>
+  <data name="Templates.SystemScan.Note" xml:space="preserve"><value>运行时间可能超过 15 分钟。</value></data>
   <data name="Templates.DnsFlush.Name" xml:space="preserve"><value>登录时清空 DNS 缓存</value></data>
-  <data name="Templates.DnsFlush.Desc" xml:space="preserve"><value>登录时清空 DNS 解析缓存 —— 适合经常切换网络或 VPN 的情况。</value></data>
+  <data name="Templates.DnsFlush.Desc" xml:space="preserve"><value>登录时清空 DNS 解析缓存，适合经常切换网络或 VPN 的情况。</value></data>
   <data name="Templates.DnsFlush.Note" xml:space="preserve"><value>需要管理员权限。</value></data>
-  <data name="Templates.NodePrune.Name" xml:space="preserve"><value>npm / pnpm 缓存清理</value></data>
+  <data name="Templates.NodePrune.Name" xml:space="preserve"><value>npm 和 pnpm 缓存清理</value></data>
   <data name="Templates.NodePrune.Desc" xml:space="preserve"><value>校验并清理 npm 缓存，并移除过期的 pnpm 存储条目，以回收数 GB 空间。</value></data>
   <data name="Templates.NodePrune.Note" xml:space="preserve"><value>需要 PATH 中包含 Node.js。</value></data>
   <data name="Templates.ProjectBackup.Name" xml:space="preserve"><value>夜间项目文件夹备份</value></data>
@@ -704,7 +704,7 @@
   <data name="Templates.ProjectBackup.Note" xml:space="preserve"><value>/MIR 会删除目标中源已不存在的文件。请先检查两侧路径。</value></data>
   <data name="Templates.DevServerRestart.Name" xml:space="preserve"><value>每晚重启一个 Windows 服务</value></data>
   <data name="Templates.DevServerRestart.Desc" xml:space="preserve"><value>重启长时间运行的服务（构建代理、数据库、本地服务器等）以清除内存泄漏。保存前请更改服务名称。</value></data>
-  <data name="Templates.DevServerRestart.Note" xml:space="preserve"><value>需要管理员权限。请将“MSSQLSERVER”替换为你自己的服务名称。</value></data>
+  <data name="Templates.DevServerRestart.Note" xml:space="preserve"><value>请将“YourServiceName”替换为服务的名称。</value></data>
   <data name="Templates.DisplayOff.Name" xml:space="preserve"><value>锁屏时关闭显示器</value></data>
   <data name="Templates.DisplayOff.Desc" xml:space="preserve"><value>在锁定工作站的瞬间关闭显示器，而不是等待电源超时。</value></data>
   <data name="Templates.DisplayOff.Note" xml:space="preserve"><value>如尚未设置，请在编辑器中将触发器的会话状态设为“锁定”。</value></data>
@@ -793,7 +793,7 @@
   <data name="Onboarding.Step6.Title" xml:space="preserve"><value>发现现有任务</value></data>
   <data name="Onboarding.Step7.Body" xml:space="preserve"><value>前往设置以启用 Mica 背景效果、最小化到系统托盘、配置日志记录、设置开机启动等。</value></data>
   <data name="Onboarding.Step7.Title" xml:space="preserve"><value>按您的喜好进行调整</value></data>
-  <data name="ScriptLibrary.DeleteTemplate.Content" xml:space="preserve"><value>删除"{0}"?</value></data>
+  <data name="ScriptLibrary.DeleteTemplate.Content" xml:space="preserve"><value>删除“{0}”？</value></data>
   <data name="ScriptLibrary.DeleteTemplate.Title" xml:space="preserve"><value>删除脚本</value></data>
   <data name="Settings.UpdateApplyFailed.Content" xml:space="preserve"><value>应用更新失败。请查看日志了解详细信息,或稍后重试。</value></data>
   <data name="Snooze.IncludeMicrosoftTasks" xml:space="preserve"><value>同时暂停 Microsoft 自身的计划任务(Defender、Windows 更新、维护等)</value></data>
@@ -816,9 +816,9 @@
   <data name="Scripts.BatteryReport.Name" xml:space="preserve"><value>电池报告</value></data>
   <data name="Scripts.CheckDisk.Description" xml:space="preserve"><value>扫描 C: 驱动器的错误但不修复（使用中运行也安全）。</value></data>
   <data name="Scripts.CheckDisk.Name" xml:space="preserve"><value>检查磁盘（仅扫描）</value></data>
-  <data name="Scripts.ClearTempFolder.Description" xml:space="preserve"><value>删除当前用户 Temp 文件夹中的所有文件以释放空间。</value></data>
+  <data name="Scripts.ClearTempFolder.Description" xml:space="preserve"><value>删除当前用户 Temp 文件夹中所有未被占用的内容以释放空间。</value></data>
   <data name="Scripts.ClearTempFolder.Name" xml:space="preserve"><value>清空临时文件夹</value></data>
-  <data name="Scripts.DiskCleanup.Description" xml:space="preserve"><value>在系统驱动器上运行磁盘清理。</value></data>
+  <data name="Scripts.DiskCleanup.Description" xml:space="preserve"><value>使用你运行一次“cleanmgr /sageset:1”保存的选项来运行磁盘清理。</value></data>
   <data name="Scripts.DiskCleanup.Name" xml:space="preserve"><value>磁盘清理（系统）</value></data>
   <data name="Scripts.EmptyRecycleBin.Description" xml:space="preserve"><value>永久删除回收站中的所有项目。</value></data>
   <data name="Scripts.EmptyRecycleBin.Name" xml:space="preserve"><value>清空回收站</value></data>
@@ -988,6 +988,29 @@
   <data name="SystemEvent.Resume" xml:space="preserve"><value>计算机已唤醒</value></data>
   <data name="SystemEvent.Logon" xml:space="preserve"><value>用户已登录</value></data>
   <data name="SystemEvent.Logoff" xml:space="preserve"><value>用户已注销</value></data>
+  <data name="Elevation.Required" xml:space="preserve"><value>需要管理员权限</value></data>
+  <data name="QuickActions.NotElevated" xml:space="preserve"><value>应用正在以非管理员权限运行，因此部分操作不可用。</value></data>
+  <data name="QuickActions.RestartElevated" xml:space="preserve"><value>以管理员身份重新启动</value></data>
+  <data name="QuickActions.Status.ExitCode" xml:space="preserve"><value>失败（退出代码 {0}）</value></data>
+  <data name="QuickActions.Status.Cancelled" xml:space="preserve"><value>已停止</value></data>
+  <data name="QuickActions.ClearTemp.Confirm" xml:space="preserve"><value>要删除临时文件夹中的所有内容吗？正在使用的文件将被跳过。</value></data>
+  <data name="QuickActions.RestartExplorer.Confirm" xml:space="preserve"><value>要重新启动 Windows 资源管理器吗？已打开的文件夹窗口会被关闭，任务栏会短暂消失。</value></data>
+  <data name="ScriptEditor.CopyOutput" xml:space="preserve"><value>复制输出</value></data>
+  <data name="ScriptEditor.Status.ExitCode" xml:space="preserve"><value>[已退出，代码 {0}]</value></data>
+  <data name="ScriptEditor.Error.Start" xml:space="preserve"><value>无法启动脚本：{0}</value></data>
+  <data name="ScriptEditor.Error.Save" xml:space="preserve"><value>无法保存脚本：{0}</value></data>
+  <data name="ScriptEditor.Error.Open" xml:space="preserve"><value>无法打开脚本“{0}”：{1}</value></data>
+  <data name="ScriptEditor.Error.NameTaken" xml:space="preserve"><value>已有名为“{0}”的脚本。请选择其他名称。</value></data>
+  <data name="ScriptEditor.Discard.Title" xml:space="preserve"><value>要放弃更改吗？</value></data>
+  <data name="ScriptEditor.Discard.Message" xml:space="preserve"><value>编辑器中的脚本有尚未保存的更改。</value></data>
+  <data name="ScriptEditor.Discard.Confirm" xml:space="preserve"><value>放弃</value></data>
+  <data name="Library.EditScript" xml:space="preserve"><value>编辑脚本</value></data>
+  <data name="ScriptLibrary.DeleteScript.TasksWarning" xml:space="preserve"><value>由此脚本创建的任务会运行它的文件，文件被删除后这些任务将失败。</value></data>
+  <data name="Library.Scripts.ListSetAside" xml:space="preserve"><value>无法读取已保存脚本的列表。该列表已保留为 {0}，库已重新创建了一个新列表。</value></data>
+  <data name="Library.Scripts.LoadFailed" xml:space="preserve"><value>无法读取已保存的脚本：{0}</value></data>
+  <data name="Library.Scripts.DeleteFailed" xml:space="preserve"><value>无法删除脚本：{0}</value></data>
+  <data name="Templates.IdleShutdown.Comment" xml:space="preserve"><value>计划的关机。要取消，请运行：shutdown /a</value></data>
+  <data name="Templates.WeeklyReboot.Comment" xml:space="preserve"><value>计划的重启。要取消，请运行：shutdown /a</value></data>
 </root>
 
 

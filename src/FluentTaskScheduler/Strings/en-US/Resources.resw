@@ -240,16 +240,16 @@ Restart now to apply the update?</value></data>
   <data name="DashboardFailure.Text" xml:space="preserve"><value>Failure</value></data>
 
   <data name="ScriptLibraryTitle.Text" xml:space="preserve"><value>Script Library</value></data>
-  <data name="ScriptLibraryCreateBtn.Content" xml:space="preserve"><value>+ New Template</value></data>
-  <data name="ScriptLibraryDeleteBtn.ToolTipService.ToolTip" xml:space="preserve"><value>Delete template</value></data>
-  <data name="ScriptLibraryUseTemplateBtn.Content" xml:space="preserve"><value>Use this template to create task</value></data>
+  <data name="ScriptLibraryCreateBtn.Content" xml:space="preserve"><value>New Script</value></data>
+  <data name="ScriptLibraryDeleteBtn.ToolTipService.ToolTip" xml:space="preserve"><value>Delete script</value></data>
+  <data name="ScriptLibraryUseTemplateBtn.Content" xml:space="preserve"><value>Create Task from Script...</value></data>
   <data name="ScriptLibraryNewTemplateDialog.Title" xml:space="preserve"><value>New Template</value></data>
   <data name="ScriptLibrarySaveBtn.PrimaryButtonText" xml:space="preserve"><value>Save</value></data>
   <data name="ScriptLibraryCancelBtn.CloseButtonText" xml:space="preserve"><value>Cancel</value></data>
   <data name="ScriptLibraryNameHeader.Header" xml:space="preserve"><value>Name</value></data>
   <data name="ScriptLibraryNamePlaceholder.PlaceholderText" xml:space="preserve"><value>e.g., Cleanup Script</value></data>
   <data name="ScriptLibraryDescHeader.Header" xml:space="preserve"><value>Description</value></data>
-  <data name="ScriptLibraryDescPlaceholder.PlaceholderText" xml:space="preserve"><value>What does this template do?</value></data>
+  <data name="ScriptLibraryDescPlaceholder.PlaceholderText" xml:space="preserve"><value>What does this script do?</value></data>
   <data name="ScriptLibraryCommandHeader.Header" xml:space="preserve"><value>Command</value></data>
   <data name="ScriptLibraryCommandPlaceholder.PlaceholderText" xml:space="preserve"><value>e.g., powershell.exe</value></data>
   <data name="ScriptLibraryArgsHeader.Header" xml:space="preserve"><value>Arguments</value></data>
@@ -488,15 +488,15 @@ Restart now to apply the update?</value></data>
   <data name="QuickActions.FlushDNS.Title" xml:space="preserve"><value>Flush DNS</value></data>
   <data name="QuickActions.FlushDNS.Desc" xml:space="preserve"><value>Clears the DNS resolver cache.</value></data>
   <data name="QuickActions.ClearTemp.Title" xml:space="preserve"><value>Clear Temp Files</value></data>
-  <data name="QuickActions.ClearTemp.Desc" xml:space="preserve"><value>Deletes files from the temporary folders.</value></data>
+  <data name="QuickActions.ClearTemp.Desc" xml:space="preserve"><value>Deletes everything in your temp folder that is not in use.</value></data>
   <data name="QuickActions.RestartExplorer.Title" xml:space="preserve"><value>Restart Explorer</value></data>
   <data name="QuickActions.RestartExplorer.Desc" xml:space="preserve"><value>Restarts the Windows Explorer process.</value></data>
   <data name="QuickActions.IPReleaseRenew.Title" xml:space="preserve"><value>Renew IP Address</value></data>
-  <data name="QuickActions.IPReleaseRenew.Desc" xml:space="preserve"><value>Releases and renews the current IP address.</value></data>
+  <data name="QuickActions.IPReleaseRenew.Desc" xml:space="preserve"><value>Asks the DHCP server for a new lease on the IP addresses of all network adapters.</value></data>
   <data name="QuickActions.SfcScannow.Title" xml:space="preserve"><value>System File Checker</value></data>
-  <data name="QuickActions.SfcScannow.Desc" xml:space="preserve"><value>Scans and repairs corrupted system files (Requires Admin).</value></data>
+  <data name="QuickActions.SfcScannow.Desc" xml:space="preserve"><value>Scans the system files and repairs corrupted ones. This can take a while.</value></data>
   <data name="QuickActions.DismHealth.Title" xml:space="preserve"><value>DISM Health Check</value></data>
-  <data name="QuickActions.DismHealth.Desc" xml:space="preserve"><value>Checks for component store corruption (Requires Admin).</value></data>
+  <data name="QuickActions.DismHealth.Desc" xml:space="preserve"><value>Checks whether the component store is marked as corrupted.</value></data>
   <data name="QuickActions.RunBtn" xml:space="preserve"><value>Run</value></data>
   <data name="QuickActions.Status.Running" xml:space="preserve"><value>Running...</value></data>
   <data name="QuickActions.Status.Success" xml:space="preserve"><value>Success</value></data>
@@ -600,35 +600,35 @@ Restart now to apply the update?</value></data>
   <data name="Templates.Subtitle" xml:space="preserve"><value>Production-ready presets for common automation jobs. Deploying a template opens the task editor pre-filled with the command, arguments and a recommended schedule.</value></data>
   <data name="Templates.Info.Title" xml:space="preserve"><value>Nothing is created until you save</value></data>
   <data name="Templates.Info.Message" xml:space="preserve"><value>Review the command, arguments and trigger in the editor before saving - several templates delete files or change system state, and some need administrator privileges.</value></data>
-  <data name="Templates.Deploy" xml:space="preserve"><value>Deploy Template</value></data>
+  <data name="Templates.Deploy" xml:space="preserve"><value>Deploy Template...</value></data>
   <data name="Templates.Error.Deploy" xml:space="preserve"><value>Could not open this template: </value></data>
   <data name="Templates.Group.Maintenance" xml:space="preserve"><value>System Maintenance</value></data>
   <data name="Templates.Group.Developer" xml:space="preserve"><value>Developer Tools</value></data>
   <data name="Templates.Group.Power" xml:space="preserve"><value>Power &amp; Utility</value></data>
   <data name="Templates.TempCleanup.Name" xml:space="preserve"><value>Nightly Temp File Cleanup</value></data>
-  <data name="Templates.TempCleanup.Desc" xml:space="preserve"><value>Deletes files older than 7 days from the user and Windows temp folders. Files still in use are skipped.</value></data>
+  <data name="Templates.TempCleanup.Desc" xml:space="preserve"><value>Deletes files older than 7 days from your temp folder. Files still in use are skipped.</value></data>
   <data name="Templates.TempCleanup.Note" xml:space="preserve"><value>Deletes files permanently - review the age threshold before deploying.</value></data>
   <data name="Templates.UpdateHealth.Name" xml:space="preserve"><value>Windows Update Health Check</value></data>
-  <data name="Templates.UpdateHealth.Desc" xml:space="preserve"><value>Reports pending Windows updates and the last successful install date to a log file in your Documents folder.</value></data>
+  <data name="Templates.UpdateHealth.Desc" xml:space="preserve"><value>Writes the number of pending Windows updates and the date of the last installed update to a log file in your Documents folder.</value></data>
   <data name="Templates.UpdateHealth.Note" xml:space="preserve"><value>Requires administrator privileges to query the update agent.</value></data>
-  <data name="Templates.Defrag.Name" xml:space="preserve"><value>Disk Optimize (Defrag / TRIM)</value></data>
-  <data name="Templates.Defrag.Desc" xml:space="preserve"><value>Runs the built-in Windows optimizer on the system drive. SSDs receive a TRIM/retrim, HDDs are defragmented.</value></data>
-  <data name="Templates.Defrag.Note" xml:space="preserve"><value>Requires administrator privileges. Runs only when the PC is idle and on AC power.</value></data>
-  <data name="Templates.GitFetch.Name" xml:space="preserve"><value>Git Repository Fetch / Backup</value></data>
+  <data name="Templates.Defrag.Name" xml:space="preserve"><value>Disk Optimize (Defrag, TRIM)</value></data>
+  <data name="Templates.Defrag.Desc" xml:space="preserve"><value>Runs the built-in Windows optimizer on drive C:. SSDs receive a TRIM/retrim, HDDs are defragmented.</value></data>
+  <data name="Templates.Defrag.Note" xml:space="preserve"><value>Runs only when the PC is idle and on AC power. Change 'C:' if Windows is on another drive.</value></data>
+  <data name="Templates.GitFetch.Name" xml:space="preserve"><value>Git Repository Fetch</value></data>
   <data name="Templates.GitFetch.Desc" xml:space="preserve"><value>Fetches all remotes with pruning for every Git repository found under a folder you choose. Edit the path before saving.</value></data>
   <data name="Templates.GitFetch.Note" xml:space="preserve"><value>Change 'C:\Repos' to your own repository root, and make sure git is on PATH.</value></data>
   <data name="Templates.DockerPrune.Name" xml:space="preserve"><value>Docker System Prune</value></data>
   <data name="Templates.DockerPrune.Desc" xml:space="preserve"><value>Removes stopped containers, unused networks, dangling images and build cache to reclaim disk space.</value></data>
   <data name="Templates.DockerPrune.Note" xml:space="preserve"><value>Requires Docker Desktop to be running. Deletes unused Docker data permanently.</value></data>
   <data name="Templates.LogRotation.Name" xml:space="preserve"><value>Daily Log Rotation</value></data>
-  <data name="Templates.LogRotation.Desc" xml:space="preserve"><value>Compresses yesterday's *.log files into a dated ZIP archive and removes archives older than 30 days.</value></data>
+  <data name="Templates.LogRotation.Desc" xml:space="preserve"><value>Moves the *.log files that were last written before today into a dated ZIP archive and removes archives older than 30 days.</value></data>
   <data name="Templates.LogRotation.Note" xml:space="preserve"><value>Change 'C:\Logs' to your own log directory before deploying.</value></data>
   <data name="Templates.IdleShutdown.Name" xml:space="preserve"><value>Auto-Shutdown at Night when Idle</value></data>
   <data name="Templates.IdleShutdown.Desc" xml:space="preserve"><value>Shuts the PC down at night, but only after it has been idle - with a 60 second warning you can cancel.</value></data>
   <data name="Templates.IdleShutdown.Note" xml:space="preserve"><value>Shuts the machine down. Unsaved work in open apps may be lost.</value></data>
-  <data name="Templates.BatterySaver.Name" xml:space="preserve"><value>Battery Saver Task Suspend</value></data>
-  <data name="Templates.BatterySaver.Desc" xml:space="preserve"><value>Switches Windows to the Power Saver plan at logon so background work is throttled while unplugged.</value></data>
-  <data name="Templates.BatterySaver.Note" xml:space="preserve"><value>Pair this with the Global Snooze toggle to pause your own tasks while on battery.</value></data>
+  <data name="Templates.BatterySaver.Name" xml:space="preserve"><value>Power Saver Plan at Logon</value></data>
+  <data name="Templates.BatterySaver.Desc" xml:space="preserve"><value>Switches Windows to the Power saver plan every time you sign in. The plan stays active until you choose another one.</value></data>
+  <data name="Templates.BatterySaver.Note" xml:space="preserve"><value>Devices with Modern Standby only have the Balanced plan; the task fails there.</value></data>
   <data name="Templates.RecycleBin.Name" xml:space="preserve"><value>Empty Recycle Bin Weekly</value></data>
   <data name="Templates.RecycleBin.Desc" xml:space="preserve"><value>Empties the Recycle Bin for the current user once a week without a confirmation prompt.</value></data>
   <data name="Templates.RecycleBin.Note" xml:space="preserve"><value>Deleted items become unrecoverable once the bin is emptied.</value></data>
@@ -686,14 +686,14 @@ Restart now to apply the update?</value></data>
   <data name="EventMsg.322" xml:space="preserve"><value>Task Scheduler did not launch task "{0}" because an instance is already running.</value></data>
   <data name="Templates.RestorePoint.Name" xml:space="preserve"><value>Weekly System Restore Point</value></data>
   <data name="Templates.RestorePoint.Desc" xml:space="preserve"><value>Creates a named System Restore point once a week so you always have a recent rollback target.</value></data>
-  <data name="Templates.RestorePoint.Note" xml:space="preserve"><value>Requires administrator privileges and System Protection to be enabled.</value></data>
+  <data name="Templates.RestorePoint.Note" xml:space="preserve"><value>System Protection must be enabled for the system drive.</value></data>
   <data name="Templates.SystemScan.Name" xml:space="preserve"><value>System File Integrity Scan</value></data>
-  <data name="Templates.SystemScan.Desc" xml:space="preserve"><value>Runs DISM component-store repair followed by System File Checker, writing the result to a log in your Documents folder.</value></data>
-  <data name="Templates.SystemScan.Note" xml:space="preserve"><value>Requires administrator privileges and can run for 15+ minutes.</value></data>
+  <data name="Templates.SystemScan.Desc" xml:space="preserve"><value>Runs DISM component-store repair followed by System File Checker and writes the exit codes of both to a log in your Documents folder.</value></data>
+  <data name="Templates.SystemScan.Note" xml:space="preserve"><value>Can run for 15 minutes or more.</value></data>
   <data name="Templates.DnsFlush.Name" xml:space="preserve"><value>Flush DNS Cache at Logon</value></data>
   <data name="Templates.DnsFlush.Desc" xml:space="preserve"><value>Clears the DNS resolver cache when you sign in - useful when you switch networks or VPNs often.</value></data>
   <data name="Templates.DnsFlush.Note" xml:space="preserve"><value>Requires administrator privileges.</value></data>
-  <data name="Templates.NodePrune.Name" xml:space="preserve"><value>npm / pnpm Cache Prune</value></data>
+  <data name="Templates.NodePrune.Name" xml:space="preserve"><value>npm and pnpm Cache Prune</value></data>
   <data name="Templates.NodePrune.Desc" xml:space="preserve"><value>Verifies and prunes the npm cache and removes stale pnpm store entries to reclaim several gigabytes.</value></data>
   <data name="Templates.NodePrune.Note" xml:space="preserve"><value>Requires Node.js on PATH.</value></data>
   <data name="Templates.ProjectBackup.Name" xml:space="preserve"><value>Nightly Project Folder Backup</value></data>
@@ -701,7 +701,7 @@ Restart now to apply the update?</value></data>
   <data name="Templates.ProjectBackup.Note" xml:space="preserve"><value>/MIR deletes files in the destination that no longer exist in the source. Check both paths first.</value></data>
   <data name="Templates.DevServerRestart.Name" xml:space="preserve"><value>Restart a Windows Service Nightly</value></data>
   <data name="Templates.DevServerRestart.Desc" xml:space="preserve"><value>Restarts a long-running service (build agent, database, local server) to clear leaks. Change the service name before saving.</value></data>
-  <data name="Templates.DevServerRestart.Note" xml:space="preserve"><value>Requires administrator privileges. Replace 'MSSQLSERVER' with your own service name.</value></data>
+  <data name="Templates.DevServerRestart.Note" xml:space="preserve"><value>Replace 'YourServiceName' with the name of the service.</value></data>
   <data name="Templates.DisplayOff.Name" xml:space="preserve"><value>Turn Off Displays on Lock</value></data>
   <data name="Templates.DisplayOff.Desc" xml:space="preserve"><value>Switches the monitors off as soon as you lock the workstation instead of waiting for the power timeout.</value></data>
   <data name="Templates.DisplayOff.Note" xml:space="preserve"><value>Set the trigger's session state to "Lock" in the editor if it is not already.</value></data>
@@ -813,9 +813,9 @@ Restart now to apply the update?</value></data>
   <data name="Scripts.BatteryReport.Name" xml:space="preserve"><value>Battery Report</value></data>
   <data name="Scripts.CheckDisk.Description" xml:space="preserve"><value>Scans the C: drive for errors without fixing them (safe to run while in use).</value></data>
   <data name="Scripts.CheckDisk.Name" xml:space="preserve"><value>Check Disk (Scan Only)</value></data>
-  <data name="Scripts.ClearTempFolder.Description" xml:space="preserve"><value>Deletes all files in the current user's Temp folder to free up space.</value></data>
+  <data name="Scripts.ClearTempFolder.Description" xml:space="preserve"><value>Deletes everything in the current user's Temp folder that is not in use, to free up space.</value></data>
   <data name="Scripts.ClearTempFolder.Name" xml:space="preserve"><value>Clear Temp Folder</value></data>
-  <data name="Scripts.DiskCleanup.Description" xml:space="preserve"><value>Runs Disk Cleanup on the system drive.</value></data>
+  <data name="Scripts.DiskCleanup.Description" xml:space="preserve"><value>Runs Disk Cleanup with the options you saved once by running 'cleanmgr /sageset:1'.</value></data>
   <data name="Scripts.DiskCleanup.Name" xml:space="preserve"><value>Disk Cleanup (System)</value></data>
   <data name="Scripts.EmptyRecycleBin.Description" xml:space="preserve"><value>Permanently deletes all items in the Recycle Bin.</value></data>
   <data name="Scripts.EmptyRecycleBin.Name" xml:space="preserve"><value>Empty Recycle Bin</value></data>
@@ -985,5 +985,28 @@ Restart now to apply the update?</value></data>
   <data name="SystemEvent.Resume" xml:space="preserve"><value>Computer woke up</value></data>
   <data name="SystemEvent.Logon" xml:space="preserve"><value>A user logged on</value></data>
   <data name="SystemEvent.Logoff" xml:space="preserve"><value>A user logged off</value></data>
+  <data name="Elevation.Required" xml:space="preserve"><value>Requires administrator rights</value></data>
+  <data name="QuickActions.NotElevated" xml:space="preserve"><value>The app is running without administrator rights, so some actions are unavailable.</value></data>
+  <data name="QuickActions.RestartElevated" xml:space="preserve"><value>Restart as Administrator</value></data>
+  <data name="QuickActions.Status.ExitCode" xml:space="preserve"><value>Failed (exit code {0})</value></data>
+  <data name="QuickActions.Status.Cancelled" xml:space="preserve"><value>Stopped</value></data>
+  <data name="QuickActions.ClearTemp.Confirm" xml:space="preserve"><value>Delete everything in your temp folder? Files that are in use are skipped.</value></data>
+  <data name="QuickActions.RestartExplorer.Confirm" xml:space="preserve"><value>Restart Windows Explorer? Open folder windows are closed, and the taskbar disappears for a moment.</value></data>
+  <data name="ScriptEditor.CopyOutput" xml:space="preserve"><value>Copy Output</value></data>
+  <data name="ScriptEditor.Status.ExitCode" xml:space="preserve"><value>[Exited with code {0}]</value></data>
+  <data name="ScriptEditor.Error.Start" xml:space="preserve"><value>The script could not be started: {0}</value></data>
+  <data name="ScriptEditor.Error.Save" xml:space="preserve"><value>The script could not be saved: {0}</value></data>
+  <data name="ScriptEditor.Error.Open" xml:space="preserve"><value>The script '{0}' could not be opened: {1}</value></data>
+  <data name="ScriptEditor.Error.NameTaken" xml:space="preserve"><value>Another script is already called '{0}'. Choose a different name.</value></data>
+  <data name="ScriptEditor.Discard.Title" xml:space="preserve"><value>Discard changes?</value></data>
+  <data name="ScriptEditor.Discard.Message" xml:space="preserve"><value>The script in the editor has changes that were not saved.</value></data>
+  <data name="ScriptEditor.Discard.Confirm" xml:space="preserve"><value>Discard</value></data>
+  <data name="Library.EditScript" xml:space="preserve"><value>Edit script</value></data>
+  <data name="ScriptLibrary.DeleteScript.TasksWarning" xml:space="preserve"><value>Tasks that were created from this script run its file and will fail once it is deleted.</value></data>
+  <data name="Library.Scripts.ListSetAside" xml:space="preserve"><value>The list of your saved scripts could not be read. It was kept as {0}, and the library started a new one.</value></data>
+  <data name="Library.Scripts.LoadFailed" xml:space="preserve"><value>Your saved scripts could not be read: {0}</value></data>
+  <data name="Library.Scripts.DeleteFailed" xml:space="preserve"><value>The script could not be deleted: {0}</value></data>
+  <data name="Templates.IdleShutdown.Comment" xml:space="preserve"><value>Scheduled shutdown. To cancel it, run: shutdown /a</value></data>
+  <data name="Templates.WeeklyReboot.Comment" xml:space="preserve"><value>Scheduled restart. To cancel it, run: shutdown /a</value></data>
 </root>
 
