@@ -164,6 +164,8 @@ public partial class App : Application, IAppLifetime, IDisposable
         services.AddScoped<SnoozeViewModel>();
         services.AddScoped<FoldersViewModel>();
         services.AddScoped<TasksPage>();
+        services.AddScoped<DashboardViewModel>();
+        services.AddScoped<DashboardPage>();
         services.AddScoped<QuickActionsViewModel>();
         services.AddScoped<QuickActionsPage>();
         services.AddScoped<ScriptEditorViewModel>();

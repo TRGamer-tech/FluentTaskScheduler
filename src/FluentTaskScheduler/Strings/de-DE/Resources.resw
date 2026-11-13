@@ -229,7 +229,7 @@ Jetzt App neustarten?</value></data>
   <data name="DashboardRecentFailure.Text" xml:space="preserve"><value>Zuletzt fehlgeschlagen</value></data>
   <data name="DashboardNeedsAttention.Text" xml:space="preserve"><value>Erfordert Aufmerksamkeit</value></data>
   <data name="DashboardCurrentlyRunning.Text" xml:space="preserve"><value>Aktuell ausgeführte Aufgaben</value></data>
-  <data name="DashboardNoRunningTasks.Text" xml:space="preserve"><value>Aktuell keine Aufgaben</value></data>
+  <data name="DashboardNoRunningTasks.Text" xml:space="preserve"><value>Zurzeit wird keine Aufgabe ausgeführt</value></data>
   <data name="DashboardRecentlyFailed.Text" xml:space="preserve"><value>Kürzlich fehlgeschlagene Aufgaben</value></data>
   <data name="DashboardExitCode.Text" xml:space="preserve"><value>Exit-Code: </value></data>
   <data name="DashboardNoRecentFailures.Text" xml:space="preserve"><value>Keine kürzlichen Fehler, Aufgaben im guten Zustand</value></data>
@@ -581,7 +581,7 @@ Jetzt App neustarten?</value></data>
   <data name="Dashboard.AvgDuration" xml:space="preserve"><value>Durchschnittliche Dauer</value></data>
   <data name="Dashboard.AvgDurationHint" xml:space="preserve"><value>Über alle abgeschlossenen Läufe (7 Tage)</value></data>
   <data name="Dashboard.LongestTask" xml:space="preserve"><value>Längster Lauf</value></data>
-  <data name="Dashboard.HeatmapTitle" xml:space="preserve"><value>Ausführungs-Heatmap - nach Tagesstunde</value></data>
+  <data name="Dashboard.HeatmapTitle" xml:space="preserve"><value>Ausführungen nach Tageszeit</value></data>
   <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>{0}:00 Uhr - {1} Lauf/Läufe in den letzten 7 Tagen</value></data>
   <data name="Dashboard.PeakHour" xml:space="preserve"><value>Stärkste Stunde:</value></data>
   <data name="Dashboard.ExecutionStream" xml:space="preserve"><value>Ausführungsprotokoll</value></data>
@@ -1086,4 +1086,6 @@ Jetzt App neustarten?</value></data>
   <data name="Dashboard.Running.Since" xml:space="preserve"><value>Seit {0}</value></data>
   <data name="Dashboard.Refused.Manual" xml:space="preserve"><value>Manueller Start</value></data>
   <data name="Dashboard.Refused.CompletionAction" xml:space="preserve"><value>Abschlussaktion</value></data>
+  <data name="Dashboard.Runs.Title" xml:space="preserve"><value>Ausführungen der letzten 7 Tage</value></data>
+  <data name="Dashboard.NothingUpcoming" xml:space="preserve"><value>Für keine Aufgabe ist ein Start geplant.</value></data>
 </root>

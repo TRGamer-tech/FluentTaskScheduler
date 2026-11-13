@@ -577,13 +577,13 @@ Restart now to apply the update?</value></data>
   <data name="Dashboard.Throughput" xml:space="preserve"><value>Executions</value></data>
   <data name="Dashboard.Runs24h" xml:space="preserve"><value>in the last 24h</value></data>
   <data name="Dashboard.Runs7d" xml:space="preserve"><value>in the last 7 days</value></data>
-  <data name="Dashboard.AvgDuration" xml:space="preserve"><value>Average Duration</value></data>
+  <data name="Dashboard.AvgDuration" xml:space="preserve"><value>Average duration</value></data>
   <data name="Dashboard.AvgDurationHint" xml:space="preserve"><value>Across all completed runs (7 days)</value></data>
   <data name="Dashboard.LongestTask" xml:space="preserve"><value>Longest Run</value></data>
-  <data name="Dashboard.HeatmapTitle" xml:space="preserve"><value>Execution Heatmap - by hour of day</value></data>
+  <data name="Dashboard.HeatmapTitle" xml:space="preserve"><value>Runs by hour of day</value></data>
   <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>{0}:00 - {1} run(s) in the last 7 days</value></data>
   <data name="Dashboard.PeakHour" xml:space="preserve"><value>Busiest hour:</value></data>
-  <data name="Dashboard.ExecutionStream" xml:space="preserve"><value>Execution Log Stream</value></data>
+  <data name="Dashboard.ExecutionStream" xml:space="preserve"><value>Execution log</value></data>
   <data name="Dashboard.NoExecutionEntries" xml:space="preserve"><value>No runs recorded for this filter.</value></data>
   <data name="Dashboard.Filter.All" xml:space="preserve"><value>All</value></data>
   <data name="Dashboard.Status.Success" xml:space="preserve"><value>Success</value></data>
@@ -1086,5 +1086,7 @@ Restart now to apply the update?</value></data>
   <data name="Dashboard.Running.Since" xml:space="preserve"><value>Since {0}</value></data>
   <data name="Dashboard.Refused.Manual" xml:space="preserve"><value>Manual start</value></data>
   <data name="Dashboard.Refused.CompletionAction" xml:space="preserve"><value>Completion action</value></data>
+  <data name="Dashboard.Runs.Title" xml:space="preserve"><value>Runs in the last 7 days</value></data>
+  <data name="Dashboard.NothingUpcoming" xml:space="preserve"><value>No task is scheduled to run.</value></data>
 </root>
 

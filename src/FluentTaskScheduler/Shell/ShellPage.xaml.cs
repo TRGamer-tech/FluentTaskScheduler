@@ -24,7 +24,7 @@ public sealed partial class ShellPage : Page, IShellNavigator
     private static readonly Dictionary<string, Destination> Destinations = new()
     {
         ["Tasks"] = new(typeof(TasksPage), "Main.Header.ScheduledTasks"),
-        ["Dashboard"] = new(typeof(DashboardPage), "Main.Header.Dashboard", CreatedByFrame: true),
+        ["Dashboard"] = new(typeof(DashboardPage), "Main.Header.Dashboard"),
         ["QuickActions"] = new(typeof(QuickActionsPage), "Main.Header.QuickActions"),
         ["ScriptLibrary"] = new(typeof(LibraryPage), "Main.Header.Library"),
         ["ScriptEditor"] = new(typeof(ScriptEditorPage), "Main.Header.ScriptEditor.Text"),

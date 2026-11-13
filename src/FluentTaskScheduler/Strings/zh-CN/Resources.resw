@@ -584,10 +584,10 @@
   <data name="Dashboard.AvgDuration" xml:space="preserve"><value>平均耗时</value></data>
   <data name="Dashboard.AvgDurationHint" xml:space="preserve"><value>基于全部已完成的运行（7 天）</value></data>
   <data name="Dashboard.LongestTask" xml:space="preserve"><value>最长运行</value></data>
-  <data name="Dashboard.HeatmapTitle" xml:space="preserve"><value>执行热力图 —— 按小时分布</value></data>
+  <data name="Dashboard.HeatmapTitle" xml:space="preserve"><value>按小时统计的运行次数</value></data>
   <data name="Dashboard.Heatmap.CellTooltip" xml:space="preserve"><value>{0}:00 - 过去 7 天内运行 {1} 次</value></data>
   <data name="Dashboard.PeakHour" xml:space="preserve"><value>最繁忙时段：</value></data>
-  <data name="Dashboard.ExecutionStream" xml:space="preserve"><value>执行日志流</value></data>
+  <data name="Dashboard.ExecutionStream" xml:space="preserve"><value>执行日志</value></data>
   <data name="Dashboard.NoExecutionEntries" xml:space="preserve"><value>此筛选条件下没有记录的运行。</value></data>
   <data name="Dashboard.Filter.All" xml:space="preserve"><value>全部</value></data>
   <data name="Dashboard.Status.Success" xml:space="preserve"><value>成功</value></data>
@@ -1089,6 +1089,8 @@
   <data name="Dashboard.Running.Since" xml:space="preserve"><value>自 {0} 起</value></data>
   <data name="Dashboard.Refused.Manual" xml:space="preserve"><value>手动启动</value></data>
   <data name="Dashboard.Refused.CompletionAction" xml:space="preserve"><value>完成后操作</value></data>
+  <data name="Dashboard.Runs.Title" xml:space="preserve"><value>最近 7 天的运行次数</value></data>
+  <data name="Dashboard.NothingUpcoming" xml:space="preserve"><value>没有计划运行的任务。</value></data>
 </root>
 
 

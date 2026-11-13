@@ -63,9 +63,9 @@ choco install fluenttaskscheduler
 
 ### 🕹️ Dashboard & Monitoring
 
-- **Activity Stream**: A live feed of task activity. Click any entry to jump directly to the task details.
+- **Execution Log**: A live list of the runs of the last seven days, and of the starts a snooze refused, that can be narrowed to what succeeded, failed or was snoozed. Click any entry to jump directly to its task.
 - **Task History**: Comprehensive history of all task executions, keeping you informed of every run.
-- **Visual Analytics**: A dynamic task run history chart on the dashboard showing successes vs. failures over time.
+- **Visual Analytics**: A health score for the last seven days, the runs per hour of the day, and how long runs take, for all tasks or for one category or tag.
 - **Animated Status**: Clearly identify running tasks at a glance with animated status indicators.
 
 ### 🕒 Comprehensive Triggers

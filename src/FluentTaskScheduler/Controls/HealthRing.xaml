@@ -1,0 +1,36 @@
+<UserControl
+    x:Class="FluentTaskScheduler.Controls.HealthRing"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    IsTabStop="False">
+
+    <Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="Levels">
+                <VisualState x:Name="None"/>
+                <VisualState x:Name="Good">
+                    <VisualState.Setters>
+                        <Setter Target="Ring.Foreground" Value="{ThemeResource SystemFillColorSuccessBrush}"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Fair">
+                    <VisualState.Setters>
+                        <Setter Target="Ring.Foreground" Value="{ThemeResource SystemFillColorCautionBrush}"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Poor">
+                    <VisualState.Setters>
+                        <Setter Target="Ring.Foreground" Value="{ThemeResource SystemFillColorCriticalBrush}"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <!-- A determinate ring draws its background as the track. The score is written next to
+             the ring, so a screen reader is not told it twice. -->
+        <ProgressRing x:Name="Ring" Width="48" Height="48" IsIndeterminate="False"
+                      Value="{x:Bind Score, Mode=OneWay}"
+                      Background="{ThemeResource ControlStrongStrokeColorDisabledBrush}"
+                      AutomationProperties.AccessibilityView="Raw"/>
+    </Grid>
+</UserControl>
