@@ -20,6 +20,7 @@ internal sealed class TrayIcon : IDisposable
 {
     private const string WindowClassName = "FluentTaskScheduler.TrayIcon";
     private const uint IconMessage = 0x0401; // WM_USER + 1
+    private const uint CheckDpiMessage = 0x0402; // WM_USER + 2
     private const int MaxTooltipLength = 127;
 
     // Explorer announces a new taskbar with this message, e.g. after it crashed and was restarted.
@@ -54,9 +55,12 @@ internal sealed class TrayIcon : IDisposable
         _window = CreateWindowExW(0, WindowClassName, "", 0, 0, 0, 0, 0, 0, 0, _module, 0);
         if (_window == 0) throw new Win32Exception();
 
-        // Windows keeps Explorer's messages from a program that runs as administrator unless it
-        // lets them through. Without this, the icon would not come back after Explorer restarts.
+        // Windows keeps the messages of programs with fewer rights, Explorer's among them, from a
+        // program that runs as administrator unless it lets them through. Without this, the icon
+        // would not come back after Explorer restarts, and could miss a new display scaling.
         ChangeWindowMessageFilterEx(_window, TaskbarCreated, MSGFLT_ALLOW, 0);
+        ChangeWindowMessageFilterEx(_window, WM_SETTINGCHANGE, MSGFLT_ALLOW, 0);
+        ChangeWindowMessageFilterEx(_window, WM_DISPLAYCHANGE, MSGFLT_ALLOW, 0);
     }
 
     /// <summary>The user clicked the icon.</summary>
@@ -66,7 +70,10 @@ internal sealed class TrayIcon : IDisposable
     public event Action? MenuRequested;
 
     /// <summary>The DPI of the display with the notification area, which the icon is to be drawn for.</summary>
-    public uint Dpi { get; } = MainDisplayDpi();
+    public uint Dpi { get; private set; } = MainDisplayDpi();
+
+    /// <summary><see cref="Dpi"/> changed, as it does with the display scaling: the icon is to be drawn anew.</summary>
+    public event Action? DpiChanged;
 
     /// <summary>Uses <paramref name="icon"/> from now on and takes charge of destroying it.</summary>
     public void SetIcon(nint icon)
@@ -203,11 +210,25 @@ internal sealed class TrayIcon : IDisposable
 
             if (message == TaskbarCreated)
             {
-                // The new taskbar starts without the icon.
+                // The new taskbar starts without the icon, and may show icons at another size.
                 _added = false;
+                CheckDpi();
                 if (_wanted) Add();
                 return 0;
             }
+
+            if (message == CheckDpiMessage)
+            {
+                CheckDpi();
+                return 0;
+            }
+
+            // Which of these reaches a window that is never shown when the display scaling
+            // changes is up to Windows: WM_DPICHANGED is meant for windows on a display,
+            // WM_SETTINGCHANGE comes when the taskbar takes another size with the scaling,
+            // WM_DISPLAYCHANGE with a new resolution. Each leads to a check once the window has
+            // answered: the sender waits for that, and can be Explorer, which a new icon goes to.
+            if (message is WM_DPICHANGED or WM_SETTINGCHANGE or WM_DISPLAYCHANGE) PostMessageW(_window, CheckDpiMessage, 0, 0);
         }
         catch (Exception ex)
         {
@@ -216,6 +237,14 @@ internal sealed class TrayIcon : IDisposable
             return 0;
         }
         return DefWindowProcW(window, message, wParam, lParam);
+    }
+
+    private void CheckDpi()
+    {
+        uint dpi = MainDisplayDpi();
+        if (dpi == Dpi) return;
+        Dpi = dpi;
+        DpiChanged?.Invoke();
     }
 
     /// <summary>
@@ -243,6 +272,7 @@ internal sealed class TrayIcon : IDisposable
     private const int NIM_ADD = 0, NIM_MODIFY = 1, NIM_DELETE = 2;
     private const int NIF_MESSAGE = 1, NIF_ICON = 2, NIF_TIP = 4;
     private const uint WM_CONTEXTMENU = 0x007B, WM_LBUTTONUP = 0x0202, WM_RBUTTONUP = 0x0205;
+    private const uint WM_SETTINGCHANGE = 0x001A, WM_DISPLAYCHANGE = 0x007E, WM_DPICHANGED = 0x02E0;
     private const uint MF_STRING = 0x0000, MF_GRAYED = 0x0001, MF_POPUP = 0x0010, MF_SEPARATOR = 0x0800;
     private const uint TPM_RIGHTBUTTON = 0x0002, TPM_NONOTIFY = 0x0080, TPM_RETURNCMD = 0x0100;
     private const uint MSGFLT_ALLOW = 1;

@@ -58,6 +58,7 @@ internal sealed class Tray(WindowManager windows, ISettingsStore settings, ITask
             var icon = new TrayIcon();
             icon.Clicked += windows.ShowLastHidden;
             icon.MenuRequested += () => icon.ShowMenu(BuildMenu());
+            icon.DpiChanged += Redraw;
             _icon = icon;
             Redraw();
             icon.Show();
