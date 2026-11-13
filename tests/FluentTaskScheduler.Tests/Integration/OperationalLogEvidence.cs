@@ -20,6 +20,7 @@ public sealed class OperationalLogEvidence
     private const string Channel = "Microsoft-Windows-TaskScheduler/Operational";
     private const string Provider = "Microsoft-Windows-TaskScheduler";
     private const string LongRunning = "ping -n 30 127.0.0.1 > nul";
+    private const string MissingExe = @"C:\FtsTests\does-not-exist.exe";
 
     private static readonly TimeSpan TimeLimit = TimeSpan.FromMinutes(1);
 
@@ -29,6 +30,7 @@ public sealed class OperationalLogEvidence
     private readonly List<string> _failures = [];
     private DateTime _sinceUtc;
     private string _folderPath = "";
+    private TaskService? _service;
 
     public OperationalLogEvidence(ITestOutputHelper output) => _out = output;
 
@@ -47,6 +49,7 @@ public sealed class OperationalLogEvidence
         try
         {
             using var sandbox = new SchedulerSandbox();
+            _service = sandbox.Service;
             _folderPath = sandbox.FolderPath;
             try
             {
@@ -67,7 +70,7 @@ public sealed class OperationalLogEvidence
                 });
 
                 // Registered first and collected last: its minute passes while the other scenarios run.
-                ScheduledTask? limited = null;
+                string? limited = null;
                 DateTime limitedStart = DateTime.Now.AddSeconds(10);
                 Scenario("(f) registration of the task with an execution time limit, started by a time trigger", () =>
                 {
@@ -81,9 +84,9 @@ public sealed class OperationalLogEvidence
 
                 Scenario("How long after enabling does the first run show up in the log?", () =>
                 {
-                    var warmUp = Register(sandbox, "W_WarmUp", null, Cmd("exit 0"));
+                    string warmUp = Register(sandbox, "W_WarmUp", null, Cmd("exit 0"));
                     Start(warmUp);
-                    bool logged = WaitUntil(() => ReadLog(withText: false).Any(e => Mentions(e, warmUp.Path) && e.Id != 106), TimeSpan.FromSeconds(30));
+                    bool logged = WaitUntil(() => ReadLog(withText: false).Any(e => Mentions(e, warmUp) && e.Id is not (106 or 140)), TimeSpan.FromSeconds(30));
                     Line($"  first run event visible: {logged}, {enabling.ElapsedMilliseconds} ms after enabling started");
                     WaitForEnd(warmUp);
                     Report(warmUp);
@@ -93,14 +96,20 @@ public sealed class OperationalLogEvidence
 
                 Scenario("(b) one action that exits with 3", () => Finish(Register(sandbox, "B_ExitThree", null, Cmd("exit 3"))));
 
+                // The log showed exit code 3 as 2147942403; these two tell how larger and negative codes are logged.
+                Scenario("(b2) one action that exits with 70000, which does not fit in 16 bits", () =>
+                    Finish(Register(sandbox, "B2_ExitLarge", null, Cmd("exit 70000"))));
+
+                Scenario("(b3) one action that exits with -1", () => Finish(Register(sandbox, "B3_ExitNegative", null, Cmd("exit -1"))));
+
                 Scenario("(c) an executable that does not exist", () =>
-                    Finish(Register(sandbox, "C_MissingExe", null, new ExecAction(@"C:\FtsTests\does-not-exist.exe"))));
+                    Finish(Register(sandbox, "C_MissingExe", null, new ExecAction(MissingExe))));
 
                 Scenario("(d) a long-running action, stopped through the API after it started", () =>
                 {
-                    var task = Register(sandbox, "D_Stopped", null, Cmd(LongRunning));
+                    string task = Register(sandbox, "D_Stopped", null, Cmd(LongRunning));
                     Start(task);
-                    Line($"  reached Running: {WaitUntil(() => task.State == TaskState.Running, TimeSpan.FromSeconds(15))}");
+                    Line($"  reached Running: {WaitUntil(() => StateOf(task) == TaskState.Running, TimeSpan.FromSeconds(15))}");
                     WaitForQuietLog();
                     Stop(task);
                     WaitForEnd(task);
@@ -112,9 +121,9 @@ public sealed class OperationalLogEvidence
 
                 Scenario("(g) started again while an instance is running, policy IgnoreNew", () =>
                 {
-                    var task = Register(sandbox, "G_IgnoreNew", definition => definition.Settings.MultipleInstances = TaskInstancesPolicy.IgnoreNew, Cmd(LongRunning));
+                    string task = Register(sandbox, "G_IgnoreNew", definition => definition.Settings.MultipleInstances = TaskInstancesPolicy.IgnoreNew, Cmd(LongRunning));
                     Start(task);
-                    Line($"  reached Running: {WaitUntil(() => task.State == TaskState.Running, TimeSpan.FromSeconds(15))}");
+                    Line($"  reached Running: {WaitUntil(() => StateOf(task) == TaskState.Running, TimeSpan.FromSeconds(15))}");
                     WaitForQuietLog();
                     Line("  second request, plain Run():");
                     Start(task, ignoreConstraints: false);
@@ -122,7 +131,7 @@ public sealed class OperationalLogEvidence
                     Line("  third request, RunEx(IgnoreConstraints) as the app starts tasks:");
                     Start(task);
                     WaitForQuietLog();
-                    Line($"  running instances now: {Safe(() => task.GetInstances().Count.ToString(CultureInfo.InvariantCulture))}");
+                    Line($"  running instances now: {Safe(() => Fresh(task).GetInstances().Count.ToString(CultureInfo.InvariantCulture))}");
                     Report(task);
                     Line("  now stopping the instance that is still running");
                     Stop(task);
@@ -132,7 +141,7 @@ public sealed class OperationalLogEvidence
 
                 Scenario("(h) two instances of one task at the same time, policy Parallel", () =>
                 {
-                    var task = Register(sandbox, "H_Parallel", definition => definition.Settings.MultipleInstances = TaskInstancesPolicy.Parallel, Cmd("ping -n 4 127.0.0.1 > nul"));
+                    string task = Register(sandbox, "H_Parallel", definition => definition.Settings.MultipleInstances = TaskInstancesPolicy.Parallel, Cmd("ping -n 4 127.0.0.1 > nul"));
                     Start(task);
                     Thread.Sleep(700);
                     Start(task);
@@ -142,13 +151,13 @@ public sealed class OperationalLogEvidence
 
                 Scenario("(i) a task is registered, changed, disabled, enabled and deleted", () =>
                 {
-                    var task = Register(sandbox, "I_Lifecycle", null, Cmd("exit 0"));
-                    string path = task.Path;
+                    string path = Register(sandbox, "I_Lifecycle", null, Cmd("exit 0"));
+                    var task = Fresh(path);
                     task.Definition.RegistrationInfo.Description = "changed";
                     task.RegisterChanges();
                     task.Enabled = false;
                     task.Enabled = true;
-                    sandbox.Folder.DeleteTask(task.Name);
+                    sandbox.Folder.DeleteTask("I_Lifecycle");
                     WaitForQuietLog();
                     ReportEvents(path);
                 });
@@ -162,7 +171,7 @@ public sealed class OperationalLogEvidence
                     {
                         var definition = sandbox.Service.NewTask();
                         definition.Actions.Add(Cmd("exit 0"));
-                        var task = sandbox.Folder.RegisterTaskDefinition("J_LogonFails", definition, TaskCreation.CreateOrUpdate, user, password, TaskLogonType.Password);
+                        string task = sandbox.Folder.RegisterTaskDefinition("J_LogonFails", definition, TaskCreation.CreateOrUpdate, user, password, TaskLogonType.Password).Path;
                         Line("  " + Shell("net.exe", $"user {user} Zz9!{Guid.NewGuid().ToString("N")[..9]}"));
                         Finish(task);
                     }
@@ -172,13 +181,49 @@ public sealed class OperationalLogEvidence
                     }
                 });
 
+                Scenario("(k1) two actions: the first exits with 0, the second cannot be launched", () =>
+                    Finish(Register(sandbox, "K1_SecondMissing", null, Cmd("exit 0"), new ExecAction(MissingExe))));
+
+                Scenario("(k2) two actions: the first cannot be launched, the second exits with 0", () =>
+                    Finish(Register(sandbox, "K2_FirstMissing", null, new ExecAction(MissingExe), Cmd("exit 0"))));
+
+                Scenario("(m) started again while an instance is running, policy StopExisting", () =>
+                {
+                    string task = Register(sandbox, "M_StopExisting", definition => definition.Settings.MultipleInstances = TaskInstancesPolicy.StopExisting, Cmd(LongRunning));
+                    Start(task);
+                    Line($"  reached Running: {WaitUntil(() => StateOf(task) == TaskState.Running, TimeSpan.FromSeconds(15))}");
+                    WaitForQuietLog();
+                    Line("  second request:");
+                    Start(task);
+                    WaitForQuietLog();
+                    Report(task);
+                    Line("  now stopping the instance that is still running");
+                    Stop(task);
+                    WaitForEnd(task);
+                    Report(task);
+                });
+
+                Scenario("(n) started again while an instance is running, policy Queue", () =>
+                {
+                    string task = Register(sandbox, "N_Queue", definition => definition.Settings.MultipleInstances = TaskInstancesPolicy.Queue, Cmd("ping -n 4 127.0.0.1 > nul"));
+                    Start(task);
+                    Line($"  reached Running: {WaitUntil(() => StateOf(task) == TaskState.Running, TimeSpan.FromSeconds(15))}");
+                    Line("  second request:");
+                    Start(task);
+                    WaitForEnd(task);
+                    // The queued instance starts when the first one ends; give it its turn.
+                    WaitUntil(() => StateOf(task) is TaskState.Running or TaskState.Queued, TimeSpan.FromSeconds(5));
+                    WaitForEnd(task);
+                    Report(task);
+                });
+
                 Scenario("(f) the task with an execution time limit, started by a time trigger", () =>
                 {
                     if (limited is null) throw new InvalidOperationException("The task could not be registered.");
                     TimeSpan remaining = limitedStart + TimeLimit + TimeSpan.FromSeconds(50) - DateTime.Now;
-                    bool started = WaitUntil(() => limited.State == TaskState.Running || limited.LastRunTime > DateTime.Now.AddMinutes(-10), TimeSpan.FromSeconds(30));
+                    bool started = WaitUntil(() => StateOf(limited) == TaskState.Running || Fresh(limited).LastRunTime > DateTime.Now.AddMinutes(-10), TimeSpan.FromSeconds(30));
                     Line($"  started by its trigger: {started}");
-                    bool ended = WaitUntil(() => limited.State != TaskState.Running, remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero);
+                    bool ended = WaitUntil(() => StateOf(limited) != TaskState.Running, remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero);
                     Line($"  ended without being stopped by this test: {ended}");
                     WaitForQuietLog();
                     Report(limited);
@@ -244,28 +289,40 @@ public sealed class OperationalLogEvidence
 
     private static ExecAction Cmd(string command) => new("cmd.exe", "/c " + command);
 
-    private static ScheduledTask Register(SchedulerSandbox sandbox, string name, Action<TaskDefinition>? configure, params ExecAction[] actions)
+    /// <returns>The path of the registered task.</returns>
+    private static string Register(SchedulerSandbox sandbox, string name, Action<TaskDefinition>? configure, params ExecAction[] actions)
     {
         var definition = sandbox.Service.NewTask();
         definition.RegistrationInfo.Description = "Operational log evidence";
         foreach (var action in actions) definition.Actions.Add(action);
         configure?.Invoke(definition);
-        return sandbox.Folder.RegisterTaskDefinition(name, definition);
+        return sandbox.Folder.RegisterTaskDefinition(name, definition).Path;
     }
 
-    private void Finish(ScheduledTask task)
+    /// <summary>
+    /// A new object for the task every time. The object a task was started through must not be
+    /// kept next to the instance object the start returns: both hold the same COM reference, so
+    /// releasing one leaves the other unusable.
+    /// </summary>
+    private ScheduledTask Fresh(string path) =>
+        _service!.GetTask(path) ?? throw new InvalidOperationException($"There is no task at {path}.");
+
+    private TaskState StateOf(string path) => Fresh(path).State;
+
+    private void Finish(string path)
     {
-        Start(task);
-        WaitForEnd(task);
-        Report(task);
+        Start(path);
+        WaitForEnd(path);
+        Report(path);
     }
 
-    private void Start(ScheduledTask task, bool ignoreConstraints = true)
+    private void Start(string path, bool ignoreConstraints = true)
     {
         string call = ignoreConstraints ? "RunEx(IgnoreConstraints)" : "Run()";
         try
         {
-            using RunningTask? instance = ignoreConstraints ? task.RunEx(TaskRunFlags.IgnoreConstraints, 0, null) : task.Run();
+            var task = Fresh(path);
+            RunningTask? instance = ignoreConstraints ? task.RunEx(TaskRunFlags.IgnoreConstraints, 0, null) : task.Run();
             Line($"  {call} returned {(instance is null ? "null" : "instance " + Safe(() => instance.InstanceGuid.ToString("B")))}");
         }
         catch (Exception ex)
@@ -274,11 +331,11 @@ public sealed class OperationalLogEvidence
         }
     }
 
-    private void Stop(ScheduledTask task)
+    private void Stop(string path)
     {
         try
         {
-            task.Stop();
+            Fresh(path).Stop();
             Line("  Stop() returned");
         }
         catch (Exception ex)
@@ -288,15 +345,14 @@ public sealed class OperationalLogEvidence
     }
 
     /// <summary>Waits until the run that was just requested is over and the log has caught up with it.</summary>
-    private void WaitForEnd(ScheduledTask task)
+    private void WaitForEnd(string path)
     {
-        string path = task.Path;
         bool attempted = WaitUntil(
-            () => task.State is TaskState.Running or TaskState.Queued || ReadLog(withText: false).Any(e => Mentions(e, path) && e.Id is not (106 or 140)),
+            () => StateOf(path) is TaskState.Running or TaskState.Queued || ReadLog(withText: false).Any(e => Mentions(e, path) && e.Id is not (106 or 140)),
             TimeSpan.FromSeconds(20));
         if (!attempted) Line("  nothing happened within 20 s of the start request");
 
-        bool ended = WaitUntil(() => task.State is not (TaskState.Running or TaskState.Queued), TimeSpan.FromSeconds(60));
+        bool ended = WaitUntil(() => StateOf(path) is not (TaskState.Running or TaskState.Queued), TimeSpan.FromSeconds(60));
         if (!ended) Line("  still running after 60 s");
         WaitForQuietLog();
     }
@@ -334,11 +390,12 @@ public sealed class OperationalLogEvidence
         return condition();
     }
 
-    private void Report(ScheduledTask task)
+    private void Report(string path)
     {
+        var task = Fresh(path);
         Line($"  state={Safe(() => task.State.ToString())} LastTaskResult={Safe(() => $"0x{task.LastTaskResult:X8} ({task.LastTaskResult})")} " +
              $"LastRunTime={Safe(() => task.LastRunTime.ToString("O", CultureInfo.InvariantCulture))} missedRuns={Safe(() => task.NumberOfMissedRuns.ToString(CultureInfo.InvariantCulture))}");
-        ReportEvents(task.Path);
+        ReportEvents(path);
     }
 
     /// <summary>
