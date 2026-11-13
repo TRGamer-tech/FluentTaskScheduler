@@ -85,6 +85,10 @@ public sealed class AppSession : IDisposable
             scenario);
         Directory.CreateDirectory(artifacts);
 
+        // The app runs once per user. A copy left over from an earlier test, for example one that
+        // crashed and is still being written to a dump, would answer this start instead.
+        EndRunningCopies();
+
         string data = Path.Combine(Path.GetTempPath(), "FtsUiTests_" + Guid.NewGuid().ToString("N")[..8]);
         Directory.CreateDirectory(data);
         File.WriteAllText(Path.Combine(data, "settings.json"), settingsJson);
@@ -338,9 +342,52 @@ public sealed class AppSession : IDisposable
 
     public void Dispose()
     {
+        // What the window showed last, and what the app wrote into its logs, explain a failure
+        // that happened inside the app better than any assertion can.
+        if (!_app.HasExited) Snapshot("last");
+        KeepAppFiles();
+
         try { if (!_app.HasExited) _app.Kill(); } catch { }
         _app.Dispose();
         _automation.Dispose();
+        EndRunningCopies();
         try { Directory.Delete(DataDir, recursive: true); } catch (IOException) { } catch (UnauthorizedAccessException) { }
+    }
+
+    private void KeepAppFiles()
+    {
+        try
+        {
+            string kept = Path.Combine(ArtifactsDir, "app-data");
+            Directory.CreateDirectory(kept);
+            foreach (string file in Directory.EnumerateFiles(DataDir, "*", SearchOption.AllDirectories)
+                         .Where(file => Path.GetExtension(file) is ".txt" or ".json" or ".log"))
+            {
+                File.Copy(file, Path.Combine(kept, Path.GetFileName(file)), overwrite: true);
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // a log still held open by an app that is being ended
+        }
+    }
+
+    private static void EndRunningCopies()
+    {
+        foreach (Process copy in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(ExePath)))
+        {
+            using (copy)
+            {
+                try
+                {
+                    copy.Kill(entireProcessTree: true);
+                    copy.WaitForExit(15000);
+                }
+                catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception)
+                {
+                    // already gone
+                }
+            }
+        }
     }
 }
