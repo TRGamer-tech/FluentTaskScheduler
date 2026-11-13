@@ -142,7 +142,7 @@
             </StackPanel>
             <TextBlock x:Name="DetailsSnoozeStatus" Text="{x:Bind ViewModel.SnoozeStatus, Mode=OneWay}"
                        Foreground="{ThemeResource SystemFillColorCautionBrush}" Visibility="{x:Bind ViewModel.IsSnoozed, Mode=OneWay}"/>
-            <!-- Collapsed as well as closed while there is nothing to say: a closed bar would still take the panel's spacing. -->
+            <!-- Each bar is collapsed as well as closed while it has nothing to say: a closed bar would still take the panel's spacing. -->
             <InfoBar x:Name="DetailsSnoozeProblem" Severity="Warning" IsClosable="False"
                      IsOpen="{x:Bind ViewModel.HasSnoozeProblem, Mode=OneWay}" Visibility="{x:Bind ViewModel.HasSnoozeProblem, Mode=OneWay}"
                      Message="{x:Bind ViewModel.SnoozeProblem, Mode=OneWay}"/>
@@ -175,7 +175,7 @@
             </Grid>
 
             <InfoBar x:Name="DetailsLogOff" Severity="Warning" IsClosable="False"
-                     IsOpen="{x:Bind ViewModel.IsLogOff, Mode=OneWay}"
+                     IsOpen="{x:Bind ViewModel.IsLogOff, Mode=OneWay}" Visibility="{x:Bind ViewModel.IsLogOff, Mode=OneWay}"
                      Title="{x:Bind l:Loc.Get('Details.History.Off.Title')}"
                      Message="{x:Bind l:Loc.Get('Details.History.Off.Message')}">
                 <InfoBar.ActionButton>
@@ -184,7 +184,7 @@
                 </InfoBar.ActionButton>
             </InfoBar>
             <InfoBar x:Name="DetailsProblem" Severity="Error" IsClosable="False"
-                     IsOpen="{x:Bind ViewModel.HasProblem, Mode=OneWay}"
+                     IsOpen="{x:Bind ViewModel.HasProblem, Mode=OneWay}" Visibility="{x:Bind ViewModel.HasProblem, Mode=OneWay}"
                      Message="{x:Bind ViewModel.Problem, Mode=OneWay}"/>
 
             <!-- The numbers double as filters for the list below. -->
