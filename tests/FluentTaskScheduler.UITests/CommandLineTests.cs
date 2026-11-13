@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
 using FlaUI.Core.AutomationElements;
-using FlaUI.Core.Definitions;
 using FlaUI.Core.Tools;
 using FlaUI.UIA3;
 
@@ -86,14 +85,14 @@ public class CommandLineTests
     {
         string title = "FtsCli_" + Guid.NewGuid().ToString("N")[..8];
 
-        // conhost.exe gives the command a classic console window, whatever the default terminal is.
-        // It has to be started through the shell: handed this process's redirected output, it
-        // would open no window and write there instead.
+        // Started through the shell, so the console gets a window of its own: handed this
+        // process's redirected output, it would write there instead. Which program shows that
+        // window (the classic console host or Windows Terminal) is up to Windows.
         using var console = Process.Start(new ProcessStartInfo(
-            "conhost.exe", $"cmd.exe /c \"title {title} & \"{AppSession.ExePath}\" --help & pause\"") { UseShellExecute = true })!;
+            "cmd.exe", $"/c \"title {title} & \"{AppSession.ExePath}\" --help & pause\"") { UseShellExecute = true })!;
+        using var automation = new UIA3Automation();
         try
         {
-            using var automation = new UIA3Automation();
             string text = "";
             bool shown = Retry.WhileFalse(() =>
             {
@@ -105,15 +104,31 @@ public class CommandLineTests
         }
         finally
         {
+            // Ending cmd closes the classic console; a terminal window may have to be closed itself.
             console.Kill(entireProcessTree: true);
+            ConsoleWindow(automation, title)?.Patterns.Window.PatternOrDefault?.Close();
         }
     }
 
+    private static AutomationElement? ConsoleWindow(UIA3Automation automation, string title) =>
+        automation.GetDesktop().FindAllChildren().FirstOrDefault(candidate => Name(candidate).Contains(title));
+
+    // The text area is a direct child in the classic console and sits deeper in Windows Terminal.
     private static string ConsoleText(UIA3Automation automation, string title)
     {
-        AutomationElement? window = automation.GetDesktop().FindAllChildren().FirstOrDefault(candidate => Name(candidate).Contains(title));
-        AutomationElement? textArea = window?.FindAllChildren().FirstOrDefault(child => child.ControlType == ControlType.Document);
-        return textArea?.Patterns.Text.PatternOrDefault?.DocumentRange.GetText(-1) ?? "";
+        if (ConsoleWindow(automation, title) is not { } window) return "";
+        foreach (AutomationElement element in AppSession.Walk(window))
+        {
+            try
+            {
+                if (element.Patterns.Text.PatternOrDefault?.DocumentRange.GetText(-1) is { Length: > 0 } text) return text;
+            }
+            catch (Exception ex) when (ex is System.Runtime.InteropServices.COMException or InvalidOperationException)
+            {
+                // an element that went away while the window was being built
+            }
+        }
+        return "";
     }
 
     private static string Name(AutomationElement element)

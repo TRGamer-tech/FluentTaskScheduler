@@ -198,6 +198,29 @@ public sealed class AppSession : IDisposable
     }
 
     /// <summary>
+    /// Answers the file dialog the app has just opened, through its controls rather than the
+    /// keyboard, so it does not matter which window has the focus.
+    /// </summary>
+    public void ChooseFile(string path)
+    {
+        // The app runs elevated in these tests and then shows the classic dialog, in its own process.
+        AutomationElement dialog = Retry.WhileNull(() =>
+                Window.FindAllChildren().Concat(_automation.GetDesktop().FindAllChildren())
+                      .FirstOrDefault(candidate => candidate.Properties.ClassName.ValueOrDefault == "#32770"
+                                                   && candidate.Properties.ProcessId.ValueOrDefault == _app.ProcessId),
+                TimeSpan.FromSeconds(20), TimeSpan.FromMilliseconds(250)).Result
+            ?? throw new InvalidOperationException("The app opened no file dialog.");
+
+        AutomationElement fileName = dialog.FindFirstDescendant(cf => cf.ByControlType(ControlType.Edit).And(cf.ByAutomationId("1148")))
+                                     ?? throw new InvalidOperationException("The file dialog has no box for the file name.");
+        fileName.AsTextBox().Text = path;
+
+        AutomationElement open = dialog.FindFirstChild(cf => cf.ByAutomationId("1"))
+                                 ?? throw new InvalidOperationException("The file dialog has no Open button.");
+        open.Press();
+    }
+
+    /// <summary>
     /// The text of a dialog the app is showing, or null if there is none. A dialog nobody asked
     /// for is how the app reports that something went wrong.
     /// </summary>

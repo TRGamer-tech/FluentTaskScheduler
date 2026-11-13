@@ -1,7 +1,5 @@
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
-using FlaUI.Core.Input;
-using FlaUI.Core.WindowsAPI;
 
 namespace FluentTaskScheduler.UITests;
 
@@ -160,12 +158,11 @@ public sealed class TaskTests : IDisposable
         using var app = AppSession.Launch("import");
         try
         {
-            // A real click: the classic file dialog holds on to whoever opened it until it is closed.
-            app.ToolbarButton("ImportButton").Click();
-            // The app runs elevated here and therefore shows the classic file dialog, with the file name box focused.
-            Thread.Sleep(2500);
-            Keyboard.Type(file);
-            Keyboard.Type(VirtualKeyShort.ENTER);
+            // On a thread of its own: the classic file dialog may hold on to whoever opened it until it is closed.
+            AutomationElement import = app.ToolbarButton("ImportButton");
+            var pressing = new Thread(import.Press) { IsBackground = true };
+            pressing.Start();
+            app.ChooseFile(file);
 
             app.Require("ImportName", 20000);
             app.Snapshot("import-dialog");
@@ -180,6 +177,7 @@ public sealed class TaskTests : IDisposable
             Assert.Contains("ping", WindowsTasks.Root.Value(name, "Actions", "Exec", "Command"));
             app.Snapshot("imported");
             Assert.Null(app.OpenDialogText());
+            Assert.True(pressing.Join(TimeSpan.FromSeconds(30)), "Pressing Import never returned.");
         }
         finally
         {

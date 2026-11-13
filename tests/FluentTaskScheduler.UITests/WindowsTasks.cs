@@ -75,20 +75,11 @@ public sealed class WindowsTasks : IDisposable
     {
         if (Folder.Length == 0) return;
 
-        if (TryRun($"/Query /FO CSV /NH /TN \"{Folder}\\\"", out string listing))
-        {
-            foreach (string line in listing.Split('\n', StringSplitOptions.RemoveEmptyEntries))
-            {
-                string task = line.Split(',')[0].Trim('"', '\r', ' ');
-                if (task.StartsWith(Folder, StringComparison.OrdinalIgnoreCase)) TryRun($"/Delete /TN \"{task}\" /F", out _);
-            }
-        }
-        RemoveFolder(Folder);
+        // schtasks has no command for folders; the scripting interface of Task Scheduler does.
+        string name = Folder.TrimStart('\\');
+        RunScript($"$folder = $scheduler.GetFolder('\\{name}'); $folder.GetTasks(1) | ForEach-Object {{ $folder.DeleteTask($_.Name, 0) }}; " +
+                  $"$scheduler.GetFolder('\\').DeleteFolder('{name}', 0)");
     }
-
-    // schtasks has no command for folders; the scripting interface of Task Scheduler does.
-    private static void RemoveFolder(string folder) =>
-        RunScript($"$scheduler.GetFolder('\\').DeleteFolder('{folder.TrimStart('\\')}', 0)");
 
     /// <summary>Every task on the machine, hidden ones included, with whether it is enabled.</summary>
     public static IReadOnlyDictionary<string, bool> EnabledStates()
