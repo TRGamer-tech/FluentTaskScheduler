@@ -378,17 +378,15 @@ public class TaskStoreTests
     }
 
     [SkippableFact]
-    public void ATaskThatKeepsNoPassword_NeedsNoneToBeImported()
+    public void ATaskThatRunsWithoutItsUserLoggedOn_ButKeepsNoPassword_IsNotSaidToStoreOne()
     {
-        // "Do not store password" (S4U) is chosen precisely so that Windows keeps no password.
         Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
         using var sandbox = new SchedulerSandbox();
-        using var me = WindowsIdentity.GetCurrent();
-        var definition = SampleTasks.Simple(sandbox.Service);
-        definition.Principal.UserId = me.User!.Value;
-        definition.Principal.LogonType = TaskLogonType.S4U;
+        var task = sandbox.Folder.RegisterTaskDefinition("S4U", SampleTasks.Simple(sandbox.Service), TaskCreation.CreateOrUpdate, TaskAccounts.CurrentUserName, null, TaskLogonType.S4U);
+        using var identity = WindowsIdentity.GetCurrent();
+        string xml = Regex.Replace(task.Xml, "<UserId>[^<]*</UserId>", $"<UserId>{identity.User!.Value}</UserId>");
 
-        var info = _store.Inspect(definition.XmlText);
+        var info = _store.Inspect(xml);
 
         Assert.Equal(TaskAccount.CurrentUser, info.Account);
         Assert.False(info.StoresPassword);

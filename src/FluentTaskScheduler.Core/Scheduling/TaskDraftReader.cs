@@ -27,7 +27,7 @@ internal static class TaskDraftReader
 
             Account = TaskAccounts.FromPrincipal(principal),
             HighestPrivileges = principal.RunLevel == TaskRunLevel.Highest,
-            StoresPassword = principal.LogonType is TaskLogonType.Password or TaskLogonType.InteractiveTokenOrPassword,
+            StoresPassword = TaskRegistration.StoresPassword(principal.LogonType),
 
             RunOnlyIfIdle = settings.RunOnlyIfIdle,
             IdleDuration = settings.IdleSettings.IdleDuration,

@@ -24,6 +24,13 @@ internal static class TaskRegistration
         var logonType => (principal.UserId, logonType)
     };
 
+    /// <summary>
+    /// True for the logon types Windows keeps the account's password for, which it wants again
+    /// whenever the task is registered. A task that runs whether or not its user is logged on
+    /// without storing a password (S4U) is not one of them.
+    /// </summary>
+    public static bool StoresPassword(TaskLogonType logonType) => logonType is TaskLogonType.Password or TaskLogonType.InteractiveTokenOrPassword;
+
     /// <param name="creation">
     /// <see cref="TaskCreation.Create"/> for a task that must not take the place of another one,
     /// <see cref="TaskCreation.CreateOrUpdate"/> only for saving a task under its own name.

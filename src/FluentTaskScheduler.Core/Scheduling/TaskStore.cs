@@ -281,7 +281,7 @@ public sealed class TaskStore : ITaskStore
         }
 
         var folder = TaskPaths.GetOrCreateFolder(service, options.FolderPath);
-        string? password = logonType is TaskLogonType.Password or TaskLogonType.InteractiveTokenOrPassword ? options.Password : null;
+        string? password = TaskRegistration.StoresPassword(logonType) ? options.Password : null;
         return TaskRegistration.Register(folder, options.Name, definition, userId, password, logonType, TaskCreation.Create).Path;
     }
 
