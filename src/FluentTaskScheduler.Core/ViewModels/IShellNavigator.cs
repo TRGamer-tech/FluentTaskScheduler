@@ -5,7 +5,7 @@ namespace FluentTaskScheduler.ViewModels;
 /// <summary>What a page can ask of the window it is shown in.</summary>
 public interface IShellNavigator
 {
-    /// <summary>Switches to the task list, selects the task and opens its details.</summary>
+    /// <summary>Switches to the task list and selects the task, scrolled into view.</summary>
     void ShowTask(string taskPath);
 
     /// <summary>Opens the task editor for a new task that starts out as <paramref name="template"/>.</summary>
