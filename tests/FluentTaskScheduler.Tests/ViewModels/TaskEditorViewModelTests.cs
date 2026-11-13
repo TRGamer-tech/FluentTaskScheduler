@@ -346,7 +346,10 @@ public sealed class TaskEditorViewModelTests : IDisposable
         var (weekly, registration) = (editor.Triggers[0], editor.Triggers[1]);
         Assert.Same(weekly, editor.SelectedTrigger);
 
-        Assert.False(editor.MoveTriggerUpCommand.CanExecute(null) && editor.Triggers.IndexOf(weekly) != 0);
+        editor.MoveTriggerUpCommand.Execute(null);
+        Assert.Equal([weekly, registration], editor.Triggers);
+        Assert.Same(weekly, editor.SelectedTrigger);
+
         editor.MoveTriggerDownCommand.Execute(null);
         Assert.Equal([registration, weekly], editor.Triggers);
         Assert.Same(weekly, editor.SelectedTrigger);
