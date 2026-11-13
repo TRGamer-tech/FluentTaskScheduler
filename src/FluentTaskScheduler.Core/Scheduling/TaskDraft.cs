@@ -59,10 +59,14 @@ public sealed record TriggerDraft
 
     public bool Enabled { get; init; } = true;
 
-    /// <summary>When the trigger becomes active; for calendar triggers also the time of day it fires.</summary>
+    /// <summary>
+    /// When the trigger becomes active; for calendar triggers also the time of day it fires. On the
+    /// local clock: of kind <see cref="DateTimeKind.Local"/> when Task Scheduler keeps the moment
+    /// with its time zone ("synchronize across time zones"), unspecified when it does not.
+    /// </summary>
     public DateTime? Start { get; init; }
 
-    /// <summary>When the trigger stops firing; null if it never expires.</summary>
+    /// <summary>When the trigger stops firing, on the local clock like <see cref="Start"/>; null if it never expires.</summary>
     public DateTime? End { get; init; }
 
     public short DaysInterval { get; init; } = 1;

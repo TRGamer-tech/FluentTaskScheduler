@@ -249,11 +249,12 @@ public sealed partial class TriggerViewModel : ObservableObject
     }
 
     // The pickers know dates and minutes. If what they show is still the stored moment, keep that
-    // one, seconds and all.
+    // one, seconds and all. A moment that was kept with its time zone keeps it when it is changed.
     private static DateTime Moment(DateTimeOffset date, TimeSpan time, DateTime? source)
     {
         var picked = date.Date + new TimeSpan(time.Hours, time.Minutes, 0);
-        return source is { } stored && stored.Date + new TimeSpan(stored.Hour, stored.Minute, 0) == picked ? stored : picked;
+        if (source is not { } stored) return picked;
+        return stored.Date + new TimeSpan(stored.Hour, stored.Minute, 0) == picked ? stored : DateTime.SpecifyKind(picked, stored.Kind);
     }
 
     private static short Count(double value, short source) =>

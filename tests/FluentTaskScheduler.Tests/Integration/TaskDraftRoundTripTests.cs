@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using FluentTaskScheduler.Scheduling;
+using FluentTaskScheduler.ViewModels;
 using Microsoft.Win32.TaskScheduler;
 using Xunit.Abstractions;
 using ScheduledTask = Microsoft.Win32.TaskScheduler.Task;
@@ -121,6 +122,35 @@ public class TaskDraftRoundTripTests
         });
 
         AssertOnlyChanged(diff, "/Task/Triggers/CalendarTrigger[0]/StartBoundary");
+    }
+
+    /// <summary>
+    /// A start written in UTC is shown and changed on the local clock, and stays tied to its time
+    /// zone: "synchronize across time zones" survives the edit.
+    /// </summary>
+    [SkippableFact]
+    public void ChangingAStartWrittenInUtc_KeepsItInATimeZone()
+    {
+        Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
+        using var sandbox = new SchedulerSandbox();
+        var utc = new DateTime(2030, 1, 1, 6, 30, 0, DateTimeKind.Utc);
+        var definition = SampleTasks.Simple(sandbox.Service);
+        definition.Triggers[0].StartBoundary = utc;
+        var task = sandbox.Folder.RegisterTaskDefinition("Utc", definition);
+        Assert.Equal(DateTimeKind.Utc, task.Definition.Triggers[0].StartBoundary.Kind);
+
+        Edit(sandbox, task, draft =>
+        {
+            var trigger = new TriggerViewModel(draft.Triggers[0]);
+            Assert.Equal(utc.ToLocalTime().TimeOfDay, trigger.StartTime);
+            trigger.StartTime += TimeSpan.FromHours(1);
+            Assert.True(trigger.TryBuild(out TriggerDraft changed, out string? problem), problem);
+            return draft with { Triggers = [changed] };
+        });
+
+        DateTime saved = sandbox.Service.GetTask(task.Path).Definition.Triggers[0].StartBoundary;
+        Assert.NotEqual(DateTimeKind.Unspecified, saved.Kind);
+        Assert.Equal(utc.AddHours(1), saved.ToUniversalTime());
     }
 
     [SkippableFact]

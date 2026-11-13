@@ -46,7 +46,24 @@ public class TriggerViewModelTests
 
         Assert.True(trigger.TryBuild(out TriggerDraft built, out _));
         Assert.Equal(new DateTime(2031, 5, 6, 21, 45, 0), built.Start);
+        Assert.Equal(DateTimeKind.Unspecified, built.Start!.Value.Kind);
         Assert.Equal(TriggerType.Daily, built.Type);
+    }
+
+    [Fact]
+    public void AMomentKeptWithItsTimeZone_KeepsItWhenChanged()
+    {
+        var zoned = DateTime.SpecifyKind(Start, DateTimeKind.Local);
+        var trigger = new TriggerViewModel(new TriggerDraft { Type = TriggerType.Daily, SourceIndex = 0, Start = zoned, End = zoned.AddYears(1) });
+
+        trigger.StartTime = new TimeSpan(21, 45, 0);
+        trigger.EndDate = new DateTimeOffset(new DateTime(2033, 3, 4));
+
+        Assert.True(trigger.TryBuild(out TriggerDraft built, out _));
+        Assert.Equal(new DateTime(2031, 5, 6, 21, 45, 0), built.Start);
+        Assert.Equal(DateTimeKind.Local, built.Start!.Value.Kind);
+        Assert.Equal(new DateTime(2033, 3, 4, 7, 8, 0), built.End);
+        Assert.Equal(DateTimeKind.Local, built.End!.Value.Kind);
     }
 
     [Fact]
