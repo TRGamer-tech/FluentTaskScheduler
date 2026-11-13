@@ -14,13 +14,15 @@ namespace FluentTaskScheduler.Views;
 public sealed partial class TasksPage : Page
 {
     private readonly IDialogService _dialogs;
+    private readonly FoldersViewModel _folders;
     private bool _loaded;
     private bool _editing;
     private TaskRow? _menuRow;
 
-    public TasksPage(TasksViewModel viewModel, IDialogService dialogs)
+    public TasksPage(TasksViewModel viewModel, FoldersViewModel folders, IDialogService dialogs)
     {
         ViewModel = viewModel;
+        _folders = folders;
         _dialogs = dialogs;
         InitializeComponent();
         Loaded += async (_, _) =>
@@ -90,7 +92,34 @@ public sealed partial class TasksPage : Page
 
     private static TaskRow RowOf(object sender) => (TaskRow)((FrameworkElement)sender).DataContext;
 
-    private void RowMenu_Opening(object? sender, object e) => _menuRow = (RowMenu.Target as FrameworkElement)?.DataContext as TaskRow;
+    private void RowMenu_Opening(object? sender, object e)
+    {
+        _menuRow = (RowMenu.Target as FrameworkElement)?.DataContext as TaskRow;
+        FillWithFolders(RowMoveMenu.Items, () => _menuRow);
+    }
+
+    private void BatchMoveMenu_Opening(object? sender, object e) => FillWithFolders(BatchMoveMenu.Items, () => null);
+
+    // The folders change while the app runs, so the menu is filled each time it opens.
+    private void FillWithFolders(IList<MenuFlyoutItemBase> items, Func<TaskRow?> row)
+    {
+        items.Clear();
+        foreach (string folder in _folders.AllPaths)
+        {
+            var item = new MenuFlyoutItem { Text = folder };
+            item.Click += async (_, _) => await ViewModel.MoveToFolderAsync(row(), folder);
+            items.Add(item);
+        }
+    }
+
+    private async void Import_Click(object sender, RoutedEventArgs e)
+    {
+        if (await ViewModel.BeginImportAsync() is not { } import) return;
+        if (await _dialogs.ShowAsync(new ImportTaskDialog(import)) != ContentDialogResult.Primary || import.ImportedPath is not { } path) return;
+
+        await ViewModel.ReloadAsync();
+        await ShowAsync(path);
+    }
 
     private async void NewTask_Click(object sender, RoutedEventArgs e) => await CreateTaskAsync();
 

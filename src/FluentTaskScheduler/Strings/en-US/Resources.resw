@@ -335,7 +335,7 @@ Restart now to apply the update?</value></data>
   <data name="Dialog.Trigger.AtStartup" xml:space="preserve"><value>At Startup</value></data>
   <data name="Dialog.Trigger.OneTime" xml:space="preserve"><value>One Time</value></data>
   <data name="Dialog.Trigger.OnEvent" xml:space="preserve"><value>On an event</value></data>
-  <data name="Dialog.Trigger.Session" xml:space="preserve"><value>On Workstation Lock/Unlock</value></data>
+  <data name="Dialog.Trigger.Session" xml:space="preserve"><value>On a session change (lock, unlock, connect)</value></data>
   <data name="Dialog.RandomDelay" xml:space="preserve"><value>Delay task for up to (random delay):</value></data>
   <data name="Dialog.StopAfter" xml:space="preserve"><value>Stop task if runs longer than:</value></data>
   <data name="Dialog.ProgramScript" xml:space="preserve"><value>Program / Script</value></data>
@@ -916,5 +916,13 @@ Restart now to apply the update?</value></data>
   <data name="Tasks.Select" xml:space="preserve"><value>Select</value></data>
   <data name="Tasks.Badge.Unreadable" xml:space="preserve"><value>Unreadable</value></data>
   <data name="Tasks.Toolbar.Sort" xml:space="preserve"><value>Sort</value></data>
+  <data name="Folders.Library" xml:space="preserve"><value>Task Scheduler Library</value></data>
+  <data name="Folders.Reload" xml:space="preserve"><value>Reload folders</value></data>
+  <data name="Tasks.MoveTo" xml:space="preserve"><value>Move to folder</value></data>
+  <data name="Import.Account.Header" xml:space="preserve"><value>Run the task as</value></data>
+  <data name="Import.Account.Keep" xml:space="preserve"><value>The account from the file ({0})</value></data>
+  <data name="Import.Account.Me" xml:space="preserve"><value>Me ({0})</value></data>
+  <data name="Import.Account.Missing" xml:space="preserve"><value>The file names the account {0}, which does not exist on this computer.</value></data>
+  <data name="Import.Error.NotATask" xml:space="preserve"><value>'{0}' is not a task exported from Task Scheduler. {1}</value></data>
 </root>
 

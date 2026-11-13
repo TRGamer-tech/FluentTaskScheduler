@@ -281,6 +281,25 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
         await ReportAsync(failures);
     }
 
+    /// <summary>Moves <paramref name="row"/>, or without one every selected task, into another folder.</summary>
+    public async Task MoveToFolderAsync(TaskRow? row, string folderPath)
+    {
+        var failures = new List<string>();
+        foreach (TaskRow task in Targets(row))
+        {
+            try
+            {
+                await Task.Run(() => _folders.MoveTask(task.Path, folderPath));
+            }
+            catch (Exception ex) when (IsTaskFailure(ex))
+            {
+                failures.Add(Describe(task, ex));
+            }
+        }
+        await ReloadAsync();
+        await ReportAsync(failures);
+    }
+
     /// <summary>Saves the selected task as an XML file of the user's choosing.</summary>
     [RelayCommand]
     private async Task ExportAsync(TaskRow? row)

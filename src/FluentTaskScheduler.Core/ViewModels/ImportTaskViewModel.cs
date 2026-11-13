@@ -58,6 +58,8 @@ public sealed partial class ImportTaskViewModel : ObservableObject
     /// <summary>True when the task's account is unknown on this computer, as for a task exported elsewhere.</summary>
     public bool AccountIsMissing => !_info.AccountExistsHere;
 
+    public string AccountIsMissingText => Loc.Format("Import.Account.Missing", AccountName);
+
     /// <summary>Keep the exported account, run as the current user, or run as SYSTEM.</summary>
     public IReadOnlyList<string> AccountOptions { get; }
 

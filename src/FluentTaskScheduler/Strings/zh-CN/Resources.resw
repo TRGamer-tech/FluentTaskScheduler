@@ -339,7 +339,7 @@
   <data name="Dialog.Trigger.AtStartup" xml:space="preserve"><value>系统启动时</value></data>
   <data name="Dialog.Trigger.OneTime" xml:space="preserve"><value>一次性</value></data>
   <data name="Dialog.Trigger.OnEvent" xml:space="preserve"><value>发生事件时</value></data>
-  <data name="Dialog.Trigger.Session" xml:space="preserve"><value>锁定/解锁工作站时</value></data>
+  <data name="Dialog.Trigger.Session" xml:space="preserve"><value>会话更改时（锁定、解锁、连接）</value></data>
   <data name="Dialog.RandomDelay" xml:space="preserve"><value>延迟任务最多（随机延迟）：</value></data>
   <data name="Dialog.StopAfter" xml:space="preserve"><value>如果运行时间超过则停止任务：</value></data>
   <data name="Dialog.ProgramScript" xml:space="preserve"><value>程序 / 脚本</value></data>
@@ -919,6 +919,14 @@
   <data name="Tasks.Select" xml:space="preserve"><value>选择</value></data>
   <data name="Tasks.Badge.Unreadable" xml:space="preserve"><value>无法读取</value></data>
   <data name="Tasks.Toolbar.Sort" xml:space="preserve"><value>排序</value></data>
+  <data name="Folders.Library" xml:space="preserve"><value>任务计划程序库</value></data>
+  <data name="Folders.Reload" xml:space="preserve"><value>重新加载文件夹</value></data>
+  <data name="Tasks.MoveTo" xml:space="preserve"><value>移动到文件夹</value></data>
+  <data name="Import.Account.Header" xml:space="preserve"><value>运行任务的帐户</value></data>
+  <data name="Import.Account.Keep" xml:space="preserve"><value>文件中的帐户 ({0})</value></data>
+  <data name="Import.Account.Me" xml:space="preserve"><value>我 ({0})</value></data>
+  <data name="Import.Account.Missing" xml:space="preserve"><value>文件中指定的帐户 {0} 在此计算机上不存在。</value></data>
+  <data name="Import.Error.NotATask" xml:space="preserve"><value>“{0}”不是从任务计划程序导出的任务。{1}</value></data>
 </root>
 
 

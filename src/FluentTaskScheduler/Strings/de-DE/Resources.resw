@@ -336,7 +336,7 @@ Jetzt App neustarten?</value></data>
   <data name="Dialog.Trigger.AtStartup" xml:space="preserve"><value>Beim Systemstart</value></data>
   <data name="Dialog.Trigger.OneTime" xml:space="preserve"><value>Einmalig</value></data>
   <data name="Dialog.Trigger.OnEvent" xml:space="preserve"><value>Bei einem Ereignis</value></data>
-  <data name="Dialog.Trigger.Session" xml:space="preserve"><value>Bei Sperren/Entsperren</value></data>
+  <data name="Dialog.Trigger.Session" xml:space="preserve"><value>Bei einer Sitzungsänderung (Sperren, Entsperren, Verbinden)</value></data>
   <data name="Dialog.RandomDelay" xml:space="preserve"><value>Aufgabe verzögern um bis zu (zufällige Verzögerung):</value></data>
   <data name="Dialog.StopAfter" xml:space="preserve"><value>Aufgabe beenden, wenn sie länger läuft als:</value></data>
   <data name="Dialog.ProgramScript" xml:space="preserve"><value>Programm / Skript</value></data>
@@ -916,4 +916,12 @@ Jetzt App neustarten?</value></data>
   <data name="Tasks.Select" xml:space="preserve"><value>Auswählen</value></data>
   <data name="Tasks.Badge.Unreadable" xml:space="preserve"><value>Nicht lesbar</value></data>
   <data name="Tasks.Toolbar.Sort" xml:space="preserve"><value>Sortieren</value></data>
+  <data name="Folders.Library" xml:space="preserve"><value>Aufgabenplanungsbibliothek</value></data>
+  <data name="Folders.Reload" xml:space="preserve"><value>Ordner neu laden</value></data>
+  <data name="Tasks.MoveTo" xml:space="preserve"><value>In Ordner verschieben</value></data>
+  <data name="Import.Account.Header" xml:space="preserve"><value>Aufgabe ausführen als</value></data>
+  <data name="Import.Account.Keep" xml:space="preserve"><value>Das Konto aus der Datei ({0})</value></data>
+  <data name="Import.Account.Me" xml:space="preserve"><value>Ich ({0})</value></data>
+  <data name="Import.Account.Missing" xml:space="preserve"><value>Die Datei nennt das Konto {0}, das es auf diesem Computer nicht gibt.</value></data>
+  <data name="Import.Error.NotATask" xml:space="preserve"><value>'{0}' ist keine aus der Aufgabenplanung exportierte Aufgabe. {1}</value></data>
 </root>

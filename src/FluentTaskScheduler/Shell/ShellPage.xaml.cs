@@ -31,13 +31,24 @@ public sealed partial class ShellPage : Page, IShellNavigator
         ["Settings"] = new(typeof(SettingsPage), "Main.Header.Settings", CreatedByFrame: true)
     };
 
-    private readonly IServiceProvider _windowServices;
+    // What the pane's entries take up, so the folder tree above them can use the rest.
+    private const double HeightOfPaneEntries = 400;
 
-    public ShellPage(IServiceProvider windowServices, ISettingsStore settings)
+    private readonly IServiceProvider _windowServices;
+    private readonly TasksViewModel _tasks;
+    private readonly FoldersViewModel _folders;
+
+    public ShellPage(IServiceProvider windowServices, ISettingsStore settings, TasksViewModel tasks, FoldersViewModel folders)
     {
         _windowServices = windowServices;
+        _tasks = tasks;
+        _folders = folders;
         InitializeComponent();
         if (settings.Current.IsOledMode) UseBlackContentAreaInDarkTheme();
+
+        Folders.ViewModel = folders;
+        SizeChanged += (_, e) => Folders.MaxHeight = Math.Max(120, e.NewSize.Height - HeightOfPaneEntries);
+        Loaded += async (_, _) => await folders.ReloadAsync();
     }
 
     /// <summary>The element that acts as the window's title bar.</summary>
@@ -70,7 +81,27 @@ public sealed partial class ShellPage : Page, IShellNavigator
 
     private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
-        if (args.SelectedItem is not NavigationViewItem { Tag: string tag } || tag == CurrentPage) return;
+        if (args.SelectedItem is not NavigationViewItem { Tag: string tag }) return;
+
+        if (tag == "Tasks")
+        {
+            // "All tasks" means all folders.
+            _folders.Selected = null;
+            _tasks.FolderPath = null;
+        }
+        Show(tag);
+    }
+
+    private void Folders_FolderChosen(object? sender, EventArgs e)
+    {
+        // The task list of one folder is no entry of the pane; none of them is selected then.
+        NavView.SelectedItem = null;
+        Show("Tasks");
+    }
+
+    private void Show(string tag)
+    {
+        if (tag == CurrentPage) return;
 
         Destination destination = Destinations[tag];
         CurrentPage = tag;

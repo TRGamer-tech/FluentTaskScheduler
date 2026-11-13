@@ -336,7 +336,7 @@
   <data name="Dialog.Trigger.AtStartup" xml:space="preserve"><value>スタートアップ時</value></data>
   <data name="Dialog.Trigger.OneTime" xml:space="preserve"><value>1回のみ</value></data>
   <data name="Dialog.Trigger.OnEvent" xml:space="preserve"><value>イベント時</value></data>
-  <data name="Dialog.Trigger.Session" xml:space="preserve"><value>ワークステーションのロック/アンロック時</value></data>
+  <data name="Dialog.Trigger.Session" xml:space="preserve"><value>セッションの変更時 (ロック、ロック解除、接続)</value></data>
   <data name="Dialog.RandomDelay" xml:space="preserve"><value>タスクを遅延させる時間 (ランダム):</value></data>
   <data name="Dialog.StopAfter" xml:space="preserve"><value>実行時間が次を超えたら停止する:</value></data>
   <data name="Dialog.ProgramScript" xml:space="preserve"><value>プログラム / スクリプト</value></data>
@@ -916,4 +916,12 @@
   <data name="Tasks.Select" xml:space="preserve"><value>選択</value></data>
   <data name="Tasks.Badge.Unreadable" xml:space="preserve"><value>読み取り不可</value></data>
   <data name="Tasks.Toolbar.Sort" xml:space="preserve"><value>並べ替え</value></data>
+  <data name="Folders.Library" xml:space="preserve"><value>タスク スケジューラ ライブラリ</value></data>
+  <data name="Folders.Reload" xml:space="preserve"><value>フォルダーを再読み込み</value></data>
+  <data name="Tasks.MoveTo" xml:space="preserve"><value>フォルダーへ移動</value></data>
+  <data name="Import.Account.Header" xml:space="preserve"><value>タスクの実行アカウント</value></data>
+  <data name="Import.Account.Keep" xml:space="preserve"><value>ファイルに記録されたアカウント ({0})</value></data>
+  <data name="Import.Account.Me" xml:space="preserve"><value>自分 ({0})</value></data>
+  <data name="Import.Account.Missing" xml:space="preserve"><value>ファイルに記録されたアカウント {0} は、このコンピューターに存在しません。</value></data>
+  <data name="Import.Error.NotATask" xml:space="preserve"><value>'{0}' はタスク スケジューラからエクスポートされたタスクではありません。{1}</value></data>
 </root>

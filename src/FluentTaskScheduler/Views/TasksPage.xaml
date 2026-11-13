@@ -15,6 +15,7 @@
             <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Main.Task.Stop')}" Icon="Stop" Click="StopRow_Click"/>
             <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Main.Task.Edit')}" Icon="Edit" Click="EditRow_Click"/>
             <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Main.Task.Export')}" Icon="Save" Click="ExportRow_Click"/>
+            <MenuFlyoutSubItem x:Name="RowMoveMenu" Text="{x:Bind l:Loc.Get('Tasks.MoveTo')}" Icon="MoveToFolder"/>
             <MenuFlyoutSeparator/>
             <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Main.Task.Delete')}" Icon="Delete" Click="DeleteRow_Click"/>
         </MenuFlyout>
@@ -85,6 +86,7 @@
                         <KeyboardAccelerator Key="F5"/>
                     </AppBarButton.KeyboardAccelerators>
                 </AppBarButton>
+                <AppBarButton x:Name="ImportButton" Icon="Import" Label="{x:Bind l:Loc.Get('Main.Toolbar.ImportTask')}" Click="Import_Click"/>
                 <AppBarButton x:Name="SortButton" Icon="Sort" Label="{x:Bind ViewModel.SortText, Mode=OneWay}">
                     <AppBarButton.Flyout>
                         <MenuFlyout>
@@ -116,6 +118,11 @@
                 <AppBarButton x:Name="BatchStopButton" Icon="Stop" Label="{x:Bind l:Loc.Get('Main.Batch.Stop')}" Command="{x:Bind ViewModel.StopCommand}"/>
                 <AppBarButton x:Name="BatchEnableButton" Icon="Accept" Label="{x:Bind l:Loc.Get('Main.Batch.Enable')}" Command="{x:Bind ViewModel.EnableSelectedCommand}"/>
                 <AppBarButton x:Name="BatchDisableButton" Icon="Cancel" Label="{x:Bind l:Loc.Get('Main.Batch.Disable')}" Command="{x:Bind ViewModel.DisableSelectedCommand}"/>
+                <AppBarButton x:Name="BatchMoveButton" Icon="MoveToFolder" Label="{x:Bind l:Loc.Get('Tasks.MoveTo')}">
+                    <AppBarButton.Flyout>
+                        <MenuFlyout x:Name="BatchMoveMenu" Opening="BatchMoveMenu_Opening"/>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
                 <AppBarButton x:Name="BatchDeleteButton" Icon="Delete" Label="{x:Bind l:Loc.Get('Main.Batch.Delete')}" Command="{x:Bind ViewModel.DeleteCommand}"/>
                 <AppBarButton x:Name="ClearSelectionButton" Icon="ClearSelection" Label="{x:Bind l:Loc.Get('Main.Batch.ClearSelectionTooltip')}" Click="ClearSelection_Click"/>
             </CommandBar>

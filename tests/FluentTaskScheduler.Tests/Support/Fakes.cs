@@ -51,6 +51,15 @@ public sealed class ScriptedPrompts : IPrompts
         Shown.Add($"{title}: {message} [{confirmText}]");
         return Task.FromResult(Confirm);
     }
+
+    /// <summary>What <see cref="AskForTextAsync"/> answers; null stands for cancelling.</summary>
+    public string? Text { get; set; }
+
+    public Task<string?> AskForTextAsync(string title, string label, string initialText, string confirmText)
+    {
+        Shown.Add($"{title}: {label} [{initialText}]");
+        return Task.FromResult(Text);
+    }
 }
 
 /// <summary>Hands out the file it was told to; null means the user cancels.</summary>

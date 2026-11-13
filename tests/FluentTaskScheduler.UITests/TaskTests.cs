@@ -114,6 +114,84 @@ public sealed class TaskTests : IDisposable
         app.Snapshot("editor-reopened");
     }
 
+    [Fact]
+    public void ATaskExportedForAnAccountUnknownHere_IsImportedForTheCurrentUser()
+    {
+        const string name = "Foreign task";
+        string file = Path.Combine(Path.GetTempPath(), name + ".xml");
+        File.WriteAllText(file, ForeignTaskXml, System.Text.Encoding.Unicode);
+        using var app = AppSession.Launch("import");
+        try
+        {
+            app.Require("ImportButton").Click();
+            // The app runs elevated here and therefore shows the classic file dialog, with the file name box focused.
+            Thread.Sleep(2500);
+            Keyboard.Type(file);
+            Keyboard.Type(VirtualKeyShort.ENTER);
+
+            app.Require("ImportName", 20000);
+            app.Snapshot("import-dialog");
+            Assert.Equal(name, app.Require("ImportName").AsTextBox().Text);
+            Assert.True(app.Find("ImportAccountMissing", 2000) is { IsOffscreen: false }, "The dialog does not say that the account is unknown here.");
+            app.Require("PrimaryButton").AsButton().Invoke();
+
+            Assert.True(WaitFor(() => WindowsTasks.Root.Exists(name)), "The task was not imported. " + ProblemsShown(app, "ImportProblem"));
+            string? user = WindowsTasks.Root.Value(name, "Principals", "Principal", "UserId");
+            Assert.NotNull(user);
+            Assert.DoesNotContain("1111111111", user);
+            Assert.Contains("ping", WindowsTasks.Root.Value(name, "Actions", "Exec", "Command"));
+            app.Snapshot("imported");
+        }
+        finally
+        {
+            WindowsTasks.Root.Delete(name);
+            File.Delete(file);
+        }
+    }
+
+    [Fact]
+    public void AFolder_CanBeCreatedAndDeletedFromTheTree()
+    {
+        string name = "FtsUiFolder" + Guid.NewGuid().ToString("N")[..6];
+        using var app = AppSession.Launch("folders");
+
+        app.Require("NewFolderButton").Click();
+        var input = app.Find(element => element.ControlType == ControlType.Edit && element.Parent?.ControlType == ControlType.Window, 10000)
+                    ?? throw new InvalidOperationException("No dialog asked for the folder's name.");
+        input.AsTextBox().Text = name;
+        app.Require("PrimaryButton").AsButton().Invoke();
+
+        var folder = app.Find(element => element.ControlType == ControlType.TreeItem && element.Name == name, 20000);
+        app.Snapshot("folder-created");
+        Assert.True(folder != null, "The new folder is not in the tree.");
+
+        folder.RightClick();
+        var delete = app.Find(element => element.ControlType == ControlType.MenuItem && element.Name == "Delete", 5000)
+                     ?? throw new InvalidOperationException("The folder's menu has no Delete entry.");
+        delete.Patterns.Invoke.Pattern.Invoke();
+        app.Require("PrimaryButton").AsButton().Invoke();
+
+        Assert.True(WaitFor(() => app.Find(element => element.ControlType == ControlType.TreeItem && element.Name == name, 500) == null),
+            "The folder is still in the tree after deleting it.");
+    }
+
+    private const string ForeignTaskXml = """
+        <?xml version="1.0" encoding="UTF-16"?>
+        <Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+          <RegistrationInfo><Author>OTHERPC\\someone</Author></RegistrationInfo>
+          <Triggers><TimeTrigger><StartBoundary>2031-05-06T07:08:00</StartBoundary><Enabled>true</Enabled></TimeTrigger></Triggers>
+          <Principals>
+            <Principal id="Author">
+              <UserId>S-1-5-21-1111111111-2222222222-3333333333-1001</UserId>
+              <LogonType>InteractiveToken</LogonType>
+              <RunLevel>LeastPrivilege</RunLevel>
+            </Principal>
+          </Principals>
+          <Settings><Enabled>true</Enabled><ExecutionTimeLimit>PT1H</ExecutionTimeLimit></Settings>
+          <Actions Context="Author"><Exec><Command>ping</Command><Arguments>-n 1 127.0.0.1</Arguments></Exec></Actions>
+        </Task>
+        """;
+
     private const string SystemTaskXml = """
         <?xml version="1.0" encoding="UTF-16"?>
         <Task version="1.3" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
@@ -168,8 +246,8 @@ public sealed class TaskTests : IDisposable
         Wait();
     }
 
-    private static string ProblemsShown(AppSession app) =>
-        app.Find("EditorProblems", 500) is { } bar ? $"The editor says: {string.Join(" | ", bar.FindAllDescendants().Select(e => e.Name).Where(n => n.Length > 0))}" : "";
+    private static string ProblemsShown(AppSession app, string infoBar = "EditorProblems") =>
+        app.Find(infoBar, 500) is { } bar ? $"The dialog says: {string.Join(" | ", bar.FindAllDescendants().Select(e => e.Name).Where(n => n.Length > 0))}" : "";
 
     private static bool WaitFor(Func<bool> condition, int seconds = 20)
     {

@@ -59,6 +59,21 @@ public sealed class DialogService(WindowContext window) : IDialogService
         return await ShowAsync(dialog) == ContentDialogResult.Primary;
     }
 
+    public async Task<string?> AskForTextAsync(string title, string label, string initialText, string confirmText)
+    {
+        var input = new TextBox { Header = label, Text = initialText, MinWidth = 320 };
+        input.SelectAll();
+        var dialog = new ContentDialog
+        {
+            Title = title,
+            Content = input,
+            PrimaryButtonText = confirmText,
+            CloseButtonText = Loc.Get("Dialog.Common.Cancel"),
+            DefaultButton = ContentDialogButton.Primary
+        };
+        return await ShowAsync(dialog) == ContentDialogResult.Primary && input.Text.Trim() is { Length: > 0 } text ? text : null;
+    }
+
     private static TextBlock Text(string message) => new()
     {
         Text = message,
