@@ -52,6 +52,9 @@ public sealed partial class TaskRow : ObservableObject
     /// <summary>True from the moment the task is started here until it is seen to have finished, so the row can show progress without waiting for a refresh.</summary>
     [ObservableProperty] private bool _isRunning;
 
+    /// <summary>A snooze keeps the task disabled: one of its own, or the snooze of all tasks. This is the app's, so <see cref="UpdateFrom"/> leaves it alone.</summary>
+    [ObservableProperty] private bool _isSnoozed;
+
     [ObservableProperty] private bool _isSelected;
     [ObservableProperty] private bool _isHidden;
     [ObservableProperty] private string _description = "";

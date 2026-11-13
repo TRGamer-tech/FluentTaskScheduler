@@ -837,7 +837,7 @@ Jetzt App neustarten?</value></data>
   <data name="Scripts.SystemInfoReport.Name" xml:space="preserve"><value>Systeminformationsbericht</value></data>
   <data name="Task.Snooze.Label" xml:space="preserve"><value>Pausieren</value></data>
   <data name="Task.Snooze.CustomIntro" xml:space="preserve"><value>Diese Aufgabe deaktivieren bis:</value></data>
-  <data name="Task.Snooze.Status" xml:space="preserve"><value>Schlummert bis {0}</value></data>
+  <data name="Task.Snooze.Status" xml:space="preserve"><value>Pausiert bis {0}</value></data>
   <data name="Task.Snooze.Resume" xml:space="preserve"><value>Jetzt fortsetzen</value></data>
   <data name="Editor.Title.New" xml:space="preserve"><value>Neue Aufgabe</value></data>
   <data name="Editor.Title.Edit" xml:space="preserve"><value>{0} bearbeiten</value></data>
@@ -1014,7 +1014,7 @@ Jetzt App neustarten?</value></data>
   <data name="Shortcuts.Delete" xml:space="preserve"><value>Ausgewählte Aufgaben löschen</value></data>
   <data name="Shortcuts.Refresh" xml:space="preserve"><value>Aufgabenliste neu laden</value></data>
   <data name="Shortcuts.Help" xml:space="preserve"><value>Diese Übersicht anzeigen</value></data>
-  <data name="Task.Snooze.UntilRestart" xml:space="preserve"><value>Schlummert bis zum Neustart oder zur Abmeldung</value></data>
+  <data name="Task.Snooze.UntilRestart" xml:space="preserve"><value>Pausiert bis zum Neustart oder zur Abmeldung</value></data>
   <data name="Settings.Appearance.Language.Windows" xml:space="preserve"><value>Sprache von Windows verwenden</value></data>
   <data name="Settings.Lead.MinutesFormat" xml:space="preserve"><value>{0} Minuten vorher</value></data>
   <data name="Settings.Sys.Startup.Failed" xml:space="preserve"><value>Windows hat die Änderung nicht angenommen. Möglicherweise wird der Autostart von deiner Organisation verwaltet.</value></data>
@@ -1075,4 +1075,5 @@ Jetzt App neustarten?</value></data>
   <data name="Snooze.Restore.AccessDenied" xml:space="preserve"><value>Windows hat den Zugriff verweigert. Eine Aufgabe, die pausiert wurde, während die App als Administrator lief, lässt sich nur mit Administratorrechten wieder aktivieren.</value></data>
   <data name="Snooze.Unreadable.MessageFormat" xml:space="preserve"><value>Aufgaben, die eine frühere Pause deaktiviert hat, sind womöglich noch deaktiviert, ohne hier zu erscheinen. Ihre Aufzeichnung konnte nicht gelesen werden und wurde als {0} aufbewahrt.</value></data>
   <data name="Snooze.Dialog.Until" xml:space="preserve"><value>Alle Aufgaben pausieren bis:</value></data>
+  <data name="Task.Snooze.AlreadyDisabled" xml:space="preserve"><value>Diese Aufgabe ist bereits deaktiviert. Eine Pause würde sie an ihrem Ende aktivieren, deshalb bleibt die Aufgabe, wie sie ist.</value></data>
 </root>

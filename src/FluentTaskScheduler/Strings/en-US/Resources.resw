@@ -1075,5 +1075,6 @@ Restart now to apply the update?</value></data>
   <data name="Snooze.Restore.AccessDenied" xml:space="preserve"><value>Windows refused access. A task that was snoozed while the app ran as administrator can only be enabled again with administrator rights.</value></data>
   <data name="Snooze.Unreadable.MessageFormat" xml:space="preserve"><value>Tasks that an earlier snooze disabled may still be disabled without being listed here. Its record could not be read and was kept as {0}.</value></data>
   <data name="Snooze.Dialog.Until" xml:space="preserve"><value>Snooze all tasks until:</value></data>
+  <data name="Task.Snooze.AlreadyDisabled" xml:space="preserve"><value>This task is disabled already. A snooze would enable it when it ends, so the task was left as it is.</value></data>
 </root>
 

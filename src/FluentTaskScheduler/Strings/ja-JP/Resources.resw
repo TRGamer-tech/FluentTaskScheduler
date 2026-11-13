@@ -1075,4 +1075,5 @@
   <data name="Snooze.Restore.AccessDenied" xml:space="preserve"><value>Windows がアクセスを拒否しました。アプリを管理者として実行していたときにスヌーズしたタスクは、管理者権限でのみ再び有効にできます。</value></data>
   <data name="Snooze.Unreadable.MessageFormat" xml:space="preserve"><value>以前のスヌーズで無効にされたタスクが、ここに表示されないまま無効になっている可能性があります。その記録は読み取れなかったため、{0} として保存されています。</value></data>
   <data name="Snooze.Dialog.Until" xml:space="preserve"><value>すべてのタスクをスヌーズする期限:</value></data>
+  <data name="Task.Snooze.AlreadyDisabled" xml:space="preserve"><value>このタスクはすでに無効です。スヌーズすると終了時に有効になってしまうため、そのままにしました。</value></data>
 </root>

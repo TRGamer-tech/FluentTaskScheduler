@@ -1,5 +1,6 @@
 using FluentTaskScheduler.History;
 using FluentTaskScheduler.Scheduling;
+using FluentTaskScheduler.Snoozing;
 using FluentTaskScheduler.Tests.History;
 using FluentTaskScheduler.Tests.Support;
 using FluentTaskScheduler.ViewModels;
@@ -14,6 +15,8 @@ public sealed class TaskDetailsViewModelTests : IDisposable
     private readonly FakeTaskHistory _history = new();
     private readonly ScriptedFilePicker _files = new();
     private readonly FakeClipboard _clipboard = new();
+    private readonly FakeSnoozeService _snooze = new();
+    private readonly FakeAppLifetime _app = new() { IsElevated = true };
     private readonly FakeTimeProvider _time = new(new DateTimeOffset(2031, 5, 6, 12, 0, 0, TimeSpan.Zero));
     private readonly TaskDetailsViewModel _details;
 
@@ -29,10 +32,17 @@ public sealed class TaskDetailsViewModelTests : IDisposable
             Triggers = [new TriggerDraft { Type = TriggerType.Daily, Start = new DateTime(2031, 1, 1, 3, 0, 0) }],
             Actions = [new ActionDraft { Path = "robocopy", Arguments = @"C:\a D:\b /MIR" }, new ActionDraft { Path = "notepad.exe" }]
         });
-        _details = new TaskDetailsFactory(_store, _history, _files, _clipboard, _time).Create(new TaskRow(@"\Backup"));
+        _details = Open(@"\Backup");
     }
 
-    public void Dispose() => _folder.Dispose();
+    public void Dispose()
+    {
+        _details.Dispose();
+        _folder.Dispose();
+    }
+
+    private TaskDetailsViewModel Open(string path, IUiThread? ui = null) =>
+        new TaskDetailsFactory(_store, _history, _snooze, _files, _clipboard, _app, ui ?? new InlineUiThread(), _time).Create(new TaskRow(path));
 
     private static List<TaskEvent> EventsOf(string task) =>
         Evidence.Of(task).Select(TaskEvent.From).OfType<TaskEvent>().ToList();
@@ -49,7 +59,7 @@ public sealed class TaskDetailsViewModelTests : IDisposable
     [Fact]
     public async Task ATaskThatCannotBeRead_StillShowsItsHistory()
     {
-        var details = new TaskDetailsFactory(_store, _history, _files, _clipboard, _time).Create(new TaskRow(@"\Gone"));
+        using TaskDetailsViewModel details = Open(@"\Gone");
         _history.Events.AddRange(Succeeded);
         details.PeriodIndex = (int)HistoryPeriod.Everything;
 
@@ -234,6 +244,121 @@ public sealed class TaskDetailsViewModelTests : IDisposable
 
         Assert.Equal(Succeeded.Count, _clipboard.Text!.Split(Environment.NewLine).Length);
         Assert.Contains("\t", _clipboard.Text);
+    }
+
+    [Fact]
+    public void ATaskSnoozedOnItsOwn_SaysUntilWhen_AndTheSnoozeOfAllTasksIsNotItsOwn()
+    {
+        Assert.False(_details.IsSnoozed);
+        Assert.Equal("", _details.SnoozeStatus);
+
+        _snooze.Publish(new SnoozeState { Global = new GlobalSnooze(SnoozeWindow.UntilRestart, SuspendsTriggers: true, [@"\Backup"]) });
+        Assert.False(_details.IsSnoozed);
+
+        _snooze.Publish(new SnoozeState { Tasks = [new TaskSnooze(@"\backup", new SnoozeWindow(_time.GetUtcNow().AddHours(1)))] });
+        Assert.True(_details.IsSnoozed);
+        Assert.Equal("Task.Snooze.Status", _details.SnoozeStatus);
+    }
+
+    [Fact]
+    public async Task SnoozingTheTask_AsksForTheChosenLength()
+    {
+        await _details.SnoozeCommand.ExecuteAsync(SnoozeChoice.ThreeHours);
+        await _details.SnoozeCommand.ExecuteAsync(SnoozeChoice.UntilRestart);
+
+        Assert.Equal([@"SnoozeTask \Backup for 03:00:00", @"SnoozeTask \Backup until restart"], _snooze.Calls);
+        Assert.False(_details.HasSnoozeProblem);
+    }
+
+    [Fact]
+    public async Task ATaskThatIsDisabledAlready_IsNotSnoozed_AndTheDetailsSayWhy()
+    {
+        _snooze.TaskOutcome = SnoozeTaskOutcome.AlreadyDisabled;
+
+        await _details.SnoozeCommand.ExecuteAsync(SnoozeChoice.OneHour);
+
+        Assert.Equal("Task.Snooze.AlreadyDisabled", _details.SnoozeProblem);
+        Assert.True(_details.HasSnoozeProblem);
+    }
+
+    [Theory]
+    [InlineData(true, "Tasks.Error.Denied")]
+    [InlineData(false, "Tasks.Error.DeniedNotElevated")]
+    public async Task ATaskWindowsRefusesToDisable_IsNotSnoozed_AndTheDetailsSayWhetherElevationWouldHelp(bool elevated, string expected)
+    {
+        _app.IsElevated = elevated;
+        _snooze.Fails = new TaskAccessDeniedException(@"\Backup", new UnauthorizedAccessException());
+
+        await _details.SnoozeCommand.ExecuteAsync(SnoozeChoice.OneHour);
+
+        Assert.Equal(expected, _details.SnoozeProblem);
+    }
+
+    [Fact]
+    public async Task ATaskThatIsGone_OrASnoozeThatCannotBeSaved_IsReportedAsSuch()
+    {
+        _snooze.Fails = new TaskNotFoundException(@"\Backup");
+        await _details.SnoozeCommand.ExecuteAsync(SnoozeChoice.OneHour);
+        Assert.Equal("Tasks.Error.Gone", _details.SnoozeProblem);
+
+        _snooze.Fails = new IOException("There is not enough space on the disk.");
+        await _details.SnoozeCommand.ExecuteAsync(SnoozeChoice.OneHour);
+        Assert.Equal("Snooze.Error.NotRecorded", _details.SnoozeProblem);
+    }
+
+    [Fact]
+    public async Task Resuming_EndsTheTasksOwnSnooze_AndForgetsAnEarlierProblem()
+    {
+        _snooze.TaskOutcome = SnoozeTaskOutcome.AlreadyDisabled;
+        await _details.SnoozeCommand.ExecuteAsync(SnoozeChoice.OneHour);
+
+        await _details.ResumeSnoozeCommand.ExecuteAsync(null);
+
+        Assert.Equal(@"ResumeTask \Backup", _snooze.Calls.Last());
+        Assert.False(_details.HasSnoozeProblem);
+    }
+
+    [Fact]
+    public async Task TheDialog_SnoozesTheTaskUntilTheMomentPicked_InTheTimeOfThisComputer()
+    {
+        SnoozeUntilViewModel dialog = _details.PickSnoozeMoment();
+
+        // It is 14:00 here; the dialog offers 15:00.
+        Assert.Equal(new TimeSpan(15, 0, 0), dialog.TimeOfDay);
+        dialog.TimeOfDay = new TimeSpan(16, 30, 0);
+
+        Assert.True(await dialog.SnoozeAsync());
+
+        Assert.Equal([@"SnoozeTask \Backup for 02:30:00"], _snooze.Calls);
+        Assert.Equal("Backup", dialog.Title);
+        Assert.Equal("Task.Snooze.CustomIntro", dialog.UntilText);
+        Assert.False(dialog.IsForAllTasks);
+    }
+
+    [Fact]
+    public async Task TheDialog_StaysOpenForATaskThatIsDisabledAlready_AndSaysWhy()
+    {
+        _snooze.TaskOutcome = SnoozeTaskOutcome.AlreadyDisabled;
+        SnoozeUntilViewModel dialog = _details.PickSnoozeMoment();
+
+        Assert.False(await dialog.SnoozeAsync());
+
+        Assert.Equal("Task.Snooze.AlreadyDisabled", dialog.Problem);
+    }
+
+    [Fact]
+    public void ClosedDetails_NoLongerFollowTheSnooze_EvenWithAChangePostedBeforeTheyClosed()
+    {
+        int listening = _snooze.Subscribers;
+        var ui = new BusyUiThread();
+        TaskDetailsViewModel details = Open(@"\Backup", ui);
+
+        _snooze.Publish(new SnoozeState { Tasks = [new TaskSnooze(@"\Backup", SnoozeWindow.UntilRestart)] });
+        details.Dispose();
+        ui.RunPosted();
+
+        Assert.False(details.IsSnoozed);
+        Assert.Equal(listening, _snooze.Subscribers);
     }
 
     private static async Task Eventually(Func<bool> condition)

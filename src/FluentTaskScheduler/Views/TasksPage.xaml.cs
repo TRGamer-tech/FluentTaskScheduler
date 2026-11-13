@@ -97,7 +97,8 @@ public sealed partial class TasksPage : Page
     {
         if (_dialogOpen) return;
         _dialogOpen = true;
-        var dialog = new TaskDetailsDialog(_details.Create(row));
+        using TaskDetailsViewModel details = _details.Create(row);
+        var dialog = new TaskDetailsDialog(details);
         try
         {
             await _dialogs.ShowAsync(dialog);

@@ -2,6 +2,7 @@ using System.Text;
 using FluentTaskScheduler.History;
 using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.Settings;
+using FluentTaskScheduler.Snoozing;
 using FluentTaskScheduler.Tests.Support;
 using FluentTaskScheduler.ViewModels;
 using Microsoft.Extensions.Time.Testing;
@@ -722,6 +723,112 @@ public sealed class TasksViewModelTests : IDisposable
         Assert.Contains(@"\New", Shown);
     }
 
+    private static SnoozeState Snoozing(string[] ownSnoozes, string[] suspendedByAll) => new()
+    {
+        Global = suspendedByAll.Length > 0 ? new GlobalSnooze(SnoozeWindow.UntilRestart, SuspendsTriggers: true, [.. suspendedByAll]) : null,
+        Tasks = ownSnoozes.Select(path => new TaskSnooze(path, SnoozeWindow.UntilRestart)).ToValueList()
+    };
+
+    private IEnumerable<string> MarkedSnoozed => _tasks.Tasks.Where(row => row.IsSnoozed).Select(row => row.Path);
+
+    [Fact]
+    public async Task ARow_ShowsWhetherASnoozeKeepsItsTaskDisabled()
+    {
+        await _tasks.ReloadAsync();
+
+        _snoozeService.Publish(Snoozing(ownSnoozes: [@"\BACKUP"], suspendedByAll: [@"\cleanup"]));
+        Assert.Equal([@"\Backup", @"\cleanup"], MarkedSnoozed);
+
+        _snoozeService.Publish(new SnoozeState());
+        Assert.Empty(MarkedSnoozed);
+    }
+
+    [Fact]
+    public async Task ASnoozeOfAllTasksThatDisablesNone_MarksNoRow()
+    {
+        await _tasks.ReloadAsync();
+
+        _snoozeService.Publish(new SnoozeState { Global = new GlobalSnooze(SnoozeWindow.UntilRestart, SuspendsTriggers: false, []) });
+
+        Assert.Empty(MarkedSnoozed);
+    }
+
+    [Fact]
+    public async Task ATaskThatShowsUpLater_IsMarkedToo()
+    {
+        await _tasks.ReloadAsync();
+        _snoozeService.Publish(Snoozing(ownSnoozes: [@"\New"], suspendedByAll: []));
+        _store.Add(@"\New");
+
+        await _tasks.ReloadAsync();
+
+        Assert.True(Row(@"\New").IsSnoozed);
+    }
+
+    [Fact]
+    public async Task TheSnoozedFilter_ShowsTheTasksASnoozeKeepsDisabled_AsTheSnoozeChanges()
+    {
+        await _tasks.ReloadAsync();
+        _tasks.StatusFilterIndex = (int)TaskStatusFilter.Snoozed;
+        Assert.Empty(Shown);
+
+        _snoozeService.Publish(Snoozing(ownSnoozes: [@"\Backup"], suspendedByAll: []));
+        Assert.Equal([@"\Backup"], Shown);
+
+        _snoozeService.Publish(new SnoozeState());
+        Assert.Empty(Shown);
+    }
+
+    [Fact]
+    public async Task OnceASnoozeHasDisabledOrEnabledTasks_TheyAreReadAgain()
+    {
+        await _tasks.ReloadAsync();
+        SnoozeState snoozed = Snoozing(ownSnoozes: [@"\Backup"], suspendedByAll: []);
+
+        _snoozeService.Publish(snoozed with { IsBusy = true });
+        _store.SetEnabled(@"\Backup", false);
+        await AfterTheReloadDelayAsync();
+        Assert.Equal(1, _store.Listings);
+
+        _snoozeService.Publish(snoozed);
+        await AfterTheReloadDelayAsync();
+
+        Assert.Equal(2, _store.Listings);
+        Assert.False(Row(@"\Backup").IsEnabled);
+    }
+
+    [Fact]
+    public async Task ASnoozeThatSwitchesNoTask_IsNoReasonToReadThemAgain()
+    {
+        await _tasks.ReloadAsync();
+
+        _snoozeService.Publish(new SnoozeState { Global = new GlobalSnooze(SnoozeWindow.UntilRestart, SuspendsTriggers: false, []) });
+        _snoozeService.Publish(new SnoozeState());
+        await AfterTheReloadDelayAsync();
+
+        Assert.Equal(1, _store.Listings);
+    }
+
+    [Fact]
+    public async Task TasksASnoozeSwitched_AreReadAgain_EvenIfTheUiThreadOnlyGetsToItAfterwards()
+    {
+        _tasks.Dispose();
+        var ui = new BusyUiThread();
+        using TasksViewModel late = NewViewModel(ui);
+        await late.ReloadAsync();
+        SnoozeState snoozed = Snoozing(ownSnoozes: [@"\Backup"], suspendedByAll: []);
+
+        _snoozeService.Publish(snoozed with { IsBusy = true });
+        _snoozeService.Publish(snoozed);
+        ui.RunPosted();
+        _time.Advance(TasksViewModel.ReloadDelay);
+        ui.RunPosted();
+        await late.PendingReads;
+
+        Assert.Equal(2, _store.Listings);
+        Assert.True(late.Find(@"\Backup")!.IsSnoozed);
+    }
+
     [Fact]
     public async Task ASlowReload_DoesNotOverwriteWhatALaterReportAboutOneTaskFound()
     {
@@ -776,11 +883,14 @@ public sealed class TasksViewModelTests : IDisposable
 
         _stream.Start(FakeTaskEventStream.Running(@"\Backup"));
         _stream.Change(Change(@"\New", TaskChangeKind.Registered));
+        _snoozeService.Publish(Snoozing(ownSnoozes: [@"\Backup"], suspendedByAll: []));
         await AfterTheReloadDelayAsync();
 
         Assert.Equal(0, _stream.Subscribers);
+        Assert.Equal(0, _snoozeService.Subscribers);
         Assert.Equal(1, _store.Listings);
         Assert.Equal(TaskRowState.Ready, Row(@"\Backup").State);
+        Assert.False(Row(@"\Backup").IsSnoozed);
     }
 
     [Fact]
@@ -794,12 +904,15 @@ public sealed class TasksViewModelTests : IDisposable
 
         _stream.Start(FakeTaskEventStream.Running(@"\Backup"));
         _stream.Change(Change(@"\Backup", TaskChangeKind.Updated));
+        _snoozeService.Publish(Snoozing(ownSnoozes: [@"\Backup"], suspendedByAll: []) with { IsBusy = true });
+        _snoozeService.Publish(Snoozing(ownSnoozes: [@"\Backup"], suspendedByAll: []));
         closing.Dispose();
         ui.RunPosted();
         _time.Advance(TasksViewModel.ReloadDelay);
         await closing.PendingReads;
 
         Assert.Equal(TaskRowState.Ready, closing.Find(@"\Backup")!.State);
+        Assert.False(closing.Find(@"\Backup")!.IsSnoozed);
         Assert.Equal(1, _store.Listings);
     }
 

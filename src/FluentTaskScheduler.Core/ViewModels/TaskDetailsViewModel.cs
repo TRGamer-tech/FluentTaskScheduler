@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 using FluentTaskScheduler.History;
 using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Scheduling;
+using FluentTaskScheduler.Snoozing;
 
 namespace FluentTaskScheduler.ViewModels;
 
@@ -30,13 +31,17 @@ public enum HistoryFilter
 /// <param name="Run">How the run the event belongs to ended; null for an event outside of any run.</param>
 public sealed record HistoryEntry(TaskEvent Event, RunStatus? Run, string Time, string Label, string Details);
 
-public sealed class TaskDetailsFactory(ITaskStore store, ITaskHistory history, IFilePicker files, IClipboard clipboard, TimeProvider time)
+public sealed class TaskDetailsFactory(ITaskStore store, ITaskHistory history, ISnoozeService snooze, IFilePicker files, IClipboard clipboard,
+    IAppLifetime app, IUiThread ui, TimeProvider time)
 {
-    public TaskDetailsViewModel Create(TaskRow task) => new(task, store, history, files, clipboard, time);
+    public TaskDetailsViewModel Create(TaskRow task) => new(task, store, history, snooze, files, clipboard, app, ui, time);
 }
 
-/// <summary>What the app knows about one task beyond its row: what starts it, what it runs, and what became of its runs.</summary>
-public sealed partial class TaskDetailsViewModel : ObservableObject
+/// <summary>
+/// What the app knows about one task beyond its row: what starts it, what it runs, what became of
+/// its runs, and whether it is snoozed. Dispose of it when the details close.
+/// </summary>
+public sealed partial class TaskDetailsViewModel : ObservableObject, IDisposable
 {
     /// <summary>The newest events of the chosen period; more would only slow the list down.</summary>
     internal const int MaxEvents = 500;
@@ -45,25 +50,49 @@ public sealed partial class TaskDetailsViewModel : ObservableObject
 
     private readonly ITaskStore _store;
     private readonly ITaskHistory _history;
+    private readonly ISnoozeService _snooze;
     private readonly IFilePicker _files;
     private readonly IClipboard _clipboard;
+    private readonly IAppLifetime _app;
+    private readonly IUiThread _ui;
     private readonly TimeProvider _time;
 
     private IReadOnlyList<HistoryEntry> _all = [];
     private CancellationTokenSource? _loading;
     private CancellationTokenSource? _lookingAround;
+    private SnoozeWindow? _snoozeWindow;
+    private bool _disposed;
 
-    internal TaskDetailsViewModel(TaskRow task, ITaskStore store, ITaskHistory history, IFilePicker files, IClipboard clipboard, TimeProvider time)
+    internal TaskDetailsViewModel(TaskRow task, ITaskStore store, ITaskHistory history, ISnoozeService snooze, IFilePicker files, IClipboard clipboard,
+        IAppLifetime app, IUiThread ui, TimeProvider time)
     {
         Row = task;
         _store = store;
         _history = history;
+        _snooze = snooze;
         _files = files;
         _clipboard = clipboard;
+        _app = app;
+        _ui = ui;
         _time = time;
+        _snoozeWindow = snooze.State.WindowOf(task.Path);
+        _snooze.Changed += OnSnoozeChanged;
     }
 
     public TaskRow Row { get; }
+
+    /// <summary>True while the task has a snooze of its own.</summary>
+    public bool IsSnoozed => _snoozeWindow is not null;
+
+    /// <summary>Until when the task's own snooze lasts, e.g. "Snoozed until 14:30"; empty while it has none.</summary>
+    public string SnoozeStatus => _snoozeWindow is { } window ? SnoozeText.OneTask(window, _time) : "";
+
+    /// <summary>Why the task was not snoozed, when that was asked for last; null when it was.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasSnoozeProblem))]
+    private string? _snoozeProblem;
+
+    public bool HasSnoozeProblem => SnoozeProblem is not null;
 
     /// <summary>What starts the task, one line per trigger. Empty until loaded, and for a task that cannot be read.</summary>
     [ObservableProperty] private IReadOnlyList<string> _triggers = [];
@@ -326,4 +355,53 @@ public sealed partial class TaskDetailsViewModel : ObservableObject
     [RelayCommand]
     private void Copy() =>
         _clipboard.SetText(string.Join(Environment.NewLine, Entries.Select(entry => $"{entry.Time}\t{entry.Label}\t{entry.Details}")));
+
+    [RelayCommand]
+    private async Task SnoozeAsync(SnoozeChoice choice) => SnoozeProblem = await TrySnoozeAsync(choice.End);
+
+    [RelayCommand]
+    private Task ResumeSnoozeAsync()
+    {
+        SnoozeProblem = null;
+        return _snooze.ResumeTaskAsync(Row.Path);
+    }
+
+    /// <summary>For the dialog that snoozes the task until a moment of the user's choosing.</summary>
+    public SnoozeUntilViewModel PickSnoozeMoment() => new(Row.Name, Loc.Get("Task.Snooze.CustomIntro"), null, _time, TrySnoozeAsync);
+
+    public void Dispose()
+    {
+        _disposed = true;
+        _snooze.Changed -= OnSnoozeChanged;
+    }
+
+    /// <returns>Why the task was not snoozed; null when it was.</returns>
+    private async Task<string?> TrySnoozeAsync(SnoozeEnd end)
+    {
+        try
+        {
+            return await _snooze.SnoozeTaskAsync(Row.Path, end) == SnoozeTaskOutcome.AlreadyDisabled ? Loc.Get("Task.Snooze.AlreadyDisabled") : null;
+        }
+        catch (TaskNotFoundException)
+        {
+            return Loc.Format("Tasks.Error.Gone", Row.Name);
+        }
+        catch (TaskAccessDeniedException)
+        {
+            return Loc.Format(_app.IsElevated ? "Tasks.Error.Denied" : "Tasks.Error.DeniedNotElevated", Row.Name);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return Loc.Format("Snooze.Error.NotRecorded", ex.Message);
+        }
+    }
+
+    // The service reports on whatever thread made the change, which can be after the details closed.
+    private void OnSnoozeChanged(object? sender, EventArgs e) => _ui.Post(() =>
+    {
+        if (_disposed) return;
+        _snoozeWindow = _snooze.State.WindowOf(Row.Path);
+        OnPropertyChanged(nameof(IsSnoozed));
+        OnPropertyChanged(nameof(SnoozeStatus));
+    });
 }

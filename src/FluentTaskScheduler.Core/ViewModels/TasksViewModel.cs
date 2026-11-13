@@ -27,7 +27,8 @@ public enum TaskStatusFilter
     All,
     Running,
     Enabled,
-    Disabled
+    Disabled,
+    Snoozed
 }
 
 /// <summary>
@@ -38,7 +39,8 @@ public enum TaskStatusFilter
 /// While Task Scheduler's history log is on, the list keeps itself up to date: a run that starts
 /// or ends shows on its row, and tasks that anything on the computer creates, changes or deletes
 /// appear, change and disappear. While the log is off, the list is as current as its last reload,
-/// except for tasks started or stopped from here, which are asked about until they have settled.
+/// except for tasks started or stopped from here, which are asked about until they have settled,
+/// and tasks a snooze disabled or enabled, which are read again once the snooze is done with them.
 /// </remarks>
 public sealed partial class TasksViewModel : ObservableObject, IDisposable
 {
@@ -73,6 +75,10 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
     private readonly ITimer _watchTimer;
     private readonly ITimer _reloadTimer;
     private bool _reloadPlanned;
+
+    /// <summary>1 from when the snooze is seen disabling or enabling tasks until a reload for that is planned. Set on any thread.</summary>
+    private int _snoozeSwitchedTasks;
+
     private Task _reads = Task.CompletedTask;
     private IReadOnlyList<TaskRow> _selection = [];
     private bool _disposed;
@@ -99,6 +105,7 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
         _stream.RunStarted += OnRunReported;
         _stream.RunCompleted += OnRunReported;
         _stream.TaskChanged += OnTaskChanged;
+        _snooze.Changed += OnSnoozeChanged;
     }
 
     /// <summary>The tasks to show, in the order to show them.</summary>
@@ -409,6 +416,7 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
         _stream.RunStarted -= OnRunReported;
         _stream.RunCompleted -= OnRunReported;
         _stream.TaskChanged -= OnTaskChanged;
+        _snooze.Changed -= OnSnoozeChanged;
         _watchTimer.Dispose();
         _reloadTimer.Dispose();
     }
@@ -425,12 +433,39 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
         if (!_disposed) _ = InTurn(() => RefreshRowAsync(run.TaskPath));
     });
 
-    private void OnTaskChanged(object? sender, TaskChange change) => _ui.Post(() =>
+    private void OnTaskChanged(object? sender, TaskChange change) => _ui.Post(PlanReload);
+
+    private void OnSnoozeChanged(object? sender, EventArgs e)
+    {
+        // Looked at here and now: the UI thread may only get to this once the tasks are switched.
+        if (_snooze.State.IsBusy) Interlocked.Exchange(ref _snoozeSwitchedTasks, 1);
+
+        _ui.Post(() =>
+        {
+            if (_disposed) return;
+            SnoozeState state = _snooze.State;
+            MarkSnoozed(state);
+            if ((TaskStatusFilter)StatusFilterIndex == TaskStatusFilter.Snoozed) Refilter();
+
+            // The rows show what the snooze did to their tasks only once those have been read again,
+            // and while the history log is off, nothing else reports it.
+            if (!state.IsBusy && Interlocked.Exchange(ref _snoozeSwitchedTasks, 0) == 1) PlanReload();
+        });
+    }
+
+    private void MarkSnoozed(SnoozeState state)
+    {
+        var snoozed = new HashSet<string>(state.Tasks.Select(task => task.TaskPath), StringComparer.OrdinalIgnoreCase);
+        if (state.Global is { } global) snoozed.UnionWith(global.SuspendedTasks);
+        foreach (TaskRow row in _all.Values) row.IsSnoozed = snoozed.Contains(row.Path);
+    }
+
+    private void PlanReload()
     {
         if (_disposed || _reloadPlanned) return;
         _reloadPlanned = true;
         _reloadTimer.Change(ReloadDelay, Timeout.InfiniteTimeSpan);
-    });
+    }
 
     private void ReloadAfterChange()
     {
@@ -540,6 +575,7 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
         foreach (string gone in _all.Keys.Where(path => !seen.Contains(path)).ToList()) _all.Remove(gone);
 
         _storeOrder = fresh.Select(row => row.Path).ToList();
+        MarkSnoozed(_snooze.State);
         Refilter();
     }
 
@@ -580,6 +616,7 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
             TaskStatusFilter.Running => row.IsRunning || row.State == TaskRowState.Running,
             TaskStatusFilter.Enabled => row.IsEnabled,
             TaskStatusFilter.Disabled => !row.IsEnabled,
+            TaskStatusFilter.Snoozed => row.IsSnoozed,
             _ => true
         };
         if (!statusFits) return false;
