@@ -31,9 +31,12 @@ public sealed class ScriptEditorViewModelTests : IDisposable
     /// <summary>The copy of the script that the started program was told to run.</summary>
     private string RunCopy => Regex.Match(_runner.Last.Request.Arguments, "-File \"([^\"]+)\"").Groups[1].Value;
 
-    private static OutputLine Note(string text) => new(text, OutputKind.Note);
-    private static OutputLine Line(string text) => new(text, OutputKind.Output);
-    private static OutputLine Error(string text) => new(text, OutputKind.Error);
+    private static (string, OutputKind) Note(string text) => (text, OutputKind.Note);
+    private static (string, OutputKind) Line(string text) => (text, OutputKind.Output);
+    private static (string, OutputKind) Error(string text) => (text, OutputKind.Error);
+
+    /// <summary>A line of the output by what it shows, to compare with the lines a test expects.</summary>
+    private static (string, OutputKind) Shown(OutputLine line) => (line.Text, line.Kind);
 
     [Fact]
     public async Task Running_HandsWindowsPowerShellACopyOfTheText_ThatItCanReadWhateverTheLanguage()
@@ -64,14 +67,14 @@ public sealed class ScriptEditorViewModelTests : IDisposable
         _runner.Last.Writes("one").WritesError("two").Writes("three");
 
         Assert.True(_editor.IsRunning);
-        Assert.Equal([Note("ScriptEditor.Status.Starting"), Line("one"), Error("two"), Line("three")], _editor.Output);
+        Assert.Equal([Note("ScriptEditor.Status.Starting"), Line("one"), Error("two"), Line("three")], _editor.Output.Select(Shown));
         Assert.Equal("two", _editor.Output[2].ToString());
 
         _runner.Last.Exits(3);
         await run;
 
         Assert.False(_editor.IsRunning);
-        Assert.Equal(Note("ScriptEditor.Status.ExitCode"), _editor.Output[^1]);
+        Assert.Equal(Note("ScriptEditor.Status.ExitCode"), Shown(_editor.Output[^1]));
         Assert.Equal(5, _editor.Output.Count);
     }
 
@@ -82,13 +85,27 @@ public sealed class ScriptEditorViewModelTests : IDisposable
         Task run = _editor.RunCommand.ExecuteAsync(null);
 
         _runner.Last.WritesUnfinished("Copying 10%");
-        Assert.Equal(Line("Copying 10%"), _editor.Output[^1]);
+        Assert.Equal(Line("Copying 10%"), Shown(_editor.Output[^1]));
 
         _runner.Last.WritesUnfinished("Copying 80%").Writes("Copying 100%").Writes("Done").WritesUnfinished("Continue? ").WritesError("no input");
 
         Assert.Equal(
             [Note("ScriptEditor.Status.Starting"), Line("Copying 100%"), Line("Done"), Line("Continue? "), Error("no input")],
-            _editor.Output);
+            _editor.Output.Select(Shown));
+        _runner.Last.Exits();
+        await run;
+    }
+
+    [Fact]
+    public async Task RepeatedLines_AreEntriesOfTheirOwn_SoTheListOnScreenFindsTheLastOne()
+    {
+        _editor.Text = "Get-ChildItem";
+        Task run = _editor.RunCommand.ExecuteAsync(null);
+
+        _runner.Last.Writes("").Writes("    Directory: C:\\").Writes("");
+
+        // The page scrolls to the last line, and the list on screen finds where that is with IndexOf.
+        Assert.Equal(_editor.Output.Count - 1, _editor.Output.IndexOf(_editor.Output[^1]));
         _runner.Last.Exits();
         await run;
     }
@@ -123,7 +140,7 @@ public sealed class ScriptEditorViewModelTests : IDisposable
 
         Task second = _editor.RunCommand.ExecuteAsync(null);
 
-        Assert.Equal([Note("ScriptEditor.Status.Starting")], _editor.Output);
+        Assert.Equal([Note("ScriptEditor.Status.Starting")], _editor.Output.Select(Shown));
         _runner.Last.Exits();
         await second;
     }
@@ -140,7 +157,7 @@ public sealed class ScriptEditorViewModelTests : IDisposable
 
         Assert.True(_runner.Last.WasStopped);
         Assert.False(_editor.IsRunning);
-        Assert.Equal([Note("ScriptEditor.Status.Starting"), Line("still going"), Note("ScriptEditor.Status.Stopped")], _editor.Output);
+        Assert.Equal([Note("ScriptEditor.Status.Starting"), Line("still going"), Note("ScriptEditor.Status.Stopped")], _editor.Output.Select(Shown));
         Assert.False(File.Exists(RunCopy));
     }
 
@@ -152,7 +169,7 @@ public sealed class ScriptEditorViewModelTests : IDisposable
 
         await _editor.RunCommand.ExecuteAsync(null);
 
-        Assert.Equal([Note("ScriptEditor.Status.Starting"), Error("ScriptEditor.Error.Start")], _editor.Output);
+        Assert.Equal([Note("ScriptEditor.Status.Starting"), Error("ScriptEditor.Error.Start")], _editor.Output.Select(Shown));
         Assert.False(_editor.IsRunning);
         Assert.True(_editor.RunCommand.CanExecute(null));
         Assert.Empty(Directory.GetFiles(_folder.Path, "script-run-*"));
@@ -195,7 +212,7 @@ public sealed class ScriptEditorViewModelTests : IDisposable
 
         ui.RunPosted();
 
-        Assert.Equal([Note("ScriptEditor.Status.Starting"), Line("one"), Line("two"), Line("three")], editor.Output);
+        Assert.Equal([Note("ScriptEditor.Status.Starting"), Line("one"), Line("two"), Line("three")], editor.Output.Select(Shown));
         _runner.Last.Exits();
         await run;
     }
@@ -216,11 +233,11 @@ public sealed class ScriptEditorViewModelTests : IDisposable
             ui.RunPosted();
 
             Assert.True(editor.Output.Count <= ScriptEditorViewModel.MaxOutputLines);
-            Assert.Equal(Line($"line {written}"), editor.Output[^1]);
+            Assert.Equal(Line($"line {written}"), Shown(editor.Output[^1]));
         }
 
         Assert.Equal(ScriptEditorViewModel.MaxOutputLines, editor.Output.Count);
-        Assert.Equal(Line($"line {written - ScriptEditorViewModel.MaxOutputLines + 1}"), editor.Output[0]);
+        Assert.Equal(Line($"line {written - ScriptEditorViewModel.MaxOutputLines + 1}"), Shown(editor.Output[0]));
         _runner.Last.Exits();
         await run;
     }
@@ -266,7 +283,7 @@ public sealed class ScriptEditorViewModelTests : IDisposable
 
         LibraryScript saved = Assert.Single(_store.GetScripts());
         Assert.Equal(("Tidy up", "Removes old files.", "Remove-Item old.txt"), (saved.Name, saved.Description, _store.ReadText(saved.Id)));
-        Assert.Equal(Note("ScriptEditor.Status.Saved"), Assert.Single(_editor.Output));
+        Assert.Equal(Note("ScriptEditor.Status.Saved"), Shown(Assert.Single(_editor.Output)));
 
         _editor.Name = "Tidy up more";
         _editor.Text = "Remove-Item older.txt";

@@ -18,8 +18,15 @@ public enum OutputKind
 }
 
 /// <summary>One line in the output of the script editor.</summary>
-public sealed record OutputLine(string Text, OutputKind Kind)
+/// <remarks>
+/// Not a record: the list on screen finds a line by comparing it with the lines it holds, and of
+/// lines that compared equal by their text, blank ones above all, it would always find the first.
+/// </remarks>
+public sealed class OutputLine(string text, OutputKind kind)
 {
+    public string Text { get; } = text;
+    public OutputKind Kind { get; } = kind;
+
     /// <summary>The text alone: this is what a screen reader reads out for the line in a list.</summary>
     public override string ToString() => Text;
 }
