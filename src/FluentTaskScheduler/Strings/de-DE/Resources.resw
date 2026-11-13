@@ -1090,4 +1090,9 @@ Jetzt App neustarten?</value></data>
   <data name="Snooze.Error.TaskScheduler" xml:space="preserve"><value>Die Aufgabenplanung hat einen Fehler gemeldet, deshalb wurde nichts pausiert. {0}</value></data>
   <data name="Shortcuts.Key.Ctrl" xml:space="preserve"><value>Strg</value></data>
   <data name="Shortcuts.Key.Del" xml:space="preserve"><value>Entf</value></data>
+  <data name="Settings.Names.RemoveFormat" xml:space="preserve"><value>{0} entfernen</value></data>
+  <data name="Templates.DeployFormat" xml:space="preserve"><value>Vorlage {0} bereitstellen</value></data>
+  <data name="Library.CreateTaskFromScriptFormat" xml:space="preserve"><value>Aufgabe aus Skript {0} erstellen</value></data>
+  <data name="Library.EditScriptFormat" xml:space="preserve"><value>Skript {0} bearbeiten</value></data>
+  <data name="Library.DeleteScriptFormat" xml:space="preserve"><value>Skript {0} löschen</value></data>
 </root>

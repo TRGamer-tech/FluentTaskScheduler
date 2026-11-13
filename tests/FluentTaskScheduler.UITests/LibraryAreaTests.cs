@@ -81,12 +81,15 @@ public class LibraryTests
 
         Assert.True(app.FindByName("Nightly Temp File Cleanup") != null, "The temp cleanup template is not listed.");
         Assert.True(app.Require("Template.Defrag").IsEnabled, "The button that deploys a template is not available.");
+        // Every card has the same buttons; a screen reader tells them apart by what they act on.
+        Assert.Equal("Deploy template Nightly Temp File Cleanup", app.Require("Template.TempCleanup").Name);
         app.Snapshot("templates");
 
         app.Require("LibraryScriptsTab").Click();
 
         Assert.True(app.FindByName("System File Checker") != null, "The built-in scripts are not listed.");
         Assert.True(app.Require("Script.SystemFileChecker").IsEnabled, "The button that creates a task from a script is not available.");
+        Assert.Equal("Create task from script System File Checker", app.Require("Script.SystemFileChecker").Name);
         Assert.Null(app.Find("Template.Defrag", 1500));
         app.Snapshot("scripts");
     }

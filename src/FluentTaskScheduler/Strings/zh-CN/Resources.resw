@@ -1093,6 +1093,11 @@
   <data name="Snooze.Error.TaskScheduler" xml:space="preserve"><value>任务计划程序报告了错误，因此未暂停任何任务。{0}</value></data>
   <data name="Shortcuts.Key.Ctrl" xml:space="preserve"><value>Ctrl</value></data>
   <data name="Shortcuts.Key.Del" xml:space="preserve"><value>Del</value></data>
+  <data name="Settings.Names.RemoveFormat" xml:space="preserve"><value>删除“{0}”</value></data>
+  <data name="Templates.DeployFormat" xml:space="preserve"><value>部署模板“{0}”</value></data>
+  <data name="Library.CreateTaskFromScriptFormat" xml:space="preserve"><value>从脚本“{0}”创建任务</value></data>
+  <data name="Library.EditScriptFormat" xml:space="preserve"><value>编辑脚本“{0}”</value></data>
+  <data name="Library.DeleteScriptFormat" xml:space="preserve"><value>删除脚本“{0}”</value></data>
 </root>
 
 

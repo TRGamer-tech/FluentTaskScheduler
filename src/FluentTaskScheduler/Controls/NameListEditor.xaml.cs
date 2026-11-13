@@ -1,3 +1,4 @@
+using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -29,6 +30,9 @@ public sealed partial class NameListEditor : UserControl
         get => (string)GetValue(PlaceholderProperty);
         set => SetValue(PlaceholderProperty, value);
     }
+
+    /// <summary>For x:Bind: what a screen reader calls the button that removes <paramref name="name"/>, so that the buttons of the list can be told apart.</summary>
+    public static string RemoveButtonName(string name) => Loc.Format("Settings.Names.RemoveFormat", name);
 
     private void NewNameBox_KeyDown(object sender, KeyRoutedEventArgs e)
     {

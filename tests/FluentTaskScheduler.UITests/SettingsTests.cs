@@ -74,6 +74,7 @@ public class SettingsTests
         app.Snapshot("category-added");
 
         Assert.True(app.FindByName("Backups", ControlType.Text) != null, "The new category is not listed.");
+        Assert.True(app.FindByName("Remove Backups", ControlType.Button) != null, "The button that removes the new category does not say which category it removes.");
         Assert.True(Eventually(() => app.SavedSetting("SavedCategories")?.Contains("\"Backups\"") == true), "settings.json does not hold the new category.");
     }
 

@@ -95,6 +95,7 @@
                                                     <Button Margin="0,8,0,0"
                                                             Content="{x:Bind l:Loc.Get('Templates.Deploy')}"
                                                             Command="{x:Bind CreateTaskCommand}"
+                                                            AutomationProperties.Name="{x:Bind local:LibraryPage.ButtonName('Templates.DeployFormat', Name)}"
                                                             AutomationProperties.AutomationId="{x:Bind local:LibraryPage.IdOf('Template', Id)}"/>
                                                 </StackPanel>
                                             </Grid>
@@ -160,18 +161,19 @@
                                     <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
                                         <Button Content="{x:Bind l:Loc.Get('ScriptLibraryUseTemplateBtn.Content')}"
                                                 Command="{x:Bind CreateTaskCommand}"
+                                                AutomationProperties.Name="{x:Bind local:LibraryPage.ButtonName('Library.CreateTaskFromScriptFormat', Name)}"
                                                 AutomationProperties.AutomationId="{x:Bind local:LibraryPage.IdOf('Script', Id)}"/>
                                         <Button Visibility="{x:Bind CanEdit}"
                                                 Command="{x:Bind EditCommand}"
                                                 ToolTipService.ToolTip="{x:Bind l:Loc.Get('Library.EditScript')}"
-                                                AutomationProperties.Name="{x:Bind l:Loc.Get('Library.EditScript')}"
+                                                AutomationProperties.Name="{x:Bind local:LibraryPage.ButtonName('Library.EditScriptFormat', Name)}"
                                                 AutomationProperties.AutomationId="{x:Bind local:LibraryPage.IdOf('EditScript', Id)}">
                                             <FontIcon Glyph="&#xE70F;" FontSize="14"/>
                                         </Button>
                                         <Button Visibility="{x:Bind CanDelete}"
                                                 Command="{x:Bind DeleteCommand}"
                                                 ToolTipService.ToolTip="{x:Bind l:Loc.Get('ScriptLibraryDeleteBtn.ToolTipService.ToolTip')}"
-                                                AutomationProperties.Name="{x:Bind l:Loc.Get('ScriptLibraryDeleteBtn.ToolTipService.ToolTip')}"
+                                                AutomationProperties.Name="{x:Bind local:LibraryPage.ButtonName('Library.DeleteScriptFormat', Name)}"
                                                 AutomationProperties.AutomationId="{x:Bind local:LibraryPage.IdOf('DeleteScript', Id)}">
                                             <FontIcon Glyph="&#xE74D;" FontSize="14"/>
                                         </Button>
