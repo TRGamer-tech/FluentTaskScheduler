@@ -45,6 +45,19 @@ public sealed class GlobalSnoozeTests : SnoozeTestBase
         Assert.Equal(DateTimeOffset.Parse(expectedEnd, CultureInfo.InvariantCulture), snooze.State.Global?.Window.Until);
     }
 
+    [Fact]
+    public async Task SnoozingUntilAMoment_EndsThen_HoweverLongListingTheTasksTakes()
+    {
+        Store.Add(Backup);
+        SuspendTriggers();
+        var snooze = await StartedService();
+        Store.Listed = () => Time.Advance(TimeSpan.FromSeconds(20));
+
+        await snooze.SnoozeAllAsync(SnoozeEnd.Until(Start.AddMinutes(30)));
+
+        Assert.Equal(new SnoozeWindow(Start.AddMinutes(30)), snooze.State.Global?.Window);
+    }
+
     [Theory]
     [InlineData(0)]
     [InlineData(-5)]

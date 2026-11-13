@@ -286,21 +286,21 @@ public sealed class SnoozeViewModelTests : IDisposable
 
         Assert.True(await dialog.SnoozeAsync());
 
-        Assert.Equal(["SnoozeAll for 1.19:13:00"], _service.Calls);
+        Assert.Equal(["SnoozeAll until 2031-05-08 09:30 +00:00"], _service.Calls);
         Assert.False(dialog.HasProblem);
     }
 
     [Fact]
     public async Task TheMoment_IsOneInTheTimeOfThisComputer()
     {
-        // 14:17 UTC is 16:17 here, so 18:00 here is an hour and 43 minutes away.
+        // 14:17 UTC is 16:17 here.
         _time.SetLocalTimeZone(TimeZoneInfo.CreateCustomTimeZone("Test", TimeSpan.FromHours(2), "Test", "Test"));
         SnoozeUntilViewModel dialog = _snooze.PickMoment();
         dialog.TimeOfDay = new TimeSpan(18, 0, 0);
 
         Assert.True(await dialog.SnoozeAsync());
 
-        Assert.Equal(["SnoozeAll for 01:43:00"], _service.Calls);
+        Assert.Equal(["SnoozeAll until 2031-05-06 18:00 +02:00"], _service.Calls);
     }
 
     [Fact]

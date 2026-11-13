@@ -208,6 +208,7 @@ public sealed class SnoozeService : ISnoozeService, ISnoozeGate, IDisposable
 
     private SnoozeWindow WindowUntil(SnoozeEnd end)
     {
+        if (end.Moment is { } moment) return new SnoozeWindow(moment.ToUniversalTime());
         if (end.Duration is { } duration) return new SnoozeWindow(_time.GetUtcNow() + duration);
         if (end.TimeOfDay is not { } timeOfDay) return SnoozeWindow.UntilRestart;
 

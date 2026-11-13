@@ -329,7 +329,7 @@ public sealed class TaskDetailsViewModelTests : IDisposable
 
         Assert.True(await dialog.SnoozeAsync());
 
-        Assert.Equal([@"SnoozeTask \Backup for 02:30:00"], _snooze.Calls);
+        Assert.Equal([@"SnoozeTask \Backup until 2031-05-06 16:30 +02:00"], _snooze.Calls);
         Assert.Equal("Backup", dialog.Title);
         Assert.Equal("Task.Snooze.CustomIntro", dialog.UntilText);
         Assert.False(dialog.IsForAllTasks);

@@ -14,7 +14,10 @@ public sealed class FakeSnoozeService : ISnoozeService
 
     public event EventHandler? Changed;
 
-    /// <summary>Every request, in order, e.g. "SnoozeAll for 00:30:00", "SnoozeTask \Backup until restart" or "TaskMoved \A -> \B\A".</summary>
+    /// <summary>
+    /// Every request, in order, e.g. "SnoozeAll for 00:30:00", "SnoozeAll until 2031-05-06 18:00 +02:00",
+    /// "SnoozeTask \Backup until restart" or "TaskMoved \A -> \B\A".
+    /// </summary>
     public List<string> Calls { get; } = [];
 
     /// <summary>When set, every request fails with this.</summary>
@@ -59,6 +62,7 @@ public sealed class FakeSnoozeService : ISnoozeService
     private static string Describe(SnoozeEnd end) =>
         end.Duration is { } duration ? $"for {duration}"
         : end.TimeOfDay is { } time ? $"until {time.ToString("HH:mm", CultureInfo.InvariantCulture)}"
+        : end.Moment is { } moment ? $"until {moment.ToString("yyyy-MM-dd HH:mm zzz", CultureInfo.InvariantCulture)}"
         : "until restart";
 }
 

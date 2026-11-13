@@ -7,6 +7,7 @@ public sealed record SnoozeEnd
 
     internal TimeSpan? Duration { get; private init; }
     internal TimeOnly? TimeOfDay { get; private init; }
+    internal DateTimeOffset? Moment { get; private init; }
 
     /// <summary>Once <paramref name="duration"/> has passed.</summary>
     /// <exception cref="ArgumentOutOfRangeException">The duration is not positive.</exception>
@@ -21,6 +22,12 @@ public sealed record SnoozeEnd
     /// tomorrow if that time has already passed today.
     /// </summary>
     public static SnoozeEnd At(TimeOnly timeOfDay) => new() { TimeOfDay = timeOfDay };
+
+    /// <summary>
+    /// At <paramref name="moment"/>, however long the snooze takes to start. A moment that has
+    /// passed by then ends the snooze as soon as it has started.
+    /// </summary>
+    public static SnoozeEnd Until(DateTimeOffset moment) => new() { Moment = moment };
 
     /// <summary>When the user signs out or Windows restarts.</summary>
     public static SnoozeEnd AtRestart { get; } = new();

@@ -48,16 +48,15 @@ public sealed partial class SnoozeUntilViewModel : ObservableObject
     /// <returns>True when the snooze has started; otherwise <see cref="Problem"/> says why not.</returns>
     public async Task<bool> SnoozeAsync()
     {
-        DateTime moment = Date.Date + TimeOfDay;
-        TimeSpan left = new DateTimeOffset(moment, _time.LocalTimeZone.GetUtcOffset(moment)) - _time.GetUtcNow();
-        if (left <= TimeSpan.Zero)
+        DateTime local = Date.Date + TimeOfDay;
+        var moment = new DateTimeOffset(local, _time.LocalTimeZone.GetUtcOffset(local));
+        if (moment <= _time.GetUtcNow())
         {
             Problem = Loc.Get("Snooze.Error.PastTime");
             return false;
         }
 
-        // The service is given how long the snooze lasts: the time left until the moment picked.
-        Problem = await _snooze(SnoozeEnd.After(left));
+        Problem = await _snooze(SnoozeEnd.Until(moment));
         return Problem is null;
     }
 }
