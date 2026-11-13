@@ -38,13 +38,15 @@ public sealed class TaskTests : IDisposable
         Toggle(app, "Wed");
         Toggle(app, "Fri");
 
-        // The time picker opens on the hour; moving to the minutes and seven steps down makes it :07.
-        app.Require("TriggerStartTime").Click();
-        Wait();
-        Keyboard.Type(VirtualKeyShort.RIGHT);
+        // A new trigger starts on the hour; seven steps down in the minutes make it :07.
+        var timeButton = app.Find(element => element.AutomationId == "FlyoutButton" && element.Parent?.AutomationId == "TriggerStartTime")
+                         ?? throw new InvalidOperationException("The time picker has no button.");
+        timeButton.Patterns.Invoke.Pattern.Invoke();
+        var accept = app.Require("AcceptButton");
+        app.Require("MinuteLoopingSelector").Focus();
         for (int i = 0; i < 7; i++) Keyboard.Type(VirtualKeyShort.DOWN);
         app.Snapshot("time-picker");
-        Keyboard.Type(VirtualKeyShort.ENTER);
+        accept.Patterns.Invoke.Pattern.Invoke();
         Wait();
 
         app.Require("EditorProgram").AsTextBox().Text = "cmd.exe";

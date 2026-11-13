@@ -46,6 +46,7 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
     private readonly IUiThread _ui;
     private readonly TimeProvider _time;
     private readonly TaskEditorFactory _editors;
+    private readonly ITaskFolders _folders;
 
     // Every task, by path. The rows in here are the ones shown: a reload updates them in place,
     // so selection and scroll position survive it.
@@ -56,8 +57,9 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
     private IReadOnlyList<TaskRow> _selection = [];
 
     public TasksViewModel(ITaskStore store, ITaskRunner runner, ISettingsStore settings, IPrompts prompts, IFilePicker files,
-        IAppLifetime app, IUiThread ui, TimeProvider time, TaskEditorFactory editors)
+        IAppLifetime app, IUiThread ui, TimeProvider time, TaskEditorFactory editors, ITaskFolders folders)
     {
+        _folders = folders;
         _store = store;
         _runner = runner;
         _settings = settings;
@@ -295,6 +297,27 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
         catch (Exception ex) when (IsTaskFailure(ex) || ex is IOException or UnauthorizedAccessException)
         {
             await ReportAsync([Describe(task, ex)]);
+        }
+    }
+
+    /// <summary>
+    /// Lets the user pick an exported task and prepares its import; null when the user cancels or
+    /// the file is not a task, which the user is told.
+    /// </summary>
+    public async Task<ImportTaskViewModel?> BeginImportAsync()
+    {
+        if (await _files.PickOpenFileAsync(Loc.Get("Dialog.ImportTask.Title"), Loc.Get("Tasks.File.TaskXml"), "xml") is not { } file) return null;
+
+        try
+        {
+            string xml = await File.ReadAllTextAsync(file);
+            var (info, folders) = await Task.Run(() => (_store.Inspect(xml), _folders.GetFolders()));
+            return new ImportTaskViewModel(_store, _app, xml, info, Path.GetFileNameWithoutExtension(file), folders, FolderPath);
+        }
+        catch (Exception ex) when (ex is FormatException or IOException or UnauthorizedAccessException)
+        {
+            await _prompts.ShowErrorAsync(Loc.Format("Import.Error.NotATask", Path.GetFileName(file), ex.Message));
+            return null;
         }
     }
 

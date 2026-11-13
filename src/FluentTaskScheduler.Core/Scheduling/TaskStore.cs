@@ -7,18 +7,12 @@ namespace FluentTaskScheduler.Scheduling;
 /// <inheritdoc cref="ITaskStore"/>
 public sealed class TaskStore : ITaskStore
 {
-    // HRESULTs Task Scheduler answers with when the account of a task cannot be used.
-    private const int LogonFailure = unchecked((int)0x8007052E);        // ERROR_LOGON_FAILURE: wrong or missing password
-    private const int NoneMapped = unchecked((int)0x80070534);          // ERROR_NONE_MAPPED: the account does not exist
-    private const int AccountRestriction = unchecked((int)0x8007052F);  // ERROR_ACCOUNT_RESTRICTION: e.g. blank password
-
-    private readonly TaskSchedulerConnection _connection;
-
-    public TaskStore(TaskSchedulerConnection connection) => _connection = connection;
+    // Every operation opens its own short-lived session with the Task Scheduler service.
+    private static TaskService Open() => new();
 
     public IReadOnlyList<TaskRow> GetTasks()
     {
-        using var service = _connection.Open();
+        using var service = Open();
         var rows = new List<TaskRow>();
         Collect(service.RootFolder, rows);
         return rows;
@@ -55,13 +49,13 @@ public sealed class TaskStore : ITaskStore
 
     public bool Exists(string path)
     {
-        using var service = _connection.Open();
+        using var service = Open();
         return service.GetTask(path) is not null;
     }
 
     public IReadOnlyDictionary<string, TaskRowState> GetStates(IEnumerable<string> paths)
     {
-        using var service = _connection.Open();
+        using var service = Open();
         var states = new Dictionary<string, TaskRowState>(StringComparer.OrdinalIgnoreCase);
         foreach (string path in paths)
         {
@@ -72,13 +66,13 @@ public sealed class TaskStore : ITaskStore
 
     public TaskDraft Load(string path)
     {
-        using var service = _connection.Open();
+        using var service = Open();
         return TaskDraftReader.Read(Find(service, path));
     }
 
     public string Save(TaskDraft draft, string folderPath, string? originalPath = null, string? password = null)
     {
-        using var service = _connection.Open();
+        using var service = Open();
 
         ScheduledTask? original = originalPath is null ? null : Find(service, originalPath);
         TaskDraft? baseline = original is null ? null : TaskDraftReader.Read(original);
@@ -96,41 +90,16 @@ public sealed class TaskStore : ITaskStore
         }
         else
         {
-            (userId, logonType) = Registration(definition.Principal, baseline.Account);
+            (userId, logonType) = TaskRegistration.Keeping(definition.Principal);
         }
 
-        TaskFolder folder = original?.Folder ?? TaskSchedulerConnection.GetOrCreateFolder(service, folderPath);
-        string savedPath = Combine(folder.Path, draft.Name);
-        Register(folder, draft.Name, definition, userId, password, logonType, savedPath);
+        TaskFolder folder = original?.Folder ?? TaskPaths.GetOrCreateFolder(service, folderPath);
+        TaskRegistration.Register(folder, draft.Name, definition, userId, password, logonType);
 
         bool renamed = original is not null && !string.Equals(original.Name, draft.Name, StringComparison.OrdinalIgnoreCase);
         if (renamed) DeleteAfterRename(folder, original!.Name, draft.Name);
 
-        return savedPath;
-    }
-
-    /// <summary>The user ID and logon type that register a definition under the principal it already has.</summary>
-    private static (string? UserId, TaskLogonType LogonType) Registration(TaskPrincipal principal, TaskAccount account) => principal.LogonType switch
-    {
-        TaskLogonType.Group => (principal.GroupId, TaskLogonType.Group),
-        TaskLogonType.ServiceAccount => (TaskAccounts.ToRegistration(account).UserId, TaskLogonType.ServiceAccount),
-        var logonType => (principal.UserId, logonType)
-    };
-
-    private static void Register(TaskFolder folder, string name, TaskDefinition definition, string? userId, string? password, TaskLogonType logonType, string path)
-    {
-        try
-        {
-            folder.RegisterTaskDefinition(name, definition, TaskCreation.CreateOrUpdate, userId, password, logonType);
-        }
-        catch (Exception ex) when (TaskSchedulerErrors.IsAccessDenied(ex))
-        {
-            throw new TaskAccessDeniedException(path, ex);
-        }
-        catch (COMException ex) when (ex.HResult is LogonFailure or NoneMapped or AccountRestriction)
-        {
-            throw new TaskAccountException(ex.Message, ex);
-        }
+        return TaskPaths.Combine(folder.Path, draft.Name);
     }
 
     /// <summary>
@@ -161,7 +130,7 @@ public sealed class TaskStore : ITaskStore
 
     public void SetEnabled(string path, bool enabled)
     {
-        using var service = _connection.Open();
+        using var service = Open();
         var task = Find(service, path);
         try
         {
@@ -175,7 +144,7 @@ public sealed class TaskStore : ITaskStore
 
     public void Run(string path)
     {
-        using var service = _connection.Open();
+        using var service = Open();
         var task = Find(service, path);
         try
         {
@@ -190,13 +159,13 @@ public sealed class TaskStore : ITaskStore
 
     public void Stop(string path)
     {
-        using var service = _connection.Open();
+        using var service = Open();
         Find(service, path).Stop();
     }
 
     public void Delete(string path)
     {
-        using var service = _connection.Open();
+        using var service = Open();
         var task = Find(service, path);
         try
         {
@@ -210,13 +179,13 @@ public sealed class TaskStore : ITaskStore
 
     public string Export(string path)
     {
-        using var service = _connection.Open();
+        using var service = Open();
         return Find(service, path).Xml;
     }
 
     public TaskImportInfo Inspect(string xml)
     {
-        using var service = _connection.Open();
+        using var service = Open();
         var principal = Parse(service, xml).Principal;
         string id = principal.LogonType == TaskLogonType.Group ? principal.GroupId ?? "" : principal.UserId ?? "";
 
@@ -229,7 +198,7 @@ public sealed class TaskStore : ITaskStore
 
     public string Import(string xml, TaskImportOptions options)
     {
-        using var service = _connection.Open();
+        using var service = Open();
         var definition = Parse(service, xml);
         var principal = definition.Principal;
 
@@ -246,13 +215,13 @@ public sealed class TaskStore : ITaskStore
         }
         else
         {
-            (userId, logonType) = Registration(principal, TaskAccounts.FromPrincipal(principal));
+            (userId, logonType) = TaskRegistration.Keeping(principal);
         }
 
-        var folder = TaskSchedulerConnection.GetOrCreateFolder(service, options.FolderPath);
-        string path = Combine(folder.Path, options.Name);
-        Register(folder, options.Name, definition, userId, logonType is TaskLogonType.Password or TaskLogonType.InteractiveTokenOrPassword ? options.Password : null, logonType, path);
-        return path;
+        var folder = TaskPaths.GetOrCreateFolder(service, options.FolderPath);
+        string? password = logonType is TaskLogonType.Password or TaskLogonType.InteractiveTokenOrPassword ? options.Password : null;
+        TaskRegistration.Register(folder, options.Name, definition, userId, password, logonType);
+        return TaskPaths.Combine(folder.Path, options.Name);
     }
 
     /// <summary>
@@ -292,7 +261,4 @@ public sealed class TaskStore : ITaskStore
 
     private static ScheduledTask Find(TaskService service, string path) =>
         service.GetTask(path) ?? throw new TaskNotFoundException(path);
-
-    private static string Combine(string folderPath, string name) =>
-        folderPath.TrimEnd('\\') + "\\" + name;
 }

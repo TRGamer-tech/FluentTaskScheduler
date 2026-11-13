@@ -55,6 +55,9 @@ public sealed partial class TaskRow : ObservableObject
     private string? _loadError;
 
     public string TagsText => string.Join(", ", Tags);
+
+    /// <summary>The name: what a list shows for an item it has no template for, and what a screen reader announces for the row.</summary>
+    public override string ToString() => Name;
     public bool HasCompletionActions => CompletionActions.IsActive;
     public bool HasLoadError => LoadError is not null;
 

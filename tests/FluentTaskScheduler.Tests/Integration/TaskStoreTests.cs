@@ -13,7 +13,7 @@ public class TaskStoreTests
     private const string ForeignSid = "S-1-5-21-1111111111-2222222222-3333333333-1001";
 
     private readonly ITestOutputHelper _out;
-    private readonly TaskStore _store = new(new TaskSchedulerConnection());
+    private readonly TaskStore _store = new();
 
     public TaskStoreTests(ITestOutputHelper output) => _out = output;
 

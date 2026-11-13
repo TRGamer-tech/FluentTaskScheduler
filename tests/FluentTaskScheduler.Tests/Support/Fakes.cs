@@ -94,3 +94,48 @@ public sealed class FakeSnoozeGate : ISnoozeGate
     public bool BlocksRun(string taskPath) => Snoozed;
     public void RecordSuppressedRun(string taskPath, RunOrigin origin) => Suppressed.Add($"{taskPath} ({origin})");
 }
+
+/// <summary>Folders in memory; moving and deleting only change the list of folders.</summary>
+public sealed class FakeTaskFolders(params string[] folders) : ITaskFolders
+{
+    private readonly List<string> _folders = ["\\", .. folders];
+
+    /// <summary>Every change, in order, e.g. "MoveTask \\A\\T -> \\B".</summary>
+    public List<string> Calls { get; } = [];
+
+    /// <summary>When set, every change fails with this.</summary>
+    public Exception? Fails { get; set; }
+
+    public IReadOnlyList<string> GetFolders() => _folders.ToList();
+
+    public void Create(string path)
+    {
+        Record($"Create {path}");
+        if (!_folders.Contains(path, StringComparer.OrdinalIgnoreCase)) _folders.Add(path);
+    }
+
+    public void Delete(string path)
+    {
+        Record($"Delete {path}");
+        _folders.RemoveAll(folder => TaskPaths.IsWithin(folder, path));
+    }
+
+    public string MoveTask(string taskPath, string folderPath)
+    {
+        Record($"MoveTask {taskPath} -> {folderPath}");
+        return TaskPaths.Combine(folderPath, TaskPaths.NameOf(taskPath));
+    }
+
+    public void MoveFolder(string path, string newPath)
+    {
+        Record($"MoveFolder {path} -> {newPath}");
+        for (int i = 0; i < _folders.Count; i++)
+            if (TaskPaths.IsWithin(_folders[i], path)) _folders[i] = newPath + _folders[i][path.Length..];
+    }
+
+    private void Record(string call)
+    {
+        if (Fails is { } failure) throw failure;
+        Calls.Add(call);
+    }
+}

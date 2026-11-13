@@ -25,7 +25,7 @@ public sealed class TasksViewModelTests : IDisposable
         _settings = new SettingsStore(_folder.Paths, _time);
         var editors = new TaskEditorFactory(_store, _settings, _app, _files, new FakeNetworkProfiles(), _time);
         _tasks = new TasksViewModel(_store, new TaskRunner(_store, _snooze, _notifier), _settings, _prompts, _files, _app,
-            new InlineUiThread(), _time, editors);
+            new InlineUiThread(), _time, editors, new FakeTaskFolders(@"\Reports", @"\Reports\Old"));
 
         _store.Add(@"\Backup", draft: new TaskDraft { Category = "Maintenance", Tags = ["night"] })
               .Add(@"\Reports\Monthly", enabled: false)
@@ -454,6 +454,41 @@ public sealed class TasksViewModelTests : IDisposable
         Assert.True(editor.IsNew);
         Assert.True(await editor.SaveAsync());
         Assert.Equal(@"\Reports\Yearly", editor.SavedPath);
+    }
+
+    [Fact]
+    public async Task ImportingStartsFromTheChosenFile_TheFoldersThatExist_AndTheFolderBeingShown()
+    {
+        _files.Choice = _folder.File("Nightly backup.xml");
+        File.WriteAllText(_files.Choice, "<Task/>");
+        _tasks.FolderPath = @"\Reports";
+
+        ImportTaskViewModel? import = await _tasks.BeginImportAsync();
+
+        Assert.NotNull(import);
+        Assert.Equal("Nightly backup", import.Name);
+        Assert.Equal(["\\", @"\Reports", @"\Reports\Old"], import.Folders);
+        Assert.Equal(1, import.FolderIndex);
+    }
+
+    [Fact]
+    public async Task AFileThatIsNotATask_IsNotOfferedForImport_AndTheUserIsToldWhy()
+    {
+        _files.Choice = _folder.File("notes.xml");
+        File.WriteAllText(_files.Choice, "<notes/>");
+
+        Assert.Null(await _tasks.BeginImportAsync());
+
+        Assert.Contains("Import.Error.NotATask", Assert.Single(_prompts.Shown));
+    }
+
+    [Fact]
+    public async Task CancellingTheFileDialog_ImportsNothing()
+    {
+        _files.Choice = null;
+
+        Assert.Null(await _tasks.BeginImportAsync());
+        Assert.Empty(_prompts.Shown);
     }
 
     [Fact]

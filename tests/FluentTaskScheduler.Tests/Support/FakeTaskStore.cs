@@ -109,10 +109,20 @@ public sealed class FakeTaskStore : ITaskStore
 
     public string Export(string path) => $"<Task name=\"{Get(path).Name}\" />";
 
-    public TaskImportInfo Inspect(string xml) => new(TaskAccount.CurrentUser, AccountExistsHere: true, HighestPrivileges: false, StoresPassword: false);
+    /// <summary>What <see cref="Inspect"/> reports about any task XML.</summary>
+    public TaskImportInfo ImportInfo { get; set; } = new(TaskAccount.CurrentUser, AccountExistsHere: true, HighestPrivileges: false, StoresPassword: false);
 
-    public string Import(string xml, TaskImportOptions options) =>
-        Save(new TaskDraft { Name = options.Name }, options.FolderPath);
+    /// <summary>The options the last <see cref="Import"/> was given.</summary>
+    public TaskImportOptions? LastImport { get; private set; }
+
+    public TaskImportInfo Inspect(string xml) =>
+        xml.Contains("<Task", StringComparison.Ordinal) ? ImportInfo : throw new FormatException("This is not a task exported from Task Scheduler.");
+
+    public string Import(string xml, TaskImportOptions options)
+    {
+        LastImport = options;
+        return Save(new TaskDraft { Name = options.Name }, options.FolderPath);
+    }
 
     /// <summary>Marks a running task as finished, as Task Scheduler would.</summary>
     public void Finish(string path) => _running.Remove(path);

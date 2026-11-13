@@ -70,8 +70,8 @@ public partial class App : Application, IAppLifetime, IDisposable
         services.AddSingleton<ISettingsStore, SettingsStore>();
         services.AddSingleton<IUiThread, UiThread>();
         services.AddSingleton<IClipboard, ClipboardService>();
-        services.AddSingleton<TaskSchedulerConnection>();
         services.AddSingleton<ITaskStore, TaskStore>();
+        services.AddSingleton<ITaskFolders, TaskFolders>();
         services.AddSingleton<ITaskRunner, TaskRunner>();
         services.AddSingleton<INetworkProfiles, RegistryNetworkProfiles>();
         services.AddSingleton<WindowManager>();

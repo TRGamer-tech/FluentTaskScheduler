@@ -71,7 +71,6 @@ internal static class TaskDraftWriter
         ApplyActions(draft.Actions, baseline?.Actions ?? Array.Empty<ActionDraft>(), definition.Actions);
     }
 
-    // ── Triggers ────────────────────────────────────────────────────────────────────────────
 
     private static void ApplyTriggers(TaskDraft draft, TaskDraft? baseline, TaskDefinition definition)
     {
@@ -190,7 +189,6 @@ internal static class TaskDraftWriter
         }
     }
 
-    // ── Actions ─────────────────────────────────────────────────────────────────────────────
 
     private static void ApplyActions(IReadOnlyList<ActionDraft> drafts, IReadOnlyList<ActionDraft> before, ActionCollection actions)
     {
