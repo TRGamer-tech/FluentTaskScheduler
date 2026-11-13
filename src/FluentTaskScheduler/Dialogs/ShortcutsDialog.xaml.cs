@@ -11,14 +11,18 @@ public sealed partial class ShortcutsDialog : ContentDialog
 {
     public ShortcutsDialog() => InitializeComponent();
 
-    // Kept next to the accelerators in TasksPage.xaml, which are what really carries them out.
+    // Only a list: the keyboard accelerators in TasksPage.xaml carry the shortcuts out, and this
+    // has to be kept in line with them.
     public IReadOnlyList<Shortcut> Shortcuts { get; } =
     [
-        new("Ctrl+N", Loc.Get("Shortcuts.NewTask")),
-        new("Ctrl+E", Loc.Get("Shortcuts.Edit")),
-        new("Ctrl+R", Loc.Get("Shortcuts.Run")),
-        new("Del", Loc.Get("Shortcuts.Delete")),
+        new(WithCtrl("N"), Loc.Get("Shortcuts.NewTask")),
+        new(WithCtrl("E"), Loc.Get("Shortcuts.Edit")),
+        new(WithCtrl("R"), Loc.Get("Shortcuts.Run")),
+        new(Loc.Get("Shortcuts.Key.Del"), Loc.Get("Shortcuts.Delete")),
         new("F5", Loc.Get("Shortcuts.Refresh")),
         new("F1", Loc.Get("Shortcuts.Help"))
     ];
+
+    // Keys are named as on the keyboard of the language: Ctrl is Strg on a German one.
+    private static string WithCtrl(string key) => $"{Loc.Get("Shortcuts.Key.Ctrl")}+{key}";
 }
