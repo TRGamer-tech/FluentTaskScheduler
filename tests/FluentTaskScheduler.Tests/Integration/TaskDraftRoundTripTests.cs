@@ -125,19 +125,22 @@ public class TaskDraftRoundTripTests
     }
 
     /// <summary>
-    /// A start written in UTC is shown and changed on the local clock, and stays tied to its time
-    /// zone: "synchronize across time zones" survives the edit.
+    /// A start kept with its time zone ("synchronize across time zones") is shown and changed on
+    /// the local clock, and stays tied to its zone after the edit.
     /// </summary>
     [SkippableFact]
-    public void ChangingAStartWrittenInUtc_KeepsItInATimeZone()
+    public void ChangingAStartKeptWithItsTimeZone_KeepsItInATimeZone()
     {
         Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
         using var sandbox = new SchedulerSandbox();
         var utc = new DateTime(2030, 1, 1, 6, 30, 0, DateTimeKind.Utc);
         var definition = SampleTasks.Simple(sandbox.Service);
         definition.Triggers[0].StartBoundary = utc;
-        var task = sandbox.Folder.RegisterTaskDefinition("Utc", definition);
-        Assert.Equal(DateTimeKind.Utc, task.Definition.Triggers[0].StartBoundary.Kind);
+        var task = sandbox.Folder.RegisterTaskDefinition("Zoned", definition);
+        // Task Scheduler keeps such a moment as "Z" or as an offset from UTC; which, is its own business.
+        string stored = StartBoundaryIn(task.Xml);
+        _out.WriteLine($"Stored: {stored}");
+        Assert.Matches(ZoneAtTheEnd, stored);
 
         Edit(sandbox, task, draft =>
         {
@@ -148,10 +151,16 @@ public class TaskDraftRoundTripTests
             return draft with { Triggers = [changed] };
         });
 
-        DateTime saved = sandbox.Service.GetTask(task.Path).Definition.Triggers[0].StartBoundary;
-        Assert.NotEqual(DateTimeKind.Unspecified, saved.Kind);
-        Assert.Equal(utc.AddHours(1), saved.ToUniversalTime());
+        string saved = StartBoundaryIn(sandbox.Service.GetTask(task.Path).Xml);
+        _out.WriteLine($"Saved: {saved}");
+        Assert.Matches(ZoneAtTheEnd, saved);
+        Assert.Equal(utc.AddHours(1), DateTimeOffset.Parse(saved, System.Globalization.CultureInfo.InvariantCulture).UtcDateTime);
     }
+
+    private const string ZoneAtTheEnd = @"(Z|[+-]\d\d:\d\d)$";
+
+    private static string StartBoundaryIn(string taskXml) =>
+        System.Xml.Linq.XDocument.Parse(taskXml).Descendants().First(element => element.Name.LocalName == "StartBoundary").Value;
 
     [SkippableFact]
     public void RemovingATrigger_KeepsTheOthersIntact()
