@@ -944,7 +944,7 @@ Jetzt App neustarten?</value></data>
   <data name="Details.LastRun" xml:space="preserve"><value>Letzte Ausführung</value></data>
   <data name="Details.Triggers" xml:space="preserve"><value>Trigger</value></data>
   <data name="Details.Actions" xml:space="preserve"><value>Aktionen</value></data>
-  <data name="Details.History" xml:space="preserve"><value>Verlauf</value></data>
+  <data name="Details.History.Title" xml:space="preserve"><value>Verlauf</value></data>
   <data name="Details.Period.Today" xml:space="preserve"><value>Heute</value></data>
   <data name="Details.Period.Yesterday" xml:space="preserve"><value>Gestern</value></data>
   <data name="Details.Period.LastSevenDays" xml:space="preserve"><value>Letzte 7 Tage</value></data>

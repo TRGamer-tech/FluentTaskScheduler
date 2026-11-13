@@ -944,7 +944,7 @@ Restart now to apply the update?</value></data>
   <data name="Details.LastRun" xml:space="preserve"><value>Last run</value></data>
   <data name="Details.Triggers" xml:space="preserve"><value>Triggers</value></data>
   <data name="Details.Actions" xml:space="preserve"><value>Actions</value></data>
-  <data name="Details.History" xml:space="preserve"><value>History</value></data>
+  <data name="Details.History.Title" xml:space="preserve"><value>History</value></data>
   <data name="Details.Period.Today" xml:space="preserve"><value>Today</value></data>
   <data name="Details.Period.Yesterday" xml:space="preserve"><value>Yesterday</value></data>
   <data name="Details.Period.LastSevenDays" xml:space="preserve"><value>Last 7 days</value></data>

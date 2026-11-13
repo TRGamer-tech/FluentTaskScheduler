@@ -947,7 +947,7 @@
   <data name="Details.LastRun" xml:space="preserve"><value>上次运行</value></data>
   <data name="Details.Triggers" xml:space="preserve"><value>触发器</value></data>
   <data name="Details.Actions" xml:space="preserve"><value>操作</value></data>
-  <data name="Details.History" xml:space="preserve"><value>历史记录</value></data>
+  <data name="Details.History.Title" xml:space="preserve"><value>历史记录</value></data>
   <data name="Details.Period.Today" xml:space="preserve"><value>今天</value></data>
   <data name="Details.Period.Yesterday" xml:space="preserve"><value>昨天</value></data>
   <data name="Details.Period.LastSevenDays" xml:space="preserve"><value>最近 7 天</value></data>

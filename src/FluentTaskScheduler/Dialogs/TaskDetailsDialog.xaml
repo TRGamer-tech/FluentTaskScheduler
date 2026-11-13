@@ -108,9 +108,9 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="{x:Bind l:Loc.Get('Details.History')}" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
+                <TextBlock Text="{x:Bind l:Loc.Get('Details.History.Title')}" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
                 <ComboBox x:Name="DetailsPeriod" Grid.Column="1" MinWidth="150" SelectedIndex="{x:Bind ViewModel.PeriodIndex, Mode=TwoWay}"
-                          AutomationProperties.Name="{x:Bind l:Loc.Get('Details.History')}">
+                          AutomationProperties.Name="{x:Bind l:Loc.Get('Details.History.Title')}">
                     <ComboBoxItem Content="{x:Bind l:Loc.Get('Details.Period.Today')}"/>
                     <ComboBoxItem Content="{x:Bind l:Loc.Get('Details.Period.Yesterday')}"/>
                     <ComboBoxItem Content="{x:Bind l:Loc.Get('Details.Period.LastSevenDays')}"/>
@@ -174,7 +174,7 @@
 
             <ListView x:Name="DetailsHistory" MaxHeight="230" SelectionMode="Single"
                       ItemsSource="{x:Bind ViewModel.Entries}" SelectionChanged="History_SelectionChanged"
-                      AutomationProperties.Name="{x:Bind l:Loc.Get('Details.History')}">
+                      AutomationProperties.Name="{x:Bind l:Loc.Get('Details.History.Title')}">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
