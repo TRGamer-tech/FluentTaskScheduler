@@ -14,6 +14,16 @@ public static class AutomationExtensions
     }
 
     /// <summary>
+    /// Selects a tab or list item the way a screen reader does, which works wherever the mouse
+    /// pointer is. An element that cannot be selected through UI Automation is clicked.
+    /// </summary>
+    public static void Select(this AutomationElement element)
+    {
+        if (element.Patterns.SelectionItem.IsSupported) element.Patterns.SelectionItem.Pattern.Select();
+        else element.Click();
+    }
+
+    /// <summary>
     /// Activates a button, menu item or navigation item the way a screen reader does, which works
     /// wherever the mouse pointer is. Use a real click only where the click itself is what is
     /// tested, and <see cref="PressWithKeyboard"/> where the element opens a system dialog.

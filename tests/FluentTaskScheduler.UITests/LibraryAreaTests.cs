@@ -9,10 +9,10 @@ public class ScriptEditorTests
     public void RunningAScript_ShowsWhatItWrites_AlsoInOtherLanguages_AndHowItEnded()
     {
         using var app = AppSession.Launch("script-run");
-        app.Require("NavScriptEditor").Click();
+        app.Require("NavScriptEditor").Press();
 
         app.Require("ScriptEditorText").AsTextBox().Text = "Write-Output 'fts-plain'; Write-Output 'Zürich 東京'; exit 3";
-        Press(app, "ScriptEditorRun");
+        PressWhenEnabled(app, "ScriptEditorRun");
 
         bool exited = app.Find(e => e.Name == "[Exited with code 3]", 60000) != null;
         app.Snapshot("ran");
@@ -25,13 +25,13 @@ public class ScriptEditorTests
     public void ARunningScript_CanBeStopped()
     {
         using var app = AppSession.Launch("script-stop");
-        app.Require("NavScriptEditor").Click();
+        app.Require("NavScriptEditor").Press();
 
         app.Require("ScriptEditorText").AsTextBox().Text = "Write-Output 'fts-started'; Start-Sleep -Seconds 600";
-        Press(app, "ScriptEditorRun");
+        PressWhenEnabled(app, "ScriptEditorRun");
         Assert.True(app.Find(e => e.Name == "fts-started", 60000) != null, "The script did not start.");
 
-        Press(app, "ScriptEditorStop");
+        PressWhenEnabled(app, "ScriptEditorStop");
 
         bool stopped = app.Find(e => e.Name == "[Stopped by user]", 20000) != null;
         app.Snapshot("stopped");
@@ -43,26 +43,26 @@ public class ScriptEditorTests
     public void AScriptSavedInTheEditor_AppearsInTheLibrary_AndStaysInTheEditorWhileLookingThere()
     {
         using var app = AppSession.Launch("script-save");
-        app.Require("NavScriptEditor").Click();
+        app.Require("NavScriptEditor").Press();
         app.Require("ScriptEditorName").AsTextBox().Text = "fts ui test script";
         app.Require("ScriptEditorText").AsTextBox().Text = "Get-Date";
 
-        Press(app, "ScriptEditorSave");
+        PressWhenEnabled(app, "ScriptEditorSave");
         Assert.True(app.Find(e => e.Name == "[Saved to Library as 'fts ui test script']", 10000) != null, "The output does not confirm that the script was saved.");
 
-        app.Require("NavScriptLibrary").Click();
-        app.Require("LibraryScriptsTab").Click();
+        app.Require("NavScriptLibrary").Press();
+        app.Require("LibraryScriptsTab").Select();
         bool listed = app.Find(e => e.Name == "fts ui test script", 10000) != null;
         app.Snapshot("library");
         Assert.True(listed, "The saved script is not listed in the library.");
         Assert.Single(Directory.GetFiles(Path.Combine(app.DataDir, "Scripts"), "*.ps1"));
 
-        app.Require("NavScriptEditor").Click();
+        app.Require("NavScriptEditor").Press();
         Assert.Equal("Get-Date", app.Require("ScriptEditorText").AsTextBox().Text.Trim());
     }
 
     /// <summary>Presses a toolbar button once the text typed before has made it available.</summary>
-    private static void Press(AppSession app, string automationId)
+    private static void PressWhenEnabled(AppSession app, string automationId)
     {
         var button = app.Find(e => e.AutomationId == automationId && e.IsEnabled, 10000)
                      ?? throw new InvalidOperationException($"'{automationId}' did not become available.");
@@ -85,7 +85,7 @@ public class LibraryTests
         Assert.Equal("Deploy template Nightly Temp File Cleanup", app.Require("Template.TempCleanup").Name);
         app.Snapshot("templates");
 
-        app.Require("LibraryScriptsTab").Press();
+        app.Require("LibraryScriptsTab").Select();
 
         Assert.True(app.FindByName("System File Checker") != null, "The built-in scripts are not listed.");
         Assert.True(app.Require("Script.SystemFileChecker").IsEnabled, "The button that creates a task from a script is not available.");
@@ -120,7 +120,7 @@ public class QuickActionsTests
     public void FlushingTheDnsCache_ReportsSuccess_AndWhatWindowsSaid()
     {
         using var app = AppSession.Launch("quick-action");
-        app.Require("NavQuickActions").Click();
+        app.Require("NavQuickActions").Press();
 
         app.Require("QuickAction.FlushDNS.Run").AsButton().Invoke();
 
@@ -134,7 +134,7 @@ public class QuickActionsTests
     public void ActionsThatNeedAdministratorRights_SaySo_AndCanOnlyRunWhenTheAppHasThem()
     {
         using var app = AppSession.Launch("quick-action-elevation");
-        app.Require("NavQuickActions").Click();
+        app.Require("NavQuickActions").Press();
 
         Assert.Equal("Requires administrator rights", app.Require("QuickAction.SfcScannow.Elevation").Name);
         Assert.Null(app.Find("QuickAction.FlushDNS.Elevation", 1500));

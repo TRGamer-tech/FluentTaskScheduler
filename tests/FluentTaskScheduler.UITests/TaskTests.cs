@@ -44,8 +44,7 @@ public sealed class TaskTests : IDisposable
         var fivePast = app.Find(element => element.ControlType == ControlType.ListItem && element.Name == "05"
                                            && element.Parent?.AutomationId == "MinuteLoopingSelector")
                        ?? throw new InvalidOperationException("The minutes do not offer 05.");
-        if (fivePast.Patterns.SelectionItem.IsSupported) fivePast.Patterns.SelectionItem.Pattern.Select();
-        else fivePast.Click();
+        fivePast.Select();
         Wait();
         app.Snapshot("time-picker");
         accept.Patterns.Invoke.Pattern.Invoke();
