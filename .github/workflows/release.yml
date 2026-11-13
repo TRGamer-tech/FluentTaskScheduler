@@ -116,10 +116,50 @@ jobs:
           path: Dist/
           if-no-files-found: error
 
-  draft-release:
-    # Only a pushed tag makes a release.
-    if: github.event_name == 'push'
+  # Installs what was just built the way winget and Chocolatey do, silently, and checks that
+  # the installed app answers and that uninstalling removes it.
+  verify-installer:
     needs: package
+    runs-on: windows-latest
+    steps:
+      - name: Download release files
+        uses: actions/download-artifact@v6
+        with:
+          name: Dist-x64
+          path: Dist
+
+      - name: Install, run and uninstall
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $msi = (Resolve-Path Dist/Setup-x64.msi).Path
+
+          $install = Start-Process msiexec.exe -ArgumentList "/i `"$msi`" /qn /norestart /l*v install.log" -Wait -PassThru
+          if ($install.ExitCode -ne 0) {
+            Get-Content install.log -Tail 80
+            throw "The installer ended with exit code $($install.ExitCode)."
+          }
+
+          $roots = "$env:ProgramFiles\FluentTaskScheduler", "$env:LOCALAPPDATA\FluentTaskScheduler"
+          $exe = $roots | ForEach-Object { Join-Path $_ 'current\FluentTaskScheduler.exe' } | Where-Object { Test-Path $_ } | Select-Object -First 1
+          if (-not $exe) {
+            Get-ChildItem $roots -Recurse -Depth 1 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
+            throw 'The installed app was not found.'
+          }
+          "Installed: $exe, version $((Get-Item $exe).VersionInfo.FileVersion)"
+
+          $list = Start-Process $exe -ArgumentList '--list' -Wait -PassThru -NoNewWindow -RedirectStandardOutput list.json
+          if ($list.ExitCode -ne 0) { throw "The installed app answered --list with exit code $($list.ExitCode)." }
+          "The installed app lists $(@(Get-Content list.json -Raw | ConvertFrom-Json).Count) tasks."
+
+          $uninstall = Start-Process msiexec.exe -ArgumentList "/x `"$msi`" /qn /norestart" -Wait -PassThru
+          if ($uninstall.ExitCode -ne 0) { throw "Uninstalling ended with exit code $($uninstall.ExitCode)." }
+          if (Test-Path $exe) { throw 'The app is still there after uninstalling.' }
+
+  draft-release:
+    # Only a pushed tag makes a release, and only if the installer worked.
+    if: github.event_name == 'push'
+    needs: [package, verify-installer]
     runs-on: ubuntu-latest
     permissions:
       contents: write
