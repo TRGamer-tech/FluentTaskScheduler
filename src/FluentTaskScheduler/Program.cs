@@ -1,5 +1,7 @@
 using System.Runtime.InteropServices;
 using FluentTaskScheduler.Cli;
+using FluentTaskScheduler.History;
+using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Notifications;
 using FluentTaskScheduler.Scheduling;
 using Microsoft.UI.Dispatching;
@@ -71,9 +73,14 @@ public static class Program
         // from. Output that is redirected to a file or a pipe goes there either way.
         AttachConsole(ParentProcess);
 
+        // An exported history names its events. The names come from the app's resources, in English
+        // like everything else the command line says, and are only opened when they are asked for.
+        var strings = new Lazy<ResourceStrings>(() => new ResourceStrings(AppLanguages.Fallback));
+        Loc.Use(key => strings.Value.Find(key));
+
         var store = new TaskStore();
         var runner = new TaskRunner(store, new App.NoSnooze(), new SilentNotifier());
-        int exitCode = new CommandLine(store, runner, Console.Out).Run(args);
+        int exitCode = new CommandLine(store, runner, new TaskHistory(new WindowsEventLog()), Console.Out).Run(args);
         Console.Out.Flush();
         return exitCode;
     }

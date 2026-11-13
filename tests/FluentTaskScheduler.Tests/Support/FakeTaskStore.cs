@@ -62,7 +62,11 @@ public sealed class FakeTaskStore : ITaskStore
         return rows;
     }
 
-    public TaskRow? GetTask(string path) => _tasks.TryGetValue(path, out var draft) ? RowOf(path, draft) : null;
+    // The row carries the path as the task was registered, however the caller spelled it.
+    public TaskRow? GetTask(string path) =>
+        _tasks.FirstOrDefault(task => string.Equals(task.Key, path, StringComparison.OrdinalIgnoreCase)) is { Key: not null } found
+            ? RowOf(found.Key, found.Value)
+            : null;
 
     private TaskRow RowOf(string path, TaskDraft draft) => new(path)
     {

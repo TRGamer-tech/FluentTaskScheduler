@@ -58,6 +58,41 @@ public class CommandLineTests
         }
     }
 
+    /// <summary>
+    /// The command line has no window, but it needs the app's texts all the same: the events in
+    /// an exported history are named in words.
+    /// </summary>
+    [Fact]
+    public void ExportHistory_WritesTheRunsOfATaskToACsvFile_WithTheEventsNamedInWords()
+    {
+        using var history = new HistoryLog();
+        using var tasks = new WindowsTasks();
+        tasks.CreateDaily("Exported");
+        string file = Path.Combine(Path.GetTempPath(), "FtsUiTests_" + Guid.NewGuid().ToString("N")[..8] + ".csv");
+        try
+        {
+            Assert.Equal(0, Run("--run", tasks.PathOf("Exported")).ExitCode);
+
+            // The log is a moment behind what happens.
+            string answer = "", csv = "";
+            bool exported = Retry.WhileFalse(() =>
+            {
+                (int exitCode, answer) = Run("--export-history", tasks.PathOf("Exported"), "--output", file);
+                csv = exitCode == 0 ? File.ReadAllText(file) : "";
+                return csv.Contains(",102,Task Completed,Information,");
+            }, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(1)).Success;
+
+            Assert.True(exported, $"The command answered '{answer}' and the file held: {csv}");
+            Assert.StartsWith("Time,EventId,Event,Level,Action,ResultCode,User,InstanceId", csv);
+            Assert.Equal(new byte[] { 0xEF, 0xBB, 0xBF }, File.ReadAllBytes(file).Take(3));
+            Assert.Contains("Exported", answer);
+        }
+        finally
+        {
+            File.Delete(file);
+        }
+    }
+
     [Fact]
     public void ATaskThatDoesNotExist_IsAFailure()
     {
