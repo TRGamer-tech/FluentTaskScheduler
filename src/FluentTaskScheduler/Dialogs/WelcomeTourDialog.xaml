@@ -6,7 +6,7 @@
     xmlns:local="using:FluentTaskScheduler.Dialogs"
     xmlns:vm="using:FluentTaskScheduler.ViewModels"
     Style="{StaticResource DefaultContentDialogStyle}"
-    Title="{x:Bind l:Loc.Get('Onboarding.Step1.Title')}"
+    Title="{x:Bind l:Loc.Get('Tour.Title')}"
     PrimaryButtonText="{x:Bind l:Loc.Get('Tour.Back')}"
     SecondaryButtonText="{x:Bind ViewModel.NextText, Mode=OneWay}"
     CloseButtonText="{x:Bind l:Loc.Get('Dialog.Common.Close')}"
