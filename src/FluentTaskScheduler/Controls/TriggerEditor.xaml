@@ -1,0 +1,130 @@
+<UserControl
+    x:Class="FluentTaskScheduler.Controls.TriggerEditor"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:FluentTaskScheduler.Controls"
+    xmlns:l="using:FluentTaskScheduler.Localization"
+    IsTabStop="False">
+
+    <Grid>
+        <TextBlock Text="{x:Bind l:Loc.Get('Editor.Trigger.Unsupported')}" TextWrapping="Wrap"
+                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                   Visibility="{x:Bind local:TriggerEditor.CollapsedIf(Trigger.IsEditable), Mode=OneWay}"/>
+
+        <StackPanel Spacing="12" Visibility="{x:Bind Trigger.IsEditable, Mode=OneWay}">
+            <Grid ColumnSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <ComboBox x:Name="TriggerTypeBox" HorizontalAlignment="Stretch"
+                          Header="{x:Bind l:Loc.Get('Dialog.TriggerType')}"
+                          SelectedIndex="{x:Bind Trigger.TypeIndex, Mode=TwoWay}"/>
+                <CheckBox x:Name="TriggerActiveBox" Grid.Column="1" VerticalAlignment="Bottom"
+                          Content="{x:Bind l:Loc.Get('Editor.Trigger.Active')}"
+                          IsChecked="{x:Bind Trigger.Enabled, Mode=TwoWay}"/>
+            </Grid>
+
+            <!-- When: the types that fire at a time of day -->
+            <StackPanel Orientation="Horizontal" Spacing="16" Visibility="{x:Bind Trigger.HasSchedule, Mode=OneWay}">
+                <DatePicker x:Name="TriggerStartDate" Header="{x:Bind l:Loc.Get('Editor.Trigger.StartDate')}"
+                            Date="{x:Bind Trigger.StartDate, Mode=TwoWay}"/>
+                <TimePicker x:Name="TriggerStartTime" Header="{x:Bind l:Loc.Get('Editor.Trigger.StartTime')}"
+                            Time="{x:Bind Trigger.StartTime, Mode=TwoWay}"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="8" Visibility="{x:Bind Trigger.IsDaily, Mode=OneWay}">
+                <TextBlock Text="{x:Bind l:Loc.Get('Dialog.RecurEvery')}" VerticalAlignment="Center"/>
+                <NumberBox x:Name="TriggerDaysInterval" Minimum="1" Maximum="365" SpinButtonPlacementMode="Inline" MinWidth="120"
+                           Value="{x:Bind Trigger.DaysInterval, Mode=TwoWay}"/>
+                <TextBlock Text="{x:Bind l:Loc.Get('Editor.Unit.Days')}" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <StackPanel Spacing="8" Visibility="{x:Bind Trigger.IsWeekly, Mode=OneWay}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{x:Bind l:Loc.Get('Dialog.RecurEvery')}" VerticalAlignment="Center"/>
+                    <NumberBox x:Name="TriggerWeeksInterval" Minimum="1" Maximum="52" SpinButtonPlacementMode="Inline" MinWidth="120"
+                               Value="{x:Bind Trigger.WeeksInterval, Mode=TwoWay}"/>
+                    <TextBlock Text="{x:Bind l:Loc.Get('Editor.Unit.Weeks')}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="{x:Bind l:Loc.Get('Editor.Trigger.Weekdays')}"/>
+                <local:FlagPicker x:Name="TriggerWeekdays" Options="{x:Bind Weekdays}" Value="{x:Bind Trigger.Weekdays, Mode=TwoWay}"/>
+            </StackPanel>
+
+            <StackPanel Spacing="8" Visibility="{x:Bind Trigger.IsMonthly, Mode=OneWay}">
+                <RadioButtons x:Name="TriggerMonthlyMode" SelectedIndex="{x:Bind Trigger.MonthlyModeIndex, Mode=TwoWay}">
+                    <RadioButton Content="{x:Bind l:Loc.Get('Editor.Trigger.ByDay')}"/>
+                    <RadioButton Content="{x:Bind l:Loc.Get('Editor.Trigger.ByWeekday')}"/>
+                </RadioButtons>
+                <StackPanel Spacing="8" Visibility="{x:Bind Trigger.IsMonthlyByDay, Mode=OneWay}">
+                    <local:FlagPicker x:Name="TriggerDaysOfMonth" Options="{x:Bind DaysOfMonth}" Columns="7" Value="{x:Bind Trigger.DaysOfMonth, Mode=TwoWay}"/>
+                    <CheckBox Content="{x:Bind l:Loc.Get('Editor.Trigger.LastDay')}" IsChecked="{x:Bind Trigger.LastDayOfMonth, Mode=TwoWay}"/>
+                </StackPanel>
+                <StackPanel Spacing="8" Visibility="{x:Bind Trigger.IsMonthlyByWeekday, Mode=OneWay}">
+                    <TextBlock Text="{x:Bind l:Loc.Get('Editor.Trigger.WeeksOfMonth')}"/>
+                    <local:FlagPicker x:Name="TriggerWeeksOfMonth" Options="{x:Bind WeeksOfMonth}" Value="{x:Bind Trigger.Weeks, Mode=TwoWay}"/>
+                    <TextBlock Text="{x:Bind l:Loc.Get('Editor.Trigger.Weekdays')}"/>
+                    <local:FlagPicker x:Name="TriggerMonthlyWeekdays" Options="{x:Bind Weekdays}" Value="{x:Bind Trigger.Weekdays, Mode=TwoWay}"/>
+                </StackPanel>
+                <TextBlock Text="{x:Bind l:Loc.Get('Editor.Trigger.Months')}"/>
+                <local:FlagPicker x:Name="TriggerMonths" Options="{x:Bind Months}" Columns="6" Value="{x:Bind Trigger.Months, Mode=TwoWay}"/>
+            </StackPanel>
+
+            <StackPanel Spacing="8" Visibility="{x:Bind Trigger.IsEvent, Mode=OneWay}">
+                <Grid ColumnSpacing="12" Visibility="{x:Bind local:TriggerEditor.CollapsedIf(Trigger.CustomEventQuery), Mode=OneWay}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="TriggerEventLog" Header="{x:Bind l:Loc.Get('Dialog.EventLog')}"
+                             PlaceholderText="{x:Bind l:Loc.Get('Dialog.Ph.EventLog')}"
+                             Text="{x:Bind Trigger.EventLog, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox x:Name="TriggerEventSource" Grid.Column="1" Header="{x:Bind l:Loc.Get('Dialog.EventSource')}"
+                             PlaceholderText="{x:Bind l:Loc.Get('Dialog.Ph.EventSource')}"
+                             Text="{x:Bind Trigger.EventSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox x:Name="TriggerEventId" Grid.Column="2" Header="{x:Bind l:Loc.Get('Dialog.EventId')}"
+                             PlaceholderText="{x:Bind l:Loc.Get('Dialog.Ph.EventId')}"
+                             Text="{x:Bind Trigger.EventId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </Grid>
+                <CheckBox Content="{x:Bind l:Loc.Get('Editor.Trigger.CustomQuery')}" IsChecked="{x:Bind Trigger.CustomEventQuery, Mode=TwoWay}"/>
+                <TextBox x:Name="TriggerEventQuery" AcceptsReturn="True" Height="120" TextWrapping="Wrap" IsSpellCheckEnabled="False"
+                         FontFamily="Consolas" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         Visibility="{x:Bind Trigger.CustomEventQuery, Mode=OneWay}"
+                         Text="{x:Bind Trigger.EventQueryXml, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
+
+            <ComboBox x:Name="TriggerSessionChange" MinWidth="260"
+                      Header="{x:Bind l:Loc.Get('Editor.Trigger.SessionChange')}"
+                      Visibility="{x:Bind Trigger.IsSessionChange, Mode=OneWay}"
+                      SelectedIndex="{x:Bind Trigger.SessionChangeIndex, Mode=TwoWay}"/>
+
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="TriggerRepeatEvery" Header="{x:Bind l:Loc.Get('RepetitionIntervalText.Text')}"
+                         PlaceholderText="{x:Bind l:Loc.Get('Editor.Ph.NoRepetition')}"
+                         Text="{x:Bind Trigger.RepetitionInterval, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox x:Name="TriggerRepeatFor" Grid.Column="1" Header="{x:Bind l:Loc.Get('RepetitionDurationText.Text')}"
+                         PlaceholderText="{x:Bind l:Loc.Get('Editor.Ph.Indefinitely')}"
+                         Text="{x:Bind Trigger.RepetitionDuration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+            <TextBox x:Name="TriggerRandomDelay" Header="{x:Bind l:Loc.Get('Dialog.RandomDelay')}"
+                     PlaceholderText="{x:Bind l:Loc.Get('Editor.Ph.NoDelay')}"
+                     Visibility="{x:Bind Trigger.HasSchedule, Mode=OneWay}"
+                     Text="{x:Bind Trigger.RandomDelay, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Text="{x:Bind l:Loc.Get('Editor.Ph.Duration')}" Style="{StaticResource CaptionTextBlockStyle}"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+
+            <CheckBox x:Name="TriggerExpires" Content="{x:Bind l:Loc.Get('Editor.Trigger.Expires')}" IsChecked="{x:Bind Trigger.Expires, Mode=TwoWay}"/>
+            <StackPanel Orientation="Horizontal" Spacing="16" Visibility="{x:Bind Trigger.Expires, Mode=OneWay}">
+                <DatePicker x:Name="TriggerEndDate" Header="{x:Bind l:Loc.Get('Editor.Trigger.ExpiryDate')}"
+                            Date="{x:Bind Trigger.EndDate, Mode=TwoWay}"/>
+                <TimePicker x:Name="TriggerEndTime" Header="{x:Bind l:Loc.Get('Editor.Trigger.StartTime')}"
+                            Time="{x:Bind Trigger.EndTime, Mode=TwoWay}"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

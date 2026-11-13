@@ -1,0 +1,53 @@
+using FluentTaskScheduler.ViewModels;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+
+namespace FluentTaskScheduler.Dialogs;
+
+/// <summary>The form for creating and changing a task.</summary>
+public sealed partial class TaskEditorDialog : ContentDialog
+{
+    public TaskEditorDialog(TaskEditorViewModel viewModel)
+    {
+        ViewModel = viewModel;
+        InitializeComponent();
+    }
+
+    public TaskEditorViewModel ViewModel { get; }
+
+    private async void Save_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    {
+        // The dialog stays open until the task is really saved; what is in the way shows at the top.
+        ContentDialogButtonClickDeferral deferral = args.GetDeferral();
+        try
+        {
+            args.Cancel = !await ViewModel.SaveAsync();
+            if (args.Cancel) EditorScroller.ChangeView(null, 0, null);
+        }
+        finally
+        {
+            deferral.Complete();
+        }
+    }
+
+    private void Category_GotFocus(object sender, RoutedEventArgs e) => SuggestCategories((AutoSuggestBox)sender);
+
+    private void Category_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+    {
+        if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput) SuggestCategories(sender);
+    }
+
+    private void SuggestCategories(AutoSuggestBox box)
+    {
+        string typed = box.Text.Trim();
+        box.ItemsSource = ViewModel.SavedCategories
+            .Where(category => category.Contains(typed, StringComparison.CurrentCultureIgnoreCase) && !category.Equals(typed, StringComparison.CurrentCultureIgnoreCase))
+            .ToList();
+    }
+
+    private void RemoveOnSuccess_Click(object sender, RoutedEventArgs e) =>
+        ViewModel.CompletionActions.RemoveOnSuccessCommand.Execute((string)((FrameworkElement)sender).Tag);
+
+    private void RemoveOnFailure_Click(object sender, RoutedEventArgs e) =>
+        ViewModel.CompletionActions.RemoveOnFailureCommand.Execute((string)((FrameworkElement)sender).Tag);
+}

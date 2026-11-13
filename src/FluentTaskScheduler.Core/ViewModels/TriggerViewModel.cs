@@ -102,8 +102,18 @@ public sealed partial class TriggerViewModel : ObservableObject
     [ObservableProperty] private int _months;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsMonthlyByDay), nameof(IsMonthlyByWeekday))]
+    [NotifyPropertyChangedFor(nameof(IsMonthlyByDay), nameof(IsMonthlyByWeekday), nameof(MonthlyModeIndex))]
     private bool _monthlyByWeekday;
+
+    /// <summary><see cref="MonthlyByWeekday"/> as the position in a two-way choice: 0 for days of the month, 1 for weekdays.</summary>
+    public int MonthlyModeIndex
+    {
+        get => MonthlyByWeekday ? 1 : 0;
+        set
+        {
+            if (value is 0 or 1) MonthlyByWeekday = value == 1;
+        }
+    }
 
     /// <summary>Selected days of the month; bit 0 is the 1st.</summary>
     [ObservableProperty] private int _daysOfMonth;
@@ -130,6 +140,17 @@ public sealed partial class TriggerViewModel : ObservableObject
 
     public TriggerType Type => IsEditable ? Types[TypeIndex] : _source.Type;
 
+    // A list control reports -1 while it has nothing selected. That is not a choice.
+    partial void OnTypeIndexChanged(int oldValue, int newValue)
+    {
+        if (newValue < 0 || newValue >= Types.Count) TypeIndex = oldValue;
+    }
+
+    partial void OnSessionChangeIndexChanged(int oldValue, int newValue)
+    {
+        if (newValue < 0 || newValue >= SessionChanges.Count) SessionChangeIndex = oldValue;
+    }
+
     /// <summary>True for types that fire at a time of day.</summary>
     public bool HasSchedule => Type is TriggerType.Once or TriggerType.Daily or TriggerType.Weekly or TriggerType.Monthly;
     public bool IsDaily => Type == TriggerType.Daily;
@@ -147,7 +168,7 @@ public sealed partial class TriggerViewModel : ObservableObject
     private static readonly HashSet<string> Derived =
     [
         nameof(Summary), nameof(Type), nameof(HasSchedule), nameof(IsDaily), nameof(IsWeekly), nameof(IsMonthly),
-        nameof(IsMonthlyByDay), nameof(IsMonthlyByWeekday), nameof(IsEvent), nameof(IsSessionChange)
+        nameof(IsMonthlyByDay), nameof(IsMonthlyByWeekday), nameof(IsEvent), nameof(IsSessionChange), nameof(MonthlyModeIndex)
     ];
 
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)

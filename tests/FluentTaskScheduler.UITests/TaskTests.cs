@@ -1,0 +1,185 @@
+using FlaUI.Core.AutomationElements;
+using FlaUI.Core.Definitions;
+using FlaUI.Core.Input;
+using FlaUI.Core.WindowsAPI;
+
+namespace FluentTaskScheduler.UITests;
+
+/// <summary>The task list and the task editor, checked against what Task Scheduler itself reports afterwards.</summary>
+public sealed class TaskTests : IDisposable
+{
+    private readonly WindowsTasks _windows = new();
+
+    public void Dispose() => _windows.Dispose();
+
+    [Fact]
+    public void ATaskCreatedOutsideTheApp_IsListed()
+    {
+        _windows.CreateDaily("Made elsewhere");
+        using var app = AppSession.Launch("listed");
+
+        app.Require("SearchBox").AsTextBox().Enter("Made elsewhere");
+        app.Snapshot("searched");
+
+        Assert.True(app.Find(RowNamed("Made elsewhere"), 20000) != null, "The task created with schtasks is not in the list.");
+    }
+
+    [Fact]
+    public void ANewWeeklyTask_IsSavedWithTheChosenDaysAndTime()
+    {
+        using var app = AppSession.Launch("weekly");
+        OpenFolderlessList(app);
+
+        app.Require("NewTaskButton").Click();
+        app.Require("EditorName", 20000).AsTextBox().Text = "Weekly report";
+        app.Snapshot("editor-new");
+
+        app.Require("TriggerTypeBox").AsComboBox().Select(2); // one time, daily, weekly, ...
+        Toggle(app, "Wed");
+        Toggle(app, "Fri");
+
+        // The time picker opens on the hour; moving to the minutes and seven steps down makes it :07.
+        app.Require("TriggerStartTime").Click();
+        Wait();
+        Keyboard.Type(VirtualKeyShort.RIGHT);
+        for (int i = 0; i < 7; i++) Keyboard.Type(VirtualKeyShort.DOWN);
+        app.Snapshot("time-picker");
+        Keyboard.Type(VirtualKeyShort.ENTER);
+        Wait();
+
+        app.Require("EditorProgram").AsTextBox().Text = "cmd.exe";
+        app.Require("EditorArguments").AsTextBox().Text = "/c exit 0";
+        app.Snapshot("editor-filled");
+        app.Require("PrimaryButton").AsButton().Invoke();
+
+        string name = "Weekly report";
+        try
+        {
+            Assert.True(WaitFor(() => WindowsTasks.Root.Exists(name)), "The task was not created. " + ProblemsShown(app));
+            app.Snapshot("saved");
+
+            string trigger = WindowsTasks.Root.Element(name, "Triggers", "CalendarTrigger")?.ToString() ?? "";
+            Assert.Contains("ScheduleByWeek", trigger);
+            Assert.Contains("Monday", trigger);
+            Assert.Contains("Wednesday", trigger);
+            Assert.Contains("Friday", trigger);
+            Assert.DoesNotContain("Tuesday", trigger);
+
+            DateTime start = DateTime.Parse(WindowsTasks.Root.Value(name, "Triggers", "CalendarTrigger", "StartBoundary")!);
+            Assert.Equal(7, start.Minute);
+            Assert.Equal(0, start.Second);
+        }
+        finally
+        {
+            WindowsTasks.Root.Delete(name);
+        }
+    }
+
+    [Fact]
+    public void SwitchingOffTheRunTimeLimit_LeavesTheAccountAndEverythingElseAlone()
+    {
+        _windows.Create("Nightly", SystemTaskXml);
+        using var app = AppSession.Launch("limit");
+
+        app.Require("SearchBox").AsTextBox().Enter("Nightly");
+        var row = app.Find(RowNamed("Nightly"), 20000) ?? throw new InvalidOperationException("The task is not in the list.");
+        row.Click();
+
+        app.Require("EditorName", 20000);
+        Expand(app, "EditorSettings");
+        app.Snapshot("editor-settings");
+        var limit = app.Require("EditorLimitRunTime").AsCheckBox();
+        Assert.True(limit.IsChecked, "The editor does not show the task's run time limit.");
+        limit.Toggle();
+        Assert.Equal("Normal", app.Require("EditorPriority").AsComboBox().SelectedItem?.Name);
+        app.Require("PrimaryButton").AsButton().Invoke();
+
+        Assert.True(WaitFor(() => _windows.Value("Nightly", "Settings", "ExecutionTimeLimit") == "PT0S"),
+            "The run time limit was not switched off. " + ProblemsShown(app));
+        Assert.Equal("S-1-5-18", _windows.Value("Nightly", "Principals", "Principal", "UserId"));
+        Assert.Equal("HighestAvailable", _windows.Value("Nightly", "Principals", "Principal", "RunLevel"));
+        Assert.Equal("4", _windows.Value("Nightly", "Settings", "Priority"));
+        Assert.Equal("true", _windows.Value("Nightly", "Settings", "WakeToRun"));
+        Assert.Equal("PT45M", _windows.Value("Nightly", "Triggers", "CalendarTrigger", "Repetition", "Interval"));
+        Assert.Contains("robocopy", _windows.Value("Nightly", "Actions", "Exec", "Command"));
+
+        // Opened again, the limit stays off instead of coming back.
+        row = app.Find(RowNamed("Nightly"), 20000)!;
+        row.Click();
+        app.Require("EditorName", 20000);
+        Expand(app, "EditorSettings");
+        Assert.False(app.Require("EditorLimitRunTime").AsCheckBox().IsChecked, "The limit is shown as on again.");
+        app.Snapshot("editor-reopened");
+    }
+
+    private const string SystemTaskXml = """
+        <?xml version="1.0" encoding="UTF-16"?>
+        <Task version="1.3" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+          <RegistrationInfo><Author>CORP\admin</Author><Description>Copies the day's work</Description></RegistrationInfo>
+          <Triggers>
+            <CalendarTrigger>
+              <Repetition><Interval>PT45M</Interval><Duration>PT6H</Duration><StopAtDurationEnd>false</StopAtDurationEnd></Repetition>
+              <StartBoundary>2030-01-02T03:04:05</StartBoundary>
+              <Enabled>true</Enabled>
+              <ScheduleByDay><DaysInterval>2</DaysInterval></ScheduleByDay>
+            </CalendarTrigger>
+          </Triggers>
+          <Principals><Principal id="Author"><UserId>S-1-5-18</UserId><RunLevel>HighestAvailable</RunLevel></Principal></Principals>
+          <Settings>
+            <MultipleInstancesPolicy>Queue</MultipleInstancesPolicy>
+            <DisallowStartIfOnBatteries>true</DisallowStartIfOnBatteries>
+            <StopIfGoingOnBatteries>true</StopIfGoingOnBatteries>
+            <AllowHardTerminate>false</AllowHardTerminate>
+            <StartWhenAvailable>true</StartWhenAvailable>
+            <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>
+            <AllowStartOnDemand>true</AllowStartOnDemand>
+            <Enabled>true</Enabled>
+            <Hidden>false</Hidden>
+            <RunOnlyIfIdle>false</RunOnlyIfIdle>
+            <WakeToRun>true</WakeToRun>
+            <ExecutionTimeLimit>PT72H</ExecutionTimeLimit>
+            <Priority>4</Priority>
+          </Settings>
+          <Actions Context="Author"><Exec><Command>robocopy</Command><Arguments>C:\a D:\b /MIR</Arguments></Exec></Actions>
+        </Task>
+        """;
+
+    private static Func<AutomationElement, bool> RowNamed(string name) =>
+        element => element.ControlType == ControlType.ListItem && element.Name == name;
+
+    private static void OpenFolderlessList(AppSession app) => app.Require("NavAllTasks").Click();
+
+    private static void Toggle(AppSession app, string name)
+    {
+        var button = app.Find(element => element.ControlType == ControlType.Button && element.Name == name && element.Patterns.Toggle.IsSupported)
+                     ?? throw new InvalidOperationException($"No toggle button '{name}'.");
+        button.Patterns.Toggle.Pattern.Toggle();
+    }
+
+    private static void Expand(AppSession app, string automationId)
+    {
+        var expander = app.Require(automationId);
+        var header = app.Find(element => element.Patterns.ExpandCollapse.IsSupported
+                                         && (element.AutomationId == automationId || element.Parent?.AutomationId == automationId))
+                     ?? expander;
+        header.Patterns.ExpandCollapse.Pattern.Expand();
+        Wait();
+    }
+
+    private static string ProblemsShown(AppSession app) =>
+        app.Find("EditorProblems", 500) is { } bar ? $"The editor says: {string.Join(" | ", bar.FindAllDescendants().Select(e => e.Name).Where(n => n.Length > 0))}" : "";
+
+    private static bool WaitFor(Func<bool> condition, int seconds = 20)
+    {
+        DateTime deadline = DateTime.UtcNow.AddSeconds(seconds);
+        while (DateTime.UtcNow < deadline)
+        {
+            try { if (condition()) return true; }
+            catch (InvalidOperationException) { }
+            Thread.Sleep(500);
+        }
+        return false;
+    }
+
+    private static void Wait() => Thread.Sleep(600);
+}

@@ -219,6 +219,27 @@ public sealed partial class TaskEditorViewModel : ObservableObject
 
     [ObservableProperty] private bool _isSaving;
 
+    // A list control reports -1 while it has nothing selected. That is not a choice.
+    partial void OnPriorityIndexChanged(int oldValue, int newValue)
+    {
+        if (newValue < 0 || newValue >= Priorities.Count) PriorityIndex = oldValue;
+    }
+
+    partial void OnInstancePolicyIndexChanged(int oldValue, int newValue)
+    {
+        if (newValue < 0 || newValue >= InstancePolicies.Count) InstancePolicyIndex = oldValue;
+    }
+
+    partial void OnAccountIndexChanged(int oldValue, int newValue)
+    {
+        if (newValue < 0 || newValue >= AccountOptions.Count) AccountIndex = oldValue;
+    }
+
+    partial void OnNetworkIndexChanged(int oldValue, int newValue)
+    {
+        if (newValue < 0 || newValue >= NetworkOptions.Count) NetworkIndex = oldValue;
+    }
+
     partial void OnLimitRunTimeChanged(bool value)
     {
         // Three days is what Task Scheduler itself suggests.

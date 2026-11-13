@@ -463,12 +463,12 @@
   <data name="Dialog.Time.3d" xml:space="preserve"><value>3日</value></data>
   <data name="Dialog.Time.5d" xml:space="preserve"><value>5日</value></data>
 
-  <data name="Dialog.Pri.Realtime" xml:space="preserve"><value>リアルタイム (0)</value></data>
-  <data name="Dialog.Pri.High" xml:space="preserve"><value>高 (1)</value></data>
-  <data name="Dialog.Pri.AboveNormal" xml:space="preserve"><value>通常以上 (3)</value></data>
-  <data name="Dialog.Pri.Normal" xml:space="preserve"><value>通常 (7)</value></data>
-  <data name="Dialog.Pri.BelowNormal" xml:space="preserve"><value>通常以下 (9)</value></data>
-  <data name="Dialog.Pri.Idle" xml:space="preserve"><value>アイドル (10)</value></data>
+  <data name="Dialog.Pri.Realtime" xml:space="preserve"><value>リアルタイム</value></data>
+  <data name="Dialog.Pri.High" xml:space="preserve"><value>高</value></data>
+  <data name="Dialog.Pri.AboveNormal" xml:space="preserve"><value>通常以上</value></data>
+  <data name="Dialog.Pri.Normal" xml:space="preserve"><value>通常</value></data>
+  <data name="Dialog.Pri.BelowNormal" xml:space="preserve"><value>通常以下 (Windows の既定)</value></data>
+  <data name="Dialog.Pri.Idle" xml:space="preserve"><value>アイドル</value></data>
 
   <data name="Dialog.NetAdmin.Title" xml:space="preserve"><value>管理者権限が必要です</value></data>
   <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>特定のネットワークの選択には、アプリを管理者として実行する必要があります。</value></data>
@@ -746,10 +746,10 @@
   <data name="Dialog.Cancel" xml:space="preserve"><value>キャンセル</value></data>
   <data name="Dialog.Delete" xml:space="preserve"><value>削除</value></data>
   <data name="Dialog.Error.EmptyName" xml:space="preserve"><value>タスク名を空にすることはできません。</value></data>
-  <data name="Dialog.Error.InvalidIdleDuration" xml:space="preserve"><value>「{0}」は有効なアイドル時間ではありません。10m、1h のような値、または PT10M のような ISO 8601 形式の期間を使用してください。</value></data>
+  <data name="Dialog.Error.InvalidIdleDuration" xml:space="preserve"><value>"{0}" はアイドル時間の期間として認識できません。10m、1h のように入力してください。</value></data>
   <data name="Dialog.Error.InvalidRandomDelay" xml:space="preserve"><value>「{0}」は有効なランダム遅延の値ではありません。PT30M や PT1H のような ISO 8601 形式の期間を使用してください。</value></data>
-  <data name="Dialog.Error.InvalidRestartInterval" xml:space="preserve"><value>「{0}」は有効な再試行間隔ではありません。1m、30s のような値、または PT1M のような ISO 8601 形式の期間を使用してください。</value></data>
-  <data name="Dialog.Error.InvalidStopAfter" xml:space="preserve"><value>「{0}」は「実行時間が次を超えたらタスクを停止」の値として無効です。PT90M や P1D のような ISO 8601 形式の期間を使用してください。</value></data>
+  <data name="Dialog.Error.InvalidRestartInterval" xml:space="preserve"><value>"{0}" は再起動の間隔として認識できません。1m、30m のように入力してください。</value></data>
+  <data name="Dialog.Error.InvalidStopAfter" xml:space="preserve"><value>"{0}" は最長実行時間として認識できません。90m、12h、3d のように入力してください。</value></data>
   <data name="Dialog.Error.RenameDuplicated" xml:space="preserve"><value>名前の変更に失敗しました。「{0}」と「{1}」の両方が存在しています。タスク スケジューラで手動でどちらかを削除してください。</value></data>
   <data name="Dialog.Error.RenameFailed" xml:space="preserve"><value>「{0}」を「{1}」に変更できませんでした。古いタスクを削除できませんでした ({2})。</value></data>
   <data name="Dialog.Error.SaveTaskFailedPrefix" xml:space="preserve"><value>タスクの保存に失敗しました: </value></data>
@@ -839,4 +839,81 @@
   <data name="Task.Snooze.CustomIntro" xml:space="preserve"><value>このタスクを次の時刻まで無効にする:</value></data>
   <data name="Task.Snooze.Status" xml:space="preserve"><value>{0} までスヌーズ中</value></data>
   <data name="Task.Snooze.Resume" xml:space="preserve"><value>今すぐ再開</value></data>
+  <data name="Editor.Title.New" xml:space="preserve"><value>新しいタスク</value></data>
+  <data name="Editor.Title.Edit" xml:space="preserve"><value>{0} を編集</value></data>
+  <data name="Editor.Section.Account" xml:space="preserve"><value>アカウント</value></data>
+  <data name="Editor.Trigger.EveryNDays" xml:space="preserve"><value>{0} 日ごと</value></data>
+  <data name="Editor.Trigger.Add" xml:space="preserve"><value>トリガーを追加</value></data>
+  <data name="Editor.Trigger.Remove" xml:space="preserve"><value>トリガーを削除</value></data>
+  <data name="Editor.Action.Add" xml:space="preserve"><value>操作を追加</value></data>
+  <data name="Editor.Action.Remove" xml:space="preserve"><value>操作を削除</value></data>
+  <data name="Editor.MoveUp" xml:space="preserve"><value>上へ移動</value></data>
+  <data name="Editor.MoveDown" xml:space="preserve"><value>下へ移動</value></data>
+  <data name="Editor.NoTriggers" xml:space="preserve"><value>トリガーなし: タスクは手動で開始した場合にのみ実行されます。</value></data>
+  <data name="Editor.Trigger.Active" xml:space="preserve"><value>トリガーは有効</value></data>
+  <data name="Editor.Trigger.StartDate" xml:space="preserve"><value>開始日</value></data>
+  <data name="Editor.Trigger.StartTime" xml:space="preserve"><value>時刻</value></data>
+  <data name="Editor.Trigger.Expires" xml:space="preserve"><value>有効期限あり</value></data>
+  <data name="Editor.Trigger.ExpiryDate" xml:space="preserve"><value>有効期限日</value></data>
+  <data name="Editor.Unit.Days" xml:space="preserve"><value>日</value></data>
+  <data name="Editor.Unit.Weeks" xml:space="preserve"><value>週</value></data>
+  <data name="Editor.Trigger.Weekdays" xml:space="preserve"><value>実行する曜日</value></data>
+  <data name="Editor.Trigger.ByDay" xml:space="preserve"><value>月の日付で指定</value></data>
+  <data name="Editor.Trigger.ByWeekday" xml:space="preserve"><value>月の曜日で指定</value></data>
+  <data name="Editor.Trigger.LastDay" xml:space="preserve"><value>月の最終日</value></data>
+  <data name="Editor.Trigger.Months" xml:space="preserve"><value>実行する月</value></data>
+  <data name="Editor.Trigger.WeeksOfMonth" xml:space="preserve"><value>実行する週</value></data>
+  <data name="Editor.Trigger.SessionChange" xml:space="preserve"><value>タイミング</value></data>
+  <data name="Editor.Trigger.CustomQuery" xml:space="preserve"><value>カスタム クエリ (XML)</value></data>
+  <data name="Editor.Trigger.Unsupported" xml:space="preserve"><value>この種類のトリガーはここでは編集できません。現在の設定のまま保持されます。</value></data>
+  <data name="Editor.Ph.Duration" xml:space="preserve"><value>例: 15m、1h 30m、2d</value></data>
+  <data name="Editor.Ph.NoRepetition" xml:space="preserve"><value>空欄: 繰り返しなし</value></data>
+  <data name="Editor.Ph.Indefinitely" xml:space="preserve"><value>空欄: 無期限</value></data>
+  <data name="Editor.Ph.NoDelay" xml:space="preserve"><value>空欄: 遅延なし</value></data>
+  <data name="Editor.Account.Keep" xml:space="preserve"><value>引き続き {0} として実行</value></data>
+  <data name="Editor.Account.Password" xml:space="preserve"><value>パスワード</value></data>
+  <data name="Editor.Account.PasswordHint" xml:space="preserve"><value>このタスクにはパスワードが保存されており、タスクを変更するたびに Windows が再入力を求めます。</value></data>
+  <data name="Editor.NeedsElevation" xml:space="preserve"><value>この設定を保存するには管理者権限が必要です。先にアプリを管理者として再起動してください。</value></data>
+  <data name="Editor.AllFiles" xml:space="preserve"><value>すべてのファイル</value></data>
+  <data name="Editor.CompletionActions.Add" xml:space="preserve"><value>追加</value></data>
+  <data name="Editor.CompletionActions.Remove" xml:space="preserve"><value>削除</value></data>
+  <data name="Editor.CompletionActions.BothWays" xml:space="preserve"><value>成功時と失敗時の両方に同じタスクが指定されているため、実行のたびに開始されます。</value></data>
+  <data name="Editor.Error.NameCharacters" xml:space="preserve"><value>タスク名に次の文字は使用できません: \ / : * ? " &lt; &gt; |</value></data>
+  <data name="Editor.Error.NoAction" xml:space="preserve"><value>タスクには少なくとも 1 つの操作が必要です。</value></data>
+  <data name="Editor.Error.ActionWithoutProgram" xml:space="preserve"><value>操作 {0}: 実行するプログラムまたはスクリプトを入力してください。</value></data>
+  <data name="Editor.Error.UserNameMissing" xml:space="preserve"><value>タスクを実行するユーザーを入力してください。</value></data>
+  <data name="Editor.Error.PasswordNeeded" xml:space="preserve"><value>タスクのアカウントのパスワードを入力してください。</value></data>
+  <data name="Editor.Error.IdleDuration" xml:space="preserve"><value>アイドル時間は 1 分以上にしてください。</value></data>
+  <data name="Editor.Error.RestartInterval" xml:space="preserve"><value>再起動の間隔は 1 分から 31 日の範囲で指定してください。</value></data>
+  <data name="Editor.Error.DeleteNeedsExpiry" xml:space="preserve"><value>実行予定がなくなったときにタスクを削除するには、少なくとも 1 つのトリガーに有効期限が必要です。</value></data>
+  <data name="Editor.Error.TriggerInterval" xml:space="preserve"><value>トリガー {0}: 間隔は 1 以上にしてください。</value></data>
+  <data name="Editor.Error.TriggerNeedsWeekday" xml:space="preserve"><value>トリガー {0}: 曜日を 1 つ以上選択してください。</value></data>
+  <data name="Editor.Error.TriggerNeedsMonth" xml:space="preserve"><value>トリガー {0}: 月を 1 つ以上選択してください。</value></data>
+  <data name="Editor.Error.TriggerNeedsDayOfMonth" xml:space="preserve"><value>トリガー {0}: 日付を 1 つ以上選択してください。</value></data>
+  <data name="Editor.Error.TriggerNeedsWeekAndWeekday" xml:space="preserve"><value>トリガー {0}: 週と曜日をそれぞれ 1 つ以上選択してください。</value></data>
+  <data name="Editor.Error.EventNeedsLog" xml:space="preserve"><value>トリガー {0}: 監視するイベント ログを入力してください。</value></data>
+  <data name="Editor.Error.TriggerNeedsStart" xml:space="preserve"><value>トリガー {0}: 開始日時を設定してください。</value></data>
+  <data name="Editor.Error.TriggerEndsBeforeStart" xml:space="preserve"><value>トリガー {0}: 有効期限が開始日時より前になっています。</value></data>
+  <data name="Editor.Error.RepetitionInterval" xml:space="preserve"><value>トリガー {0}: 繰り返しの間隔は 1 分から 31 日の範囲で指定してください。</value></data>
+  <data name="Editor.Error.RepetitionDuration" xml:space="preserve"><value>トリガー {0}: 繰り返しの期間を間隔より短くすることはできません。</value></data>
+  <data name="Editor.Error.RepetitionText" xml:space="preserve"><value>トリガー {0}: 繰り返しが期間として認識できません。15m、1h 30m、2d のように入力してください。</value></data>
+  <data name="Editor.Error.RandomDelayText" xml:space="preserve"><value>トリガー {0}: ランダム遅延が期間として認識できません。30s、10m、1h のように入力してください。</value></data>
+  <data name="Editor.Error.EventIdText" xml:space="preserve"><value>トリガー {0}: イベント ID は数値で入力してください。</value></data>
+  <data name="Editor.Error.AccessDenied" xml:space="preserve"><value>Windows によって変更が拒否されました。タスクが保護されている可能性があります。</value></data>
+  <data name="Editor.Error.AccessDeniedNotElevated" xml:space="preserve"><value>Windows によって変更が拒否されました。管理者権限が必要です。アプリを管理者として再起動してから、もう一度お試しください。</value></data>
+  <data name="Editor.Error.Account" xml:space="preserve"><value>Windows がアカウントを受け付けませんでした: {0}</value></data>
+  <data name="Tasks.NotElevated.Title" xml:space="preserve"><value>一部のタスクは表示されていません</value></data>
+  <data name="Tasks.NotElevated.Message" xml:space="preserve"><value>他のユーザーや Windows 自体のタスクは、管理者にのみ表示されます。</value></data>
+  <data name="Tasks.NotElevated.Restart" xml:space="preserve"><value>管理者として再起動</value></data>
+  <data name="Tasks.LoadError.Title" xml:space="preserve"><value>タスクを読み込めませんでした</value></data>
+  <data name="Tasks.Empty" xml:space="preserve"><value>表示するタスクはありません。</value></data>
+  <data name="Tasks.NextRunFormat" xml:space="preserve"><value>次回の実行: {0}</value></data>
+  <data name="Tasks.Error.Denied" xml:space="preserve"><value>'{0}': Windows によってアクセスが拒否されました。</value></data>
+  <data name="Tasks.Error.DeniedNotElevated" xml:space="preserve"><value>'{0}': この操作には管理者権限が必要です。アプリを管理者として再起動してから、もう一度お試しください。</value></data>
+  <data name="Tasks.Error.Gone" xml:space="preserve"><value>'{0}' は既に存在しません。</value></data>
+  <data name="Tasks.Snoozed.Title" xml:space="preserve"><value>タスクはスヌーズ中です</value></data>
+  <data name="Tasks.File.TaskXml" xml:space="preserve"><value>タスク XML</value></data>
+  <data name="Tasks.Select" xml:space="preserve"><value>選択</value></data>
+  <data name="Tasks.Badge.Unreadable" xml:space="preserve"><value>読み取り不可</value></data>
+  <data name="Tasks.Toolbar.Sort" xml:space="preserve"><value>並べ替え</value></data>
 </root>

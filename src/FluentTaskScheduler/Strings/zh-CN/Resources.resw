@@ -466,12 +466,12 @@
   <data name="Dialog.Time.3d" xml:space="preserve"><value>3 天</value></data>
   <data name="Dialog.Time.5d" xml:space="preserve"><value>5 天</value></data>
 
-  <data name="Dialog.Pri.Realtime" xml:space="preserve"><value>实时 (0)</value></data>
-  <data name="Dialog.Pri.High" xml:space="preserve"><value>高 (1)</value></data>
-  <data name="Dialog.Pri.AboveNormal" xml:space="preserve"><value>高于标准 (3)</value></data>
-  <data name="Dialog.Pri.Normal" xml:space="preserve"><value>标准 (7)</value></data>
-  <data name="Dialog.Pri.BelowNormal" xml:space="preserve"><value>低于标准 (9)</value></data>
-  <data name="Dialog.Pri.Idle" xml:space="preserve"><value>空闲 (10)</value></data>
+  <data name="Dialog.Pri.Realtime" xml:space="preserve"><value>实时</value></data>
+  <data name="Dialog.Pri.High" xml:space="preserve"><value>高</value></data>
+  <data name="Dialog.Pri.AboveNormal" xml:space="preserve"><value>高于正常</value></data>
+  <data name="Dialog.Pri.Normal" xml:space="preserve"><value>正常</value></data>
+  <data name="Dialog.Pri.BelowNormal" xml:space="preserve"><value>低于正常（Windows 默认）</value></data>
+  <data name="Dialog.Pri.Idle" xml:space="preserve"><value>空闲</value></data>
 
   <data name="Dialog.NetAdmin.Title" xml:space="preserve"><value>需要管理员权限</value></data>
   <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>选择特定网络需要以管理员身份运行应用程序。</value></data>
@@ -749,10 +749,10 @@
   <data name="Dialog.Cancel" xml:space="preserve"><value>取消</value></data>
   <data name="Dialog.Delete" xml:space="preserve"><value>删除</value></data>
   <data name="Dialog.Error.EmptyName" xml:space="preserve"><value>任务名称不能为空。</value></data>
-  <data name="Dialog.Error.InvalidIdleDuration" xml:space="preserve"><value>"{0}" 不是有效的空闲时长。请使用类似 10m、1h 的值,或 PT10M 这样的 ISO 8601 时长格式。</value></data>
+  <data name="Dialog.Error.InvalidIdleDuration" xml:space="preserve"><value>“{0}”不是有效的空闲时长。请按 10m 或 1h 的形式填写。</value></data>
   <data name="Dialog.Error.InvalidRandomDelay" xml:space="preserve"><value>"{0}" 不是有效的随机延迟值。请使用 PT30M 或 PT1H 这样的 ISO 8601 时长格式。</value></data>
-  <data name="Dialog.Error.InvalidRestartInterval" xml:space="preserve"><value>"{0}" 不是有效的重试间隔。请使用类似 1m、30s 的值,或 PT1M 这样的 ISO 8601 时长格式。</value></data>
-  <data name="Dialog.Error.InvalidStopAfter" xml:space="preserve"><value>"{0}" 不是"运行超过以下时长后停止任务"的有效值。请使用 PT90M 或 P1D 这样的 ISO 8601 时长格式。</value></data>
+  <data name="Dialog.Error.InvalidRestartInterval" xml:space="preserve"><value>“{0}”不是有效的重新启动间隔。请按 1m 或 30m 的形式填写。</value></data>
+  <data name="Dialog.Error.InvalidStopAfter" xml:space="preserve"><value>“{0}”不是有效的最长运行时间。请按 90m、12h 或 3d 的形式填写。</value></data>
   <data name="Dialog.Error.RenameDuplicated" xml:space="preserve"><value>重命名失败:"{0}" 和 "{1}" 现在都已存在。请在任务计划程序中手动删除其中一个。</value></data>
   <data name="Dialog.Error.RenameFailed" xml:space="preserve"><value>无法将 "{0}" 重命名为 "{1}":无法删除旧任务 ({2})。</value></data>
   <data name="Dialog.Error.SaveTaskFailedPrefix" xml:space="preserve"><value>保存任务失败: </value></data>
@@ -842,6 +842,83 @@
   <data name="Task.Snooze.CustomIntro" xml:space="preserve"><value>将此任务禁用至：</value></data>
   <data name="Task.Snooze.Status" xml:space="preserve"><value>已暂停至 {0}</value></data>
   <data name="Task.Snooze.Resume" xml:space="preserve"><value>立即恢复</value></data>
+  <data name="Editor.Title.New" xml:space="preserve"><value>新建任务</value></data>
+  <data name="Editor.Title.Edit" xml:space="preserve"><value>编辑 {0}</value></data>
+  <data name="Editor.Section.Account" xml:space="preserve"><value>帐户</value></data>
+  <data name="Editor.Trigger.EveryNDays" xml:space="preserve"><value>每 {0} 天</value></data>
+  <data name="Editor.Trigger.Add" xml:space="preserve"><value>添加触发器</value></data>
+  <data name="Editor.Trigger.Remove" xml:space="preserve"><value>删除触发器</value></data>
+  <data name="Editor.Action.Add" xml:space="preserve"><value>添加操作</value></data>
+  <data name="Editor.Action.Remove" xml:space="preserve"><value>删除操作</value></data>
+  <data name="Editor.MoveUp" xml:space="preserve"><value>上移</value></data>
+  <data name="Editor.MoveDown" xml:space="preserve"><value>下移</value></data>
+  <data name="Editor.NoTriggers" xml:space="preserve"><value>没有触发器：任务仅在手动启动时运行。</value></data>
+  <data name="Editor.Trigger.Active" xml:space="preserve"><value>触发器已启用</value></data>
+  <data name="Editor.Trigger.StartDate" xml:space="preserve"><value>开始日期</value></data>
+  <data name="Editor.Trigger.StartTime" xml:space="preserve"><value>时间</value></data>
+  <data name="Editor.Trigger.Expires" xml:space="preserve"><value>到期</value></data>
+  <data name="Editor.Trigger.ExpiryDate" xml:space="preserve"><value>到期日期</value></data>
+  <data name="Editor.Unit.Days" xml:space="preserve"><value>天</value></data>
+  <data name="Editor.Unit.Weeks" xml:space="preserve"><value>周</value></data>
+  <data name="Editor.Trigger.Weekdays" xml:space="preserve"><value>在这些日子</value></data>
+  <data name="Editor.Trigger.ByDay" xml:space="preserve"><value>按每月的日期</value></data>
+  <data name="Editor.Trigger.ByWeekday" xml:space="preserve"><value>按每月的星期</value></data>
+  <data name="Editor.Trigger.LastDay" xml:space="preserve"><value>每月最后一天</value></data>
+  <data name="Editor.Trigger.Months" xml:space="preserve"><value>在这些月份</value></data>
+  <data name="Editor.Trigger.WeeksOfMonth" xml:space="preserve"><value>在这些周</value></data>
+  <data name="Editor.Trigger.SessionChange" xml:space="preserve"><value>时机</value></data>
+  <data name="Editor.Trigger.CustomQuery" xml:space="preserve"><value>自定义查询 (XML)</value></data>
+  <data name="Editor.Trigger.Unsupported" xml:space="preserve"><value>无法在此处编辑这种触发器。它将保持原样。</value></data>
+  <data name="Editor.Ph.Duration" xml:space="preserve"><value>例如 15m、1h 30m、2d</value></data>
+  <data name="Editor.Ph.NoRepetition" xml:space="preserve"><value>留空：不重复</value></data>
+  <data name="Editor.Ph.Indefinitely" xml:space="preserve"><value>留空：无限期</value></data>
+  <data name="Editor.Ph.NoDelay" xml:space="preserve"><value>留空：不延迟</value></data>
+  <data name="Editor.Account.Keep" xml:space="preserve"><value>继续以 {0} 身份运行</value></data>
+  <data name="Editor.Account.Password" xml:space="preserve"><value>密码</value></data>
+  <data name="Editor.Account.PasswordHint" xml:space="preserve"><value>Windows 为此任务保存了密码，每次更改任务时都会要求重新输入。</value></data>
+  <data name="Editor.NeedsElevation" xml:space="preserve"><value>保存此设置需要管理员权限。请先以管理员身份重新启动应用。</value></data>
+  <data name="Editor.AllFiles" xml:space="preserve"><value>所有文件</value></data>
+  <data name="Editor.CompletionActions.Add" xml:space="preserve"><value>添加</value></data>
+  <data name="Editor.CompletionActions.Remove" xml:space="preserve"><value>删除</value></data>
+  <data name="Editor.CompletionActions.BothWays" xml:space="preserve"><value>同一任务同时列在成功和失败中，因此每次运行后都会启动。</value></data>
+  <data name="Editor.Error.NameCharacters" xml:space="preserve"><value>任务名称不能包含以下字符：\ / : * ? " &lt; &gt; |</value></data>
+  <data name="Editor.Error.NoAction" xml:space="preserve"><value>任务至少需要一个操作。</value></data>
+  <data name="Editor.Error.ActionWithoutProgram" xml:space="preserve"><value>操作 {0}：请输入要运行的程序或脚本。</value></data>
+  <data name="Editor.Error.UserNameMissing" xml:space="preserve"><value>请输入运行任务的用户。</value></data>
+  <data name="Editor.Error.PasswordNeeded" xml:space="preserve"><value>请输入任务帐户的密码。</value></data>
+  <data name="Editor.Error.IdleDuration" xml:space="preserve"><value>空闲时间至少为一分钟。</value></data>
+  <data name="Editor.Error.RestartInterval" xml:space="preserve"><value>重新启动间隔必须在一分钟到 31 天之间。</value></data>
+  <data name="Editor.Error.DeleteNeedsExpiry" xml:space="preserve"><value>若要在任务不再计划运行时将其删除，至少需要一个触发器设有到期日期。</value></data>
+  <data name="Editor.Error.TriggerInterval" xml:space="preserve"><value>触发器 {0}：间隔至少为 1。</value></data>
+  <data name="Editor.Error.TriggerNeedsWeekday" xml:space="preserve"><value>触发器 {0}：请至少选择一个星期几。</value></data>
+  <data name="Editor.Error.TriggerNeedsMonth" xml:space="preserve"><value>触发器 {0}：请至少选择一个月份。</value></data>
+  <data name="Editor.Error.TriggerNeedsDayOfMonth" xml:space="preserve"><value>触发器 {0}：请至少选择一个日期。</value></data>
+  <data name="Editor.Error.TriggerNeedsWeekAndWeekday" xml:space="preserve"><value>触发器 {0}：请至少选择一周和一个星期几。</value></data>
+  <data name="Editor.Error.EventNeedsLog" xml:space="preserve"><value>触发器 {0}：请输入要监视的事件日志。</value></data>
+  <data name="Editor.Error.TriggerNeedsStart" xml:space="preserve"><value>触发器 {0}：请设置开始日期和时间。</value></data>
+  <data name="Editor.Error.TriggerEndsBeforeStart" xml:space="preserve"><value>触发器 {0}：到期时间早于开始时间。</value></data>
+  <data name="Editor.Error.RepetitionInterval" xml:space="preserve"><value>触发器 {0}：重复间隔必须在一分钟到 31 天之间。</value></data>
+  <data name="Editor.Error.RepetitionDuration" xml:space="preserve"><value>触发器 {0}：重复持续时间不能短于其间隔。</value></data>
+  <data name="Editor.Error.RepetitionText" xml:space="preserve"><value>触发器 {0}：重复设置不是有效的时长。请按 15m、1h 30m 或 2d 的形式填写。</value></data>
+  <data name="Editor.Error.RandomDelayText" xml:space="preserve"><value>触发器 {0}：随机延迟不是有效的时长。请按 30s、10m 或 1h 的形式填写。</value></data>
+  <data name="Editor.Error.EventIdText" xml:space="preserve"><value>触发器 {0}：事件 ID 必须是数字。</value></data>
+  <data name="Editor.Error.AccessDenied" xml:space="preserve"><value>Windows 拒绝了此更改。该任务可能受保护。</value></data>
+  <data name="Editor.Error.AccessDeniedNotElevated" xml:space="preserve"><value>Windows 拒绝了此更改。此操作需要管理员权限：请以管理员身份重新启动应用后重试。</value></data>
+  <data name="Editor.Error.Account" xml:space="preserve"><value>Windows 未接受该帐户：{0}</value></data>
+  <data name="Tasks.NotElevated.Title" xml:space="preserve"><value>未显示全部任务</value></data>
+  <data name="Tasks.NotElevated.Message" xml:space="preserve"><value>其他用户以及 Windows 自身的任务仅对管理员可见。</value></data>
+  <data name="Tasks.NotElevated.Restart" xml:space="preserve"><value>以管理员身份重新启动</value></data>
+  <data name="Tasks.LoadError.Title" xml:space="preserve"><value>无法加载任务</value></data>
+  <data name="Tasks.Empty" xml:space="preserve"><value>此处没有可显示的任务。</value></data>
+  <data name="Tasks.NextRunFormat" xml:space="preserve"><value>下次运行：{0}</value></data>
+  <data name="Tasks.Error.Denied" xml:space="preserve"><value>“{0}”：Windows 拒绝访问。</value></data>
+  <data name="Tasks.Error.DeniedNotElevated" xml:space="preserve"><value>“{0}”：此操作需要管理员权限。请以管理员身份重新启动应用后重试。</value></data>
+  <data name="Tasks.Error.Gone" xml:space="preserve"><value>“{0}”已不存在。</value></data>
+  <data name="Tasks.Snoozed.Title" xml:space="preserve"><value>任务已暂停</value></data>
+  <data name="Tasks.File.TaskXml" xml:space="preserve"><value>任务 XML</value></data>
+  <data name="Tasks.Select" xml:space="preserve"><value>选择</value></data>
+  <data name="Tasks.Badge.Unreadable" xml:space="preserve"><value>无法读取</value></data>
+  <data name="Tasks.Toolbar.Sort" xml:space="preserve"><value>排序</value></data>
 </root>
 
 

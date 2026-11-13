@@ -33,6 +33,37 @@ public partial class App
     public void ApplySmoothScrolling(bool enable) =>
         _services!.GetRequiredService<ISettingsStore>().Update(settings => settings with { SmoothScrolling = enable });
 
+    // Stand-ins until the reworked snooze service and the notifier are in.
+    private static void AddBridges(IServiceCollection services)
+    {
+        services.AddSingleton<Scheduling.ISnoozeGate, NoSnooze>();
+        services.AddSingleton<Notifications.INotifier, LegacyNotifier>();
+    }
+
+    private sealed class NoSnooze : Scheduling.ISnoozeGate
+    {
+        public bool BlocksRun(string taskPath) => false;
+        public void RecordSuppressedRun(string taskPath, Scheduling.RunOrigin origin) { }
+    }
+
+    private sealed class LegacyNotifier : Notifications.INotifier
+    {
+        public void TaskStarted(string taskName) => Try(() => NotificationService.ShowTaskStarted(taskName));
+        public void TaskCouldNotStart(string taskName, string reason) => Try(() => NotificationService.ShowTaskError(taskName, reason));
+        public void RunSuppressed(string taskName) { }
+        public void SnoozeStarted(string status) { }
+        public void SnoozeEnded() { }
+        public void CompletionActionStarted(string finishedTask, string startedTask, bool afterSuccess) { }
+        public void TaskRunsSoon(string taskName, int minutes) { }
+        public void HiddenToTray() { }
+
+        private static void Try(Action show)
+        {
+            try { show(); }
+            catch (Exception ex) { Serilog.Log.Warning(ex, "A notification could not be shown"); }
+        }
+    }
+
     private static void StartLegacyServices()
     {
         var services = new ServiceCollection();

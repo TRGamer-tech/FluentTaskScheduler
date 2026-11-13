@@ -56,12 +56,16 @@ public sealed partial class ShellPage : Page, IShellNavigator
     /// <param name="backdrop">One of the states in BackdropStates: Solid, Mica or Oled.</param>
     public void ShowBackdrop(string backdrop) => VisualStateManager.GoToState(this, backdrop, useTransitions: false);
 
-    public void ShowTask(string taskPath) => Navigate("Tasks");
+    public void ShowTask(string taskPath)
+    {
+        Navigate("Tasks");
+        _ = _windowServices.GetRequiredService<TasksPage>().ShowAsync(taskPath);
+    }
 
     public Task<string?> CreateTaskAsync(TaskDraft template)
     {
         Navigate("Tasks");
-        return Task.FromResult<string?>(null);
+        return _windowServices.GetRequiredService<TasksPage>().CreateTaskAsync(template);
     }
 
     private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
@@ -77,7 +81,9 @@ public sealed partial class ShellPage : Page, IShellNavigator
 
     private async void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
     {
-        if (ReferenceEquals(args.InvokedItemContainer, NavAdd)) await CreateTaskAsync(new TaskDraft());
+        if (!ReferenceEquals(args.InvokedItemContainer, NavAdd)) return;
+        Navigate("Tasks");
+        await _windowServices.GetRequiredService<TasksPage>().CreateTaskAsync();
     }
 
     // The area next to the pane normally sits one layer above the window background. OLED mode

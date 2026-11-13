@@ -61,6 +61,7 @@ public partial class App : Application, IAppLifetime, IDisposable
     private ServiceCollection ConfigureServices()
     {
         var services = new ServiceCollection();
+        AddBridges(services);
 
         // One per app
         services.AddSingleton<IAppLifetime>(this);
@@ -71,6 +72,8 @@ public partial class App : Application, IAppLifetime, IDisposable
         services.AddSingleton<IClipboard, ClipboardService>();
         services.AddSingleton<TaskSchedulerConnection>();
         services.AddSingleton<ITaskStore, TaskStore>();
+        services.AddSingleton<ITaskRunner, TaskRunner>();
+        services.AddSingleton<INetworkProfiles, RegistryNetworkProfiles>();
         services.AddSingleton<WindowManager>();
         services.AddSingleton<AppAppearance>();
 
@@ -81,6 +84,8 @@ public partial class App : Application, IAppLifetime, IDisposable
         services.AddScoped<IFilePicker, FilePicker>();
         services.AddScoped<ShellPage>();
         services.AddScoped<IShellNavigator>(window => window.GetRequiredService<ShellPage>());
+        services.AddScoped<TaskEditorFactory>();
+        services.AddScoped<TasksViewModel>();
         services.AddScoped<TasksPage>();
 
         return services;

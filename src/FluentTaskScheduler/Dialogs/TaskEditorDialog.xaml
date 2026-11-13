@@ -1,0 +1,339 @@
+<ContentDialog
+    x:Class="FluentTaskScheduler.Dialogs.TaskEditorDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:FluentTaskScheduler.Controls"
+    xmlns:l="using:FluentTaskScheduler.Localization"
+    xmlns:vm="using:FluentTaskScheduler.ViewModels"
+    Title="{x:Bind ViewModel.Title}"
+    PrimaryButtonText="{x:Bind l:Loc.Get('Dialog.Common.Save')}"
+    CloseButtonText="{x:Bind l:Loc.Get('Dialog.Common.Cancel')}"
+    DefaultButton="Primary"
+    PrimaryButtonClick="Save_Click">
+
+    <ContentDialog.Resources>
+        <!-- The form is wider than a message box. -->
+        <x:Double x:Key="ContentDialogMaxWidth">760</x:Double>
+        <Style x:Key="SectionTitleStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}">
+            <Setter Property="Margin" Value="0,12,0,0"/>
+        </Style>
+    </ContentDialog.Resources>
+
+    <ScrollViewer x:Name="EditorScroller" VerticalScrollBarVisibility="Auto" IsTabStop="False">
+        <StackPanel Spacing="12" Width="680" Margin="0,0,16,0">
+
+            <InfoBar x:Name="EditorProblems" Severity="Error" IsClosable="False"
+                     IsOpen="{x:Bind ViewModel.HasProblems, Mode=OneWay}"
+                     Message="{x:Bind ViewModel.Problems, Mode=OneWay}"/>
+            <InfoBar Severity="Warning" IsClosable="False"
+                     IsOpen="{x:Bind ViewModel.NeedsElevation, Mode=OneWay}"
+                     Message="{x:Bind l:Loc.Get('Editor.NeedsElevation')}"/>
+
+            <TextBox x:Name="EditorName" Header="{x:Bind l:Loc.Get('Dialog.TaskName')}"
+                     PlaceholderText="{x:Bind l:Loc.Get('Dialog.Ph.TaskName')}"
+                     Text="{x:Bind ViewModel.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBox x:Name="EditorDescription" Header="{x:Bind l:Loc.Get('Dialog.Description')}"
+                     AcceptsReturn="True" TextWrapping="Wrap" Height="72"
+                     Text="{x:Bind ViewModel.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="EditorAuthor" Header="{x:Bind l:Loc.Get('Dialog.Author')}"
+                         Text="{x:Bind ViewModel.Author, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <AutoSuggestBox x:Name="EditorCategory" Grid.Column="1" Header="{x:Bind l:Loc.Get('Dialog.Category')}"
+                                PlaceholderText="{x:Bind l:Loc.Get('Dialog.Ph.Category')}"
+                                Text="{x:Bind ViewModel.Category, Mode=TwoWay}"
+                                TextChanged="Category_TextChanged" GotFocus="Category_GotFocus"/>
+                <TextBox x:Name="EditorTags" Grid.Column="2" Header="{x:Bind l:Loc.Get('Dialog.Tags')}"
+                         PlaceholderText="{x:Bind l:Loc.Get('Dialog.Ph.Tags')}"
+                         Text="{x:Bind ViewModel.Tags, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+            <ToggleSwitch x:Name="EditorEnabled" Header="{x:Bind l:Loc.Get('Dialog.Enabled')}"
+                          IsOn="{x:Bind ViewModel.Enabled, Mode=TwoWay}"/>
+
+            <!-- Triggers -->
+            <TextBlock Text="{x:Bind l:Loc.Get('TriggerTitle.Text')}" Style="{StaticResource SectionTitleStyle}"/>
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <ListView x:Name="EditorTriggers" MinHeight="72" MaxHeight="140" SelectionMode="Single"
+                          BorderThickness="1" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" CornerRadius="4"
+                          ItemsSource="{x:Bind ViewModel.Triggers}"
+                          SelectedItem="{x:Bind ViewModel.SelectedTrigger, Mode=TwoWay}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:TriggerViewModel">
+                            <TextBlock Text="{x:Bind Summary, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <StackPanel Grid.Column="1" Spacing="4">
+                    <Button x:Name="EditorAddTrigger" Command="{x:Bind ViewModel.AddTriggerCommand}"
+                            ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.Trigger.Add')}"
+                            AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.Trigger.Add')}">
+                        <FontIcon Glyph="&#xE710;" FontSize="14"/>
+                    </Button>
+                    <Button x:Name="EditorRemoveTrigger" Command="{x:Bind ViewModel.RemoveTriggerCommand}"
+                            ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.Trigger.Remove')}"
+                            AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.Trigger.Remove')}">
+                        <FontIcon Glyph="&#xE74D;" FontSize="14"/>
+                    </Button>
+                    <Button Command="{x:Bind ViewModel.MoveTriggerUpCommand}"
+                            ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.MoveUp')}"
+                            AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.MoveUp')}">
+                        <FontIcon Glyph="&#xE70E;" FontSize="14"/>
+                    </Button>
+                    <Button Command="{x:Bind ViewModel.MoveTriggerDownCommand}"
+                            ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.MoveDown')}"
+                            AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.MoveDown')}">
+                        <FontIcon Glyph="&#xE70D;" FontSize="14"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+            <TextBlock Text="{x:Bind l:Loc.Get('Editor.NoTriggers')}" TextWrapping="Wrap"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       Visibility="{x:Bind controls:TriggerEditor.CollapsedIf(ViewModel.HasSelectedTrigger), Mode=OneWay}"/>
+            <controls:TriggerEditor Trigger="{x:Bind ViewModel.SelectedTrigger, Mode=OneWay}"
+                                    Visibility="{x:Bind ViewModel.HasSelectedTrigger, Mode=OneWay}"/>
+
+            <!-- Actions -->
+            <TextBlock Text="{x:Bind l:Loc.Get('ActionTitle.Text')}" Style="{StaticResource SectionTitleStyle}"/>
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <ListView x:Name="EditorActions" MinHeight="72" MaxHeight="140" SelectionMode="Single"
+                          BorderThickness="1" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" CornerRadius="4"
+                          ItemsSource="{x:Bind ViewModel.Actions}"
+                          SelectedItem="{x:Bind ViewModel.SelectedAction, Mode=TwoWay}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ActionViewModel">
+                            <TextBlock Text="{x:Bind Summary, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <StackPanel Grid.Column="1" Spacing="4">
+                    <Button x:Name="EditorAddAction" ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.Action.Add')}"
+                            AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.Action.Add')}">
+                        <FontIcon Glyph="&#xE710;" FontSize="14"/>
+                        <Button.Flyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Dialog.Action.RunProg')}" Command="{x:Bind ViewModel.AddActionCommand}"/>
+                                <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Dialog.Action.Email')}" Command="{x:Bind ViewModel.AddEmailActionCommand}"/>
+                                <MenuFlyoutItem Text="{x:Bind l:Loc.Get('Dialog.Action.Notif')}" Command="{x:Bind ViewModel.AddMessageActionCommand}"/>
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                    <Button x:Name="EditorRemoveAction" Command="{x:Bind ViewModel.RemoveActionCommand}"
+                            ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.Action.Remove')}"
+                            AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.Action.Remove')}">
+                        <FontIcon Glyph="&#xE74D;" FontSize="14"/>
+                    </Button>
+                    <Button Command="{x:Bind ViewModel.MoveActionUpCommand}"
+                            ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.MoveUp')}"
+                            AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.MoveUp')}">
+                        <FontIcon Glyph="&#xE70E;" FontSize="14"/>
+                    </Button>
+                    <Button Command="{x:Bind ViewModel.MoveActionDownCommand}"
+                            ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.MoveDown')}"
+                            AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.MoveDown')}">
+                        <FontIcon Glyph="&#xE70D;" FontSize="14"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+            <StackPanel Spacing="8" Visibility="{x:Bind ViewModel.SelectedAction.IsEditable, Mode=OneWay, FallbackValue=Collapsed}">
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="EditorProgram" Header="{x:Bind l:Loc.Get('Dialog.ProgramScript')}"
+                             PlaceholderText="{x:Bind l:Loc.Get('Dialog.Ph.Command')}" IsSpellCheckEnabled="False"
+                             Text="{x:Bind ViewModel.SelectedAction.Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Column="1" VerticalAlignment="Bottom" Content="{x:Bind l:Loc.Get('Dialog.Browse')}"
+                            Command="{x:Bind ViewModel.BrowseForProgramCommand}"/>
+                </Grid>
+                <TextBox x:Name="EditorArguments" Header="{x:Bind l:Loc.Get('Dialog.Arguments')}"
+                         PlaceholderText="{x:Bind l:Loc.Get('Dialog.Ph.Args')}" IsSpellCheckEnabled="False"
+                         Text="{x:Bind ViewModel.SelectedAction.Arguments, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox x:Name="EditorWorkingDirectory" Header="{x:Bind l:Loc.Get('Dialog.WorkingDir')}"
+                         PlaceholderText="{x:Bind l:Loc.Get('Dialog.Ph.WorkDir')}" IsSpellCheckEnabled="False"
+                         Text="{x:Bind ViewModel.SelectedAction.WorkingDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="{x:Bind l:Loc.Get('Dialog.PsTip')}" TextWrapping="Wrap"
+                           Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+            </StackPanel>
+
+            <!-- Conditions -->
+            <Expander x:Name="EditorConditions" Header="{x:Bind l:Loc.Get('ConditionsTitle.Text')}"
+                      HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="{x:Bind l:Loc.Get('ConditionStartOnlyIf.Text')}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <CheckBox x:Name="EditorOnlyIfIdle" Content="{x:Bind l:Loc.Get('ConditionIdle.Content')}" IsChecked="{x:Bind ViewModel.RunOnlyIfIdle, Mode=TwoWay}"/>
+                    <StackPanel Orientation="Horizontal" Spacing="12" Margin="28,0,0,0" Visibility="{x:Bind ViewModel.RunOnlyIfIdle, Mode=OneWay}">
+                        <TextBlock Text="{x:Bind l:Loc.Get('ConditionIdleFor.Text')}" VerticalAlignment="Center"/>
+                        <TextBox x:Name="EditorIdleDuration" Width="120" PlaceholderText="{x:Bind l:Loc.Get('Dialog.Ph.Idle')}"
+                                 Text="{x:Bind ViewModel.IdleDuration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <CheckBox Content="{x:Bind l:Loc.Get('ConditionStopOnIdleEnd.Content')}" IsChecked="{x:Bind ViewModel.StopOnIdleEnd, Mode=TwoWay}"/>
+                    </StackPanel>
+                    <CheckBox x:Name="EditorOnlyOnAc" Content="{x:Bind l:Loc.Get('ConditionAC.Content')}" IsChecked="{x:Bind ViewModel.RunOnlyOnAcPower, Mode=TwoWay}"/>
+                    <CheckBox Margin="28,0,0,0" Content="{x:Bind l:Loc.Get('ConditionStopBatterySwitch.Content')}" IsChecked="{x:Bind ViewModel.StopOnBattery, Mode=TwoWay}"/>
+                    <CheckBox x:Name="EditorOnlyIfNetwork" Content="{x:Bind l:Loc.Get('ConditionNetwork.Content')}" IsChecked="{x:Bind ViewModel.RunOnlyIfNetwork, Mode=TwoWay}"/>
+                    <StackPanel Spacing="8" Margin="28,0,0,0" Visibility="{x:Bind ViewModel.RunOnlyIfNetwork, Mode=OneWay}">
+                        <ComboBox MinWidth="260" Header="{x:Bind l:Loc.Get('ConditionSpecificNetwork.Text')}"
+                                  ItemsSource="{x:Bind ViewModel.NetworkOptions}"
+                                  SelectedIndex="{x:Bind ViewModel.NetworkIndex, Mode=TwoWay}"/>
+                        <InfoBar Severity="Informational" IsClosable="False"
+                                 IsOpen="{x:Bind ViewModel.NetworkListNeedsElevation}"
+                                 Title="{x:Bind l:Loc.Get('Dialog.NetAdmin.Title')}"
+                                 Message="{x:Bind l:Loc.Get('Dialog.NetAdmin.Msg')}"/>
+                    </StackPanel>
+                    <CheckBox x:Name="EditorWakeToRun" Content="{x:Bind l:Loc.Get('ConditionWake.Content')}" IsChecked="{x:Bind ViewModel.WakeToRun, Mode=TwoWay}"/>
+                </StackPanel>
+            </Expander>
+
+            <!-- Settings -->
+            <Expander x:Name="EditorSettings" Header="{x:Bind l:Loc.Get('SettingsTitle.Text')}"
+                      HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                <StackPanel Spacing="8">
+                    <CheckBox x:Name="EditorHighestPrivileges" Content="{x:Bind l:Loc.Get('Dialog.HighPriv')}" IsChecked="{x:Bind ViewModel.HighestPrivileges, Mode=TwoWay}"/>
+                    <CheckBox x:Name="EditorHidden" Content="{x:Bind l:Loc.Get('Dialog.Hidden')}" IsChecked="{x:Bind ViewModel.Hidden, Mode=TwoWay}"/>
+                    <CheckBox x:Name="EditorRunIfMissed" Content="{x:Bind l:Loc.Get('RunIfMissed.Content')}" IsChecked="{x:Bind ViewModel.RunIfMissed, Mode=TwoWay}"/>
+                    <CheckBox x:Name="EditorLimitRunTime" Content="{x:Bind l:Loc.Get('Dialog.StopAfter')}" IsChecked="{x:Bind ViewModel.LimitRunTime, Mode=TwoWay}"/>
+                    <TextBox x:Name="EditorTimeLimit" Width="160" HorizontalAlignment="Left" Margin="28,0,0,0"
+                             PlaceholderText="{x:Bind l:Loc.Get('Editor.Ph.Duration')}"
+                             Visibility="{x:Bind ViewModel.LimitRunTime, Mode=OneWay}"
+                             Text="{x:Bind ViewModel.TimeLimit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <CheckBox x:Name="EditorRestartOnFailure" Content="{x:Bind l:Loc.Get('RestartOnFailure.Content')}" IsChecked="{x:Bind ViewModel.RestartOnFailure, Mode=TwoWay}"/>
+                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="28,0,0,0" Visibility="{x:Bind ViewModel.RestartOnFailure, Mode=OneWay}">
+                        <TextBox x:Name="EditorRestartInterval" Width="120" PlaceholderText="{x:Bind l:Loc.Get('Dialog.Ph.Idle')}"
+                                 Text="{x:Bind ViewModel.RestartInterval, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{x:Bind l:Loc.Get('Dialog.RestartUpTo')}" VerticalAlignment="Center"/>
+                        <NumberBox x:Name="EditorRestartCount" Minimum="1" Maximum="999" SpinButtonPlacementMode="Inline" MinWidth="120"
+                                   Value="{x:Bind ViewModel.RestartCount, Mode=TwoWay}"/>
+                        <TextBlock Text="{x:Bind l:Loc.Get('Dialog.RestartTimes')}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <ComboBox x:Name="EditorInstancePolicy" MinWidth="320" Header="{x:Bind l:Loc.Get('Dialog.MultiInstance')}"
+                              SelectedIndex="{x:Bind ViewModel.InstancePolicyIndex, Mode=TwoWay}">
+                        <ComboBoxItem Content="{x:Bind l:Loc.Get('Dialog.Multi.Ignore')}"/>
+                        <ComboBoxItem Content="{x:Bind l:Loc.Get('Dialog.Multi.Parallel')}"/>
+                        <ComboBoxItem Content="{x:Bind l:Loc.Get('Dialog.Multi.Queue')}"/>
+                        <ComboBoxItem Content="{x:Bind l:Loc.Get('Dialog.Multi.Stop')}"/>
+                    </ComboBox>
+                    <ComboBox x:Name="EditorPriority" MinWidth="320" Header="{x:Bind l:Loc.Get('Dialog.Priority')}"
+                              SelectedIndex="{x:Bind ViewModel.PriorityIndex, Mode=TwoWay}">
+                        <ComboBoxItem Content="{x:Bind l:Loc.Get('Dialog.Pri.Realtime')}"/>
+                        <ComboBoxItem Content="{x:Bind l:Loc.Get('Dialog.Pri.High')}"/>
+                        <ComboBoxItem Content="{x:Bind l:Loc.Get('Dialog.Pri.AboveNormal')}"/>
+                        <ComboBoxItem Content="{x:Bind l:Loc.Get('Dialog.Pri.Normal')}"/>
+                        <ComboBoxItem Content="{x:Bind l:Loc.Get('Dialog.Pri.BelowNormal')}"/>
+                        <ComboBoxItem Content="{x:Bind l:Loc.Get('Dialog.Pri.Idle')}"/>
+                    </ComboBox>
+                    <CheckBox x:Name="EditorDeleteWhenExpired" Content="{x:Bind l:Loc.Get('Dialog.DeleteExpired')}" IsChecked="{x:Bind ViewModel.DeleteWhenExpired, Mode=TwoWay}"/>
+                    <CheckBox x:Name="EditorAllowHardTerminate" Content="{x:Bind l:Loc.Get('Dialog.HardTerminate')}" IsChecked="{x:Bind ViewModel.AllowHardTerminate, Mode=TwoWay}"/>
+                </StackPanel>
+            </Expander>
+
+            <!-- Account -->
+            <Expander x:Name="EditorAccount" Header="{x:Bind l:Loc.Get('Dialog.UserContext')}"
+                      HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                <StackPanel Spacing="8">
+                    <RadioButtons x:Name="EditorAccountOptions" ItemsSource="{x:Bind ViewModel.AccountOptions}"
+                                  SelectedIndex="{x:Bind ViewModel.AccountIndex, Mode=TwoWay}"/>
+                    <TextBox x:Name="EditorUserName" Header="{x:Bind l:Loc.Get('Dialog.UsernameHeader')}"
+                             PlaceholderText="{x:Bind l:Loc.Get('Dialog.Ph.Username')}" IsSpellCheckEnabled="False"
+                             Visibility="{x:Bind ViewModel.RunsAsOtherUser, Mode=OneWay}"
+                             Text="{x:Bind ViewModel.UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <StackPanel Spacing="4" Visibility="{x:Bind ViewModel.NeedsPassword, Mode=OneWay}">
+                        <PasswordBox x:Name="EditorPassword" Header="{x:Bind l:Loc.Get('Editor.Account.Password')}"
+                                     Password="{x:Bind ViewModel.Password, Mode=TwoWay}"/>
+                        <TextBlock Text="{x:Bind l:Loc.Get('Editor.Account.PasswordHint')}" TextWrapping="Wrap"
+                                   Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+
+            <!-- Completion actions -->
+            <Expander x:Name="EditorCompletionActions" Header="{x:Bind l:Loc.Get('Pipeline.SectionTitle')}"
+                      HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                <StackPanel Spacing="8">
+                    <ToggleSwitch Header="{x:Bind l:Loc.Get('Pipeline.EnableSwitch')}"
+                                  IsOn="{x:Bind ViewModel.CompletionActions.Enabled, Mode=TwoWay}"/>
+                    <TextBlock Text="{x:Bind l:Loc.Get('Pipeline.EnableSubtitle')}" TextWrapping="Wrap"
+                               Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+
+                    <TextBlock Text="{x:Bind l:Loc.Get('Pipeline.SuccessHeader')}" Style="{StaticResource SectionTitleStyle}"/>
+                    <Grid ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ComboBox x:Name="OnSuccessPicker" HorizontalAlignment="Stretch"
+                                  PlaceholderText="{x:Bind l:Loc.Get('Pipeline.PickTask')}"
+                                  ItemsSource="{x:Bind ViewModel.CompletionActions.OtherTasks}"/>
+                        <Button Grid.Column="1" Content="{x:Bind l:Loc.Get('Editor.CompletionActions.Add')}"
+                                Command="{x:Bind ViewModel.CompletionActions.AddOnSuccessCommand}"
+                                CommandParameter="{x:Bind OnSuccessPicker.SelectedItem, Mode=OneWay}"/>
+                    </Grid>
+                    <ListView x:Name="OnSuccessList" SelectionMode="None" ItemsSource="{x:Bind ViewModel.CompletionActions.OnSuccess}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Grid ColumnSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{x:Bind}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                    <Button Grid.Column="1" Tag="{x:Bind}" Click="RemoveOnSuccess_Click"
+                                            AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.CompletionActions.Remove')}"
+                                            ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.CompletionActions.Remove')}">
+                                        <FontIcon Glyph="&#xE74D;" FontSize="12"/>
+                                    </Button>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <TextBlock Text="{x:Bind l:Loc.Get('Pipeline.FailureHeader')}" Style="{StaticResource SectionTitleStyle}"/>
+                    <Grid ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ComboBox x:Name="OnFailurePicker" HorizontalAlignment="Stretch"
+                                  PlaceholderText="{x:Bind l:Loc.Get('Pipeline.PickTask')}"
+                                  ItemsSource="{x:Bind ViewModel.CompletionActions.OtherTasks}"/>
+                        <Button Grid.Column="1" Content="{x:Bind l:Loc.Get('Editor.CompletionActions.Add')}"
+                                Command="{x:Bind ViewModel.CompletionActions.AddOnFailureCommand}"
+                                CommandParameter="{x:Bind OnFailurePicker.SelectedItem, Mode=OneWay}"/>
+                    </Grid>
+                    <ListView x:Name="OnFailureList" SelectionMode="None" ItemsSource="{x:Bind ViewModel.CompletionActions.OnFailure}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Grid ColumnSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{x:Bind}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                    <Button Grid.Column="1" Tag="{x:Bind}" Click="RemoveOnFailure_Click"
+                                            AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.CompletionActions.Remove')}"
+                                            ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.CompletionActions.Remove')}">
+                                        <FontIcon Glyph="&#xE74D;" FontSize="12"/>
+                                    </Button>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <InfoBar Severity="Warning" IsClosable="False"
+                             IsOpen="{x:Bind ViewModel.CompletionActions.StartsSameTaskEitherWay, Mode=OneWay}"
+                             Message="{x:Bind l:Loc.Get('Editor.CompletionActions.BothWays')}"/>
+                </StackPanel>
+            </Expander>
+        </StackPanel>
+    </ScrollViewer>
+</ContentDialog>

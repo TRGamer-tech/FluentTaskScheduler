@@ -462,12 +462,12 @@ Restart now to apply the update?</value></data>
   <data name="Dialog.Time.3d" xml:space="preserve"><value>3 days</value></data>
   <data name="Dialog.Time.5d" xml:space="preserve"><value>5 days</value></data>
 
-  <data name="Dialog.Pri.Realtime" xml:space="preserve"><value>Realtime (0)</value></data>
-  <data name="Dialog.Pri.High" xml:space="preserve"><value>High (1)</value></data>
-  <data name="Dialog.Pri.AboveNormal" xml:space="preserve"><value>Above Normal (3)</value></data>
-  <data name="Dialog.Pri.Normal" xml:space="preserve"><value>Normal (7)</value></data>
-  <data name="Dialog.Pri.BelowNormal" xml:space="preserve"><value>Below Normal (9)</value></data>
-  <data name="Dialog.Pri.Idle" xml:space="preserve"><value>Idle (10)</value></data>
+  <data name="Dialog.Pri.Realtime" xml:space="preserve"><value>Realtime</value></data>
+  <data name="Dialog.Pri.High" xml:space="preserve"><value>High</value></data>
+  <data name="Dialog.Pri.AboveNormal" xml:space="preserve"><value>Above normal</value></data>
+  <data name="Dialog.Pri.Normal" xml:space="preserve"><value>Normal</value></data>
+  <data name="Dialog.Pri.BelowNormal" xml:space="preserve"><value>Below normal (Windows default)</value></data>
+  <data name="Dialog.Pri.Idle" xml:space="preserve"><value>Idle</value></data>
 
   <data name="Dialog.NetAdmin.Title" xml:space="preserve"><value>Administrator required</value></data>
   <data name="Dialog.NetAdmin.Msg" xml:space="preserve"><value>Specific network selection requires the app to run as administrator.</value></data>
@@ -746,10 +746,10 @@ Restart now to apply the update?</value></data>
   <data name="Dialog.Cancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="Dialog.Delete" xml:space="preserve"><value>Delete</value></data>
   <data name="Dialog.Error.EmptyName" xml:space="preserve"><value>Task name cannot be empty.</value></data>
-  <data name="Dialog.Error.InvalidIdleDuration" xml:space="preserve"><value>"{0}" is not a valid idle duration. Use a value like 10m, 1h, or an ISO-8601 duration such as PT10M.</value></data>
+  <data name="Dialog.Error.InvalidIdleDuration" xml:space="preserve"><value>"{0}" is not a duration for the idle time. Write it like 10m or 1h.</value></data>
   <data name="Dialog.Error.InvalidRandomDelay" xml:space="preserve"><value>"{0}" is not a valid random delay value. Use an ISO-8601 duration such as PT30M or PT1H.</value></data>
-  <data name="Dialog.Error.InvalidRestartInterval" xml:space="preserve"><value>"{0}" is not a valid restart interval. Use a value like 1m, 30s, or an ISO-8601 duration such as PT1M.</value></data>
-  <data name="Dialog.Error.InvalidStopAfter" xml:space="preserve"><value>"{0}" is not a valid duration for "Stop task if runs longer than". Use an ISO-8601 duration such as PT90M or P1D.</value></data>
+  <data name="Dialog.Error.InvalidRestartInterval" xml:space="preserve"><value>"{0}" is not a duration for the restart interval. Write it like 1m or 30m.</value></data>
+  <data name="Dialog.Error.InvalidStopAfter" xml:space="preserve"><value>"{0}" is not a duration for the longest run time. Write it like 90m, 12h or 3d.</value></data>
   <data name="Dialog.Error.RenameDuplicated" xml:space="preserve"><value>Rename failed: both "{0}" and "{1}" now exist. Please delete one manually in Task Scheduler.</value></data>
   <data name="Dialog.Error.RenameFailed" xml:space="preserve"><value>Could not rename "{0}" to "{1}": the old task could not be deleted ({2}).</value></data>
   <data name="Dialog.Error.SaveTaskFailedPrefix" xml:space="preserve"><value>Failed to save task: </value></data>
@@ -839,5 +839,82 @@ Restart now to apply the update?</value></data>
   <data name="Task.Snooze.CustomIntro" xml:space="preserve"><value>Disable this task until:</value></data>
   <data name="Task.Snooze.Status" xml:space="preserve"><value>Snoozed until {0}</value></data>
   <data name="Task.Snooze.Resume" xml:space="preserve"><value>Resume now</value></data>
+  <data name="Editor.Title.New" xml:space="preserve"><value>New task</value></data>
+  <data name="Editor.Title.Edit" xml:space="preserve"><value>Edit {0}</value></data>
+  <data name="Editor.Section.Account" xml:space="preserve"><value>Account</value></data>
+  <data name="Editor.Trigger.EveryNDays" xml:space="preserve"><value>every {0} days</value></data>
+  <data name="Editor.Trigger.Add" xml:space="preserve"><value>Add trigger</value></data>
+  <data name="Editor.Trigger.Remove" xml:space="preserve"><value>Remove trigger</value></data>
+  <data name="Editor.Action.Add" xml:space="preserve"><value>Add action</value></data>
+  <data name="Editor.Action.Remove" xml:space="preserve"><value>Remove action</value></data>
+  <data name="Editor.MoveUp" xml:space="preserve"><value>Move up</value></data>
+  <data name="Editor.MoveDown" xml:space="preserve"><value>Move down</value></data>
+  <data name="Editor.NoTriggers" xml:space="preserve"><value>No trigger: the task only runs when it is started by hand.</value></data>
+  <data name="Editor.Trigger.Active" xml:space="preserve"><value>Trigger is active</value></data>
+  <data name="Editor.Trigger.StartDate" xml:space="preserve"><value>Start date</value></data>
+  <data name="Editor.Trigger.StartTime" xml:space="preserve"><value>Time</value></data>
+  <data name="Editor.Trigger.Expires" xml:space="preserve"><value>Expires</value></data>
+  <data name="Editor.Trigger.ExpiryDate" xml:space="preserve"><value>Expiry date</value></data>
+  <data name="Editor.Unit.Days" xml:space="preserve"><value>days</value></data>
+  <data name="Editor.Unit.Weeks" xml:space="preserve"><value>weeks</value></data>
+  <data name="Editor.Trigger.Weekdays" xml:space="preserve"><value>On these days</value></data>
+  <data name="Editor.Trigger.ByDay" xml:space="preserve"><value>On days of the month</value></data>
+  <data name="Editor.Trigger.ByWeekday" xml:space="preserve"><value>On a weekday of the month</value></data>
+  <data name="Editor.Trigger.LastDay" xml:space="preserve"><value>Last day of the month</value></data>
+  <data name="Editor.Trigger.Months" xml:space="preserve"><value>In these months</value></data>
+  <data name="Editor.Trigger.WeeksOfMonth" xml:space="preserve"><value>In these weeks</value></data>
+  <data name="Editor.Trigger.SessionChange" xml:space="preserve"><value>When</value></data>
+  <data name="Editor.Trigger.CustomQuery" xml:space="preserve"><value>Custom query (XML)</value></data>
+  <data name="Editor.Trigger.Unsupported" xml:space="preserve"><value>This kind of trigger cannot be edited here. It stays as it is.</value></data>
+  <data name="Editor.Ph.Duration" xml:space="preserve"><value>e.g. 15m, 1h 30m, 2d</value></data>
+  <data name="Editor.Ph.NoRepetition" xml:space="preserve"><value>empty: no repetition</value></data>
+  <data name="Editor.Ph.Indefinitely" xml:space="preserve"><value>empty: indefinitely</value></data>
+  <data name="Editor.Ph.NoDelay" xml:space="preserve"><value>empty: no delay</value></data>
+  <data name="Editor.Account.Keep" xml:space="preserve"><value>Keep running as {0}</value></data>
+  <data name="Editor.Account.Password" xml:space="preserve"><value>Password</value></data>
+  <data name="Editor.Account.PasswordHint" xml:space="preserve"><value>Windows stores a password for this task and asks for it again whenever the task is changed.</value></data>
+  <data name="Editor.NeedsElevation" xml:space="preserve"><value>Saving this needs administrator rights. Restart the app as administrator first.</value></data>
+  <data name="Editor.AllFiles" xml:space="preserve"><value>All files</value></data>
+  <data name="Editor.CompletionActions.Add" xml:space="preserve"><value>Add</value></data>
+  <data name="Editor.CompletionActions.Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="Editor.CompletionActions.BothWays" xml:space="preserve"><value>A task is listed for success and for failure, so it starts after every run.</value></data>
+  <data name="Editor.Error.NameCharacters" xml:space="preserve"><value>The task name must not contain any of these characters: \ / : * ? " &lt; &gt; |</value></data>
+  <data name="Editor.Error.NoAction" xml:space="preserve"><value>The task needs at least one action.</value></data>
+  <data name="Editor.Error.ActionWithoutProgram" xml:space="preserve"><value>Action {0}: enter the program or script to run.</value></data>
+  <data name="Editor.Error.UserNameMissing" xml:space="preserve"><value>Enter the user the task should run as.</value></data>
+  <data name="Editor.Error.PasswordNeeded" xml:space="preserve"><value>Enter the password of the task's account.</value></data>
+  <data name="Editor.Error.IdleDuration" xml:space="preserve"><value>The idle time must be at least one minute.</value></data>
+  <data name="Editor.Error.RestartInterval" xml:space="preserve"><value>The restart interval must be between one minute and 31 days.</value></data>
+  <data name="Editor.Error.DeleteNeedsExpiry" xml:space="preserve"><value>To delete the task when it is no longer scheduled to run, at least one trigger needs an expiry date.</value></data>
+  <data name="Editor.Error.TriggerInterval" xml:space="preserve"><value>Trigger {0}: the interval must be at least 1.</value></data>
+  <data name="Editor.Error.TriggerNeedsWeekday" xml:space="preserve"><value>Trigger {0}: choose at least one day of the week.</value></data>
+  <data name="Editor.Error.TriggerNeedsMonth" xml:space="preserve"><value>Trigger {0}: choose at least one month.</value></data>
+  <data name="Editor.Error.TriggerNeedsDayOfMonth" xml:space="preserve"><value>Trigger {0}: choose at least one day of the month.</value></data>
+  <data name="Editor.Error.TriggerNeedsWeekAndWeekday" xml:space="preserve"><value>Trigger {0}: choose at least one week and one day of the week.</value></data>
+  <data name="Editor.Error.EventNeedsLog" xml:space="preserve"><value>Trigger {0}: enter the event log to watch.</value></data>
+  <data name="Editor.Error.TriggerNeedsStart" xml:space="preserve"><value>Trigger {0}: set the start date and time.</value></data>
+  <data name="Editor.Error.TriggerEndsBeforeStart" xml:space="preserve"><value>Trigger {0}: it expires before it starts.</value></data>
+  <data name="Editor.Error.RepetitionInterval" xml:space="preserve"><value>Trigger {0}: the repetition interval must be between one minute and 31 days.</value></data>
+  <data name="Editor.Error.RepetitionDuration" xml:space="preserve"><value>Trigger {0}: the repetition cannot last shorter than its interval.</value></data>
+  <data name="Editor.Error.RepetitionText" xml:space="preserve"><value>Trigger {0}: the repetition is not a duration. Write it like 15m, 1h 30m or 2d.</value></data>
+  <data name="Editor.Error.RandomDelayText" xml:space="preserve"><value>Trigger {0}: the random delay is not a duration. Write it like 30s, 10m or 1h.</value></data>
+  <data name="Editor.Error.EventIdText" xml:space="preserve"><value>Trigger {0}: the event ID must be a number.</value></data>
+  <data name="Editor.Error.AccessDenied" xml:space="preserve"><value>Windows denied the change. The task may be protected.</value></data>
+  <data name="Editor.Error.AccessDeniedNotElevated" xml:space="preserve"><value>Windows denied the change. It needs administrator rights: restart the app as administrator and try again.</value></data>
+  <data name="Editor.Error.Account" xml:space="preserve"><value>Windows did not accept the account: {0}</value></data>
+  <data name="Tasks.NotElevated.Title" xml:space="preserve"><value>Not all tasks are shown</value></data>
+  <data name="Tasks.NotElevated.Message" xml:space="preserve"><value>Tasks of other users and of Windows itself are only visible to an administrator.</value></data>
+  <data name="Tasks.NotElevated.Restart" xml:space="preserve"><value>Restart as administrator</value></data>
+  <data name="Tasks.LoadError.Title" xml:space="preserve"><value>The tasks could not be loaded</value></data>
+  <data name="Tasks.Empty" xml:space="preserve"><value>No tasks to show here.</value></data>
+  <data name="Tasks.NextRunFormat" xml:space="preserve"><value>Next run: {0}</value></data>
+  <data name="Tasks.Error.Denied" xml:space="preserve"><value>'{0}': Windows denied access.</value></data>
+  <data name="Tasks.Error.DeniedNotElevated" xml:space="preserve"><value>'{0}': this needs administrator rights. Restart the app as administrator and try again.</value></data>
+  <data name="Tasks.Error.Gone" xml:space="preserve"><value>'{0}' no longer exists.</value></data>
+  <data name="Tasks.Snoozed.Title" xml:space="preserve"><value>Tasks are snoozed</value></data>
+  <data name="Tasks.File.TaskXml" xml:space="preserve"><value>Task XML</value></data>
+  <data name="Tasks.Select" xml:space="preserve"><value>Select</value></data>
+  <data name="Tasks.Badge.Unreadable" xml:space="preserve"><value>Unreadable</value></data>
+  <data name="Tasks.Toolbar.Sort" xml:space="preserve"><value>Sort</value></data>
 </root>
 
