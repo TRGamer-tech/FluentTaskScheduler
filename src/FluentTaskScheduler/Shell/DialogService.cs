@@ -28,6 +28,10 @@ public sealed class DialogService(WindowContext window) : IDialogService
         {
             dialog.XamlRoot = window.XamlRoot;
             dialog.RequestedTheme = window.Theme;
+            // The controls' resources give ContentDialog its current look through an implicit style,
+            // and implicit styles reach no derived class: the app's own dialogs would fall back to
+            // the framework's old template.
+            dialog.Style ??= (Style)Application.Current.Resources["DefaultContentDialogStyle"];
             return await dialog.ShowAsync();
         }
         finally
