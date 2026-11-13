@@ -33,10 +33,14 @@ public class ShellTests
         }
     }
 
+    /// <summary>
+    /// The app opens its window at the size it last had, maybe on a larger screen. The size here
+    /// is larger than any screen the tests run on, so the window has to shrink and move to fit.
+    /// </summary>
     [Fact]
-    public void TheWindow_OpensInsideTheScreen_HoweverSmallThatIs()
+    public void TheWindow_OpensInsideTheScreen_EvenAtASizeRememberedFromALargerOne()
     {
-        using var app = AppSession.Launch("placement");
+        using var app = AppSession.Launch("placement", AppSession.FirstRunDone(("WindowWidth", 4000), ("WindowHeight", 3000)));
 
         var window = app.Window.BoundingRectangle;
         var screen = app.Screen;
