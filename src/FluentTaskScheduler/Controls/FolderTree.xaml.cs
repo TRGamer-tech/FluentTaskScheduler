@@ -29,10 +29,12 @@ public sealed partial class FolderTree : UserControl
     public event EventHandler? FolderChosen;
 
     /// <summary>
-    /// Highlights the folder the view model has selected. The tree drops a folder it has no node
-    /// for yet, and it makes the node of a subfolder only once it has laid out the item of the
-    /// parent: the folder the list opens on is selected before that. So until the node is there,
-    /// this looks again after each layout pass.
+    /// Highlights the folder the view model has selected, where the tree does not by itself. The
+    /// tree drops a folder it has no node for yet, and it makes the node of a subfolder only once
+    /// it has laid out the item of the parent: the folder the list opens on is selected before
+    /// that, so until the node is there, this looks again after each layout pass. The tree also
+    /// drops its highlight when the parent of the folder is collapsed, while the list goes on
+    /// showing the folder.
     /// </summary>
     private void HighlightSelected()
     {
@@ -47,7 +49,11 @@ public sealed partial class FolderTree : UserControl
         _highlighting = true;
         try
         {
-            Tree.SelectedNode = node;
+            // SelectedItem has to hold the folder as well: the view model clears the highlight
+            // through it, which does nothing while it holds none already. Set to the folder it
+            // already holds, it would do nothing either.
+            if (ReferenceEquals(Tree.SelectedItem, folder)) Tree.SelectedNode = node;
+            else Tree.SelectedItem = folder;
         }
         finally
         {

@@ -382,6 +382,38 @@ public sealed class TaskTests : IDisposable
         Assert.True(highlighted, "The tree does not highlight the folder the list opened on.");
     }
 
+    /// <summary>
+    /// Collapsing the parent of the folder the list shows takes the highlight off the folder, but
+    /// the tree keeps it for when the folder is in view again. All tasks chosen in the meantime
+    /// has to end that, and stay the choice.
+    /// </summary>
+    [Fact]
+    public void AllTasksChosenWhileTheFolderIsCollapsedAway_StaysTheChoice_WhenTheFolderIsInViewAgain()
+    {
+        _windows.CreateDaily("Chosen last time");
+        using var app = AppSession.Launch("last-folder-collapsed", AppSession.FirstRunDone(("LastFolderPath", _windows.Folder)));
+        AutomationElement TreeItem(string name) =>
+            app.Find(element => element.ControlType == ControlType.TreeItem && element.Name == name, 20000)
+            ?? throw new InvalidOperationException($"'{name}' is not in the tree.");
+        string folder = _windows.Folder.TrimStart('\\');
+        Assert.True(AppSession.Eventually(() => TreeItem(folder).Patterns.SelectionItem.Pattern.IsSelected.Value), "The tree does not highlight the folder the list opened on.");
+
+        AutomationElement library = TreeItem("Task Scheduler Library");
+        library.Patterns.ExpandCollapse.Pattern.Collapse();
+        Wait();
+        app.Require("NavAllTasks").Press();
+        Assert.True(AppSession.Eventually(() => app.SavedSetting("LastFolderPath") == @"\"), "settings.json does not say that all tasks were chosen.");
+        library.Patterns.ExpandCollapse.Pattern.Expand();
+        Wait();
+        app.Snapshot("expanded");
+
+        Assert.False(TreeItem(folder).Patterns.SelectionItem.Pattern.IsSelected.Value, "The folder is highlighted again although all tasks were chosen.");
+        Wait(); // settings are written half a second after a change
+        Assert.Equal(@"\", app.SavedSetting("LastFolderPath"));
+        int rows = RowsIn(app);
+        Assert.True(rows > 1, $"The list shows {rows} task(s) instead of the tasks of all folders.");
+    }
+
     [Fact]
     public void NewTaskInThePane_IsForTheFolderShown_WhichStaysTheOneRemembered()
     {
