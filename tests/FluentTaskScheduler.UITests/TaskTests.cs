@@ -130,8 +130,7 @@ public sealed class TaskTests : IDisposable
         _windows.Create("Nightly", SystemTaskXml);
         using var app = AppSession.Launch("limit");
 
-        app.Require("SearchBox").TypeText("Nightly");
-        var row = app.Find(RowNamed("Nightly"), 20000) ?? throw new InvalidOperationException("The task is not in the list.");
+        var row = app.SearchTask("Nightly");
         OpenEditor(app, row);
         app.Expand("EditorSettings");
         app.Snapshot("editor-settings");
@@ -201,10 +200,8 @@ public sealed class TaskTests : IDisposable
         using var history = new HistoryLog(switchOn: false);
         _windows.CreateDaily("Detailed");
         using var app = AppSession.Launch("details");
-        app.Require("SearchBox").TypeText("Detailed");
+        app.SearchTask("Detailed").Click();
         AutomationElement Row() => app.Find(RowNamed("Detailed"), 20000) ?? throw new InvalidOperationException("The task is not in the list.");
-
-        Row().Click();
         app.Require("DetailsRunButton", 20000);
         bool showsAction = app.FindByName("cmd.exe /c exit 0", ControlType.Text, 20000) != null;
         app.Snapshot("details-opened");
@@ -243,8 +240,7 @@ public sealed class TaskTests : IDisposable
         _windows.CreateDaily("Seen narrow");
         // German has the longest texts.
         using var app = AppSession.Launch("details-narrow", AppSession.FirstRunDone(("Language", "de-DE")));
-        app.Require("SearchBox").TypeText("Seen narrow");
-        (app.Find(RowNamed("Seen narrow"), 20000) ?? throw new InvalidOperationException("The task is not in the list.")).Click();
+        app.SearchTask("Seen narrow").Click();
         app.Require("DetailsRunButton", 20000);
 
         app.Resize(560, 800);

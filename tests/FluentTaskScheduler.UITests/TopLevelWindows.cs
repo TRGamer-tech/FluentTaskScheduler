@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -54,30 +55,43 @@ internal static class TopLevelWindows
         return windows;
     }
 
+    /// <summary>The top-level window that is on top at <paramref name="point"/>, which a click there goes to; 0 if none is.</summary>
+    public static nint RootAt(Point point) => GetAncestor(WindowFromPoint(point), RootRelation);
+
     /// <summary>Asks <paramref name="window"/> to close, as its close button does.</summary>
     public static void Close(nint window) => PostMessageW(window, CloseMessage, 0, 0);
+
+    /// <summary>Minimizes <paramref name="window"/>; Windows then gives the foreground to the window under it.</summary>
+    public static void Minimize(nint window) => ShowWindow(window, MinimizeCommand);
+
+    /// <summary>The dialog <paramref name="window"/> has open, where the foreground belongs while it is; otherwise the window itself.</summary>
+    public static nint LastActivePopupOf(nint window) => GetLastActivePopup(window);
 
     /// <summary>
     /// Brings <paramref name="window"/> to the foreground. Windows lets only the program in the
     /// foreground hand it on, and sharing that program's input for the moment counts as being it.
-    /// That does not work with every program, an app of the Store for one; for those, Alt is
-    /// pressed first, after which Windows lets any program take the foreground, as it does for a
-    /// user who is about to switch windows. The key goes to the window in the foreground.
+    /// That does not work with every program, a console for one; for those, Alt is pressed first,
+    /// after which Windows lets any program take the foreground, as it does for a user who is
+    /// about to switch windows. The key goes to the window of the other program.
     /// </summary>
-    public static void BringToFront(nint window)
+    /// <returns>Whether a window of the program of <paramref name="window"/> is in the foreground now.</returns>
+    public static bool BringToFront(nint window)
     {
-        if (TryBringToFront(window)) return;
+        if (TryBringToFront(window) || ProcessOf(GetForegroundWindow()) == ProcessOf(window)) return true;
         keybd_event(AltKey, 0, 0, 0);
         keybd_event(AltKey, 0, KeyUp, 0);
         Thread.Sleep(100); // the key has to reach that window before it loses the foreground
-        TryBringToFront(window);
+        return TryBringToFront(window) || ProcessOf(GetForegroundWindow()) == ProcessOf(window);
     }
 
     private static bool TryBringToFront(nint window)
     {
-        uint foregroundThread = GetWindowThreadProcessId(GetForegroundWindow(), out _);
+        uint foregroundThread = GetWindowThreadProcessId(GetForegroundWindow(), out uint foregroundProcess);
+        GetWindowThreadProcessId(window, out uint process);
         uint thisThread = GetCurrentThreadId();
-        bool shared = foregroundThread != 0 && foregroundThread != thisThread && AttachThreadInput(thisThread, foregroundThread, true);
+        // Sharing the input of the window's own program would reset the keys held down in it.
+        bool shared = foregroundThread != 0 && foregroundThread != thisThread && foregroundProcess != process
+                      && AttachThreadInput(thisThread, foregroundThread, true);
         try
         {
             SetForegroundWindow(window);
@@ -90,7 +104,9 @@ internal static class TopLevelWindows
     }
 
     private const uint OwnerRelation = 4;     // GW_OWNER
+    private const uint RootRelation = 2;      // GA_ROOT
     private const uint RootOwnerRelation = 3; // GA_ROOTOWNER
+    private const int MinimizeCommand = 6;    // SW_MINIMIZE
     private const uint CloseMessage = 0x0010; // WM_CLOSE
     private const byte AltKey = 0x12;         // VK_MENU
     private const uint KeyUp = 0x0002;        // KEYEVENTF_KEYUP
@@ -126,6 +142,15 @@ internal static class TopLevelWindows
 
     [DllImport("user32.dll")]
     private static extern nint GetAncestor(nint window, uint relation);
+
+    [DllImport("user32.dll")]
+    private static extern nint GetLastActivePopup(nint window);
+
+    [DllImport("user32.dll")]
+    private static extern nint WindowFromPoint(Point point);
+
+    [DllImport("user32.dll")]
+    private static extern bool ShowWindow(nint window, int command);
 
     [DllImport("user32.dll")]
     private static extern bool IsWindowVisible(nint window);

@@ -20,6 +20,7 @@ public sealed class AppSession : IDisposable
     private readonly UIA3Automation _automation;
     private readonly Timer? _foregroundGuard;
     private int _guarding;
+    private nint _broughtBackOver;
     private int _shotIndex;
 
     public Window Window { get; }
@@ -101,7 +102,7 @@ public sealed class AppSession : IDisposable
         {
             var window = app.GetMainWindow(automation, TimeSpan.FromSeconds(60))
                          ?? throw new InvalidOperationException("The app did not show a main window within 60 s.");
-            BringToFront(automation, app, window);
+            BringToFront(app, window);
             return new AppSession(app, automation, window, artifacts, data);
         }
         catch
@@ -123,8 +124,8 @@ public sealed class AppSession : IDisposable
     }
 
     /// <summary>
-    /// Set to 1 on a build machine to let the tests end programs whose windows lie over the app,
-    /// and close dialogs of other programs that take the foreground.
+    /// Set to 1 on a build machine to let the tests get windows of other programs out of the
+    /// app's way, which a hosted build machine has with nobody there to click them away.
     /// </summary>
     private const string CloseCoveringWindowsVariable = "FTS_UI_CLOSE_COVERING_WINDOWS";
 
@@ -134,13 +135,15 @@ public sealed class AppSession : IDisposable
     private static readonly HashSet<string> ShellClasses =
         ["Shell_TrayWnd", "Shell_SecondaryTrayWnd", "NotifyIconOverflowWindow", "TopLevelWindowForOverflowXamlIsland", "Xaml_WindowedPopupClass", "#32768"];
 
+    /// <summary>Console windows, of Windows' own console or of Windows Terminal: closing one ends the programs in it.</summary>
+    private static readonly HashSet<string> ConsoleClasses = ["ConsoleWindowClass", "CASCADIA_HOSTING_WINDOW_CLASS", "PseudoConsoleWindow"];
+
     /// <summary>
     /// Mouse input goes to whatever is on top, keyboard input to the window in the foreground. A
     /// hosted build machine can have a first sign-in screen of Windows lying over everything, or a
-    /// window of its own keeping the foreground, as a System Properties dialog on the ARM64 one
-    /// did, with nobody there to click it away.
+    /// window of its own keeping the foreground, with nobody there to click it away.
     /// </summary>
-    private static void BringToFront(UIA3Automation automation, Application app, Window window)
+    private static void BringToFront(Application app, Window window)
     {
         nint handle = window.Properties.NativeWindowHandle.Value;
         for (int attempt = 0; attempt < 5; attempt++)
@@ -148,67 +151,77 @@ public sealed class AppSession : IDisposable
             TopLevelWindows.BringToFront(handle);
             Thread.Sleep(500);
 
-            if (CloseForeignDialogInTheForeground(app.ProcessId, handle)) continue;
+            nint foreground = TopLevelWindows.Foreground;
+            nint onTop = TopLevelWindows.RootAt(window.BoundingRectangle.Center());
+            (nint inTheWay, string problem) =
+                IsInTheWay(foreground, app.ProcessId, handle) ? (foreground, "keeps the foreground, so keys would not reach the app")
+                : IsInTheWay(onTop, app.ProcessId, handle) ? (onTop, "covers the app's window, so clicks would not reach the app")
+                : (0, "");
+            if (inTheWay == 0) return;
 
-            int owner = automation.FromPoint(window.BoundingRectangle.Center()).Properties.ProcessId.ValueOrDefault;
-            if (owner == app.ProcessId) return;
-
-            using var covering = Process.GetProcessById(owner);
-            string what = $"{covering.ProcessName} (process {owner})";
             if (Environment.GetEnvironmentVariable(CloseCoveringWindowsVariable) != "1")
             {
                 throw new InvalidOperationException(
-                    $"The app's window is covered by a window of {what}, so clicks would not reach the app. " +
-                    $"Close that window, or set {CloseCoveringWindowsVariable}=1 to let the tests end such programs.");
+                    $"{Describe(inTheWay)} {problem}. Close it, or set {CloseCoveringWindowsVariable}=1 to let the tests get such windows out of the way.");
             }
-
-            Console.WriteLine($"Ending {what}: its window covers the app.");
-            covering.Kill();
-            covering.WaitForExit(5000);
+            StepOver(inTheWay, problem);
         }
-        throw new InvalidOperationException("The app's window is still covered by another window.");
+        throw new InvalidOperationException("A window of another program is still in the app's way.");
     }
 
-    /// <summary>
-    /// Closes the dialog of another program that keeps the foreground, which Windows then does not
-    /// give to the app. Only a dialog is closed, and only closed: the foreground can also be the
-    /// build machine's own console, which must go on.
-    /// </summary>
-    /// <returns>Whether a dialog was closed.</returns>
-    private static bool CloseForeignDialogInTheForeground(int appProcess, nint appWindow)
-    {
-        nint foreground = TopLevelWindows.Foreground;
-        if (foreground == 0 || IsTheApps(foreground, appProcess, appWindow) || TopLevelWindows.ClassOf(foreground) != DialogClass) return false;
-
-        if (Environment.GetEnvironmentVariable(CloseCoveringWindowsVariable) != "1")
-        {
-            throw new InvalidOperationException(
-                $"A dialog of process {TopLevelWindows.ProcessOf(foreground)} keeps the foreground, so keys would not reach the app. " +
-                $"Close it, or set {CloseCoveringWindowsVariable}=1 to let the tests close such dialogs.");
-        }
-        CloseForeignDialog(foreground);
-        return true;
-    }
-
-    private static void CloseForeignDialog(nint dialog)
-    {
-        Console.WriteLine($"Closing \"{TopLevelWindows.TitleOf(dialog)}\" of process {TopLevelWindows.ProcessOf(dialog)}: it keeps the foreground.");
-        TopLevelWindows.Close(dialog);
-        Thread.Sleep(500);
-    }
+    private static bool IsInTheWay(nint window, int appProcess, nint appWindow) =>
+        window != 0 && !IsTheApps(window, appProcess, appWindow) && !ShellClasses.Contains(TopLevelWindows.ClassOf(window));
 
     /// <summary>Whether <paramref name="window"/> is the app's, or a dialog it opened, which another process may show.</summary>
     private static bool IsTheApps(nint window, int appProcess, nint appWindow) =>
         TopLevelWindows.ProcessOf(window) == appProcess || TopLevelWindows.RootOwnerOf(window) == appWindow;
 
     /// <summary>
+    /// Gets a window of another program out of the app's way. A dialog is closed. A console window
+    /// is minimized, since it can be the build machine's own and closing it would end the programs
+    /// in it; so is a window of Explorer, which also runs the taskbar. Anything else is ended with
+    /// its program, such as Windows Search or the Start menu: Windows starts them again when they
+    /// are needed, and nothing else gets them out of the foreground.
+    /// </summary>
+    private static void StepOver(nint window, string problem)
+    {
+        string className = TopLevelWindows.ClassOf(window);
+        int process = TopLevelWindows.ProcessOf(window);
+        string what = Describe(window);
+        try
+        {
+            if (className == DialogClass)
+            {
+                Console.WriteLine($"Closing {what}: it {problem}.");
+                TopLevelWindows.Close(window);
+            }
+            else if (ConsoleClasses.Contains(className) || ProgramName(process) == "explorer")
+            {
+                Console.WriteLine($"Minimizing {what}: it {problem}.");
+                TopLevelWindows.Minimize(window);
+            }
+            else
+            {
+                Console.WriteLine($"Ending {what}: it {problem}.");
+                using var program = Process.GetProcessById(process);
+                program.Kill();
+                program.WaitForExit(5000);
+            }
+        }
+        catch (Exception ex) when (ex is ArgumentException or InvalidOperationException or System.ComponentModel.Win32Exception)
+        {
+            Console.WriteLine($"{what} could not be got out of the way: {ex.Message}");
+        }
+        Thread.Sleep(500);
+    }
+
+    /// <summary>
     /// Windows of other programs can also come up while a test runs and take the foreground, and
     /// with it the keys the test types: on the build machines a dialog of Windows, Windows Search,
     /// and console windows of the machine's own setup did. Where the build machine lets the tests
-    /// close what covers the app, the app's window is brought back to the front while it is
-    /// shown, and a dialog of another program is closed first. Other windows are only stepped
-    /// over, since a console can be the build machine's own; the taskbar and its pop-ups are left
-    /// to the tests that use them.
+    /// get such windows out of the way, the app's window is brought back to the front while it is
+    /// shown; a window that Windows does not take the foreground from is stepped over first. The
+    /// taskbar and its pop-ups are left to the tests that use them.
     /// </summary>
     private void GuardForeground()
     {
@@ -217,13 +230,18 @@ public sealed class AppSession : IDisposable
         {
             if (!TopLevelWindows.IsVisible(_windowHandle) || TopLevelWindows.IsMinimized(_windowHandle)) return;
             nint foreground = TopLevelWindows.Foreground;
-            if (foreground == 0 || IsTheApps(foreground, _app.ProcessId, _windowHandle)) return;
+            if (!IsInTheWay(foreground, _app.ProcessId, _windowHandle)) return;
 
-            string className = TopLevelWindows.ClassOf(foreground);
-            if (ShellClasses.Contains(className)) return;
-            if (className == DialogClass) CloseForeignDialog(foreground);
-            else Console.WriteLine($"Stepping over \"{TopLevelWindows.TitleOf(foreground)}\" ({className}) of process {TopLevelWindows.ProcessOf(foreground)}: it took the foreground.");
-            TopLevelWindows.BringToFront(_windowHandle);
+            // While the app has a dialog open, the foreground belongs to that rather than to the window under it.
+            nint app = TopLevelWindows.LastActivePopupOf(_windowHandle);
+            if (TopLevelWindows.BringToFront(app))
+            {
+                if (foreground != _broughtBackOver) Console.WriteLine($"Brought the app back to the front over {Describe(foreground)}.");
+                _broughtBackOver = foreground;
+                return;
+            }
+            StepOver(foreground, "keeps the foreground, so keys would not reach the app");
+            TopLevelWindows.BringToFront(app);
         }
         catch (Exception ex)
         {
@@ -233,6 +251,26 @@ public sealed class AppSession : IDisposable
         finally
         {
             Volatile.Write(ref _guarding, 0);
+        }
+    }
+
+    /// <summary>Title, class and program of a window, to say in a message which one it is.</summary>
+    private static string Describe(nint window)
+    {
+        int process = TopLevelWindows.ProcessOf(window);
+        return $"\"{TopLevelWindows.TitleOf(window)}\" ({TopLevelWindows.ClassOf(window)}) of {ProgramName(process)} (process {process})";
+    }
+
+    private static string ProgramName(int process)
+    {
+        try
+        {
+            using var program = Process.GetProcessById(process);
+            return program.ProcessName;
+        }
+        catch (Exception ex) when (ex is ArgumentException or InvalidOperationException)
+        {
+            return "?"; // gone already
         }
     }
 
@@ -296,6 +334,29 @@ public sealed class AppSession : IDisposable
 
     public AutomationElement Require(string automationId, int timeoutMs = 10000) =>
         Find(automationId, timeoutMs) ?? throw new InvalidOperationException($"Element '{automationId}' was not found.");
+
+    /// <summary>
+    /// Searches the task list for <paramref name="name"/> and returns the row of the task of that
+    /// name once the list has stopped changing. The list is filtered anew with every key typed,
+    /// and a click aimed at a row that is still moving lands elsewhere.
+    /// </summary>
+    public AutomationElement SearchTask(string name)
+    {
+        Require("SearchBox").TypeText(name);
+        AutomationElement list = Require("TaskList");
+        AutomationElement? row = null;
+        string seen = "";
+        bool settled = Retry.WhileFalse(() =>
+        {
+            List<AutomationElement> rows = Walk(list).Where(element => element.Is(ControlType.ListItem)).ToList();
+            row = rows.FirstOrDefault(element => element.NameOrEmpty() == name);
+            string layout = row is null ? "" : string.Join("|", rows.Select(element => element.NameOrEmpty() + element.BoundingRectangle));
+            bool unchanged = layout.Length > 0 && layout == seen;
+            seen = layout;
+            return unchanged;
+        }, TimeSpan.FromSeconds(20), TimeSpan.FromMilliseconds(500), ignoreException: true).Success;
+        return settled && row is not null ? row : throw new InvalidOperationException($"The task '{name}' is not in the list, or the list kept changing.");
+    }
 
     /// <summary>
     /// A button of the task list's toolbar, wherever the toolbar put it: what does not fit next
@@ -365,16 +426,8 @@ public sealed class AppSession : IDisposable
             TopLevelWindows.ClassOf(window) == DialogClass
             && (TopLevelWindows.ProcessOf(window) == _app.ProcessId || TopLevelWindows.OwnerOf(window) == _windowHandle));
 
-    // Class, title and program of every visible top-level window, to tell what a test met instead of what it expected.
-    private static IEnumerable<string> VisibleWindows() =>
-        TopLevelWindows.Visible().Select(window =>
-        {
-            int owner = TopLevelWindows.ProcessOf(window);
-            string program;
-            try { using var process = Process.GetProcessById(owner); program = process.ProcessName; }
-            catch (ArgumentException) { program = "?"; }
-            return $"{TopLevelWindows.ClassOf(window)} \"{TopLevelWindows.TitleOf(window)}\" ({program} {owner})";
-        });
+    // Every visible top-level window, to tell what a test met instead of what it expected.
+    private static IEnumerable<string> VisibleWindows() => TopLevelWindows.Visible().Select(Describe);
 
     /// <summary>
     /// The text of a dialog the app is showing, or null if there is none. A dialog nobody asked
