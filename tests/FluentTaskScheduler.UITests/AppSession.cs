@@ -20,6 +20,7 @@ public sealed class AppSession : IDisposable
     private readonly UIA3Automation _automation;
     private readonly Timer? _foregroundGuard;
     private int _guarding;
+    private nint _foreignInFront;
     private nint _broughtBackOver;
     private int _shotIndex;
 
@@ -221,16 +222,20 @@ public sealed class AppSession : IDisposable
     /// and console windows of the machine's own setup did. Where the build machine lets the tests
     /// get such windows out of the way, the app's window is brought back to the front while it is
     /// shown; a window that Windows does not take the foreground from is stepped over first. The
-    /// taskbar and its pop-ups are left to the tests that use them.
+    /// taskbar and its pop-ups are left to the tests that use them. Only a window that is in the
+    /// foreground at two looks in a row counts: one gets it for a moment whenever the app's window
+    /// is hidden or minimized, before Windows says that it is.
     /// </summary>
     private void GuardForeground()
     {
         if (Interlocked.Exchange(ref _guarding, 1) == 1) return;
         try
         {
-            if (!TopLevelWindows.IsVisible(_windowHandle) || TopLevelWindows.IsMinimized(_windowHandle)) return;
             nint foreground = TopLevelWindows.Foreground;
-            if (!IsInTheWay(foreground, _app.ProcessId, _windowHandle)) return;
+            bool shown = TopLevelWindows.IsVisible(_windowHandle) && !TopLevelWindows.IsMinimized(_windowHandle);
+            nint seenBefore = _foreignInFront;
+            _foreignInFront = shown && IsInTheWay(foreground, _app.ProcessId, _windowHandle) ? foreground : 0;
+            if (_foreignInFront == 0 || _foreignInFront != seenBefore) return;
 
             // While the app has a dialog open, the foreground belongs to that rather than to the window under it.
             nint app = TopLevelWindows.LastActivePopupOf(_windowHandle);
