@@ -22,9 +22,10 @@
         <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
         <!-- Program.Main is written by hand (update hooks and the command line run before XAML starts). -->
         <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
-
-        <!-- Symbols inside the assembly, so a crash log from a release build has line numbers. -->
-        <DebugType>embedded</DebugType>
+        <!-- The index of texts and compiled pages keeps the name it had up to version 1.9. The Windows App SDK
+             would now name it after the app, but it still looks for resources.pri first: a copy of the app
+             unpacked over an older one would go on showing the older one's texts and pages. -->
+        <ProjectPriFileName>resources.pri</ProjectPriFileName>
     </PropertyGroup>
 
     <ItemGroup>
