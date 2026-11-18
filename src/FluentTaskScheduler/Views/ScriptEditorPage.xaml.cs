@@ -3,6 +3,7 @@ using FluentTaskScheduler.ViewModels;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Windows.UI.Core;
@@ -45,6 +46,14 @@ public sealed partial class ScriptEditorPage : Page
     private void ScrollOutputToEnd()
     {
         if (IsLoaded && ViewModel.Output.Count > 0) OutputList.ScrollIntoView(ViewModel.Output[^1]);
+    }
+
+    // A row is announced by what its line has to say to a screen reader, which for a line
+    // without text is that it is blank. Left to itself the row takes the text it shows, and a row
+    // whose name is a space is passed over as if it were not there.
+    private void OutputList_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
+    {
+        if (!args.InRecycleQueue) AutomationProperties.SetName(args.ItemContainer, args.Item?.ToString() ?? "");
     }
 
     private void ScriptText_PreviewKeyDown(object sender, KeyRoutedEventArgs e)

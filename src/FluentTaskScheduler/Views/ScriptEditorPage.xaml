@@ -7,17 +7,22 @@
     xmlns:vm="using:FluentTaskScheduler.ViewModels">
 
     <Page.Resources>
-        <!-- One template per kind of line, so each takes its colour from the theme the window shows. -->
+        <!-- One template per kind of line, so each takes its colour from the theme the window shows.
+             A screen reader is told of the row, which says what the line says; the text inside it
+             would only say the same again, or nothing but a space for a blank line. -->
         <DataTemplate x:Key="OutputLineTemplate" x:DataType="vm:OutputLine">
-            <TextBlock Text="{x:Bind Text}" FontFamily="Consolas" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
+            <TextBlock Text="{x:Bind Text}" FontFamily="Consolas" TextWrapping="Wrap" IsTextSelectionEnabled="True"
+                       AutomationProperties.AccessibilityView="Raw"/>
         </DataTemplate>
         <DataTemplate x:Key="ErrorLineTemplate" x:DataType="vm:OutputLine">
             <TextBlock Text="{x:Bind Text}" FontFamily="Consolas" TextWrapping="Wrap" IsTextSelectionEnabled="True"
-                       Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
+                       Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                       AutomationProperties.AccessibilityView="Raw"/>
         </DataTemplate>
         <DataTemplate x:Key="NoteLineTemplate" x:DataType="vm:OutputLine">
             <TextBlock Text="{x:Bind Text}" FontFamily="Consolas" TextWrapping="Wrap" IsTextSelectionEnabled="True"
-                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       AutomationProperties.AccessibilityView="Raw"/>
         </DataTemplate>
         <local:OutputLineTemplateSelector x:Key="OutputLineTemplates"
                                           Output="{StaticResource OutputLineTemplate}"
@@ -122,6 +127,7 @@
         <ListView x:Name="OutputList" Grid.Row="4"
                   ItemsSource="{x:Bind ViewModel.Output}"
                   ItemTemplateSelector="{StaticResource OutputLineTemplates}"
+                  ContainerContentChanging="OutputList_ContainerContentChanging"
                   SelectionMode="None"
                   IsItemClickEnabled="False"
                   Padding="0,8"
