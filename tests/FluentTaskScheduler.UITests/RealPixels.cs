@@ -13,6 +13,10 @@ namespace FluentTaskScheduler.UITests;
 internal static class RealPixels
 {
     private const nint PerMonitorV2 = -4; // DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2
+    private const int PerMonitor = 2;     // DPI_AWARENESS_PER_MONITOR_AWARE
+
+    /// <summary>Whether Windows took the declaration. It does not from a process that has declared otherwise before.</summary>
+    public static bool InForce => GetAwarenessFromDpiAwarenessContext(GetThreadDpiAwarenessContext()) == PerMonitor;
 
     // When the tests are loaded: Windows takes the declaration once, and wants it before the
     // process asks anything that depends on it.
@@ -21,4 +25,10 @@ internal static class RealPixels
 
     [DllImport("user32.dll")]
     private static extern bool SetProcessDpiAwarenessContext(nint context);
+
+    [DllImport("user32.dll")]
+    private static extern nint GetThreadDpiAwarenessContext();
+
+    [DllImport("user32.dll")]
+    private static extern int GetAwarenessFromDpiAwarenessContext(nint context);
 }

@@ -97,6 +97,8 @@ jobs:
           FTS_UI_CLOSE_COVERING_WINDOWS: 1
           # The pictures of the README need more room than the screen of the ARM64 runner has.
           FTS_README_SCREENSHOTS: ${{ matrix.platform == 'x64' && '1' || '0' }}
+          # The tests that change the display scaling need the room of the larger screen, which only the x64 runner has.
+          FTS_UI_CHANGE_DISPLAY_SCALING: ${{ matrix.platform == 'x64' && '1' || '0' }}
         # A test held up by a dialog or by an app that stopped answering is ended after ten
         # minutes instead of holding the runner for hours. No dump: nothing would upload it.
         run: >
