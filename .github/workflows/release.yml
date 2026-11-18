@@ -12,6 +12,9 @@ name: Release
 # try the packaging out. With "draft" ticked it also creates the draft, for the commit it ran
 # on, or brings the existing draft of that version up to date. A release that is already
 # published is never touched.
+#
+# Every run also keeps the manifests for winget, Scoop and Chocolatey, written for the files it
+# has built, as the artifact "package-manifests".
 on:
   push:
     tags: ['V*']
@@ -459,11 +462,40 @@ jobs:
           Get-Item $logs -ErrorAction SilentlyContinue |
             ForEach-Object { "--- $($_.FullName)"; Get-Content $_.FullName -Tail 200 }
 
+  # The manifests for winget, Scoop and Chocolatey, rewritten for the files that were just built.
+  # They stay with the run and are picked up from there once the release is published.
+  package-manifests:
+    needs: package
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Download release files
+        uses: actions/download-artifact@v8
+        with:
+          pattern: Dist-*
+          path: Dist
+          merge-multiple: true
+
+      - name: Update the manifests
+        shell: pwsh
+        env:
+          VERSION: ${{ needs.package.outputs.version }}
+        run: ./packaging/Update-Manifests.ps1 -Version $env:VERSION -Downloads Dist
+
+      - name: Upload the manifests
+        uses: actions/upload-artifact@v7
+        with:
+          name: package-manifests
+          path: packaging/
+          if-no-files-found: error
+
   draft-release:
     # A pushed tag always drafts a release, a manual run when it was asked to; neither does
     # unless everything above worked.
     if: github.event_name == 'push' || inputs.draft
-    needs: [package, verify-installer, verify-update]
+    needs: [package, verify-installer, verify-update, package-manifests]
     runs-on: ubuntu-latest
     permissions:
       contents: write
