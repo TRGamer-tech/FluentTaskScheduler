@@ -76,8 +76,8 @@ This project uses [Velopack](https://velopack.io/) for installers and auto-updat
 
 The workflow builds both architectures with that version and packs them. Before it makes the draft, it checks on fresh machines that:
 
-- **the installer works the way winget and Chocolatey run it.** The x64 MSI installs silently, the installed app answers `--list`, and uninstalling removes the app. The user's files in `%LOCALAPPDATA%\TRGamer-tech\FluentTaskScheduler` stay, unless the settings say to remove them on uninstall; then they go too.
-- **an installed 1.9.0 gets to the new version.** Both update feeds name exactly the package that is attached, with its size and hashes. Then 1.9.0 is installed per user, with settings and a script where it keeps them, and the new package is applied the way its updater does it. The new app has to have the new version and answer `--list`, the files have to be in the new place and nothing of the installer with them, and uninstalling has to leave them there.
+- **the installer works the way winget and Chocolatey run it.** The x64 MSI installs silently, the installed app answers `--list`, and uninstalling removes the app. The user's files in `%LOCALAPPDATA%\TRGamer-tech\FluentTaskScheduler` stay. An app that started with Windows no longer does after the uninstall, and does again after a reinstallation: that is how a newer installer replaces this one, and it shows that the app does its part when the installer starts it for a moment.
+- **an installed 1.9.0 gets to the new version.** Both update feeds name exactly the package that is attached, with its size and hashes. Then 1.9.0 is installed per user, with settings and a script where it keeps them, and the new package is applied the way its updater does it. The new app has to have the new version and answer `--list`, the files have to be in the new place and nothing of the installer with them, the script has to be in the old place as well (tasks created with 1.9.0 run it from there), and uninstalling has to leave the files in the new place.
 
 Only if all of that works does it create the draft and attach the files. It names the draft like the tag; give it its title there.
 

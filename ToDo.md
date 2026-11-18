@@ -26,11 +26,12 @@
 
 # Changelog:
 
-## [Unreleased]
+## [V2.0.0] - 2026-11-18
 
 The app was rebuilt on a Core library that holds all logic and is tested on its own, with the
 window, pages and dialogs only binding to it. Two reviews went over every part of it, and every fix
-has a test; the UI tests drive the published app on Windows x64 and ARM64 in CI.
+has a test; the UI tests drive the published app on Windows x64 and ARM64 in CI. It now runs on
+.NET 10 and Windows App SDK 2.7.
 
 ### Fixed issues
 - Triggers keep the type and time you set, also for weekly and monthly triggers, and keep their time
@@ -53,6 +54,7 @@ has a test; the UI tests drive the published app on Windows x64 and ARM64 in CI.
 - The editor suggests saved tags as well as categories, and separates tags at a Japanese or Chinese
   comma too.
 - The task details fit a narrow window, and every failure is told in the app's language.
+- A disabled task shows no next run.
 
 ### Snoozing, dashboard and notification area
 - A snooze follows its task when the task or its folder is moved or renamed, a snooze until a picked
@@ -68,14 +70,28 @@ has a test; the UI tests drive the published app on Windows x64 and ARM64 in CI.
 - When a setting rebuilds the pages, as a change of language does, the script stays in the editor
   with its output, and a script or quick action that is running runs on.
 
+### Your settings and scripts
+- The app keeps its files in `%LOCALAPPDATA%\TRGamer-tech\FluentTaskScheduler`, outside the folder
+  of the installer, and moves them there at its first start. Uninstalling and every way of updating
+  from 2.0 on leave them alone. Scripts saved with 1.9 also stay where tasks created back then run
+  them from.
+- "Delete App Data" in the settings takes them off the computer: it resumes snoozed tasks, switches
+  Start with Windows off, ends the app and deletes its files.
+- Start with Windows survives a reinstallation and an upgrade by a newer Setup MSI.
+- Uninstalling asks a running copy of the app to end first, and a start by the installer never
+  opens the window, also for an installation for all users.
+
 ### Texts, updates and packaging
 - 263 texts that nothing showed were removed; German says "du" throughout; Japanese and Chinese use
-  Windows' own terms.
+  Windows' own terms, and every text of both languages was reviewed again.
 - An update you put off is offered again instead of being installed at the next start.
 - The command line is answered by the program in the `current` folder; the README says so, and the
   Scoop manifest points there.
 - A release installs, starts and uninstalls its MSI, and takes an installed 1.9.0 to the new
-  version the way its updater does, before it makes a draft.
+  version the way its updater does, before it makes a draft. It also writes the manifests for
+  winget, Scoop and Chocolatey for the files it has built.
+- The README's screenshots are taken by the UI tests, and other UI tests change the display scaling
+  while the app runs.
 
 ## [V1.9.0] - 2026-07-25
 

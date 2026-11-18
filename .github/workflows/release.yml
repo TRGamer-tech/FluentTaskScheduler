@@ -138,12 +138,17 @@ jobs:
 
   # Installs what was just built the way winget and Chocolatey do, silently, and checks that
   # the installed app answers and that uninstalling removes it. What the app keeps for the user
-  # (settings, scripts, logs) lies outside the install folder: uninstalling leaves it alone,
-  # unless the user chose in the settings to have it removed.
+  # (settings, scripts, logs) lies outside the install folder, and uninstalling leaves it alone.
+  # The installer starts the app for a moment when it installs and before it uninstalls; that
+  # the app does its part then is seen by its start with Windows, which an uninstall takes away
+  # and the installation that follows puts back, as when a newer installer replaces this one.
   verify-installer:
     needs: package
     runs-on: windows-latest
     timeout-minutes: 15
+    env:
+      # What Windows starts when this account signs in.
+      RUN_KEY: HKCU:\Software\Microsoft\Windows\CurrentVersion\Run
     steps:
       - name: Download release files
         uses: actions/download-artifact@v8
@@ -196,6 +201,14 @@ jobs:
             Set-Content $settings '{ "ReminderLeadMinutes": 17 }'
           }
 
+      # What the switch "Start with Windows" in the app's settings writes: the program of this
+      # copy, in quotation marks, under the app's name.
+      - name: Let the app start with Windows
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Set-ItemProperty $env:RUN_KEY -Name FluentTaskScheduler -Value "`"$env:FTS_EXE`""
+
       - name: Uninstall, which leaves the user's files alone
         shell: pwsh
         run: |
@@ -207,7 +220,13 @@ jobs:
             throw "Uninstalling removed the user's files in $env:FTS_DATA, which nobody asked for."
           }
 
-      - name: Install again and choose to have the files removed
+          # The app's part in its uninstall: Windows no longer starts it, and a note says that it did.
+          if ((Get-ItemProperty $env:RUN_KEY).FluentTaskScheduler) { throw 'Windows would still start the uninstalled app at sign-in.' }
+          if (-not (Test-Path (Join-Path $env:FTS_DATA 'start-with-windows'))) {
+            throw "The app left no note in $env:FTS_DATA that it started with Windows, so a reinstallation could not put that back."
+          }
+
+      - name: Install again, which lets the app start with Windows again
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -218,19 +237,17 @@ jobs:
           }
           if (-not (Test-Path $env:FTS_EXE)) { throw 'The second installation did not go where the first one went.' }
 
-          Set-Content (Join-Path $env:FTS_DATA 'settings.json') '{ "RemoveDataOnUninstall": true }'
+          $started = (Get-ItemProperty $env:RUN_KEY).FluentTaskScheduler
+          if ($started -ne "`"$env:FTS_EXE`"") { throw "After the reinstallation Windows starts '$started' at sign-in, not the app." }
+          if (Test-Path (Join-Path $env:FTS_DATA 'start-with-windows')) { throw 'The note that the app started with Windows is still there after it was acted on.' }
 
-      - name: Uninstall, which now removes the user's files too
+      - name: Uninstall for good
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
           $uninstall = Start-Process msiexec.exe -ArgumentList "/x `"$env:FTS_MSI`" /qn /norestart" -Wait -PassThru
           if ($uninstall.ExitCode -ne 0) { throw "Uninstalling ended with exit code $($uninstall.ExitCode)." }
           if (Test-Path $env:FTS_EXE) { throw 'The app is still there after uninstalling.' }
-          if (Test-Path $env:FTS_DATA) {
-            Get-ChildItem $env:FTS_DATA -Recurse | Select-Object -ExpandProperty FullName
-            throw "The user's files in $env:FTS_DATA are still there, although the settings say to remove them."
-          }
 
       # The installer starts the app for its part in installing and uninstalling. What the app
       # was asked to do then, and how that ended, is in the log of Velopack's library.
@@ -247,6 +264,7 @@ jobs:
         run: |
           $data = Join-Path $env:LOCALAPPDATA $env:DATA_FOLDER
           if (Test-Path $data) { Remove-Item $data -Recurse -Force }
+          Remove-ItemProperty $env:RUN_KEY -Name FluentTaskScheduler -ErrorAction SilentlyContinue
 
   # An installed 1.9.0 has to get to this version by itself. Its updater reads the feed
   # (releases.*.json) attached to the release, downloads the package the feed names, compares
@@ -256,7 +274,7 @@ jobs:
   # 1.9.0 is also the last version that keeps the user's files in the folder
   # %LOCALAPPDATA%\FluentTaskScheduler, which is the very folder its installer puts the app in
   # when it is installed per user. The new version moves them out of there at its first start,
-  # and must take nothing with it that belongs to the installer.
+  # copies the saved scripts, and must take nothing with it that belongs to the installer.
   verify-update:
     needs: package
     runs-on: windows-latest
@@ -407,8 +425,12 @@ jobs:
             if (-not (Test-Path $saved)) { "The script did not arrive in $env:FTS_DATA\Scripts." }
             elseif ((Get-FileHash $saved).Hash -ne (Get-FileHash saved-with-1.9.0.ps1).Hash) { 'The script is not the one that was saved with 1.9.0.' }
 
-            foreach ($left in 'settings.json', 'Scripts\Saved with 1.9.0.ps1') {
-              if (Test-Path (Join-Path $env:FTS_ROOT $left)) { "$left is still in the install folder." }
+            if (Test-Path (Join-Path $env:FTS_ROOT 'settings.json')) { 'settings.json is still in the install folder.' }
+
+            # A task that was created from a saved script with 1.9.0 names the script's file
+            # there, so the scripts are copied and the old ones stay.
+            if (-not (Test-Path (Join-Path $env:FTS_ROOT 'Scripts\Saved with 1.9.0.ps1'))) {
+              'The script is gone from the folder 1.9.0 kept it in, where tasks that were created back then run it from.'
             }
             foreach ($own in 'Update.exe', 'FluentTaskScheduler.exe', '.msi-installed', 'current\sq.version', "packages\FluentTaskScheduler-$env:VERSION-win-x64-full.nupkg") {
               if (-not (Test-Path (Join-Path $env:FTS_ROOT $own))) { "$own belongs to the installer and is gone from the install folder." }
