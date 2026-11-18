@@ -1,5 +1,6 @@
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
+using FlaUI.Core.Input;
 using FlaUI.Core.Tools;
 
 namespace FluentTaskScheduler.UITests;
@@ -94,30 +95,54 @@ public class TrayTests
     private static void ChooseFromIconsMenu(AppSession app, params string[] path)
     {
         AutomationElement icon = NotificationAreaIcon.Require(app);
-        AutomationElement item = OpenIconsMenuAt(icon, app, path[0]) ?? throw new InvalidOperationException($"The icon's menu has no '{path[0]}' entry.");
+        AutomationElement item = OpenIconsMenuAt(icon, app, path[0]) ?? throw NoEntry(app, path[0]);
         foreach (string name in path.Skip(1))
         {
-            OrClick(item, () => item.Patterns.ExpandCollapse.Pattern.Expand());
-            item = Retry.WhileNull(() => MenuItem(app, name), TimeSpan.FromSeconds(10)).Result
-                   ?? throw new InvalidOperationException($"The icon's menu has no '{name}' entry.");
+            item = OpenSubmenu(app, item, name) ?? throw NoEntry(app, name);
         }
-        OrClick(item, item.Press);
+        Choose(app, item);
     }
 
-    /// <summary>
-    /// The icon's menu is one of Windows' own. On Windows 11 its entries do what UI Automation asks
-    /// of them; on Windows Server 2022, which is built on Windows 10, they answer that the
-    /// operation is not valid. An entry that says so is clicked instead.
-    /// </summary>
-    private static void OrClick(AutomationElement entry, Action ask)
+    private static InvalidOperationException NoEntry(AppSession app, string name)
+    {
+        app.SaveScreen("no-menu-entry");
+        return new InvalidOperationException($"The icon's menu has no '{name}' entry.");
+    }
+
+    // The icon's menu is one of Windows' own. On Windows 11 its entries do what UI Automation asks
+    // of them. On Windows Server 2022, which is built on Windows 10, they answer that the
+    // operation is not valid; what the menu shows afterwards tells whether they did it all the same,
+    // and where they did not, the mouse does it.
+
+    /// <summary>Opens the submenu of <paramref name="entry"/> and returns the entry of that name in it.</summary>
+    private static AutomationElement? OpenSubmenu(AppSession app, AutomationElement entry, string name)
     {
         try
         {
-            ask();
+            entry.Patterns.ExpandCollapse.Pattern.Expand();
         }
         catch (InvalidOperationException)
         {
-            entry.Click();
+            if (Retry.WhileNull(() => MenuItem(app, name), TimeSpan.FromSeconds(2)).Result is { } opened) return opened;
+
+            // A submenu also opens for a mouse pointer that rests on its entry.
+            Mouse.MoveTo(entry.BoundingRectangle.Center());
+        }
+        return Retry.WhileNull(() => MenuItem(app, name), TimeSpan.FromSeconds(10)).Result;
+    }
+
+    /// <summary>Chooses an entry that stands for a command. The menu closes when one is chosen.</summary>
+    private static void Choose(AppSession app, AutomationElement entry)
+    {
+        string name = entry.NameOrEmpty();
+        try
+        {
+            entry.Press();
+        }
+        catch (InvalidOperationException)
+        {
+            bool closed = Retry.WhileTrue(() => MenuItem(app, name) is not null, TimeSpan.FromSeconds(1)).Success;
+            if (!closed && MenuItem(app, name) is { } stillOffered) Mouse.Click(stillOffered.BoundingRectangle.Center());
         }
     }
 

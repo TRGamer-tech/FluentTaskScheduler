@@ -40,6 +40,8 @@ dotnet test tests/FluentTaskScheduler.UITests
 
 Every push to `main` and every pull request runs all of this on Windows for x64 and ARM64 (`.github/workflows/build.yml`). The UI tests leave screenshots of what they saw as an artifact of the run, which is the quickest way to find out why one of them failed.
 
+GitHub hosts no Windows 10. The nearest thing is Windows Server 2022, which is built on it: the older taskbar and menus, no Mica, and Segoe MDL2 Assets where Windows 11 has Segoe Fluent Icons. To see the app there, start the workflow by hand ("Run workflow") with `x64-runner` set to `windows-2022`: the x64 UI tests then run on that machine, and their screenshots show what a user of Windows 10 gets.
+
 The screenshots in the README are taken by the UI tests as well, but only on request: when `FTS_README_SCREENSHOTS` is `1`, as it is for the x64 build of the workflow. They need a display at a scale of 100 % with room for a window of 1280 by 800 pixels. For these the tests fill a task folder `\Housekeeping` with tasks that look like a user's own, which is the exception to the rule about names, and remove the folder again afterwards. On a machine that already has a task folder of that name they take no pictures. The pictures are in the folder `readme` of the artifact `ui-artifacts-win-x64`, under the names they have in `Assets/`: look them over, then copy them there.
 
 Two more kinds of UI test are worth knowing before you change a page:

@@ -1,5 +1,4 @@
 using System.Drawing;
-using FlaUI.Core.Capturing;
 
 namespace FluentTaskScheduler.UITests;
 
@@ -91,7 +90,7 @@ public sealed class DisplayScalingTests : IDisposable
         }, 30);
 
         // Nobody has seen the taskbar of a build machine at this scaling: what is around the icon may explain its picture.
-        using (CaptureImage screen = Capture.Screen()) screen.ToFile(Path.Combine(app.ArtifactsDir, $"screen-{larger}.png"));
+        app.SaveScreen($"screen-{larger}");
         app.Log($"The badge at 100 %: {Describe(before)}. At {larger} %: {Describe(after)}.");
 
         string log = AppLog(app);

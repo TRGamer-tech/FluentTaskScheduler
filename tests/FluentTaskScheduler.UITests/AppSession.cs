@@ -502,6 +502,16 @@ public sealed class AppSession : IDisposable
         catch (Exception ex) { File.WriteAllText(Path.Combine(ArtifactsDir, baseName + ".tree-error.txt"), ex.ToString()); }
     }
 
+    /// <summary>
+    /// Saves a picture of the whole screen, with the taskbar and the menus that
+    /// <see cref="Snapshot"/> of the app's window leaves out.
+    /// </summary>
+    public void SaveScreen(string name)
+    {
+        using CaptureImage screen = Capture.Screen();
+        screen.ToFile(Path.Combine(ArtifactsDir, name + ".png"));
+    }
+
     public string DumpTree()
     {
         var sb = new StringBuilder();

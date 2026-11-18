@@ -56,7 +56,7 @@ internal static class NotificationAreaIcon
         if (Find(app) is { } icon) return icon;
 
         string names = Names(app);
-        using (CaptureImage screen = Capture.Screen()) screen.ToFile(Path.Combine(app.ArtifactsDir, "no-icon-screen.png"));
+        app.SaveScreen("no-icon");
         throw new InvalidOperationException("The app has no icon in the notification area. Found there: " + names);
     }
 
