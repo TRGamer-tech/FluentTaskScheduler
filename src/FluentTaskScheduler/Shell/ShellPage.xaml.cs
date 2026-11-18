@@ -220,8 +220,9 @@ public sealed partial class ShellPage : Page, IShellNavigator
     {
         if (ReferenceEquals(args.InvokedItemContainer, NavAllTasks))
         {
-            // Windows App SDK 1.5 also reports the shell's own selection of the entry as invoked
+            // The navigation view also reports the shell's own selection of the entry as invoked
             // after a click in the pane that selected nothing: New task, or the entry selected already.
+            // Windows App SDK 1.5 did, and the sources of 2.0 still do.
             if (_selectionsFromCode == 0) _folders.ChooseAllTasks();
         }
         else if (ReferenceEquals(args.InvokedItemContainer, NavAdd))

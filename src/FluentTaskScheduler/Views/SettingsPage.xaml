@@ -12,8 +12,8 @@
         </Style>
 
         <!-- An expander that looks like the cards around it: as wide, as tall, its rows bringing their own padding.
-             The expander's default style still applies underneath. Windows App SDK 1.5 does not let
-             app XAML name that style, so BasedOn would fail when the page loads. -->
+             The expander's default style still applies underneath. App XAML cannot name that style:
+             BasedOn made the page fail to load (seen with Windows App SDK 1.5). -->
         <Style x:Key="SettingsExpanderStyle" TargetType="Expander">
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>

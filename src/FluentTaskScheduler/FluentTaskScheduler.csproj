@@ -40,7 +40,9 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.15" />
         <!-- Toasts: the Windows App SDK's own notifications do not work in an elevated process. -->
         <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
-        <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.7.0" />
+        <!-- The WinUI part of the Windows App SDK and what it needs. The whole SDK would put its AI and machine
+             learning runtimes, 50 MB of them, next to an app that carries the SDK along. -->
+        <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.7.0" />
         <PackageReference Include="Velopack" Version="1.2.161" />
     </ItemGroup>
 
