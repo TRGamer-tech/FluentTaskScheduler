@@ -13,11 +13,13 @@ public sealed class ScriptStoreTests : IDisposable
     private string ScriptsFolder => _folder.Paths.ScriptsFolder;
     private string ListFile => Path.Combine(ScriptsFolder, "scripts.json");
 
-    private ScriptStore NewStore()
+    private ScriptStore NewStore() => NewStore(_folder.Paths);
+
+    private ScriptStore NewStore(AppPaths paths)
     {
         string builtIn = _folder.File("built-in.json");
         File.WriteAllText(builtIn, """[{ "Id": "Ping", "Command": "ping.exe", "Arguments": "localhost", "RunAsAdmin": true }]""");
-        return new ScriptStore(_folder.Paths, builtIn);
+        return new ScriptStore(paths, builtIn);
     }
 
     private static LibraryScript OnlyUserScript(ScriptStore store) => Assert.Single(store.GetScripts(), script => !script.IsBuiltIn);
@@ -256,5 +258,109 @@ public sealed class ScriptStoreTests : IDisposable
         Assert.False(File.Exists(editorScript));
         Assert.True(File.Exists(elsewhere));
         Assert.All(NewStore().GetScripts(), script => Assert.True(script.IsBuiltIn));
+    }
+
+    /// <summary>
+    /// An account that version 1.9 saved two scripts for, after version 2.0 has started once:
+    /// the list and a copy of each script are in the data folder of today, and the scripts are
+    /// also still where version 1.9 put them and where its list says they are.
+    /// </summary>
+    private sealed class MovedFromVersion19
+    {
+        public MovedFromVersion19(string localAppData)
+        {
+            Paths = new AppPaths(null, localAppData);
+            string oldFolder = Paths.Version19!.ScriptsFolder;
+            OldCopy = Path.Combine(oldFolder, "0f8fad5b-d9cb-469f-a165-70867728950e.ps1");
+            OtherOldCopy = Path.Combine(oldFolder, "7c9e6679-7425-40de-944b-e07fc1f90ae7.ps1");
+            Directory.CreateDirectory(oldFolder);
+            File.WriteAllText(OldCopy, "Write-Output 'tidy'");
+            File.WriteAllText(OtherOldCopy, "Write-Output 'other'");
+            File.WriteAllText(Paths.Version19.File("user_templates.json"), JsonSerializer.Serialize(new object[]
+            {
+                new { Id = "", Name = "Tidy up", Description = "", Command = "powershell.exe", Arguments = $"-ExecutionPolicy Bypass -File \"{OldCopy}\"", RunAsAdmin = false },
+                new { Id = "", Name = "Other", Description = "", Command = "powershell.exe", Arguments = $"-ExecutionPolicy Bypass -File \"{OtherOldCopy}\"", RunAsAdmin = false }
+            }));
+
+            Assert.Empty(DataFolderMove.Run(Paths).Failures);
+        }
+
+        public AppPaths Paths { get; }
+
+        /// <summary>The first script where version 1.9 saved it, which is where the tasks it created from the script look for it.</summary>
+        public string OldCopy { get; }
+        public string OtherOldCopy { get; }
+
+        /// <summary>The first script in the scripts folder of today.</summary>
+        public string Script => Path.Combine(Paths.ScriptsFolder, Path.GetFileName(OldCopy));
+    }
+
+    [Fact]
+    public void AScriptSavedByVersion19_IsTheLibrarysOwn_OnceTheAppsFilesHaveMoved()
+    {
+        var account = new MovedFromVersion19(_folder.Path);
+        ScriptStore store = NewStore(account.Paths);
+
+        LibraryScript script = store.GetScripts().First(script => script.Name == "Tidy up");
+
+        Assert.True(script.HasText);
+        Assert.Equal("Write-Output 'tidy'", store.ReadText(script.Id));
+        // A task created from it now runs the script from the folder of today.
+        Assert.Equal(account.Script, WindowsCommandLine.Split(script.Arguments)[^1]);
+    }
+
+    [Fact]
+    public void ChangingAScriptSavedByVersion19_AlsoChangesTheCopyThatOlderTasksRun()
+    {
+        var account = new MovedFromVersion19(_folder.Path);
+        ScriptStore store = NewStore(account.Paths);
+        LibraryScript script = store.GetScripts().First(script => script.Name == "Tidy up");
+
+        store.Save(script.Id, "Tidy up", "", "Write-Output 'tidier'");
+
+        Assert.Equal("Write-Output 'tidier'", File.ReadAllText(account.Script));
+        Assert.Equal(File.ReadAllBytes(account.Script), File.ReadAllBytes(account.OldCopy));
+        Assert.Equal("Write-Output 'other'", File.ReadAllText(account.OtherOldCopy));
+    }
+
+    [Fact]
+    public void DeletingAScriptSavedByVersion19_AlsoRemovesTheCopyThatOlderTasksRun()
+    {
+        var account = new MovedFromVersion19(_folder.Path);
+        ScriptStore store = NewStore(account.Paths);
+        LibraryScript script = store.GetScripts().First(script => script.Name == "Tidy up");
+
+        store.Delete(script.Id);
+
+        Assert.False(File.Exists(account.Script));
+        Assert.False(File.Exists(account.OldCopy));
+        Assert.True(File.Exists(account.OtherOldCopy));
+    }
+
+    [Fact]
+    public void AScriptSavedNow_IsNotPutWhereVersion19KeptItsScripts()
+    {
+        var account = new MovedFromVersion19(_folder.Path);
+        ScriptStore store = NewStore(account.Paths);
+
+        LibraryScript saved = store.Save(null, "New", "", "Write-Output 'new'");
+        store.Save(saved.Id, "New", "", "Write-Output 'newer'");
+
+        Assert.Equal([account.OldCopy, account.OtherOldCopy], Directory.GetFiles(account.Paths.Version19!.ScriptsFolder).Order(StringComparer.Ordinal));
+    }
+
+    [Fact]
+    public void AScriptOfVersion19ThatHasNotComeOver_StaysTheCommandLineThatRunsItWhereItIs()
+    {
+        var account = new MovedFromVersion19(_folder.Path);
+        File.Delete(account.Script);
+        ScriptStore store = NewStore(account.Paths);
+
+        LibraryScript script = store.GetScripts().First(script => script.Name == "Tidy up");
+
+        Assert.False(script.HasText);
+        Assert.Equal(("powershell.exe", $"-ExecutionPolicy Bypass -File \"{account.OldCopy}\""), (script.Command, script.Arguments));
+        store.Delete(script.Id);
+        Assert.True(File.Exists(account.OldCopy));
     }
 }

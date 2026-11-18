@@ -7,7 +7,10 @@ namespace FluentTaskScheduler.Library;
 /// <summary>
 /// The scripts of the library: those that ship with the app, and those the user saved. The
 /// user's scripts live in one folder, as PowerShell files next to a list of their names. Nothing
-/// outside of that folder is ever written or deleted.
+/// outside of that folder is ever written or deleted, with one exception: a script that a
+/// version before 2.0 saved also stays in the folder that version kept it in, where the tasks
+/// created from it back then still run it. That copy is kept the same as the script, and goes
+/// when the script goes.
 ///
 /// Every call reads the list from disk, so there is no state to go stale. Reading and writing
 /// can fail with an <see cref="IOException"/> or <see cref="UnauthorizedAccessException"/>.
@@ -23,6 +26,7 @@ public sealed class ScriptStore
     private readonly string _folder;
     private readonly string _listFile;
     private readonly string _version19ListFile;
+    private readonly string? _version19Folder;
     private readonly Lazy<IReadOnlyList<BuiltIn>> _builtIn;
 
     /// <param name="builtInScriptsFile">The JSON file with the scripts that ship with the app.</param>
@@ -31,6 +35,7 @@ public sealed class ScriptStore
         _folder = paths.ScriptsFolder;
         _listFile = Path.Combine(_folder, "scripts.json");
         _version19ListFile = paths.File("user_templates.json");
+        _version19Folder = paths.Version19?.ScriptsFolder;
         _builtIn = new(() => ReadBuiltIn(builtInScriptsFile));
     }
 
@@ -107,6 +112,7 @@ public sealed class ScriptStore
         Entry entry = (position < 0 ? NewEntry() : entries[position]) with { Name = name, Description = description };
 
         ScriptFile.Write(TextFileOf(entry)!, text);
+        if (CopyThatOlderTasksRun(entry) is { } copy) ScriptFile.Write(copy, text);
         if (position < 0) entries.Add(entry);
         else entries[position] = entry;
         WriteList(entries);
@@ -125,20 +131,23 @@ public sealed class ScriptStore
         entries.Remove(entry);
         WriteList(entries);
 
-        if (TextFileOf(entry) is { } file)
-        {
-            try
-            {
-                File.Delete(file);
-            }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-            {
-                // The script is off the list either way; a file left behind does no harm.
-                Serilog.Log.Warning(ex, "The file {Path} of a deleted script could not be removed", file);
-            }
-        }
+        if (TextFileOf(entry) is { } file) RemoveFileOfDeletedScript(file);
+        if (CopyThatOlderTasksRun(entry) is { } copy) RemoveFileOfDeletedScript(copy);
 
         Changed?.Invoke(this, EventArgs.Empty);
+    }
+
+    private static void RemoveFileOfDeletedScript(string file)
+    {
+        try
+        {
+            File.Delete(file);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // The script is off the list either way; a file left behind does no harm.
+            Serilog.Log.Warning(ex, "The file {Path} of a deleted script could not be removed", file);
+        }
     }
 
     // The file gets a name of its own, not the script's: tasks refer to it by its path, so
@@ -183,6 +192,19 @@ public sealed class ScriptStore
     /// </summary>
     private string? TextFileOf(Entry entry) =>
         entry.File is { } name && IsScriptFileName(name) ? Path.Combine(_folder, name) : null;
+
+    /// <summary>
+    /// The entry's script as it still lies in the folder version 1.9 kept its scripts in, or null
+    /// if it is not there. Tasks that were created from the script before the app's files moved
+    /// name that file.
+    /// </summary>
+    private string? CopyThatOlderTasksRun(Entry entry)
+    {
+        if (_version19Folder is null || TextFileOf(entry) is null) return null;
+
+        string copy = Path.Combine(_version19Folder, entry.File!);
+        return File.Exists(copy) ? copy : null;
+    }
 
     private static bool IsScriptFileName(string name) =>
         name.Length > ScriptExtension.Length
@@ -236,8 +258,9 @@ public sealed class ScriptStore
 
     /// <summary>
     /// Version 1.9 kept its list one folder up and without ids, and a script written in its
-    /// editor was a command line with the full path of the script file in it. The old list is
-    /// left where it is; it is only read as long as there is no new one.
+    /// editor was a command line with the full path of the script file in it. That path names
+    /// the folder version 1.9 kept its scripts in, which is not the scripts folder of today. The
+    /// old list is left where it is; it is only read as long as there is no new one.
     /// </summary>
     private List<Entry> ImportFromVersion19()
     {
@@ -271,10 +294,13 @@ public sealed class ScriptStore
         string path = match.Groups[1].Value;
         string name = Path.GetFileName(path);
         bool isInScriptsFolder = IsScriptFileName(name)
-            && string.Equals(Path.GetDirectoryName(path), _folder, StringComparison.OrdinalIgnoreCase)
-            && File.Exists(path);
+            && Path.GetDirectoryName(path) is { } folder
+            && (IsSameFolder(folder, _folder) || IsSameFolder(folder, _version19Folder))
+            && File.Exists(Path.Combine(_folder, name));
         return isInScriptsFolder ? entry with { File = name, Command = null, Arguments = null } : entry;
     }
+
+    private static bool IsSameFolder(string folder, string? other) => folder.Equals(other, StringComparison.OrdinalIgnoreCase);
 
     private static IReadOnlyList<BuiltIn> ReadBuiltIn(string file)
     {

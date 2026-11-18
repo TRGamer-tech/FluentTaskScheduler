@@ -350,6 +350,33 @@ public sealed class DataFolderMoveTests : IDisposable
     }
 
     [Fact]
+    public void WhatVersionsBefore2KeptForTheAccount_IsBroughtToItsDataFolder()
+    {
+        Write(Old, ["settings.json", "snooze.json"], "old");
+
+        DataFolderMoveReport report = DataFolderMove.Run(new AppPaths(null, _temp.Path));
+
+        Assert.Equal(["settings.json: old", "snooze.json: old"], Content(New));
+        Assert.Equal((Old, New, 2), (report.From, report.To, report.Moved));
+        Assert.False(Directory.Exists(Old));
+    }
+
+    [Fact]
+    public void WithADataFolderNamedByTheEnvironmentVariable_TheFilesOfTheAccountStayWhereTheyAre()
+    {
+        Write(Old, ["settings.json", "snooze.json"], "old");
+        string chosen = _temp.File("Chosen");
+
+        DataFolderMoveReport report = DataFolderMove.Run(new AppPaths(chosen, _temp.Path));
+
+        Assert.Equal(["settings.json: old", "snooze.json: old"], Content(Old));
+        Assert.False(Directory.Exists(chosen));
+        Assert.False(Directory.Exists(New));
+        Assert.Equal(0, report.Moved);
+        Assert.Empty(report.Failures);
+    }
+
+    [Fact]
     public void WhatWasMovedAndWhatCouldNotBe_AreWrittenToTheLog()
     {
         var written = new CollectedEvents();

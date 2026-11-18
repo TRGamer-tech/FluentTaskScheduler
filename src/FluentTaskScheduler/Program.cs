@@ -53,6 +53,11 @@ public static class Program
             }
         }
 
+        // Versions before 2.0 kept the app's files where an installation for one user also has the
+        // app itself. They come over to the data folder before anything reads them, whatever this
+        // start is for: a command looks at them as well.
+        DataFolderMoveReport movedFiles = DataFolderMove.Run(new AppPaths());
+
         // A command is answered and done, whether or not the app is already running.
         if (CommandLine.Handles(args)) return RunCommandLine(args);
 
@@ -69,7 +74,7 @@ public static class Program
         Application.Start(_ =>
         {
             SynchronizationContext.SetSynchronizationContext(new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread()));
-            app = new App(instance, updaterFailure);
+            app = new App(instance, updaterFailure, movedFiles);
         });
 
         // Start returns when the last window has closed.

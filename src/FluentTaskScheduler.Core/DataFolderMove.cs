@@ -21,8 +21,9 @@ public sealed record DataFolderMoveReport(string From, string To, int Moved, Val
 }
 
 /// <summary>
-/// Takes the app's files from one folder to another, and leaves alone whatever else the first
-/// folder holds.
+/// Takes the app's files from the folder that versions before 2.0 kept them in to the data folder
+/// of today, and leaves alone whatever else the old folder holds: for an installation for one
+/// user, that is the app itself.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -48,7 +49,16 @@ public sealed class DataFolderMove
     {
     }
 
-    public static DataFolderMoveReport Run(string from, string to)
+    /// <summary>
+    /// With a data folder that somebody chose, the files of the account stay where they are:
+    /// whoever points the app elsewhere, a test for one, does not mean them to be touched.
+    /// </summary>
+    public static DataFolderMoveReport Run(AppPaths paths) =>
+        paths.Version19 is { } version19
+            ? Run(version19.DataFolder, paths.DataFolder)
+            : new DataFolderMoveReport("", paths.DataFolder, 0, []);
+
+    internal static DataFolderMoveReport Run(string from, string to)
     {
         var move = new DataFolderMove();
         move.TakeAppFiles(from, to);

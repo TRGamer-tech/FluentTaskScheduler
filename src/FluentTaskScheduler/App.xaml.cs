@@ -25,14 +25,17 @@ public partial class App : Application, IAppLifetime, IDisposable
 {
     private readonly SingleInstance _instance;
     private readonly Exception? _updaterFailure;
+    private readonly DataFolderMoveReport _movedFiles;
     private ServiceProvider? _services;
     private bool _crashReportPending;
 
     /// <param name="updaterFailure">What went wrong in Velopack's start-up code, which runs before there is a log; null if nothing did.</param>
-    internal App(SingleInstance instance, Exception? updaterFailure)
+    /// <param name="movedFiles">What became of the files of versions before 2.0, which also come over before there is a log.</param>
+    internal App(SingleInstance instance, Exception? updaterFailure, DataFolderMoveReport movedFiles)
     {
         _instance = instance;
         _updaterFailure = updaterFailure;
+        _movedFiles = movedFiles;
         InitializeComponent();
 
         UnhandledException += (_, e) =>
@@ -69,6 +72,7 @@ public partial class App : Application, IAppLifetime, IDisposable
         logging.Follow(_services.GetRequiredService<ISettingsStore>());
         Serilog.Log.Information("FluentTaskScheduler {Version} started", _services.GetRequiredService<AppInfo>().VersionText);
         if (_updaterFailure is not null) Serilog.Log.Warning(_updaterFailure, "Velopack's start-up code failed; this copy may not be able to update itself");
+        _movedFiles.WriteTo(Serilog.Log.Logger);
 
         // Before anything saves the settings: the snooze state of version 1.9 lived in the settings
         // file, and the first save in the new format drops what the snooze service has not taken over.
