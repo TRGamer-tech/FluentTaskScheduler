@@ -1,4 +1,5 @@
 using System.Drawing;
+using FlaUI.Core.Capturing;
 
 namespace FluentTaskScheduler.UITests;
 
@@ -34,6 +35,67 @@ public sealed class DisplayScalingTests : IDisposable
     public void Dispose()
     {
         if (_scaling is not null) PutBack(_scaling);
+    }
+
+    /// <summary>
+    /// Ten tasks run meanwhile, so that the icon shows "9+" whatever else runs on the machine and
+    /// the two pictures differ in nothing but the scaling. The window is hidden, as it is for
+    /// most of the life of an app in the notification area; notifications are off, since one
+    /// could lie over the icon.
+    /// <para>
+    /// That the app drew the icon anew is told from what the notification area shows: the badge
+    /// has grown with the scaling, and is at least as clean as it was (see <see cref="BadgePicture"/>).
+    /// Should the picture not show that, the app's log says whether the app did its part.
+    /// </para>
+    /// </summary>
+    [SkippableFact]
+    public void TheNotificationAreaIcon_IsDrawnAnew_ForTheSizeOfANewScaling()
+    {
+        DisplayScaling scaling = ScalingToChange(out int larger);
+        SetOrSkip(scaling, 100);
+        using var tasks = new WindowsTasks();
+        for (int number = 1; number <= 10; number++)
+        {
+            tasks.Create($"Running{number}", NotificationAreaIcon.RunningTaskXml);
+            tasks.Start($"Running{number}");
+        }
+        using var app = AppSession.Launch("scaling-icon", AppSession.FirstRunDone(("ShowNotifications", false), ("HasSeenTrayHint", true)));
+        app.Window.Close();
+        Assert.True(AppSession.Eventually(() => !app.IsWindowVisible), "Closing did not hide the window.");
+        NotificationAreaIcon.Require(app);
+
+        // The app counts the running tasks every ten seconds.
+        var before = new BadgePicture(Rectangle.Empty, 0);
+        bool counted = AppSession.Eventually(() =>
+        {
+            before = BadgePicture.In(NotificationAreaIcon.SavePicture(app, "100"));
+            return before.Bounds.Width > before.Bounds.Height;
+        }, 40);
+        Assert.True(counted, $"The icon does not show the badge of more than nine running tasks, which is wider than high. Its badge is {Describe(before)}.");
+
+        SetOrSkip(scaling, larger);
+
+        // The taskbar and the app take a moment to follow. What the last picture shows is judged below.
+        var after = new BadgePicture(Rectangle.Empty, 0);
+        bool HasGrown() => Math.Abs(after.Bounds.Height - before.Bounds.Height * larger / 100.0) <= 1.5;
+        AppSession.Eventually(() =>
+        {
+            after = BadgePicture.In(NotificationAreaIcon.SavePicture(app, $"{larger}"));
+            return HasGrown() && after.PureShare >= before.PureShare;
+        }, 30);
+
+        // Nobody has seen the taskbar of a build machine at this scaling: what is around the icon may explain its picture.
+        using (CaptureImage screen = Capture.Screen()) screen.ToFile(Path.Combine(app.ArtifactsDir, $"screen-{larger}.png"));
+        app.Log($"The badge at 100 %: {Describe(before)}. At {larger} %: {Describe(after)}.");
+
+        string log = AppLog(app);
+        Assert.True(log.Contains($"drawn anew for a display of {96 * larger / 100} DPI"),
+            $"The app did not draw its icon anew for a scaling of {larger} %. There the badge is {Describe(after)}; at 100 % it was {Describe(before)}. The app's log:{Environment.NewLine}{log}");
+        Assert.True(HasGrown(),
+            $"The notification area does not show the icon at the size of {larger} %: there the badge is {Describe(after)}; at 100 % it was {Describe(before)}.");
+        Assert.True(after.PureShare >= before.PureShare,
+            $"The app drew its icon anew for {larger} %, but the notification area shows a blurred one: there the badge is {Describe(after)}; at 100 % it was {Describe(before)}. " +
+            $"A badge drawn for its size gains pure pixels as it grows, a stretched one loses them. See icon-{larger}-x8.png.");
     }
 
     [SkippableFact]
@@ -164,5 +226,16 @@ public sealed class DisplayScalingTests : IDisposable
         }, 5);
         Assert.True(right, $"At {percent} %, the app remembers a window of {remembered.Width} x {remembered.Height} device-independent pixels for its next start. " +
                            $"The window has {WindowSize.Width} x {WindowSize.Height}.");
+    }
+
+    private static string Describe(BadgePicture badge) =>
+        $"{badge.Bounds.Width} x {badge.Bounds.Height} pixels, {badge.PureShare:P0} of them purely red or white";
+
+    /// <summary>What the app has logged so far. The app keeps the file open, so it is read without claiming it.</summary>
+    private static string AppLog(AppSession app)
+    {
+        using var file = new FileStream(Path.Combine(app.DataDir, "App_Log.txt"), FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        using var reader = new StreamReader(file);
+        return reader.ReadToEnd();
     }
 }

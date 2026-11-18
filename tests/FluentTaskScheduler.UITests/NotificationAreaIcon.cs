@@ -45,7 +45,8 @@ internal static class NotificationAreaIcon
     /// Leaves a picture of the icon as the notification area shows it, and one eight times as
     /// large, for whoever checks by eye that its marks can be read at the size Windows shows it at.
     /// </summary>
-    public static void SavePicture(AppSession app, string name)
+    /// <returns>The file of the picture at its own size.</returns>
+    public static string SavePicture(AppSession app, string name)
     {
         Require(app);
 
@@ -64,8 +65,9 @@ internal static class NotificationAreaIcon
             return place is { Width: > 1, Height: > 1 };
         });
 
+        string file = Path.Combine(app.ArtifactsDir, $"icon-{name}.png");
         using CaptureImage picture = Capture.Rectangle(place);
-        picture.ToFile(Path.Combine(app.ArtifactsDir, $"icon-{name}.png"));
+        picture.ToFile(file);
         using var enlarged = new Bitmap(picture.Bitmap.Width * 8, picture.Bitmap.Height * 8);
         using (Graphics graphics = Graphics.FromImage(enlarged))
         {
@@ -74,6 +76,7 @@ internal static class NotificationAreaIcon
             graphics.DrawImage(picture.Bitmap, 0, 0, enlarged.Width, enlarged.Height);
         }
         enlarged.Save(Path.Combine(app.ArtifactsDir, $"icon-{name}-x8.png"));
+        return file;
     }
 
     // Windows puts more than the tooltip into the name, at least a leading blank. The shell also
