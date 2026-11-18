@@ -1,17 +1,26 @@
 name: Release
 
-# Pushing a tag like V1.9.1 builds both architectures, packs them with Velopack and attaches the
-# result to a draft GitHub Release, to be reviewed and published by hand. A manual run packs
-# the version typed in and keeps the result as workflow artifacts only: nothing is published,
-# which makes it the way to try the packaging out.
+# Builds both architectures, packs them with Velopack and checks on a fresh machine that the
+# installer installs and uninstalls silently. Only then are the eight release files attached
+# to a draft GitHub Release, which is reviewed and published by hand.
+#
+# A pushed tag like V2.0.1 always ends in that draft. A manual run packs the version typed in,
+# runs the same check and keeps the files as artifacts of the run, which makes it the way to
+# try the packaging out. With "draft" ticked it also creates the draft, for the commit it ran
+# on, or brings the existing draft of that version up to date. A release that is already
+# published is never touched.
 on:
   push:
     tags: ['V*']
   workflow_dispatch:
     inputs:
       version:
-        description: Version to pack, e.g. 1.9.1. Nothing is published.
+        description: Version to pack, e.g. 2.0.1
         required: true
+      draft:
+        description: Create the draft release of that version, or bring it up to date
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -34,6 +43,9 @@ jobs:
     # Both architectures are built on an x64 machine: the WiX tools Velopack brings along for
     # the MSI are x64 programs and do not start on the ARM64 runner.
     runs-on: windows-latest
+
+    outputs:
+      version: ${{ steps.version.outputs.version }}
 
     steps:
       - name: Checkout
@@ -160,12 +172,18 @@ jobs:
           if (Test-Path $exe) { throw 'The app is still there after uninstalling.' }
 
   draft-release:
-    # Only a pushed tag makes a release, and only if the installer worked.
-    if: github.event_name == 'push'
+    # A pushed tag always drafts a release, a manual run when it was asked to; neither does
+    # unless everything above worked.
+    if: github.event_name == 'push' || inputs.draft
     needs: [package, verify-installer]
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      VERSION: ${{ needs.package.outputs.version }}
+      TAG: V${{ needs.package.outputs.version }}
     steps:
       - name: Download release files
         uses: actions/download-artifact@v8
@@ -174,10 +192,54 @@ jobs:
           path: Dist
           merge-multiple: true
 
-      - name: Create draft release
-        uses: softprops/action-gh-release@v3
-        with:
-          files: Dist/*
-          draft: true
-          generate_release_notes: true
-          fail_on_unmatched_files: true
+      - name: Look for a release of this version
+        id: existing
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $listed = gh release list --limit 1000 --json tagName,isDraft
+          if ($LASTEXITCODE -ne 0) { throw 'The releases could not be listed.' }
+          $releases = @($listed | ConvertFrom-Json | Where-Object { $_.tagName -ceq $env:TAG })
+
+          if ($releases | Where-Object { -not $_.isDraft }) {
+            throw "$env:TAG is published. A published release is not touched: its files are what people have downloaded."
+          }
+          if ($releases.Count -gt 1) { throw "There are $($releases.Count) drafts named $env:TAG. Delete all but one of them." }
+          "draft=$($releases.Count -eq 1)" >> $env:GITHUB_OUTPUT
+
+      - name: Write the release notes
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $generated = gh api "repos/$env:GH_REPO/releases/generate-notes" -f "tag_name=$env:TAG" -f "target_commitish=$env:GITHUB_SHA" --jq .body
+          if ($LASTEXITCODE -ne 0) { throw 'GitHub did not generate release notes.' }
+          Set-Content notes.md $generated
+
+      - name: Create the draft or bring it up to date
+        shell: pwsh
+        env:
+          DRAFT_EXISTS: ${{ steps.existing.outputs.draft }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $files = @(
+            'Setup-x64.msi', 'Setup-arm64.msi', 'Portable-x64.zip', 'Portable-arm64.zip'
+            'releases.win-x64.json', 'releases.win-arm64.json'
+            "FluentTaskScheduler-$env:VERSION-win-x64-full.nupkg", "FluentTaskScheduler-$env:VERSION-win-arm64-full.nupkg"
+          ) | ForEach-Object { (Get-Item "Dist/$_").FullName }
+
+          if ($env:DRAFT_EXISTS -eq 'True') {
+            gh release edit $env:TAG --target $env:GITHUB_SHA --notes-file notes.md
+            if ($LASTEXITCODE -ne 0) { throw "The draft $env:TAG could not be changed." }
+
+            $attached = gh release view $env:TAG --json assets --jq '.assets[].name'
+            if ($LASTEXITCODE -ne 0) { throw "The files of the draft $env:TAG could not be listed." }
+            foreach ($name in $attached) {
+              gh release delete-asset $env:TAG $name --yes
+              if ($LASTEXITCODE -ne 0) { throw "$name could not be removed from the draft $env:TAG." }
+            }
+            gh release upload $env:TAG $files
+            if ($LASTEXITCODE -ne 0) { throw "The files could not be attached to the draft $env:TAG." }
+          } else {
+            gh release create $env:TAG --draft --target $env:GITHUB_SHA --title $env:TAG --notes-file notes.md $files
+            if ($LASTEXITCODE -ne 0) { throw "The draft $env:TAG could not be created." }
+          }
