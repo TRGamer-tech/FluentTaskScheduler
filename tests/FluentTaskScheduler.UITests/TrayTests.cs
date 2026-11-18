@@ -47,10 +47,14 @@ public class TrayTests
         Assert.True(AppSession.Eventually(() => app.Window.Patterns.Window.Pattern.WindowVisualState.Value == WindowVisualState.Normal), "The window came back minimized.");
     }
 
+    /// <summary>
+    /// The app has given its hint about the notification area before, and notifications are off:
+    /// Windows 10 shows one right above the notification area, over the icon and its menu.
+    /// </summary>
     [Fact]
     public void TheIconsMenu_EndsTheApp()
     {
-        using var app = AppSession.Launch("tray-exit");
+        using var app = AppSession.Launch("tray-exit", AppSession.FirstRunDone(("ShowNotifications", false), ("HasSeenTrayHint", true)));
         app.Window.Close();
         Assert.True(AppSession.Eventually(() => !app.IsWindowVisible), "Closing did not hide the window.");
 
