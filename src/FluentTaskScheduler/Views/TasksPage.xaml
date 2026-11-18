@@ -203,9 +203,11 @@
                    Text="{x:Bind l:Loc.Get('Tasks.Empty')}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                    Visibility="{x:Bind local:TasksPage.VisibleIfNone(ViewModel.Tasks.Count, ViewModel.IsLoading), Mode=OneWay}"/>
 
+        <!-- Hidden: the keys would otherwise show as a tooltip, "Ctrl+E", wherever the pointer rests on the list. -->
         <ListView x:Name="TaskList" Grid.Row="4" Margin="-12,4,-12,0"
                   SelectionMode="Extended" IsItemClickEnabled="True"
                   ItemsSource="{x:Bind ViewModel.Tasks}"
+                  KeyboardAcceleratorPlacementMode="Hidden"
                   ItemClick="TaskList_ItemClick" SelectionChanged="TaskList_SelectionChanged">
             <ListView.KeyboardAccelerators>
                 <!-- Scoped to the list: Delete in the search box must not delete tasks. -->
