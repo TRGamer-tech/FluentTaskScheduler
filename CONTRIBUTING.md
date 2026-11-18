@@ -42,6 +42,11 @@ Every push to `main` and every pull request runs all of this on Windows for x64 
 
 The screenshots in the README are taken by the UI tests as well, but only on request: when `FTS_README_SCREENSHOTS` is `1`, as it is for the x64 build of the workflow. They need a display at a scale of 100 % with room for a window of 1280 by 800 pixels. For these the tests fill a task folder `\Housekeeping` with tasks that look like a user's own, which is the exception to the rule about names, and remove the folder again afterwards. On a machine that already has a task folder of that name they take no pictures. The pictures are in the folder `readme` of the artifact `ui-artifacts-win-x64`, under the names they have in `Assets/`: look them over, then copy them there.
 
+Two more kinds of UI test are worth knowing before you change a page:
+
+- **Accessibility.** `PageAccessibilityTests` and `DialogAccessibilityTests` scan every page and dialog with [Axe.Windows](https://github.com/microsoft/axe-windows), the engine of Accessibility Insights for Windows, and `KeyboardTests` walk each page with the Tab key. A failing scan names the rule, the element and where it is, and leaves an `.a11ytest` file in the artifacts that Accessibility Insights opens. Fix what the app gets wrong (a control without a name, two neighbours with the same one). Only a finding inside one of WinUI's own controls goes on the list in `AcceptedViolations.cs`, for that rule in that control, with the reason.
+- **Display scaling.** `DisplayScalingTests` change the scaling of the main display while the app runs and put it back afterwards. They move every window on the desktop, so they only run when `FTS_UI_CHANGE_DISPLAY_SCALING` is `1`, as it is for the x64 build of the workflow.
+
 ## How to contribute
 
 1. **Fork the repository** to your own GitHub account.

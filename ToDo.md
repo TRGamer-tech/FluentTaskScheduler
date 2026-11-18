@@ -93,6 +93,14 @@ has a test; the UI tests drive the published app on Windows x64 and ARM64 in CI.
 - The README's screenshots are taken by the UI tests, and other UI tests change the display scaling
   while the app runs.
 
+### Accessibility
+- Controls a screen reader could only call "button" or "combo box" have names, neighbours that were
+  called the same are told apart, and page titles and sections are headings.
+- A screen reader is told how a quick action ended, what a check for updates found and what the
+  next slide of the welcome tour says. The release notes can be scrolled with the keyboard.
+- Every page and dialog is checked against the rules of Accessibility Insights for Windows, and
+  walked with the Tab key, by the UI tests.
+
 ## [V1.9.0] - 2026-07-25
 
 ### Task Chaining & Execution Pipelines
