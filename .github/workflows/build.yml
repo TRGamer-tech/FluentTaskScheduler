@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      x64-runner:
+        description: Where the x64 UI tests run. windows-2022 is built on Windows 10, the nearest thing to it that GitHub hosts.
+        type: choice
+        options: [windows-latest, windows-2022]
+        default: windows-latest
 
 permissions:
   contents: read
@@ -48,7 +54,8 @@ jobs:
         include:
           - platform: x64
             rid: win-x64
-            runner: windows-latest
+            # Only a run started by hand has the input.
+            runner: ${{ inputs.x64-runner || 'windows-latest' }}
           - platform: ARM64
             rid: win-arm64
             runner: windows-11-arm
