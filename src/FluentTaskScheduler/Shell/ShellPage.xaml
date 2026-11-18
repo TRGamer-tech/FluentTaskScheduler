@@ -37,7 +37,8 @@
 
             <NavigationView.HeaderTemplate>
                 <DataTemplate x:DataType="x:String">
-                    <TextBlock Text="{x:Bind}" Style="{StaticResource TitleTextBlockStyle}" AutomationProperties.AutomationId="PageTitle"/>
+                    <TextBlock Text="{x:Bind}" Style="{StaticResource TitleTextBlockStyle}" AutomationProperties.AutomationId="PageTitle"
+                               AutomationProperties.HeadingLevel="Level1"/>
                 </DataTemplate>
             </NavigationView.HeaderTemplate>
 

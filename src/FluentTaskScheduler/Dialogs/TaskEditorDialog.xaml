@@ -17,6 +17,7 @@
         <x:Double x:Key="ContentDialogMaxWidth">760</x:Double>
         <Style x:Key="SectionTitleStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}">
             <Setter Property="Margin" Value="0,12,0,0"/>
+            <Setter Property="AutomationProperties.HeadingLevel" Value="Level2"/>
         </Style>
     </ContentDialog.Resources>
 
@@ -299,7 +300,8 @@
                                    Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
 
                         <!-- The same picker, button and list twice, for success and for failure: each is named after its half. -->
-                        <TextBlock Text="{x:Bind l:Loc.Get('Pipeline.SuccessHeader')}" Style="{StaticResource SectionTitleStyle}"/>
+                        <TextBlock Text="{x:Bind l:Loc.Get('Pipeline.SuccessHeader')}" Style="{StaticResource SectionTitleStyle}"
+                                   AutomationProperties.HeadingLevel="Level3"/>
                         <TextBlock Text="{x:Bind l:Loc.Get('Pipeline.SuccessHint')}" TextWrapping="Wrap"
                                    Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         <Grid ColumnSpacing="8">
@@ -337,7 +339,8 @@
                             </ListView.ItemTemplate>
                         </ListView>
 
-                        <TextBlock Text="{x:Bind l:Loc.Get('Pipeline.FailureHeader')}" Style="{StaticResource SectionTitleStyle}"/>
+                        <TextBlock Text="{x:Bind l:Loc.Get('Pipeline.FailureHeader')}" Style="{StaticResource SectionTitleStyle}"
+                                   AutomationProperties.HeadingLevel="Level3"/>
                         <TextBlock Text="{x:Bind l:Loc.Get('Pipeline.FailureHint')}" TextWrapping="Wrap"
                                    Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         <Grid ColumnSpacing="8">

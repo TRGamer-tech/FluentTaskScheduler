@@ -865,4 +865,5 @@ Jetzt neu starten, um das Update zu installieren?</value></data>
   <data name="Settings.Data.Delete.Confirm.Title" xml:space="preserve"><value>App-Daten löschen?</value></data>
   <data name="Settings.Data.Delete.Confirm.Content" xml:space="preserve"><value>Deine Einstellungen, gespeicherten Skripte, der Ausführungsverlauf und die Protokolle werden von diesem Computer entfernt, und die App wird geschlossen. Pausierte Aufgaben werden vorher fortgesetzt, und die App startet nicht mehr mit Windows. Deine Aufgaben bleiben, aber eine Aufgabe, die eines deiner gespeicherten Skripte ausführt, findet es dann nicht mehr.</value></data>
   <data name="Settings.Data.Delete.StillSnoozed" xml:space="preserve"><value>Einige pausierte Aufgaben konnten nicht fortgesetzt werden, deshalb wurde nichts gelöscht. Setze sie zuerst fort; eine Aufgabe, die pausiert wurde, während die App als Administrator lief, braucht dafür Administratorrechte.</value></data>
+  <data name="ScriptEditor.BlankLine" xml:space="preserve"><value>Leerzeile</value></data>
 </root>

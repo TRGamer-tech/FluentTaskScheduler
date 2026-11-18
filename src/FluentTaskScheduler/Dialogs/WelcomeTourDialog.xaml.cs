@@ -11,6 +11,10 @@ public sealed partial class WelcomeTourDialog : ContentDialog
     {
         ViewModel = viewModel;
         InitializeComponent();
+        viewModel.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(WelcomeTourViewModel.Index)) ReadOut(viewModel.Slides[viewModel.Index]);
+        };
     }
 
     public WelcomeTourViewModel ViewModel { get; }
@@ -29,4 +33,11 @@ public sealed partial class WelcomeTourDialog : ContentDialog
     }
 
     private void Next_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args) => args.Cancel = ViewModel.GoNext();
+
+    // The focus stays on the button or the dot that changed the slide, and a screen reader reads
+    // out what has the focus: of the new slide it would say nothing. So the pager tells it.
+    private void ReadOut(TourSlide slide) =>
+        FrameworkElementAutomationPeer.CreatePeerForElement(TourPager)?.RaiseNotificationEvent(
+            AutomationNotificationKind.Other, AutomationNotificationProcessing.ImportantMostRecent,
+            slide.Title + Environment.NewLine + slide.Body, activityId: "TourSlide");
 }

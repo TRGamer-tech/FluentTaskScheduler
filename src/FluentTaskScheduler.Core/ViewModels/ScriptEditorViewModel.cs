@@ -27,8 +27,11 @@ public sealed class OutputLine(string text, OutputKind kind)
     public string Text { get; } = text;
     public OutputKind Kind { get; } = kind;
 
-    /// <summary>The text alone: this is what a screen reader reads out for the line in a list.</summary>
-    public override string ToString() => Text;
+    /// <summary>
+    /// What a screen reader reads out for the line in a list: the text alone. A line without any
+    /// says that it is blank, because a row without a name is passed over as if it were not there.
+    /// </summary>
+    public override string ToString() => string.IsNullOrWhiteSpace(Text) ? Loc.Get("ScriptEditor.BlankLine") : Text;
 }
 
 /// <summary>

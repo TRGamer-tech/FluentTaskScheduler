@@ -36,7 +36,10 @@
 
         <StackPanel Grid.Column="1" VerticalAlignment="Center">
             <TextBlock Text="{x:Bind Header, Mode=OneWay}" TextWrapping="Wrap"/>
+            <!-- An explanation that changes says what became of something the card's control started,
+                 such as a check for updates. It is read out then, since the focus is on the control. -->
             <TextBlock Text="{x:Bind Description, Mode=OneWay}"
+                       local:LiveRegion.IsLive="True"
                        Visibility="{x:Bind local:SettingsCard.VisibilityOf(Description), Mode=OneWay}"
                        Style="{StaticResource CaptionTextBlockStyle}"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"

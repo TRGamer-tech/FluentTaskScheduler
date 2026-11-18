@@ -99,6 +99,14 @@ public sealed class TaskDetailsViewModelTests : IDisposable
     }
 
     [Fact]
+    public void AnEventOfTheHistory_IsAnnouncedByWhatItsRowShows()
+    {
+        Assert.Equal("06.05.2031 14:00:00, Task started", new HistoryEntry(Succeeded[0], null, "06.05.2031 14:00:00", "Task started", "").ToString());
+        Assert.Equal("06.05.2031 14:00:02, Action completed, Result 3 · notepad.exe",
+            new HistoryEntry(Failed[0], RunStatus.Failed, "06.05.2031 14:00:02", "Action completed", "Result 3 · notepad.exe").ToString());
+    }
+
+    [Fact]
     public async Task TheLastResult_IsThatOfTheNewestRun_WithItsCode()
     {
         _history.Events.AddRange(Failed);

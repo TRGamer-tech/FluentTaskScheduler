@@ -131,6 +131,14 @@ public sealed class ScriptEditorViewModelTests : IDisposable
     }
 
     [Fact]
+    public void ALineWithoutText_IsAnnouncedAsBlank_SoAScreenReaderDoesNotPassOverIt()
+    {
+        Assert.Equal("ScriptEditor.BlankLine", new OutputLine("", OutputKind.Output).ToString());
+        Assert.Equal("ScriptEditor.BlankLine", new OutputLine("   ", OutputKind.Error).ToString());
+        Assert.Equal("    Directory: C:\\", new OutputLine("    Directory: C:\\", OutputKind.Output).ToString());
+    }
+
+    [Fact]
     public void OfAProgressDisplayThatChangedWhileTheUiThreadWasBusy_OnlyTheLatestStateIsShown()
     {
         var ui = new BusyUiThread();

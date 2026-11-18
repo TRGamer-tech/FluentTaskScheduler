@@ -48,7 +48,8 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="vm:TemplateSection">
                             <StackPanel Margin="0,4,0,12">
-                                <TextBlock Text="{x:Bind Title}" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,0,0,8"/>
+                                <TextBlock Text="{x:Bind Title}" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,0,0,8"
+                                           AutomationProperties.HeadingLevel="Level2"/>
 
                                 <ItemsControl ItemsSource="{x:Bind Templates}" IsTabStop="False">
                                     <ItemsControl.ItemTemplate>

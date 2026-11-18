@@ -30,7 +30,11 @@ public enum HistoryFilter
 
 /// <summary>One event of a task's history, worded for the list.</summary>
 /// <param name="Run">How the run the event belongs to ended; null for an event outside of any run.</param>
-public sealed record HistoryEntry(TaskEvent Event, RunStatus? Run, string Time, string Label, string Details);
+public sealed record HistoryEntry(TaskEvent Event, RunStatus? Run, string Time, string Label, string Details)
+{
+    /// <summary>What the row shows: this is what a screen reader announces for it, not the record with all it holds.</summary>
+    public override string ToString() => Details.Length > 0 ? $"{Time}, {Label}, {Details}" : $"{Time}, {Label}";
+}
 
 public sealed class TaskDetailsFactory(ITaskStore store, ITaskHistory history, ISnoozeService snooze, IFilePicker files, IClipboard clipboard,
     IAppLifetime app, IUiThread ui, TimeProvider time)

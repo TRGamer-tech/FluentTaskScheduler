@@ -49,7 +49,7 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <PipsPager HorizontalAlignment="Center"
+            <PipsPager x:Name="TourPager" HorizontalAlignment="Center"
                        NumberOfPages="{x:Bind ViewModel.SlideCount}"
                        SelectedPageIndex="{x:Bind ViewModel.Index, Mode=TwoWay}"/>
         </StackPanel>

@@ -866,6 +866,7 @@
   <data name="Settings.Data.Delete.Confirm.Title" xml:space="preserve"><value>要删除应用数据吗？</value></data>
   <data name="Settings.Data.Delete.Confirm.Content" xml:space="preserve"><value>此操作会从此计算机中删除你的设置、已保存的脚本、执行历史和日志，并关闭应用。已暂停的任务会先恢复，应用也不再随 Windows 启动。你的任务会保留，但运行已保存脚本的任务将找不到相应的脚本。</value></data>
   <data name="Settings.Data.Delete.StillSnoozed" xml:space="preserve"><value>部分已暂停的任务无法恢复，因此未删除任何内容。请先恢复这些任务；在应用以管理员身份运行时暂停的任务，需要管理员权限才能恢复。</value></data>
+  <data name="ScriptEditor.BlankLine" xml:space="preserve"><value>空行</value></data>
 </root>
 
 

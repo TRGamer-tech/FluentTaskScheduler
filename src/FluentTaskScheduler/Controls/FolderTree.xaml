@@ -27,7 +27,8 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="{x:Bind l:Loc.Get('Main.FoldersHeader')}" VerticalAlignment="Center" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+            <TextBlock Text="{x:Bind l:Loc.Get('Main.FoldersHeader')}" VerticalAlignment="Center" Style="{StaticResource BodyStrongTextBlockStyle}"
+                       AutomationProperties.HeadingLevel="Level2"/>
             <Button x:Name="ReloadFoldersButton" Grid.Column="1" Background="Transparent" BorderThickness="0" Padding="8" Click="Reload_Click"
                     ToolTipService.ToolTip="{x:Bind l:Loc.Get('Folders.Reload')}"
                     AutomationProperties.Name="{x:Bind l:Loc.Get('Folders.Reload')}">

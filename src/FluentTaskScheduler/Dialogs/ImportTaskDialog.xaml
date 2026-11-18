@@ -9,7 +9,7 @@
     DefaultButton="Primary"
     PrimaryButtonClick="Import_Click">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" IsTabStop="False">
+    <ScrollViewer x:Name="ImportScroller" VerticalScrollBarVisibility="Auto" IsTabStop="False">
         <StackPanel Spacing="12" Width="440" Margin="0,0,16,0">
             <InfoBar x:Name="ImportProblem" Severity="Error" IsClosable="False"
                      IsOpen="{x:Bind ViewModel.HasProblem, Mode=OneWay}"

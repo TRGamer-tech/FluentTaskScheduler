@@ -25,7 +25,7 @@
         </Style>
     </ContentDialog.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" IsTabStop="False">
+    <ScrollViewer x:Name="DetailsScroller" VerticalScrollBarVisibility="Auto" IsTabStop="False">
         <!-- The details are 780 wide where the window allows it and narrower where it does not. The
              empty border asks for the full width, so the dialog keeps its width whatever it shows. -->
         <Grid MaxWidth="780" Margin="0,0,16,0">
@@ -164,7 +164,8 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="{x:Bind l:Loc.Get('Details.History.Title')}" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Bind l:Loc.Get('Details.History.Title')}" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"
+                               AutomationProperties.HeadingLevel="Level2"/>
                     <ComboBox x:Name="DetailsPeriod" Grid.Column="1" MinWidth="150" SelectedIndex="{x:Bind ViewModel.PeriodIndex, Mode=TwoWay}"
                               AutomationProperties.Name="{x:Bind l:Loc.Get('Details.History.Title')}">
                         <ComboBoxItem Content="{x:Bind l:Loc.Get('Details.Period.Today')}"/>
