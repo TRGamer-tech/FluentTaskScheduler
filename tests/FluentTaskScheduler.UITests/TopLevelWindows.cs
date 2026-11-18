@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -6,7 +7,7 @@ namespace FluentTaskScheduler.UITests;
 
 /// <summary>
 /// The top-level windows of the desktop as Windows reports them: which one is in the foreground,
-/// whose it is and who owns it, which UI Automation does not tell.
+/// whose it is and who owns it, and how much of it can be seen, which UI Automation does not tell.
 /// </summary>
 internal static class TopLevelWindows
 {
@@ -103,6 +104,42 @@ internal static class TopLevelWindows
         return GetForegroundWindow() == window;
     }
 
+    /// <summary>
+    /// What can be seen of <paramref name="window"/>, in pixels of the screen. The bounds Windows
+    /// and UI Automation give for a window reach further: to the left, to the right and at the
+    /// bottom they take in a border that cannot be seen, for the mouse to take hold of.
+    /// </summary>
+    public static Rectangle FrameOf(nint window)
+    {
+        Marshal.ThrowExceptionForHR(DwmGetWindowAttribute(window, ExtendedFrameBounds, out Edges frame, Marshal.SizeOf<Edges>()));
+        return Rectangle.FromLTRB(frame.Left, frame.Top, frame.Right, frame.Bottom);
+    }
+
+    /// <summary>The dots per inch <paramref name="window"/> is drawn with: 96 at a display scale of 100 %.</summary>
+    public static int DpiOf(nint window) => (int)GetDpiForWindow(window);
+
+    /// <summary>
+    /// Puts a plain rectangle, white or dark grey, right behind <paramref name="window"/>, in front
+    /// of everything else that is behind it: what the window lets through then is that rectangle.
+    /// The rectangle is a window of its own, to be taken away again with <see cref="Destroy"/> on
+    /// the thread that asked for it.
+    /// </summary>
+    public static nint ShowRectangleBehind(nint window, Rectangle area, bool white)
+    {
+        nint rectangle = CreateWindowExW(ToolWindow | NeverActive, "Static", null, Popup | (white ? WhiteRectangle : DarkRectangle),
+            area.X, area.Y, area.Width, area.Height, 0, 0, 0, 0);
+        if (rectangle == 0) throw new Win32Exception();
+
+        SetWindowPos(rectangle, window, 0, 0, 0, 0, KeepSize | KeepPosition | KeepInactive | Show);
+        UpdateWindow(rectangle);
+        // Returns once the screen has been put together anew, with the rectangle on it.
+        DwmFlush();
+        return rectangle;
+    }
+
+    /// <summary>Takes a window of this process off the screen for good.</summary>
+    public static void Destroy(nint window) => DestroyWindow(window);
+
     private const uint OwnerRelation = 4;     // GW_OWNER
     private const uint RootRelation = 2;      // GA_ROOT
     private const uint RootOwnerRelation = 3; // GA_ROOTOWNER
@@ -110,6 +147,24 @@ internal static class TopLevelWindows
     private const uint CloseMessage = 0x0010; // WM_CLOSE
     private const byte AltKey = 0x12;         // VK_MENU
     private const uint KeyUp = 0x0002;        // KEYEVENTF_KEYUP
+
+    private const uint ExtendedFrameBounds = 9;  // DWMWA_EXTENDED_FRAME_BOUNDS
+    private const uint Popup = 0x80000000;       // WS_POPUP
+    private const uint ToolWindow = 0x00000080;  // WS_EX_TOOLWINDOW: no button in the taskbar
+    private const uint NeverActive = 0x08000000; // WS_EX_NOACTIVATE
+    private const uint DarkRectangle = 0x4;      // SS_BLACKRECT: black by name, a dark grey in the colours of Windows 10 and 11
+    private const uint WhiteRectangle = 0x6;     // SS_WHITERECT
+    private const uint KeepSize = 0x0001;        // SWP_NOSIZE
+    private const uint KeepPosition = 0x0002;    // SWP_NOMOVE
+    private const uint KeepInactive = 0x0010;    // SWP_NOACTIVATE
+    private const uint Show = 0x0040;            // SWP_SHOWWINDOW
+
+    /// <summary>The edges of a rectangle the way Windows hands them over.</summary>
+    [StructLayout(LayoutKind.Sequential)]
+    private struct Edges
+    {
+        public int Left, Top, Right, Bottom;
+    }
 
     private delegate bool WindowVisitor(nint window, nint parameter);
 
@@ -163,4 +218,26 @@ internal static class TopLevelWindows
 
     [DllImport("user32.dll")]
     private static extern void keybd_event(byte key, byte scanCode, uint flags, nuint extraInfo);
+
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmGetWindowAttribute(nint window, uint attribute, out Edges value, int size);
+
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmFlush();
+
+    [DllImport("user32.dll")]
+    private static extern uint GetDpiForWindow(nint window);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern nint CreateWindowExW(uint extendedStyle, string className, string? title, uint style,
+        int x, int y, int width, int height, nint parent, nint menu, nint module, nint parameter);
+
+    [DllImport("user32.dll")]
+    private static extern bool SetWindowPos(nint window, nint insertAfter, int x, int y, int width, int height, uint flags);
+
+    [DllImport("user32.dll")]
+    private static extern bool UpdateWindow(nint window);
+
+    [DllImport("user32.dll")]
+    private static extern bool DestroyWindow(nint window);
 }
