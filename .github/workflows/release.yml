@@ -1,9 +1,10 @@
 name: Release
 
 # Builds both architectures, packs them with Velopack and checks on a fresh machine that the
-# installer installs and uninstalls silently. Only then are the eight release files attached
-# to a draft GitHub Release. Its notes end with the SHA-256 of the four downloads, taken from
-# the very files that are attached. The draft is reviewed and published by hand.
+# installer installs and uninstalls silently and leaves the user's files alone. Only then are
+# the eight release files attached to a draft GitHub Release. Its notes end with the SHA-256
+# of the four downloads, taken from the very files that are attached. The draft is reviewed
+# and published by hand.
 #
 # A pushed tag like V2.0.1 always ends in that draft. A manual run packs the version typed in,
 # runs the same check and keeps the files as artifacts of the run, which makes it the way to
@@ -30,6 +31,8 @@ env:
   # The Velopack command line tool. Without a version the newest one would be installed, which
   # is not necessarily one that understands the Velopack package the app references.
   VPK_VERSION: 1.2.161
+  # Where the app keeps the user's settings, scripts and logs, below %LOCALAPPDATA%.
+  DATA_FOLDER: TRGamer-tech\FluentTaskScheduler
 
 jobs:
   package:
@@ -130,10 +133,13 @@ jobs:
           if-no-files-found: error
 
   # Installs what was just built the way winget and Chocolatey do, silently, and checks that
-  # the installed app answers and that uninstalling removes it.
+  # the installed app answers and that uninstalling removes it. What the app keeps for the user
+  # (settings, scripts, logs) lies outside the install folder: uninstalling leaves it alone,
+  # unless the user chose in the settings to have it removed.
   verify-installer:
     needs: package
     runs-on: windows-latest
+    timeout-minutes: 15
     steps:
       - name: Download release files
         uses: actions/download-artifact@v8
@@ -141,7 +147,7 @@ jobs:
           name: Dist-x64
           path: Dist
 
-      - name: Install, run and uninstall
+      - name: Install
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -164,13 +170,79 @@ jobs:
           }
           "Installed: $exe, version $((Get-Item $exe).VersionInfo.FileVersion)"
 
-          $list = Start-Process $exe -ArgumentList '--list' -Wait -PassThru -NoNewWindow -RedirectStandardOutput list.json
-          if ($list.ExitCode -ne 0) { throw "The installed app answered --list with exit code $($list.ExitCode)." }
-          "The installed app lists $(@(Get-Content list.json -Raw | ConvertFrom-Json).Count) tasks."
+          "FTS_MSI=$msi" >> $env:GITHUB_ENV
+          "FTS_EXE=$exe" >> $env:GITHUB_ENV
+          "FTS_DATA=$(Join-Path $env:LOCALAPPDATA $env:DATA_FOLDER)" >> $env:GITHUB_ENV
 
-          $uninstall = Start-Process msiexec.exe -ArgumentList "/x `"$msi`" /qn /norestart" -Wait -PassThru
+      - name: Run the installed app
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $list = Start-Process $env:FTS_EXE -ArgumentList '--list' -Wait -PassThru -NoNewWindow -RedirectStandardOutput list.json
+          if ($list.ExitCode -ne 0) { throw "The installed app answered --list with exit code $($list.ExitCode)." }
+          $answer = "$(Get-Content list.json -Raw)".Trim()
+          if (-not $answer.StartsWith('[')) { throw "The installed app answered --list with something that is no list of tasks: '$answer'" }
+          "The installed app lists $(@($answer | ConvertFrom-Json).Count) tasks."
+
+          # A start that only answers a command has no reason to save settings. The next steps
+          # need a settings file, so one is put where the app keeps it.
+          $settings = Join-Path $env:FTS_DATA 'settings.json'
+          if (-not (Test-Path $settings)) {
+            New-Item -ItemType Directory -Force $env:FTS_DATA | Out-Null
+            Set-Content $settings '{ "ReminderLeadMinutes": 17 }'
+          }
+
+      - name: Uninstall, which leaves the user's files alone
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $uninstall = Start-Process msiexec.exe -ArgumentList "/x `"$env:FTS_MSI`" /qn /norestart" -Wait -PassThru
           if ($uninstall.ExitCode -ne 0) { throw "Uninstalling ended with exit code $($uninstall.ExitCode)." }
-          if (Test-Path $exe) { throw 'The app is still there after uninstalling.' }
+          if (Test-Path $env:FTS_EXE) { throw 'The app is still there after uninstalling.' }
+          if (-not (Test-Path (Join-Path $env:FTS_DATA 'settings.json'))) {
+            throw "Uninstalling removed the user's files in $env:FTS_DATA, which nobody asked for."
+          }
+
+      - name: Install again and choose to have the files removed
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $install = Start-Process msiexec.exe -ArgumentList "/i `"$env:FTS_MSI`" /qn /norestart /l*v install-again.log" -Wait -PassThru
+          if ($install.ExitCode -ne 0) {
+            Get-Content install-again.log -Tail 80
+            throw "The installer ended with exit code $($install.ExitCode)."
+          }
+          if (-not (Test-Path $env:FTS_EXE)) { throw 'The second installation did not go where the first one went.' }
+
+          Set-Content (Join-Path $env:FTS_DATA 'settings.json') '{ "RemoveDataOnUninstall": true }'
+
+      - name: Uninstall, which now removes the user's files too
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $uninstall = Start-Process msiexec.exe -ArgumentList "/x `"$env:FTS_MSI`" /qn /norestart" -Wait -PassThru
+          if ($uninstall.ExitCode -ne 0) { throw "Uninstalling ended with exit code $($uninstall.ExitCode)." }
+          if (Test-Path $env:FTS_EXE) { throw 'The app is still there after uninstalling.' }
+          if (Test-Path $env:FTS_DATA) {
+            Get-ChildItem $env:FTS_DATA -Recurse | Select-Object -ExpandProperty FullName
+            throw "The user's files in $env:FTS_DATA are still there, although the settings say to remove them."
+          }
+
+      # The installer starts the app for its part in installing and uninstalling. What the app
+      # was asked to do then, and how that ended, is in the log of Velopack's library.
+      - name: Show Velopack's log
+        if: failure()
+        shell: pwsh
+        run: |
+          Get-Item (Join-Path $env:LOCALAPPDATA 'velopack\*.log') -ErrorAction SilentlyContinue |
+            ForEach-Object { "--- $($_.FullName)"; Get-Content $_.FullName -Tail 100 }
+
+      - name: Clean up
+        if: always()
+        shell: pwsh
+        run: |
+          $data = Join-Path $env:LOCALAPPDATA $env:DATA_FOLDER
+          if (Test-Path $data) { Remove-Item $data -Recurse -Force }
 
   draft-release:
     # A pushed tag always drafts a release, a manual run when it was asked to; neither does
