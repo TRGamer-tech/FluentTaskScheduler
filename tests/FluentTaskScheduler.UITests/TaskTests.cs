@@ -130,8 +130,8 @@ public sealed class TaskTests : IDisposable
         _windows.Create("Nightly", SystemTaskXml);
         using var app = AppSession.Launch("limit");
 
-        var row = app.SearchTask("Nightly");
-        OpenEditor(app, row);
+        app.SearchTask("Nightly");
+        OpenEditor(app, "Nightly");
         app.Expand("EditorSettings");
         app.Snapshot("editor-settings");
         var limit = app.Require("EditorLimitRunTime").AsCheckBox();
@@ -150,8 +150,7 @@ public sealed class TaskTests : IDisposable
         Assert.Contains("robocopy", _windows.Value("Nightly", "Actions", "Exec", "Command"));
 
         // Opened again, the limit stays off instead of coming back.
-        row = app.Find(RowNamed("Nightly"), 20000)!;
-        OpenEditor(app, row);
+        OpenEditor(app, "Nightly");
         app.Expand("EditorSettings");
         Assert.False(app.Require("EditorLimitRunTime").AsCheckBox().IsChecked, "The limit is shown as on again.");
         app.Snapshot("editor-reopened");
@@ -200,9 +199,8 @@ public sealed class TaskTests : IDisposable
         using var history = new HistoryLog(switchOn: false);
         _windows.CreateDaily("Detailed");
         using var app = AppSession.Launch("details");
-        app.SearchTask("Detailed").Click();
-        AutomationElement Row() => app.Find(RowNamed("Detailed"), 20000) ?? throw new InvalidOperationException("The task is not in the list.");
-        app.Require("DetailsRunButton", 20000);
+        app.SearchTask("Detailed");
+        app.OpenDetails("Detailed");
         bool showsAction = app.FindByName("cmd.exe /c exit 0", ControlType.Text, 20000) != null;
         app.Snapshot("details-opened");
         Assert.True(showsAction, "The details do not show the task's action.");
@@ -217,13 +215,8 @@ public sealed class TaskTests : IDisposable
         app.Require("DetailsRunButton").Press();
         Assert.True(AppSession.Eventually(() => app.Find("DetailsRunButton", 500) is null), "Run did not close the details.");
 
-        // The log is written a moment after the fact. Meanwhile the list reads the task again and can
-        // rebuild its row just as it is clicked, which the ARM64 build machine has seen.
-        Assert.True(AppSession.Eventually(() =>
-        {
-            Row().Click();
-            return app.Find("DetailsReloadButton", 3000) is not null;
-        }), "The details did not open again after the run.");
+        // The log is written a moment after the fact.
+        app.OpenDetails("Detailed");
         Assert.True(AppSession.Eventually(() =>
         {
             app.Require("DetailsReloadButton").Press();
@@ -240,8 +233,8 @@ public sealed class TaskTests : IDisposable
         _windows.CreateDaily("Seen narrow");
         // German has the longest texts.
         using var app = AppSession.Launch("details-narrow", AppSession.FirstRunDone(("Language", "de-DE")));
-        app.SearchTask("Seen narrow").Click();
-        app.Require("DetailsRunButton", 20000);
+        app.SearchTask("Seen narrow");
+        app.OpenDetails("Seen narrow");
 
         app.Resize(560, 800);
         app.Snapshot("narrow");
@@ -438,7 +431,7 @@ public sealed class TaskTests : IDisposable
         Assert.True(app.Find(RowNamed("Chosen last time"), 20000) != null, "The list does not show the task of the folder chosen last.");
 
         // Pressing the entry that is selected already leaves an invocation pending in the pane,
-        // which Windows App SDK 1.5 hands on to the entry the app selects next: All tasks, for
+        // which the navigation view hands on to the entry the app selects next: All tasks, for
         // the template's editor.
         app.Require("NavScriptLibrary").Press();
         app.Require("Template.TempCleanup", 20000);
@@ -510,10 +503,10 @@ public sealed class TaskTests : IDisposable
     private static int RowsIn(AppSession app) => AppSession.Walk(app.Require("TaskList")).Count(element => element.ControlType == ControlType.ListItem);
 
     /// <summary>A click on a row shows the task's details; the editor is one button further.</summary>
-    private static void OpenEditor(AppSession app, AutomationElement row)
+    private static void OpenEditor(AppSession app, string taskName)
     {
-        row.Click();
-        app.Require("DetailsEditButton", 20000).Press();
+        app.OpenDetails(taskName);
+        app.Require("DetailsEditButton").Press();
         app.Require("EditorName", 20000);
     }
 

@@ -20,7 +20,7 @@ public sealed class SnoozeTests : IDisposable
     {
         _windows.CreateDaily("Held back");
         using var app = AppSession.Launch("snooze-all");
-        AutomationElement row = app.SearchTask("Held back");
+        app.SearchTask("Held back");
 
         app.ToolbarButton("SnoozeButton").Press();
         app.Require("SnoozeHalfAnHourItem").Press();
@@ -28,10 +28,15 @@ public sealed class SnoozeTests : IDisposable
         Assert.True(app.Find("SnoozeBannerResume", 10000) is { IsOffscreen: false }, "No banner says that all tasks are snoozed.");
         app.Snapshot("snoozed");
 
-        row.RightClick();
-        AutomationElement run = app.Find(element => element.ControlType == ControlType.MenuItem && element.Name == "Run Now", 5000)
-                                ?? throw new InvalidOperationException("The task's menu has no Run Now entry.");
-        run.Press();
+        // The row is looked up for every try: the list may have replaced it since the search.
+        AutomationElement? run = null;
+        Assert.True(AppSession.Eventually(() =>
+        {
+            app.Find(RowNamed("Held back"), 5000)?.RightClick();
+            run = app.Find(element => element.ControlType == ControlType.MenuItem && element.Name == "Run Now", 3000);
+            return run is not null;
+        }), "The task's menu has no Run Now entry.");
+        run!.Press();
         string? said = Retry.WhileNull(app.OpenDialogText, TimeSpan.FromSeconds(10)).Result;
         app.Snapshot("run-refused");
         Assert.True(said?.Contains("Tasks are snoozed") == true, $"Starting the task was not refused. The app says: {said ?? "nothing"}");
@@ -46,10 +51,10 @@ public sealed class SnoozeTests : IDisposable
     {
         _windows.CreateDaily("Paused one");
         using var app = AppSession.Launch("snooze-task");
-        AutomationElement row = app.SearchTask("Paused one");
+        app.SearchTask("Paused one");
 
-        row.Click();
-        app.Require("DetailsSnoozeButton", 20000).Press();
+        app.OpenDetails("Paused one");
+        app.Require("DetailsSnoozeButton").Press();
         app.Require("DetailsSnoozeHalfAnHourItem").Press();
 
         Assert.True(AppSession.Eventually(() => !_windows.IsEnabled("Paused one")), "The snoozed task is still enabled in Task Scheduler. " + ProblemShown(app, "DetailsSnoozeProblem"));
@@ -92,10 +97,10 @@ public sealed class SnoozeTests : IDisposable
     {
         _windows.CreateDaily("Paused until");
         using var app = AppSession.Launch("snooze-task-until");
-        AutomationElement row = app.SearchTask("Paused until");
+        app.SearchTask("Paused until");
 
-        row.Click();
-        app.Require("DetailsSnoozeButton", 20000).Press();
+        app.OpenDetails("Paused until");
+        app.Require("DetailsSnoozeButton").Press();
         app.Require("DetailsSnoozeCustomItem").Press();
 
         // The details close to make way for the dialog.
@@ -105,8 +110,7 @@ public sealed class SnoozeTests : IDisposable
 
         Assert.True(AppSession.Eventually(() => !_windows.IsEnabled("Paused until")), "The snoozed task is still enabled in Task Scheduler. " + ProblemShown(app, "SnoozeProblem"));
 
-        row = app.Find(RowNamed("Paused until"), 20000) ?? throw new InvalidOperationException("The task is no longer in the list.");
-        row.Click();
+        app.OpenDetails("Paused until");
         Assert.True(app.Find("DetailsSnoozeStatus", 20000) is { IsOffscreen: false }, "The details do not say until when the task is snoozed.");
         app.Snapshot("task-snoozed");
 

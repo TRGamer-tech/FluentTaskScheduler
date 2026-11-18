@@ -364,6 +364,23 @@ public sealed class AppSession : IDisposable
     }
 
     /// <summary>
+    /// Opens the details of a task of the list with a click on its row. The list reads a task again
+    /// whenever Task Scheduler reports something about it and can replace the row while doing so;
+    /// UI Automation then answers for the row found a moment ago with a point in the middle of the
+    /// list. So the row is looked up and clicked until the details are open.
+    /// </summary>
+    public void OpenDetails(string taskName)
+    {
+        bool open = Eventually(() =>
+        {
+            if (Find("DetailsRunButton", 500) is not null) return true;
+            Find(element => element.Is(ControlType.ListItem) && element.NameOrEmpty() == taskName, 5000)?.Click();
+            return Find("DetailsRunButton", 3000) is not null;
+        }, seconds: 40);
+        if (!open) throw new InvalidOperationException($"The details of the task '{taskName}' did not open.");
+    }
+
+    /// <summary>
     /// A button of the task list's toolbar, wherever the toolbar put it: what does not fit next
     /// to the search box moves into the menu behind the "more" button.
     /// </summary>
