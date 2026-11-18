@@ -6,5 +6,9 @@
         <EnableWindowsTargeting>true</EnableWindowsTargeting>
         <!-- Dependencies ship their own translations; the app's languages live in Strings/. -->
         <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+        <!-- NuGet checks every package of a build, also the ones packages bring along, against the list of known
+             vulnerabilities. That stays a warning where warnings are errors: an advisory published tomorrow, or
+             the list being out of reach, must not stop today's sources, or a tagged release, from building. -->
+        <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1900;NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
     </PropertyGroup>
 </Project>
