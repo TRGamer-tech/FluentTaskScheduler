@@ -65,8 +65,6 @@ public static class Program
             return 0;
         }
 
-        XamlCheckProcessRequirements();
-
         App? app = null;
         Application.Start(_ =>
         {
@@ -118,8 +116,4 @@ public static class Program
     [DllImport("kernel32.dll")]
     [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     private static extern bool AttachConsole(int processId);
-
-    [DllImport("Microsoft.ui.xaml.dll")]
-    [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
-    private static extern void XamlCheckProcessRequirements();
 }
