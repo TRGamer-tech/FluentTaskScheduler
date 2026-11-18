@@ -1,0 +1,216 @@
+using FluentTaskScheduler.Scheduling;
+
+namespace FluentTaskScheduler.Tests.Support;
+
+/// <summary>
+/// Tasks in memory, behaving like <see cref="TaskStore"/> as far as callers can tell: paths
+/// compare without regard to case, a missing task throws <see cref="TaskNotFoundException"/>,
+/// a new, renamed or imported task never replaces another one but throws
+/// <see cref="TaskExistsException"/>, and a path listed in <see cref="Protected"/> throws
+/// <see cref="TaskAccessDeniedException"/> for anything that would change or start it.
+/// </summary>
+public sealed class FakeTaskStore : ITaskStore
+{
+    private readonly Dictionary<string, TaskDraft> _tasks = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _running = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, (DateTime? Last, DateTime? Next)> _runTimes = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Tasks Windows would refuse to change or start.</summary>
+    public HashSet<string> Protected { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Every call that changed or started something, in order, e.g. "Run \Backup", "Run \Backup unforced" or "SetEnabled \Backup False".</summary>
+    public List<string> Calls { get; } = [];
+
+    /// <summary>The password the last <see cref="Save"/> was given.</summary>
+    public string? LastPassword { get; private set; }
+
+    /// <summary>Called before each operation with its name and task path; throw from it to make the operation fail.</summary>
+    public Action<string, string>? Before { get; set; }
+
+    public FakeTaskStore Add(string path, bool enabled = true, TaskDraft? draft = null)
+    {
+        _tasks[path] = (draft ?? new TaskDraft()) with { Name = NameOf(path), Enabled = enabled };
+        return this;
+    }
+
+    /// <summary>Sets when the task last ran and will run next, as the task list shows it.</summary>
+    public FakeTaskStore SetRunTimes(string path, DateTime? last, DateTime? next)
+    {
+        _runTimes[path] = (last, next);
+        return this;
+    }
+
+    /// <summary>When set, listing the tasks fails with this, as when the Task Scheduler service is not reachable.</summary>
+    public Exception? ListingFails { get; set; }
+
+    public bool IsEnabled(string path) => Get(path).Enabled;
+    public bool IsRunning(string path) => _running.Contains(path);
+    public IEnumerable<string> Paths => _tasks.Keys;
+
+    /// <summary>How often all tasks were listed.</summary>
+    public int Listings { get; private set; }
+
+    /// <summary>Called by <see cref="GetTasks"/> on the reading thread when it has read the tasks and before it hands them over; block in it to make a listing slow.</summary>
+    public Action? Listed { get; set; }
+
+    public IReadOnlyList<TaskRow> GetTasks()
+    {
+        Listings++;
+        if (ListingFails is { } failure) throw failure;
+
+        var rows = _tasks.Select(entry => RowOf(entry.Key, entry.Value)).ToList();
+        Listed?.Invoke();
+        return rows;
+    }
+
+    /// <summary>When set, reading a single task fails with this.</summary>
+    public Exception? ReadingFails { get; set; }
+
+    /// <summary>The paths <see cref="GetTask"/> was asked for, in order.</summary>
+    public List<string> TasksRead { get; } = [];
+
+    // The row carries the path as the task was registered, however the caller spelled it.
+    public TaskRow? GetTask(string path)
+    {
+        TasksRead.Add(path);
+        if (ReadingFails is { } failure) throw failure;
+
+        return _tasks.FirstOrDefault(task => string.Equals(task.Key, path, StringComparison.OrdinalIgnoreCase)) is { Key: not null } found
+            ? RowOf(found.Key, found.Value)
+            : null;
+    }
+
+    private TaskRow RowOf(string path, TaskDraft draft) => new(path)
+    {
+        LastRunTime = _runTimes.GetValueOrDefault(path).Last,
+        NextRunTime = draft.Enabled ? _runTimes.GetValueOrDefault(path).Next : null,
+        IsEnabled = draft.Enabled,
+        State = StateOf(path),
+        IsHidden = draft.Hidden,
+        Description = draft.Description,
+        Author = draft.Author,
+        Category = draft.Category,
+        Tags = draft.Tags,
+        CompletionActions = draft.CompletionActions
+    };
+
+    public bool Exists(string path) => _tasks.ContainsKey(path);
+
+    /// <summary>When set, a question about states is counted and stays unanswered until this is.</summary>
+    public ManualResetEventSlim? StatesHeldBack { get; set; }
+
+    /// <summary>How often the states of tasks were asked for.</summary>
+    public int StatesAsked => _statesAsked;
+
+    private int _statesAsked;
+
+    public IReadOnlyDictionary<string, TaskRowState> GetStates(IEnumerable<string> paths)
+    {
+        Interlocked.Increment(ref _statesAsked);
+        StatesHeldBack?.Wait(TimeSpan.FromSeconds(30));
+        return paths.Where(Exists).Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(path => path, StateOf, StringComparer.OrdinalIgnoreCase);
+    }
+
+    public int CountRunningTasks() => _running.Count;
+
+    public TaskDraft Load(string path) => Get(path);
+
+    public CompletionActions GetCompletionActions(string path) =>
+        _tasks.TryGetValue(path, out var draft) ? draft.CompletionActions : CompletionActions.None;
+
+    public string Save(TaskDraft draft, string folderPath, string? originalPath = null, string? password = null)
+    {
+        string path = folderPath.TrimEnd('\\') + "\\" + draft.Name;
+        bool sameTask = string.Equals(originalPath, path, StringComparison.OrdinalIgnoreCase);
+        if (!sameTask && _tasks.ContainsKey(path)) throw new TaskExistsException(path);
+
+        Change("Save", originalPath ?? path, mustExist: originalPath is not null);
+        LastPassword = password;
+        if (originalPath is not null && originalPath != path)
+        {
+            _tasks.Remove(originalPath);
+            _running.Remove(originalPath);
+        }
+        _tasks[path] = draft;
+        return path;
+    }
+
+    public void SetEnabled(string path, bool enabled)
+    {
+        Change($"SetEnabled", path, detail: enabled.ToString());
+        _tasks[path] = _tasks[path] with { Enabled = enabled };
+    }
+
+    public void Run(string path, bool force = true)
+    {
+        Change("Run", path, detail: force ? null : "unforced");
+        _running.Add(path);
+    }
+
+    public void Stop(string path)
+    {
+        Change("Stop", path);
+        _running.Remove(path);
+    }
+
+    public void Delete(string path)
+    {
+        Change("Delete", path);
+        _tasks.Remove(path);
+        _running.Remove(path);
+    }
+
+    public string Export(string path) => $"<Task name=\"{Get(path).Name}\" />";
+
+    /// <summary>What <see cref="Inspect"/> reports about any task XML.</summary>
+    public TaskImportInfo ImportInfo { get; set; } = new(TaskAccount.CurrentUser, AccountExistsHere: true, HighestPrivileges: false, StoresPassword: false);
+
+    /// <summary>The options the last <see cref="Import"/> was given.</summary>
+    public TaskImportOptions? LastImport { get; private set; }
+
+    public TaskImportInfo Inspect(string xml) =>
+        xml.Contains("<Task", StringComparison.Ordinal) ? ImportInfo : throw new FormatException("This is not a task exported from Task Scheduler.");
+
+    /// <summary>Like the real import, it never replaces a task that is already there.</summary>
+    public string Import(string xml, TaskImportOptions options)
+    {
+        LastImport = options;
+        string path = options.FolderPath.TrimEnd('\\') + "\\" + options.Name;
+        if (Exists(path)) throw new TaskExistsException(path);
+        return Save(new TaskDraft { Name = options.Name }, options.FolderPath);
+    }
+
+    /// <summary>Marks a running task as finished, as Task Scheduler would.</summary>
+    public void Finish(string path) => _running.Remove(path);
+
+    /// <summary>
+    /// Gives a task another path, as <see cref="FakeTaskFolders"/> does when it moves the task or
+    /// its folder. Like Windows, it leaves a protected task where it is and never replaces another task.
+    /// </summary>
+    public void Move(string from, string to)
+    {
+        TaskDraft task = Get(from);
+        if (Protected.Contains(from)) throw new TaskAccessDeniedException(from, new UnauthorizedAccessException());
+        if (!string.Equals(from, to, StringComparison.OrdinalIgnoreCase) && _tasks.ContainsKey(to)) throw new TaskExistsException(to);
+
+        _tasks.Remove(from);
+        _tasks[to] = task with { Name = NameOf(to) };
+    }
+
+    private TaskRowState StateOf(string path) =>
+        _running.Contains(path) ? TaskRowState.Running : _tasks[path].Enabled ? TaskRowState.Ready : TaskRowState.Disabled;
+
+    private TaskDraft Get(string path) =>
+        _tasks.TryGetValue(path, out var draft) ? draft : throw new TaskNotFoundException(path);
+
+    private void Change(string operation, string path, bool mustExist = true, string? detail = null)
+    {
+        Before?.Invoke(operation, path);
+        if (mustExist && !_tasks.ContainsKey(path)) throw new TaskNotFoundException(path);
+        if (Protected.Contains(path)) throw new TaskAccessDeniedException(path, new UnauthorizedAccessException());
+        Calls.Add(detail is null ? $"{operation} {path}" : $"{operation} {path} {detail}");
+    }
+
+    private static string NameOf(string path) => path[(path.LastIndexOf('\\') + 1)..];
+}

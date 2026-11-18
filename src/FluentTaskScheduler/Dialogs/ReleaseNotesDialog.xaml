@@ -1,0 +1,41 @@
+<ContentDialog
+    x:Class="FluentTaskScheduler.Dialogs.ReleaseNotesDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:l="using:FluentTaskScheduler.Localization"
+    Style="{StaticResource DefaultContentDialogStyle}"
+    Title="{x:Bind Heading}"
+    CloseButtonText="{x:Bind l:Loc.Get('Dialog.Common.Close')}"
+    DefaultButton="Close">
+
+    <ContentDialog.Resources>
+        <!-- Release notes are prose with long lines; the stock dialog is too narrow for them. -->
+        <x:Double x:Key="ContentDialogMaxWidth">680</x:Double>
+    </ContentDialog.Resources>
+
+    <Grid RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="{x:Bind Notes.Title}" TextWrapping="Wrap"
+                   Style="{StaticResource BodyStrongTextBlockStyle}"
+                   Visibility="{x:Bind HasTitle}"/>
+
+        <!-- Long notes scroll. The row shrinks with a small window; the maximum height keeps the
+             dialog from growing with the notes in a large one. Notes need not hold anything that
+             takes the focus, so the scroller takes it: the keyboard could not scroll them otherwise. -->
+        <ScrollViewer x:Name="NotesScroller" Grid.Row="1" MaxHeight="480" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                      IsTabStop="True" UseSystemFocusVisuals="True"
+                      AutomationProperties.Name="{x:Bind l:Loc.Get('Settings.WhatsNew.Title')}">
+            <StackPanel x:Name="NotesPanel" Spacing="8" Margin="0,0,16,0"/>
+        </ScrollViewer>
+
+        <HyperlinkButton Grid.Row="2" Padding="0"
+                         Content="{x:Bind l:Loc.Get('WhatsNew.ViewRelease')}"
+                         NavigateUri="{x:Bind ReleasePage}"
+                         Visibility="{x:Bind HasReleasePage}"/>
+    </Grid>
+</ContentDialog>

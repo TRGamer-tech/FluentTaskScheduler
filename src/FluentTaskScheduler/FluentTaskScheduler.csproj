@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+        <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+        <RootNamespace>FluentTaskScheduler</RootNamespace>
+        <Version>2.0.0</Version>
+
+        <Platforms>x64;ARM64</Platforms>
+        <RuntimeIdentifier Condition="'$(Platform)' == 'ARM64'">win-arm64</RuntimeIdentifier>
+        <RuntimeIdentifier Condition="'$(Platform)' != 'ARM64'">win-x64</RuntimeIdentifier>
+        <SelfContained>true</SelfContained>
+        <DisableTransitiveFrameworkReferenceDownloads>true</DisableTransitiveFrameworkReferenceDownloads>
+
+        <!-- Unpackaged WinUI 3 app that carries the Windows App SDK next to the exe. -->
+        <UseWinUI>true</UseWinUI>
+        <EnableMsixTooling>true</EnableMsixTooling>
+        <WindowsPackageType>None</WindowsPackageType>
+        <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
+        <!-- Program.Main is written by hand (update hooks and the command line run before XAML starts). -->
+        <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+        <!-- The index of texts and compiled pages keeps the name it had up to version 1.9. The Windows App SDK
+             would now name it after the app, but it still looks for resources.pri first: a copy of the app
+             unpacked over an older one would go on showing the older one's texts and pages. -->
+        <ProjectPriFileName>resources.pri</ProjectPriFileName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Content Include="Assets\AppIcon.ico" CopyToOutputDirectory="PreserveNewest" />
+        <Content Include="Assets\Scripts.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\FluentTaskScheduler.Core\FluentTaskScheduler.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.15" />
+        <!-- Toasts: the Windows App SDK's own notifications do not work in an elevated process. -->
+        <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
+        <!-- The WinUI part of the Windows App SDK and what it needs. The whole SDK would put its AI and machine
+             learning runtimes, 50 MB of them, next to an app that carries the SDK along. -->
+        <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.7.0" />
+        <PackageReference Include="Velopack" Version="1.2.161" />
+    </ItemGroup>
+
+</Project>

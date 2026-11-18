@@ -1,0 +1,142 @@
+using FluentTaskScheduler.Localization;
+using Microsoft.Win32.TaskScheduler;
+using ScheduledTask = Microsoft.Win32.TaskScheduler.Task;
+using TaskAction = Microsoft.Win32.TaskScheduler.Action;
+
+namespace FluentTaskScheduler.Scheduling;
+
+/// <summary>Reads a registered task into a <see cref="TaskDraft"/>.</summary>
+internal static class TaskDraftReader
+{
+    public static TaskDraft Read(ScheduledTask task) => Read(task.Definition) with { Name = task.Name };
+
+    public static TaskDraft Read(TaskDefinition definition)
+    {
+        var metadata = TaskMetadata.Split(definition.RegistrationInfo.Description);
+        var settings = definition.Settings;
+        var principal = definition.Principal;
+
+        return new TaskDraft
+        {
+            Description = metadata.Description,
+            Category = metadata.Category,
+            Tags = metadata.Tags,
+            CompletionActions = metadata.CompletionActions,
+            Author = definition.RegistrationInfo.Author ?? "",
+            Enabled = settings.Enabled,
+            Hidden = settings.Hidden,
+
+            Account = TaskAccounts.FromPrincipal(principal),
+            HighestPrivileges = principal.RunLevel == TaskRunLevel.Highest,
+            StoresPassword = TaskRegistration.StoresPassword(principal.LogonType),
+
+            RunOnlyIfIdle = settings.RunOnlyIfIdle,
+            IdleDuration = settings.IdleSettings.IdleDuration,
+            StopOnIdleEnd = settings.IdleSettings.StopOnIdleEnd,
+            RunOnlyOnAcPower = settings.DisallowStartIfOnBatteries,
+            StopOnBattery = settings.StopIfGoingOnBatteries,
+            RunOnlyIfNetwork = settings.RunOnlyIfNetworkAvailable,
+            NetworkId = settings.NetworkSettings.Id,
+            NetworkName = settings.NetworkSettings.Name ?? "",
+            WakeToRun = settings.WakeToRun,
+
+            ExecutionTimeLimit = settings.ExecutionTimeLimit,
+            RunIfMissed = settings.StartWhenAvailable,
+            MultipleInstances = settings.MultipleInstances,
+            Priority = settings.Priority,
+            DeleteWhenExpired = settings.DeleteExpiredTaskAfter != TimeSpan.Zero,
+            AllowHardTerminate = settings.AllowHardTerminate,
+            RestartCount = settings.RestartCount,
+            RestartInterval = settings.RestartInterval,
+
+            Triggers = definition.Triggers.Select(Read).ToArray(),
+            Actions = definition.Actions.Select(Read).ToArray()
+        };
+    }
+
+    public static TriggerDraft Read(Trigger trigger, int index)
+    {
+        var draft = new TriggerDraft
+        {
+            SourceIndex = index,
+            Enabled = trigger.Enabled,
+            Start = trigger.StartBoundary == DateTime.MinValue ? null : InLocalTime(trigger.StartBoundary),
+            End = trigger.EndBoundary == DateTime.MaxValue ? null : InLocalTime(trigger.EndBoundary),
+            RepetitionInterval = trigger.Repetition.Interval,
+            RepetitionDuration = trigger.Repetition.Duration
+        };
+
+        return trigger switch
+        {
+            DailyTrigger t => draft with { Type = TriggerType.Daily, DaysInterval = t.DaysInterval, RandomDelay = t.RandomDelay },
+            WeeklyTrigger t => draft with { Type = TriggerType.Weekly, WeeksInterval = t.WeeksInterval, DaysOfWeek = t.DaysOfWeek, RandomDelay = t.RandomDelay },
+            MonthlyTrigger t => draft with
+            {
+                Type = TriggerType.Monthly,
+                MonthlyByWeekday = false,
+                Months = t.MonthsOfYear,
+                DaysOfMonth = DaysOfMonthMask(t.DaysOfMonth),
+                LastDayOfMonth = t.RunOnLastDayOfMonth,
+                RandomDelay = t.RandomDelay
+            },
+            MonthlyDOWTrigger t => draft with
+            {
+                Type = TriggerType.Monthly,
+                MonthlyByWeekday = true,
+                Months = t.MonthsOfYear,
+                DaysOfWeek = t.DaysOfWeek,
+                Weeks = t.WeeksOfMonth,
+                RandomDelay = t.RandomDelay
+            },
+            TimeTrigger t => draft with { Type = TriggerType.Once, RandomDelay = t.RandomDelay },
+            LogonTrigger => draft with { Type = TriggerType.AtLogon },
+            BootTrigger => draft with { Type = TriggerType.AtStartup },
+            IdleTrigger => draft with { Type = TriggerType.OnIdle },
+            EventTrigger t => draft with { Type = TriggerType.Event, EventSubscription = t.Subscription ?? "" },
+            SessionStateChangeTrigger t => draft with { Type = TriggerType.SessionStateChange, SessionChange = t.StateChange },
+            _ => draft with { Type = TriggerType.Unsupported, UnsupportedSummary = KindText(trigger.TriggerType) }
+        };
+    }
+
+    // Windows' own tasks use these kinds a lot; one without a text of its own keeps the library's name.
+    private static string KindText(TaskTriggerType type) => type switch
+    {
+        TaskTriggerType.Registration => Loc.Get("Trigger.Kind.Registration"),
+        TaskTriggerType.Custom => Loc.Get("Trigger.Kind.Custom"),
+        _ => type.ToString()
+    };
+
+    /// <summary>
+    /// A boundary stored in UTC (Task Scheduler's "synchronize across time zones") comes back from
+    /// the library as UTC for the start but as local time for the end. Everything that works with
+    /// a draft, the editor and every text included, takes its times as local times.
+    /// </summary>
+    private static DateTime InLocalTime(DateTime boundary) => boundary.Kind == DateTimeKind.Utc ? boundary.ToLocalTime() : boundary;
+
+    public static ActionDraft Read(TaskAction action, int index) => action switch
+    {
+        ExecAction exec => new ActionDraft
+        {
+            SourceIndex = index,
+            Path = exec.Path ?? "",
+            Arguments = exec.Arguments ?? "",
+            WorkingDirectory = exec.WorkingDirectory ?? ""
+        },
+        ComHandlerAction com => new ActionDraft { SourceIndex = index, UnsupportedSummary = Loc.Format("Action.Kind.ComHandler", com.ClassId.ToString("B")) },
+        _ => new ActionDraft { SourceIndex = index, UnsupportedSummary = KindText(action.ActionType) }
+    };
+
+    private static string KindText(TaskActionType type) => type switch
+    {
+        TaskActionType.SendEmail => Loc.Get("Action.Kind.SendEmail"),
+        TaskActionType.ShowMessage => Loc.Get("Action.Kind.ShowMessage"),
+        _ => type.ToString()
+    };
+
+    /// <summary>Days 1 to 31 as a bit mask: bit 0 is the 1st.</summary>
+    public static uint DaysOfMonthMask(IEnumerable<int> days) =>
+        days.Where(day => day is >= 1 and <= 31).Aggregate(0u, (mask, day) => mask | 1u << (day - 1));
+
+    public static int[] DaysOfMonthFromMask(uint mask) =>
+        Enumerable.Range(1, 31).Where(day => (mask & 1u << (day - 1)) != 0).ToArray();
+}

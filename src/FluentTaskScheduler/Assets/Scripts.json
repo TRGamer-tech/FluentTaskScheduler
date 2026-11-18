@@ -1,0 +1,80 @@
+[
+  {
+    "Id": "SystemFileChecker",
+    "Command": "sfc.exe",
+    "Arguments": "/scannow",
+    "RunAsAdmin": true
+  },
+  {
+    "Id": "DiskCleanup",
+    "Command": "cleanmgr.exe",
+    "Arguments": "/sagerun:1",
+    "RunAsAdmin": true
+  },
+  {
+    "Id": "CheckDisk",
+    "Command": "chkdsk.exe",
+    "Arguments": "C: /scan",
+    "RunAsAdmin": true
+  },
+  {
+    "Id": "ClearTempFolder",
+    "Command": "powershell.exe",
+    "Arguments": "-NoProfile -NonInteractive -ExecutionPolicy Bypass -WindowStyle Hidden -Command \"Remove-Item -Path (Join-Path $env:TEMP '*') -Recurse -Force -ErrorAction SilentlyContinue; exit 0\"",
+    "RunAsAdmin": false
+  },
+  {
+    "Id": "SystemInfoReport",
+    "Command": "cmd.exe",
+    "Arguments": "/c systeminfo > \"%USERPROFILE%\\SystemInfo.txt\"",
+    "RunAsAdmin": false
+  },
+  {
+    "Id": "NetworkCheck",
+    "Command": "ping.exe",
+    "Arguments": "8.8.8.8 -n 4",
+    "RunAsAdmin": false
+  },
+  {
+    "Id": "FlushDns",
+    "Command": "ipconfig.exe",
+    "Arguments": "/flushdns",
+    "RunAsAdmin": false
+  },
+  {
+    "Id": "Shutdown",
+    "Command": "shutdown.exe",
+    "Arguments": "/s /t 3600",
+    "RunAsAdmin": false
+  },
+  {
+    "Id": "Reboot",
+    "Command": "shutdown.exe",
+    "Arguments": "/r /t 3600",
+    "RunAsAdmin": false
+  },
+  {
+    "Id": "RestartPrintSpooler",
+    "Command": "powershell.exe",
+    "Arguments": "-NoProfile -NonInteractive -ExecutionPolicy Bypass -WindowStyle Hidden -Command \"Restart-Service -Name Spooler -Force\"",
+    "RunAsAdmin": true
+  },
+  {
+    "Id": "BatteryReport",
+    "Command": "cmd.exe",
+    "Arguments": "/c powercfg /batteryreport /output \"%USERPROFILE%\\battery-report.html\"",
+    "RunAsAdmin": false
+  },
+  {
+    "Id": "EmptyRecycleBin",
+    "Command": "powershell.exe",
+    "Arguments": "-NoProfile -NonInteractive -ExecutionPolicy Bypass -WindowStyle Hidden -Command \"Clear-RecycleBin -Force -ErrorAction SilentlyContinue; exit 0\"",
+    "RunAsAdmin": false
+  },
+  {
+    "Id": "ExportIpConfig",
+    "Command": "cmd.exe",
+    "Arguments": "/c ipconfig /all > \"%USERPROFILE%\\ipconfig.txt\"",
+    "RunAsAdmin": false
+  }
+]

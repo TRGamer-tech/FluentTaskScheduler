@@ -6,10 +6,21 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      x64-runner:
+        description: Where the x64 UI tests run. windows-2022 is built on Windows 10, the nearest thing to it that GitHub hosts.
+        type: choice
+        options: [windows-latest, windows-2022]
+        default: windows-latest
+
+permissions:
+  contents: read
 
 jobs:
+  # Unit tests plus the tests that register real tasks in the runner's Task Scheduler.
   test:
     runs-on: windows-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -17,35 +28,40 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
 
       - name: Run tests
         run: >
-          dotnet test FluentTaskScheduler.Tests/FluentTaskScheduler.Tests.csproj
+          dotnet test tests/FluentTaskScheduler.Tests
           -c Release
-          -p:Platform=x64
           --logger "trx;LogFileName=test-results.trx"
+          --collect:"XPlat Code Coverage"
+          --blame
+          --results-directory test-results
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: test-results
-          path: FluentTaskScheduler.Tests/TestResults/test-results.trx
+          path: test-results/
 
-  build:
-    needs: test
+  # Publishes the app the way a release does, then drives the published exe through its UI.
+  app:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - platform: x64
             rid: win-x64
-            runner: windows-latest
+            # Only a run started by hand has the input.
+            runner: ${{ inputs.x64-runner || 'windows-latest' }}
           - platform: ARM64
             rid: win-arm64
             runner: windows-11-arm
 
     runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
 
     steps:
       - name: Checkout
@@ -54,17 +70,54 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
 
       - name: Publish
         run: >
-          dotnet publish
+          dotnet publish src/FluentTaskScheduler
           -c Release
           -p:Platform=${{ matrix.platform }}
-          --self-contained true
+          -o publish
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v5
+      - name: Upload app
+        uses: actions/upload-artifact@v7
         with:
           name: FluentTaskScheduler-${{ matrix.rid }}
-          path: bin/${{ matrix.platform }}/Release/net8.0-windows10.0.19041.0/${{ matrix.rid }}/publish/
+          path: publish/
+
+      # The hosted runner's desktop defaults to 1024x768, smaller than the app's default window.
+      # Only Windows Server has the command to change that; the ARM64 runner runs Windows 11.
+      - name: Set screen resolution
+        shell: pwsh
+        run: |
+          if (Get-Command Set-DisplayResolution -ErrorAction SilentlyContinue) {
+            Set-DisplayResolution -Width 1920 -Height 1080 -Force
+          } else {
+            'This runner cannot change its screen resolution; the UI tests run at 1024x768.'
+          }
+
+      - name: Run UI tests
+        env:
+          FTS_APP_EXE: ${{ github.workspace }}\publish\FluentTaskScheduler.exe
+          FTS_UI_ARTIFACTS: ${{ github.workspace }}\ui-artifacts
+          # A fresh runner can show Windows' first sign-in screens on top of everything.
+          FTS_UI_CLOSE_COVERING_WINDOWS: 1
+          # The pictures of the README need more room than the screen of the ARM64 runner has.
+          FTS_README_SCREENSHOTS: ${{ matrix.platform == 'x64' && '1' || '0' }}
+          # The tests that change the display scaling need the room of the larger screen, which only the x64 runner has.
+          FTS_UI_CHANGE_DISPLAY_SCALING: ${{ matrix.platform == 'x64' && '1' || '0' }}
+        # A test held up by a dialog or by an app that stopped answering is ended after ten
+        # minutes instead of holding the runner for hours. No dump: nothing would upload it.
+        run: >
+          dotnet test tests/FluentTaskScheduler.UITests
+          -c Release
+          --logger "console;verbosity=detailed"
+          --blame-hang-timeout 10m
+          --blame-hang-dump-type none
+
+      - name: Upload UI screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ui-artifacts-${{ matrix.rid }}
+          path: ui-artifacts/

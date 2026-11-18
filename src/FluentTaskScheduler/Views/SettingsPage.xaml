@@ -1,0 +1,300 @@
+<Page
+    x:Class="FluentTaskScheduler.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="using:FluentTaskScheduler.Controls"
+    xmlns:l="using:FluentTaskScheduler.Localization">
+
+    <Page.Resources>
+        <Style x:Key="SectionHeaderStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}">
+            <Setter Property="Margin" Value="1,20,0,4"/>
+            <Setter Property="AutomationProperties.HeadingLevel" Value="Level2"/>
+        </Style>
+
+        <!-- An expander that looks like the cards around it: as wide, as tall, its rows bringing their own padding.
+             The expander's default style still applies underneath. App XAML cannot name that style:
+             BasedOn made the page fail to load (seen with Windows App SDK 1.5). -->
+        <Style x:Key="SettingsExpanderStyle" TargetType="Expander">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="MinHeight" Value="68"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+    </Page.Resources>
+
+    <ScrollViewer AutomationProperties.AutomationId="SettingsScroller">
+        <!-- Stretch with a maximum width keeps the cards centred in a wide window. The grid has to
+             be there: the scroll viewer centres its own content by the width that content asks
+             for, not by the width it gets, which put the cards off centre. -->
+        <Grid>
+            <StackPanel MaxWidth="1000" Margin="24,0,24,24" Spacing="4">
+
+                <!-- The three settings that make the app build its windows anew (language, black
+                     backgrounds, smooth scrolling) are in this first section: the page comes back
+                     scrolled to the top, which is then where the user was. -->
+                <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="{x:Bind l:Loc.Get('Settings.Section.Appearance')}"/>
+
+                <c:SettingsCard Glyph="&#xE790;"
+                                Header="{x:Bind l:Loc.Get('Settings.Appearance.Theme.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.Appearance.Theme.Description')}">
+                    <!-- Here and below the items are given before the selection: a list drops a selection it gets while it is empty. -->
+                    <ComboBox MinWidth="200" AutomationProperties.AutomationId="ThemeChoice"
+                              ItemsSource="{x:Bind ViewModel.ThemeNames}"
+                              SelectedIndex="{x:Bind ViewModel.ThemeIndex, Mode=TwoWay}"/>
+                </c:SettingsCard>
+
+                <c:SettingsCard Glyph="&#xE774;"
+                                Header="{x:Bind l:Loc.Get('Settings.Appearance.Language.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.Appearance.Language.Description')}">
+                    <ComboBox MinWidth="200" AutomationProperties.AutomationId="LanguageChoice"
+                              ItemsSource="{x:Bind ViewModel.LanguageNames}"
+                              SelectedIndex="{x:Bind ViewModel.LanguageIndex, Mode=TwoWay}"/>
+                </c:SettingsCard>
+
+                <c:SettingsCard Glyph="&#xE771;"
+                                Header="{x:Bind l:Loc.Get('Settings.Appearance.Mica.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.Appearance.Mica.Description')}">
+                    <ToggleSwitch AutomationProperties.AutomationId="MicaSwitch"
+                                  IsOn="{x:Bind ViewModel.IsMicaEnabled, Mode=TwoWay}"
+                                  IsEnabled="{x:Bind ViewModel.CanUseMica, Mode=OneWay}"/>
+                </c:SettingsCard>
+
+                <c:SettingsCard Glyph="&#xE708;"
+                                Header="{x:Bind l:Loc.Get('Settings.Appearance.Oled.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.Appearance.Oled.Description')}">
+                    <ToggleSwitch AutomationProperties.AutomationId="OledSwitch"
+                                  IsOn="{x:Bind ViewModel.IsOledMode, Mode=TwoWay}"
+                                  IsEnabled="{x:Bind ViewModel.CanUseOled, Mode=OneWay}"/>
+                </c:SettingsCard>
+
+                <c:SettingsCard Glyph="&#xE8CB;"
+                                Header="{x:Bind l:Loc.Get('Settings.Sys.Smooth.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.Sys.Smooth.Desc')}">
+                    <ToggleSwitch AutomationProperties.AutomationId="SmoothScrollingSwitch"
+                                  IsOn="{x:Bind ViewModel.SmoothScrolling, Mode=TwoWay}"/>
+                </c:SettingsCard>
+
+                <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="{x:Bind l:Loc.Get('Settings.Section.Notifications')}"/>
+
+                <c:SettingsCard Glyph="&#xEA8F;"
+                                Header="{x:Bind l:Loc.Get('Settings.Notif.Task.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.Notif.Task.Desc')}">
+                    <ToggleSwitch AutomationProperties.AutomationId="NotificationsSwitch"
+                                  IsOn="{x:Bind ViewModel.ShowNotifications, Mode=TwoWay}"/>
+                </c:SettingsCard>
+
+                <c:SettingsCard Glyph="&#xE823;"
+                                Header="{x:Bind l:Loc.Get('Settings.Notif.Reminders.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.Notif.Reminders.Desc')}">
+                    <ToggleSwitch AutomationProperties.AutomationId="RemindersSwitch"
+                                  IsOn="{x:Bind ViewModel.EnableUpcomingReminders, Mode=TwoWay}"
+                                  IsEnabled="{x:Bind ViewModel.CanRemind, Mode=OneWay}"/>
+                </c:SettingsCard>
+
+                <c:SettingsCard Glyph="&#xE916;"
+                                Header="{x:Bind l:Loc.Get('Settings.Notif.Timing.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.Notif.Timing.Desc')}">
+                    <ComboBox MinWidth="200" AutomationProperties.AutomationId="ReminderLeadChoice"
+                              ItemsSource="{x:Bind ViewModel.ReminderLeadNames, Mode=OneWay}"
+                              SelectedIndex="{x:Bind ViewModel.ReminderLeadIndex, Mode=TwoWay}"
+                              IsEnabled="{x:Bind ViewModel.CanChooseReminderLead, Mode=OneWay}"/>
+                </c:SettingsCard>
+
+                <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="{x:Bind l:Loc.Get('Settings.Section.System')}"/>
+
+                <c:SettingsCard Glyph="&#xE7E8;"
+                                Header="{x:Bind l:Loc.Get('Settings.Sys.Startup.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.Sys.Startup.Desc')}">
+                    <ToggleSwitch AutomationProperties.AutomationId="StartWithWindowsSwitch"
+                                  IsOn="{x:Bind ViewModel.StartWithWindows, Mode=TwoWay}"/>
+                </c:SettingsCard>
+
+                <c:SettingsCard Glyph="&#xE78B;"
+                                Header="{x:Bind l:Loc.Get('Settings.Sys.Tray.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.Sys.Tray.Desc')}">
+                    <ToggleSwitch AutomationProperties.AutomationId="TraySwitch"
+                                  IsOn="{x:Bind ViewModel.EnableTrayIcon, Mode=TwoWay}"/>
+                </c:SettingsCard>
+
+                <c:SettingsCard Glyph="&#xE921;"
+                                Header="{x:Bind l:Loc.Get('Settings.Sys.MinimizeToTray.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.Sys.MinimizeToTray.Desc')}">
+                    <ToggleSwitch AutomationProperties.AutomationId="MinimizeToTraySwitch"
+                                  IsOn="{x:Bind ViewModel.MinimizeToTray, Mode=TwoWay}"
+                                  IsEnabled="{x:Bind ViewModel.CanMinimizeToTray, Mode=OneWay}"/>
+                </c:SettingsCard>
+
+                <c:SettingsCard Glyph="&#xE71B;"
+                                Header="{x:Bind l:Loc.Get('Settings.Sys.Pipelines.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.Sys.Pipelines.Desc')}">
+                    <ToggleSwitch AutomationProperties.AutomationId="PipelinesSwitch"
+                                  IsOn="{x:Bind ViewModel.EnableTaskPipelines, Mode=TwoWay}"/>
+                </c:SettingsCard>
+
+                <c:SettingsCard Glyph="&#xE7B3;"
+                                Header="{x:Bind l:Loc.Get('Settings.Sys.Hidden.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.Sys.Hidden.Desc')}">
+                    <ToggleSwitch AutomationProperties.AutomationId="HiddenTasksSwitch"
+                                  IsOn="{x:Bind ViewModel.ShowHiddenTasks, Mode=TwoWay}"/>
+                </c:SettingsCard>
+
+                <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="{x:Bind l:Loc.Get('Settings.Section.Advanced')}"/>
+
+                <c:SettingsCard Glyph="&#xE74D;"
+                                Header="{x:Bind l:Loc.Get('Settings.Adv.Confirm.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.Adv.Confirm.Desc')}">
+                    <ToggleSwitch AutomationProperties.AutomationId="ConfirmDeleteSwitch"
+                                  IsOn="{x:Bind ViewModel.ConfirmDelete, Mode=TwoWay}"/>
+                </c:SettingsCard>
+
+                <Expander Style="{StaticResource SettingsExpanderStyle}" AutomationProperties.AutomationId="LoggingExpander"
+                          AutomationProperties.Name="{x:Bind l:Loc.Get('Settings.Adv.Logging.Title')}">
+                    <Expander.Header>
+                        <c:SettingsCard IsFramed="False" Margin="0,12" Glyph="&#xE9D9;"
+                                        Header="{x:Bind l:Loc.Get('Settings.Adv.Logging.Title')}"
+                                        Description="{x:Bind l:Loc.Get('Settings.Adv.Logging.Desc')}">
+                            <ToggleSwitch AutomationProperties.AutomationId="LoggingSwitch"
+                                          IsOn="{x:Bind ViewModel.EnableLogging, Mode=TwoWay}"/>
+                        </c:SettingsCard>
+                    </Expander.Header>
+                    <StackPanel>
+                        <c:SettingsCard IsFramed="False" Margin="16,12"
+                                        Header="{x:Bind l:Loc.Get('Settings.Adv.SepLogs.Title')}"
+                                        Description="{x:Bind l:Loc.Get('Settings.Adv.SepLogs.Desc')}">
+                            <ToggleSwitch AutomationProperties.AutomationId="SeparateLogsSwitch"
+                                          IsOn="{x:Bind ViewModel.SeparateLogFiles, Mode=TwoWay}"
+                                          IsEnabled="{x:Bind ViewModel.CanSeparateLogFiles, Mode=OneWay}"/>
+                        </c:SettingsCard>
+                        <c:SettingsLink Background="Transparent" BorderThickness="0" ActionGlyph="&#xE8A7;"
+                                        AutomationProperties.AutomationId="OpenAppLogLink"
+                                        Header="{x:Bind l:Loc.Get('Settings.Adv.OpenLog')}"
+                                        Description="{x:Bind l:Loc.Get('Settings.Adv.OpenLogDesc')}"
+                                        Command="{x:Bind ViewModel.OpenAppLogCommand}"/>
+                        <c:SettingsLink Background="Transparent" BorderThickness="0" ActionGlyph="&#xE8A7;"
+                                        AutomationProperties.AutomationId="OpenErrorLogLink"
+                                        Header="{x:Bind l:Loc.Get('Settings.Adv.ErrorLog')}"
+                                        Description="{x:Bind l:Loc.Get('Settings.Adv.ErrorLogDesc')}"
+                                        Command="{x:Bind ViewModel.OpenErrorLogCommand}"/>
+                        <c:SettingsLink Background="Transparent" BorderThickness="0" ActionGlyph="&#xE8A7;"
+                                        AutomationProperties.AutomationId="OpenCrashLogLink"
+                                        Header="{x:Bind l:Loc.Get('Settings.Adv.CrashLog')}"
+                                        Description="{x:Bind l:Loc.Get('Settings.Adv.CrashLogDesc')}"
+                                        Command="{x:Bind ViewModel.OpenCrashLogCommand}"/>
+                    </StackPanel>
+                </Expander>
+
+                <Expander Style="{StaticResource SettingsExpanderStyle}" AutomationProperties.AutomationId="ExecutionHistoryExpander"
+                          AutomationProperties.Name="{x:Bind l:Loc.Get('Settings.Adv.ExecHistory.Title')}">
+                    <Expander.Header>
+                        <c:SettingsCard IsFramed="False" Margin="0,12" Glyph="&#xE81C;"
+                                        Header="{x:Bind l:Loc.Get('Settings.Adv.ExecHistory.Title')}"
+                                        Description="{x:Bind l:Loc.Get('Settings.Adv.ExecHistory.Desc')}">
+                            <ToggleSwitch AutomationProperties.AutomationId="ExecutionHistorySwitch"
+                                          IsOn="{x:Bind ViewModel.EnableExecutionHistoryLog, Mode=TwoWay}"/>
+                        </c:SettingsCard>
+                    </Expander.Header>
+                    <c:SettingsLink Background="Transparent" BorderThickness="0" ActionGlyph="&#xE8A7;"
+                                    AutomationProperties.AutomationId="OpenExecutionHistoryFolderLink"
+                                    Header="{x:Bind l:Loc.Get('Settings.Adv.ExecHistoryFolder.Title')}"
+                                    Description="{x:Bind l:Loc.Get('Settings.Adv.ExecHistoryFolder.Desc')}"
+                                    Command="{x:Bind ViewModel.OpenExecutionHistoryFolderCommand}"/>
+                </Expander>
+
+                <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="{x:Bind l:Loc.Get('Settings.Section.Data')}"/>
+
+                <c:SettingsCard Glyph="&#xEDE1;"
+                                Header="{x:Bind l:Loc.Get('Settings.Data.Export.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.Data.Export.Desc')}">
+                    <Button MinWidth="120" AutomationProperties.AutomationId="ExportSettingsButton"
+                            Content="{x:Bind l:Loc.Get('Settings.Data.ExportBtn')}"
+                            Command="{x:Bind ViewModel.ExportCommand}"/>
+                </c:SettingsCard>
+
+                <c:SettingsCard Glyph="&#xE8B5;"
+                                Header="{x:Bind l:Loc.Get('Settings.Data.Import.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.Data.Import.Desc')}">
+                    <Button MinWidth="120" AutomationProperties.AutomationId="ImportSettingsButton"
+                            Content="{x:Bind l:Loc.Get('Settings.Data.ImportBtn')}"
+                            Command="{x:Bind ViewModel.ImportCommand}"/>
+                </c:SettingsCard>
+
+                <c:SettingsLink Glyph="&#xE8B7;" ActionGlyph="&#xE8A7;" AutomationProperties.AutomationId="OpenDataFolderLink"
+                                Header="{x:Bind l:Loc.Get('Settings.Adv.DataFolder.Title')}"
+                                Description="{x:Bind ViewModel.DataFolderDescription}"
+                                Command="{x:Bind ViewModel.OpenDataFolderCommand}"/>
+
+                <c:SettingsCard Glyph="&#xE74D;"
+                                Header="{x:Bind l:Loc.Get('Settings.Data.Delete.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.Data.Delete.Desc')}">
+                    <Button MinWidth="120" AutomationProperties.AutomationId="DeleteAppDataButton"
+                            Content="{x:Bind l:Loc.Get('Settings.Data.DeleteBtn')}"
+                            Command="{x:Bind ViewModel.DeleteAppDataCommand}"/>
+                </c:SettingsCard>
+
+                <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="{x:Bind l:Loc.Get('Settings.Section.Categories')}"/>
+
+                <Expander Style="{StaticResource SettingsExpanderStyle}" AutomationProperties.AutomationId="CategoriesExpander"
+                          AutomationProperties.Name="{x:Bind l:Loc.Get('Settings.Cat.Manage.Title')}">
+                    <Expander.Header>
+                        <c:SettingsCard IsFramed="False" Margin="0,12" Glyph="&#xE8FD;"
+                                        Header="{x:Bind l:Loc.Get('Settings.Cat.Manage.Title')}"
+                                        Description="{x:Bind l:Loc.Get('Settings.Cat.Manage.Desc')}"/>
+                    </Expander.Header>
+                    <c:NameListEditor Margin="16" List="{x:Bind ViewModel.Categories}"
+                                      Placeholder="{x:Bind l:Loc.Get('Settings.Cat.Placeholder')}"/>
+                </Expander>
+
+                <Expander Style="{StaticResource SettingsExpanderStyle}" AutomationProperties.AutomationId="TagsExpander"
+                          AutomationProperties.Name="{x:Bind l:Loc.Get('Settings.Tag.Manage.Title')}">
+                    <Expander.Header>
+                        <c:SettingsCard IsFramed="False" Margin="0,12" Glyph="&#xE8EC;"
+                                        Header="{x:Bind l:Loc.Get('Settings.Tag.Manage.Title')}"
+                                        Description="{x:Bind l:Loc.Get('Settings.Tag.Manage.Desc')}"/>
+                    </Expander.Header>
+                    <c:NameListEditor Margin="16" List="{x:Bind ViewModel.Tags}"
+                                      Placeholder="{x:Bind l:Loc.Get('Settings.Tag.Placeholder')}"/>
+                </Expander>
+
+                <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="{x:Bind l:Loc.Get('Settings.Section.About')}"/>
+
+                <c:SettingsCard Glyph="&#xE946;"
+                                Header="{x:Bind l:Loc.Get('App.WindowTitle')}"
+                                Description="{x:Bind ViewModel.VersionText}"/>
+
+                <c:SettingsCard Glyph="&#xE895;"
+                                Header="{x:Bind l:Loc.Get('Settings.About.Update.Title')}"
+                                Description="{x:Bind ViewModel.UpdateMessage, Mode=OneWay}">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <ProgressRing Width="20" Height="20" IsActive="{x:Bind ViewModel.CheckForUpdatesCommand.IsRunning, Mode=OneWay}"/>
+                        <!-- A card names the control it holds after its heading. This one holds two, so the
+                             button is named here: "Check" alone would not tell a screen reader what for. -->
+                        <Button MinWidth="120" AutomationProperties.AutomationId="CheckForUpdatesButton"
+                                AutomationProperties.Name="{x:Bind l:Loc.Get('Settings.About.Update.Title')}"
+                                Content="{x:Bind l:Loc.Get('Settings.About.CheckBtn')}"
+                                Command="{x:Bind ViewModel.CheckForUpdatesCommand}"/>
+                    </StackPanel>
+                </c:SettingsCard>
+
+                <c:SettingsLink Glyph="&#xE7C3;" AutomationProperties.AutomationId="ReleaseNotesLink"
+                                Header="{x:Bind l:Loc.Get('Settings.WhatsNew.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.About.ReleaseNotes.Desc')}"
+                                Command="{x:Bind ViewModel.ShowReleaseNotesCommand}"/>
+
+                <c:SettingsLink Glyph="&#xE7BE;" AutomationProperties.AutomationId="WelcomeTourLink"
+                                Header="{x:Bind l:Loc.Get('Settings.About.Onboard.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.About.Onboard.Desc')}"
+                                Command="{x:Bind ViewModel.ShowTourCommand}"/>
+
+                <c:SettingsLink Glyph="&#xE943;" ActionGlyph="&#xE8A7;" AutomationProperties.AutomationId="RepositoryLink"
+                                Header="{x:Bind l:Loc.Get('Settings.About.Repository.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.About.Repository.Desc')}"
+                                Command="{x:Bind ViewModel.OpenRepositoryCommand}"/>
+
+                <c:SettingsLink Glyph="&#xEBE8;" ActionGlyph="&#xE8A7;" AutomationProperties.AutomationId="ReportProblemLink"
+                                Header="{x:Bind l:Loc.Get('Settings.About.Issue.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.About.Issue.Desc')}"
+                                Command="{x:Bind ViewModel.ReportProblemCommand}"/>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Page>

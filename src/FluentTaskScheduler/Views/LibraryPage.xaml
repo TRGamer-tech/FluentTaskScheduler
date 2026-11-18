@@ -1,0 +1,198 @@
+<Page
+    x:Class="FluentTaskScheduler.Views.LibraryPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:l="using:FluentTaskScheduler.Localization"
+    xmlns:local="using:FluentTaskScheduler.Views"
+    xmlns:vm="using:FluentTaskScheduler.ViewModels">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- A selector bar cuts off the tabs that do not fit, so the tabs keep their full width. The
+             search box keeps to the right and gives way instead: it shares what the tabs leave with
+             the gap before it, and is between half its width and all of it. -->
+        <Grid Padding="24,8,24,8" ColumnSpacing="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*" MinWidth="120" MaxWidth="240"/>
+            </Grid.ColumnDefinitions>
+
+            <SelectorBar VerticalAlignment="Center" SelectionChanged="Sections_SelectionChanged">
+                <SelectorBarItem Text="{x:Bind l:Loc.Get('Library.Section.Templates')}"
+                                 IsSelected="True"
+                                 AutomationProperties.AutomationId="LibraryTemplatesTab"/>
+                <SelectorBarItem Text="{x:Bind l:Loc.Get('Library.Section.Scripts')}"
+                                 AutomationProperties.AutomationId="LibraryScriptsTab"/>
+            </SelectorBar>
+
+            <AutoSuggestBox Grid.Column="2" VerticalAlignment="Center"
+                            QueryIcon="Find"
+                            PlaceholderText="{x:Bind l:Loc.Get('Library.Search.Placeholder')}"
+                            Text="{x:Bind ViewModel.SearchText, Mode=TwoWay}"
+                            AutomationProperties.AutomationId="LibrarySearch"/>
+        </Grid>
+
+        <ScrollViewer x:Name="TemplatesView" Grid.Row="1">
+            <StackPanel Padding="24,0,24,24" Spacing="12">
+                <InfoBar IsOpen="True"
+                         Severity="Informational"
+                         Title="{x:Bind l:Loc.Get('Templates.Info.Title')}"
+                         Message="{x:Bind l:Loc.Get('Templates.Info.Message')}"/>
+
+                <ItemsControl ItemsSource="{x:Bind ViewModel.TemplateSections}" IsTabStop="False">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:TemplateSection">
+                            <StackPanel Margin="0,4,0,12">
+                                <TextBlock Text="{x:Bind Title}" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,0,0,8"
+                                           AutomationProperties.HeadingLevel="Level2"/>
+
+                                <ItemsControl ItemsSource="{x:Bind Templates}" IsTabStop="False">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:TemplateCard">
+                                            <Grid Margin="0,0,0,4" Padding="16" ColumnSpacing="16"
+                                                  Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                                  BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                                  BorderThickness="1"
+                                                  CornerRadius="{ThemeResource ControlCornerRadius}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <FontIcon Glyph="{x:Bind Glyph}" FontSize="20" VerticalAlignment="Top" Margin="0,2,0,0"/>
+
+                                                <StackPanel Grid.Column="1" Spacing="4">
+                                                    <TextBlock Text="{x:Bind Name}" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap"/>
+                                                    <TextBlock Text="{x:Bind Description}"
+                                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                               TextWrapping="Wrap"/>
+                                                    <TextBlock Text="{x:Bind Summary}"
+                                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                                               Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                                               TextWrapping="Wrap"/>
+
+                                                    <StackPanel Orientation="Horizontal" Spacing="6" Visibility="{x:Bind RunsElevated}">
+                                                        <FontIcon Glyph="&#xE7EF;" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                                        <TextBlock Text="{x:Bind l:Loc.Get('Elevation.Required')}"
+                                                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                                    </StackPanel>
+
+                                                    <Grid ColumnSpacing="6" Visibility="{x:Bind HasNote}">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <FontIcon Glyph="&#xE7BA;" FontSize="12" VerticalAlignment="Top" Margin="0,2,0,0"
+                                                                  Foreground="{ThemeResource SystemFillColorCautionBrush}"/>
+                                                        <TextBlock Grid.Column="1" Text="{x:Bind Note}"
+                                                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                                                   Foreground="{ThemeResource SystemFillColorCautionBrush}"
+                                                                   TextWrapping="Wrap"/>
+                                                    </Grid>
+
+                                                    <Button Margin="0,8,0,0"
+                                                            Content="{x:Bind l:Loc.Get('Templates.Deploy')}"
+                                                            Command="{x:Bind CreateTaskCommand}"
+                                                            AutomationProperties.Name="{x:Bind local:LibraryPage.ButtonName('Templates.DeployFormat', Name)}"
+                                                            AutomationProperties.AutomationId="{x:Bind local:LibraryPage.IdOf('Template', Id)}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Text="{x:Bind l:Loc.Get('Library.Search.NoTemplates')}"
+                           Visibility="{x:Bind ViewModel.HasNoTemplates, Mode=OneWay}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <ScrollViewer x:Name="ScriptsView" Grid.Row="1" Visibility="Collapsed">
+            <StackPanel Padding="24,0,24,24" Spacing="12">
+                <InfoBar IsOpen="{x:Bind ViewModel.HasScriptsProblem, Mode=OneWay}"
+                         IsClosable="False"
+                         Severity="Warning"
+                         Message="{x:Bind ViewModel.ScriptsProblem, Mode=OneWay}"/>
+
+                <Button Command="{x:Bind ViewModel.NewScriptCommand}"
+                        AutomationProperties.Name="{x:Bind l:Loc.Get('ScriptLibraryCreateBtn.Content')}"
+                        AutomationProperties.AutomationId="LibraryNewScript">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE710;" FontSize="14"/>
+                        <TextBlock Text="{x:Bind l:Loc.Get('ScriptLibraryCreateBtn.Content')}"/>
+                    </StackPanel>
+                </Button>
+
+                <ItemsControl ItemsSource="{x:Bind ViewModel.Scripts}" IsTabStop="False">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ScriptCard">
+                            <Grid Margin="0,0,0,4" Padding="16" ColumnSpacing="16"
+                                  Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                  BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                  BorderThickness="1"
+                                  CornerRadius="{ThemeResource ControlCornerRadius}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <FontIcon Glyph="&#xE943;" FontSize="20" VerticalAlignment="Top" Margin="0,2,0,0"/>
+
+                                <StackPanel Grid.Column="1" Spacing="4">
+                                    <TextBlock Text="{x:Bind Name}" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap"/>
+                                    <TextBlock Text="{x:Bind Description}"
+                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                               TextWrapping="Wrap"/>
+
+                                    <StackPanel Orientation="Horizontal" Spacing="6" Visibility="{x:Bind RunsElevated}">
+                                        <FontIcon Glyph="&#xE7EF;" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                        <TextBlock Text="{x:Bind l:Loc.Get('Elevation.Required')}"
+                                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+                                        <Button Content="{x:Bind l:Loc.Get('ScriptLibraryUseTemplateBtn.Content')}"
+                                                Command="{x:Bind CreateTaskCommand}"
+                                                AutomationProperties.Name="{x:Bind local:LibraryPage.ButtonName('Library.CreateTaskFromScriptFormat', Name)}"
+                                                AutomationProperties.AutomationId="{x:Bind local:LibraryPage.IdOf('Script', Id)}"/>
+                                        <Button Visibility="{x:Bind CanEdit}"
+                                                Command="{x:Bind EditCommand}"
+                                                ToolTipService.ToolTip="{x:Bind l:Loc.Get('Library.EditScript')}"
+                                                AutomationProperties.Name="{x:Bind local:LibraryPage.ButtonName('Library.EditScriptFormat', Name)}"
+                                                AutomationProperties.AutomationId="{x:Bind local:LibraryPage.IdOf('EditScript', Id)}">
+                                            <FontIcon Glyph="&#xE70F;" FontSize="14"/>
+                                        </Button>
+                                        <Button Visibility="{x:Bind CanDelete}"
+                                                Command="{x:Bind DeleteCommand}"
+                                                ToolTipService.ToolTip="{x:Bind l:Loc.Get('ScriptLibraryDeleteBtn.ToolTipService.ToolTip')}"
+                                                AutomationProperties.Name="{x:Bind local:LibraryPage.ButtonName('Library.DeleteScriptFormat', Name)}"
+                                                AutomationProperties.AutomationId="{x:Bind local:LibraryPage.IdOf('DeleteScript', Id)}">
+                                            <FontIcon Glyph="&#xE74D;" FontSize="14"/>
+                                        </Button>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Text="{x:Bind l:Loc.Get('Library.Search.NoScripts')}"
+                           Visibility="{x:Bind ViewModel.HasNoScripts, Mode=OneWay}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

@@ -1,0 +1,304 @@
+using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
+using FluentTaskScheduler.Localization;
+using FluentTaskScheduler.Scheduling;
+using FluentTaskScheduler.Settings;
+using FluentTaskScheduler.Snoozing;
+
+namespace FluentTaskScheduler.ViewModels;
+
+/// <summary>One folder in the tree of task folders.</summary>
+public sealed partial class FolderNode(string path, string name) : ObservableObject
+{
+    public string Path { get; } = path;
+    public string Name { get; } = name;
+    public bool IsRoot => Path == TaskPaths.Root;
+    public ObservableCollection<FolderNode> Children { get; } = [];
+
+    [ObservableProperty] private bool _isExpanded;
+
+    public override string ToString() => Name;
+}
+
+/// <summary>
+/// The tree of task folders of one window, and what can be done with folders. What the user
+/// chooses to see, the tasks of one folder or of all folders, is remembered: windows opened later,
+/// also at the next start of the app, show it again.
+/// </summary>
+public sealed partial class FoldersViewModel(ITaskFolders folders, TasksViewModel tasks, ISettingsStore settings, IPrompts prompts, IAppLifetime app, ISnoozeService snooze) : ObservableObject
+{
+    /// <summary>The top of the tree: the one node that stands for the whole library.</summary>
+    public ObservableCollection<FolderNode> Roots { get; } = [];
+
+    private FolderNode? _selected;
+
+    /// <summary>
+    /// The folder whose tasks the list shows, highlighted in the tree; null while the list shows
+    /// the tasks of all folders. A folder set here is the user's choice in the tree, and remembered
+    /// as such. Null set here changes nothing: the tree sets it when it loses its highlight by
+    /// itself, when the folder's parent is collapsed for one, and the list goes on showing the folder.
+    /// </summary>
+    public FolderNode? Selected
+    {
+        get => _selected;
+        set
+        {
+            if (value is null || !SetProperty(ref _selected, value)) return;
+            tasks.FolderPath = value.Path;
+            Remember(value.Path);
+        }
+    }
+
+    /// <summary>The paths of all folders, parents first, for pickers.</summary>
+    public IReadOnlyList<string> AllPaths { get; private set; } = [];
+
+    /// <summary>A folder as a list of all folders shows it: by its path, and the root by the name the tree gives it.</summary>
+    public static string PathText(string path) => path == TaskPaths.Root ? Loc.Get("Folders.Library") : path;
+
+    /// <summary>Shows the tasks of <paramref name="folder"/>, which the user picked in the tree.</summary>
+    public void Choose(FolderNode folder)
+    {
+        Selected = folder;
+        // Also when it was selected already: another window may have had a choice of its own since.
+        Remember(folder.Path);
+    }
+
+    /// <summary>Shows the tasks of all folders, as the user chose.</summary>
+    public void ChooseAllTasks()
+    {
+        ShowAllTasks();
+        Remember(null);
+    }
+
+    /// <summary>Shows the tasks of all folders as the app's doing rather than the user's choice, which is not remembered.</summary>
+    public void ShowAllTasks()
+    {
+        Highlight(null);
+        tasks.FolderPath = null;
+    }
+
+    /// <summary>
+    /// Shows what the user chose last, in this window or another: the tasks of one folder, or of
+    /// all folders. A window does this as it opens, before the folders are read; whether the
+    /// folder is still there shows when they are.
+    /// </summary>
+    public void ShowLastChoice() => tasks.FolderPath = FolderOf(settings.Current.LastFolderPath);
+
+    /// <summary>
+    /// Reads the folders and rebuilds the tree, keeping what was expanded. The tree highlights the
+    /// folder the list shows and opens up to it; if that folder is gone, the list shows the tasks
+    /// of all folders instead.
+    /// </summary>
+    public async Task ReloadAsync()
+    {
+        IReadOnlyList<string> paths;
+        try
+        {
+            paths = await Task.Run(folders.GetFolders);
+        }
+        catch (Exception ex)
+        {
+            // Whatever Task Scheduler answered: keep the tree as it is rather than show an empty one.
+            Serilog.Log.Error(ex, "The task folders could not be loaded");
+            return;
+        }
+
+        if (tasks.FolderPath is { } gone && !paths.Contains(gone, StringComparer.OrdinalIgnoreCase))
+        {
+            // Deleted outside the app, perhaps while it was closed.
+            tasks.FolderPath = null;
+            FollowChoice(gone, newPath: null);
+        }
+        string? shown = tasks.FolderPath;
+
+        var expanded = Flatten(Roots).Where(node => node.IsExpanded).Select(node => node.Path).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var nodes = new Dictionary<string, FolderNode>(StringComparer.OrdinalIgnoreCase);
+        foreach (string path in paths)
+        {
+            var node = new FolderNode(path, path == TaskPaths.Root ? Loc.Get("Folders.Library") : TaskPaths.NameOf(path))
+            {
+                IsExpanded = path == TaskPaths.Root || expanded.Contains(path) || (shown is not null && TaskPaths.IsWithin(TaskPaths.ParentOf(shown), path))
+            };
+            nodes[path] = node;
+            if (path != TaskPaths.Root && nodes.TryGetValue(TaskPaths.ParentOf(path), out FolderNode? parent)) parent.Children.Add(node);
+        }
+
+        AllPaths = paths;
+        Roots.Clear();
+        if (nodes.TryGetValue(TaskPaths.Root, out FolderNode? root)) Roots.Add(root);
+        Highlight(shown is not null ? nodes[shown] : null);
+    }
+
+    /// <summary>
+    /// Lets the list show the task at <paramref name="taskPath"/>: the folder being shown stays if
+    /// the task is in it; otherwise the list shows the tasks of all folders, and the tree
+    /// highlights none, so that any folder can be chosen again. As the app's doing rather than
+    /// the user's choice, this is not remembered.
+    /// </summary>
+    public void Reveal(string taskPath)
+    {
+        if (!string.Equals(tasks.FolderPath, TaskPaths.ParentOf(taskPath), StringComparison.OrdinalIgnoreCase)) ShowAllTasks();
+    }
+
+    /// <summary>Asks for a name and creates a folder in <paramref name="parent"/>.</summary>
+    public async Task CreateAsync(FolderNode parent)
+    {
+        if (await prompts.AskForTextAsync(Loc.Get("Dialog.NewFolder.Title"), Loc.Get("Dialog.NewFolder.NamePlaceholder"), "", Loc.Get("Dialog.Common.Create")) is not { } name) return;
+        if (!await IsValidAsync(name)) return;
+
+        string path = TaskPaths.Combine(parent.Path, name);
+        try
+        {
+            await Task.Run(() => folders.Create(path));
+        }
+        catch (Exception ex)
+        {
+            await prompts.ShowErrorAsync(Describe(name, ex));
+            return;
+        }
+
+        parent.IsExpanded = true;
+        await ReloadAsync();
+    }
+
+    /// <summary>Asks for a new name and renames <paramref name="folder"/>.</summary>
+    public async Task RenameAsync(FolderNode folder)
+    {
+        if (folder.IsRoot) return;
+        if (await prompts.AskForTextAsync(Loc.Get("Dialog.RenameFolder.Title"), Loc.Get("Dialog.NewFolder.NamePlaceholder"), folder.Name, Loc.Get("Dialog.Common.Rename")) is not { } name) return;
+        if (name == folder.Name || !await IsValidAsync(name)) return;
+
+        await MoveAsync(folder, TaskPaths.Combine(TaskPaths.ParentOf(folder.Path), name));
+    }
+
+    /// <summary>Deletes <paramref name="folder"/> and all tasks and folders in it, after asking.</summary>
+    public async Task DeleteAsync(FolderNode folder)
+    {
+        if (folder.IsRoot) return;
+        string question = Loc.Format("Dialog.DeleteFolder.ContentFormat", folder.Name);
+        if (!await prompts.ConfirmAsync(Loc.Get("Dialog.DeleteFolder.Title"), question, Loc.Get("Dialog.Common.Delete"), isDestructive: true)) return;
+
+        try
+        {
+            await Task.Run(() => folders.Delete(folder.Path));
+        }
+        catch (DirectoryNotFoundException)
+        {
+            // Someone else was faster; either way it is gone.
+        }
+        catch (Exception ex)
+        {
+            // Windows may have refused part way through, with some of the tasks deleted already.
+            await ReloadAsync();
+            await tasks.ReloadAsync();
+            await prompts.ShowErrorAsync(Describe(folder.Name, ex));
+            return;
+        }
+        await AfterChangeAsync(folder.Path, newPath: null);
+    }
+
+    private async Task MoveAsync(FolderNode folder, string newPath)
+    {
+        IReadOnlyList<TaskMove> moved;
+        var problems = new List<string>();
+        try
+        {
+            moved = await Task.Run(() => folders.MoveFolder(folder.Path, newPath));
+        }
+        catch (FolderPartlyMovedException ex)
+        {
+            moved = ex.Moved;
+            problems.Add(Loc.Format("Folders.Error.PartlyMoved", folder.Name));
+            problems.Add(Describe(folder.Name, ex.InnerException!));
+        }
+        catch (Exception ex)
+        {
+            await prompts.ShowErrorAsync(Describe(folder.Name, ex));
+            return;
+        }
+
+        // Snoozes and completion actions know tasks only by their paths. A task that stayed behind
+        // keeps its snooze, and the tasks that start it need no change.
+        foreach (TaskMove move in moved) await snooze.TaskMovedAsync(move.From, move.To);
+        problems.AddRange(await tasks.FollowAsync(moved));
+        await AfterChangeAsync(folder.Path, newPath);
+        if (problems.Count > 0) await prompts.ShowErrorAsync(string.Join(Environment.NewLine, problems));
+    }
+
+    /// <summary>
+    /// Brings everything up to date after the folder at <paramref name="oldPath"/> moved to
+    /// <paramref name="newPath"/>, or was deleted when that is null. The list may be showing the
+    /// folder or one inside it: it moves along, or falls back to the folder that held the deleted
+    /// one. The user's last choice moves along too, or is forgotten.
+    /// </summary>
+    private async Task AfterChangeAsync(string oldPath, string? newPath)
+    {
+        if (tasks.FolderPath is { } shown && TaskPaths.IsWithin(shown, oldPath))
+            tasks.FolderPath = newPath is null ? TaskPaths.ParentOf(oldPath) : newPath + shown[oldPath.Length..];
+        if (Selected is { } selected && TaskPaths.IsWithin(selected.Path, oldPath)) Highlight(null);
+        FollowChoice(oldPath, newPath);
+
+        await ReloadAsync();
+        await tasks.ReloadAsync();
+    }
+
+    /// <summary>Highlights a folder in the tree, or none, without that counting as the user's choice.</summary>
+    private void Highlight(FolderNode? folder) => SetProperty(ref _selected, folder, nameof(Selected));
+
+    private void Remember(string? folderPath) => settings.Update(current => current with { LastFolderPath = Stored(folderPath) });
+
+    /// <summary>
+    /// Keeps the user's last choice, made in this window or another, in step with a folder that
+    /// moved to <paramref name="newPath"/>, or that is gone when that is null.
+    /// </summary>
+    private void FollowChoice(string oldPath, string? newPath) => settings.Update(current =>
+        FolderOf(current.LastFolderPath) is { } chosen && TaskPaths.IsWithin(chosen, oldPath)
+            ? current with { LastFolderPath = Stored(newPath is null ? null : newPath + chosen[oldPath.Length..]) }
+            : current);
+
+    // AppSettings.LastFolderPath holds "\" for all folders, and so "" for the root folder, whose path that is.
+    private static string Stored(string? folderPath) => folderPath switch
+    {
+        null => "\\",
+        TaskPaths.Root => "",
+        _ => folderPath
+    };
+
+    private static string? FolderOf(string stored) => stored switch
+    {
+        "\\" => null,
+        "" => TaskPaths.Root,
+        _ => stored
+    };
+
+    private async Task<bool> IsValidAsync(string name)
+    {
+        // A folder name follows the same rules as a task name.
+        if (TaskDraftValidator.CheckName(name) is not { } problem) return true;
+        await prompts.ShowErrorAsync(problem.Message);
+        return false;
+    }
+
+    /// <summary>What to tell the user when a change of the folder called <paramref name="name"/> failed.</summary>
+    private string Describe(string name, Exception ex)
+    {
+        switch (ex)
+        {
+            case TaskAccessDeniedException:
+                return Loc.Get(app.IsElevated ? "Editor.Error.AccessDenied" : "Editor.Error.AccessDeniedNotElevated");
+            case FolderExistsException taken:
+                return Loc.Format("Folders.Error.NameTaken", TaskPaths.NameOf(taken.Path));
+            case DirectoryNotFoundException:
+                return Loc.Format("Tasks.Error.Gone", name);
+            case TaskDuplicatedException twice:
+                return Loc.Format("Tasks.Error.Duplicated", twice.Path, twice.CopyPath);
+            default:
+                // Task Scheduler refuses with whatever COM error fits; the text is the best there is to show.
+                Serilog.Log.Error(ex, "A change of the folder {Name} failed", name);
+                return Loc.Format("Folders.Error.Failed", ex.Message);
+        }
+    }
+
+    private static IEnumerable<FolderNode> Flatten(IEnumerable<FolderNode> nodes) =>
+        nodes.SelectMany(node => Flatten(node.Children).Prepend(node));
+}

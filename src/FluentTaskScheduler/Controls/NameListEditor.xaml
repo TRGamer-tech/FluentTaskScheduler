@@ -1,0 +1,50 @@
+<UserControl
+    x:Class="FluentTaskScheduler.Controls.NameListEditor"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:l="using:FluentTaskScheduler.Localization"
+    xmlns:local="using:FluentTaskScheduler.Controls"
+    IsTabStop="False">
+
+    <StackPanel Spacing="8">
+        <Grid ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="NewNameBox"
+                     Text="{x:Bind List.NewName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     PlaceholderText="{x:Bind Placeholder, Mode=OneWay}"
+                     AutomationProperties.Name="{x:Bind Placeholder, Mode=OneWay}"
+                     KeyDown="NewNameBox_KeyDown"/>
+            <Button x:Name="AddButton" Grid.Column="1"
+                    Content="{x:Bind l:Loc.Get('Settings.Cat.AddBtn')}"
+                    Command="{x:Bind List.AddCommand, Mode=OneWay}"/>
+        </Grid>
+
+        <ItemsControl ItemsSource="{x:Bind List.Items, Mode=OneWay}" IsTabStop="False">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                    <Grid ColumnSpacing="8" Padding="12,2,2,2" Margin="0,0,0,4"
+                          Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                          BorderThickness="1"
+                          CornerRadius="{ThemeResource ControlCornerRadius}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{x:Bind}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                        <!-- (x:String) is the name itself. -->
+                        <Button Grid.Column="1" Tag="{x:Bind}" Click="Remove_Click"
+                                Background="Transparent" BorderThickness="0" Padding="8"
+                                ToolTipService.ToolTip="{x:Bind l:Loc.Get('Settings.Names.Remove')}"
+                                AutomationProperties.Name="{x:Bind local:NameListEditor.RemoveButtonName((x:String))}">
+                            <FontIcon Glyph="&#xE74D;" FontSize="14"/>
+                        </Button>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,45 @@
+<UserControl
+    x:Class="FluentTaskScheduler.Controls.LogOutcomeIcon"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    IsTabStop="False">
+
+    <Grid Width="20" Height="20">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="Outcomes">
+                <VisualState x:Name="Running">
+                    <VisualState.Setters>
+                        <Setter Target="Icon.Visibility" Value="Collapsed"/>
+                        <Setter Target="Ring.Visibility" Value="Visible"/>
+                        <Setter Target="Ring.IsActive" Value="True"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Succeeded"/>
+                <VisualState x:Name="Failed">
+                    <VisualState.Setters>
+                        <Setter Target="Icon.Glyph" Value="&#xEA39;"/>
+                        <Setter Target="Icon.Foreground" Value="{ThemeResource SystemFillColorCriticalBrush}"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Stopped">
+                    <VisualState.Setters>
+                        <Setter Target="Icon.Glyph" Value="&#xE71A;"/>
+                        <Setter Target="Icon.Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Snoozed">
+                    <VisualState.Setters>
+                        <Setter Target="Icon.Glyph" Value="&#xE769;"/>
+                        <Setter Target="Icon.Foreground" Value="{ThemeResource SystemFillColorCautionBrush}"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <!-- The entry says how it turned out in words as well; the icon is for the eye. -->
+        <FontIcon x:Name="Icon" Glyph="&#xE73E;" FontSize="16" Foreground="{ThemeResource SystemFillColorSuccessBrush}"
+                  AutomationProperties.AccessibilityView="Raw"/>
+        <ProgressRing x:Name="Ring" Width="16" Height="16" IsActive="False" Visibility="Collapsed"
+                      AutomationProperties.AccessibilityView="Raw"/>
+    </Grid>
+</UserControl>

@@ -1,0 +1,102 @@
+<Page
+    x:Class="FluentTaskScheduler.Views.QuickActionsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:FluentTaskScheduler.Controls"
+    xmlns:l="using:FluentTaskScheduler.Localization"
+    xmlns:local="using:FluentTaskScheduler.Views"
+    xmlns:vm="using:FluentTaskScheduler.ViewModels">
+
+    <ScrollViewer x:Name="QuickActionsScroller">
+        <StackPanel Padding="24,8,24,24" Spacing="12">
+            <TextBlock Text="{x:Bind l:Loc.Get('QuickActions.Description.Text')}"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       TextWrapping="Wrap"/>
+
+            <InfoBar IsOpen="{x:Bind ViewModel.OffersRestartAsAdministrator}"
+                     IsClosable="False"
+                     Severity="Informational"
+                     Message="{x:Bind l:Loc.Get('QuickActions.NotElevated')}">
+                <InfoBar.ActionButton>
+                    <Button Content="{x:Bind l:Loc.Get('Tasks.NotElevated.Restart')}"
+                            Command="{x:Bind ViewModel.RestartAsAdministratorCommand}"
+                            AutomationProperties.AutomationId="QuickActionsRestartElevated"/>
+                </InfoBar.ActionButton>
+            </InfoBar>
+
+            <ItemsControl ItemsSource="{x:Bind ViewModel.Actions}" IsTabStop="False">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:QuickActionViewModel">
+                        <Grid Margin="0,0,0,4" Padding="16" ColumnSpacing="16"
+                              Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                              BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                              BorderThickness="1"
+                              CornerRadius="{ThemeResource ControlCornerRadius}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <FontIcon Glyph="{x:Bind Glyph}" FontSize="20" VerticalAlignment="Top" Margin="0,2,0,0"/>
+
+                            <StackPanel Grid.Column="1" Spacing="4">
+                                <TextBlock Text="{x:Bind Title}" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap"/>
+                                <TextBlock Text="{x:Bind Description}"
+                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                           TextWrapping="Wrap"/>
+
+                                <!-- Text next to the icon: the icon alone would say nothing to a screen reader. -->
+                                <StackPanel Orientation="Horizontal" Spacing="6" Visibility="{x:Bind RequiresElevation}">
+                                    <FontIcon Glyph="&#xE7EF;" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock Text="{x:Bind l:Loc.Get('Elevation.Required')}"
+                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                               AutomationProperties.AutomationId="{x:Bind local:QuickActionsPage.IdOf(Id, 'Elevation')}"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,8,0,0">
+                                    <Button Content="{x:Bind l:Loc.Get('QuickActions.RunBtn')}"
+                                            Command="{x:Bind RunCommand}"
+                                            Visibility="{x:Bind IsNotRunning, Mode=OneWay}"
+                                            MinWidth="96"
+                                            AutomationProperties.Name="{x:Bind local:QuickActionsPage.ButtonName('QuickActions.RunFormat', Title)}"
+                                            AutomationProperties.AutomationId="{x:Bind local:QuickActionsPage.IdOf(Id, 'Run')}"/>
+                                    <Button Content="{x:Bind l:Loc.Get('Dialog.Common.Cancel')}"
+                                            Command="{x:Bind CancelCommand}"
+                                            Visibility="{x:Bind IsRunning, Mode=OneWay}"
+                                            MinWidth="96"
+                                            AutomationProperties.Name="{x:Bind local:QuickActionsPage.ButtonName('QuickActions.CancelFormat', Title)}"
+                                            AutomationProperties.AutomationId="{x:Bind local:QuickActionsPage.IdOf(Id, 'Cancel')}"/>
+                                    <ProgressRing IsActive="{x:Bind IsRunning, Mode=OneWay}"
+                                                  Visibility="{x:Bind IsRunning, Mode=OneWay}"
+                                                  Width="20" Height="20"/>
+                                    <FontIcon Glyph="&#xE73E;" FontSize="16"
+                                              Foreground="{ThemeResource SystemFillColorSuccessBrush}"
+                                              Visibility="{x:Bind HasSucceeded, Mode=OneWay}"/>
+                                    <FontIcon Glyph="&#xEA39;" FontSize="16"
+                                              Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                              Visibility="{x:Bind HasFailed, Mode=OneWay}"/>
+                                    <!-- Read out when it changes: the focus is on the button, and how the action
+                                         ended is said nowhere else. -->
+                                    <TextBlock Text="{x:Bind StatusText, Mode=OneWay}"
+                                               VerticalAlignment="Center"
+                                               controls:LiveRegion.IsLive="True"
+                                               AutomationProperties.AutomationId="{x:Bind local:QuickActionsPage.IdOf(Id, 'Status')}"/>
+                                </StackPanel>
+
+                                <TextBlock Text="{x:Bind Detail, Mode=OneWay}"
+                                           Visibility="{x:Bind HasDetail, Mode=OneWay}"
+                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                           FontFamily="Consolas"
+                                           TextWrapping="Wrap"
+                                           IsTextSelectionEnabled="True"
+                                           AutomationProperties.AutomationId="{x:Bind local:QuickActionsPage.IdOf(Id, 'Detail')}"/>
+                            </StackPanel>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

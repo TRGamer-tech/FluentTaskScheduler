@@ -1,0 +1,85 @@
+<Page
+    x:Class="FluentTaskScheduler.Shell.ShellPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:FluentTaskScheduler.Controls"
+    xmlns:l="using:FluentTaskScheduler.Localization"
+    xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals">
+
+    <Grid x:Name="Root" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
+        <VisualStateManager.VisualStateGroups>
+            <!-- What is behind the navigation pane and the title bar. -->
+            <VisualStateGroup x:Name="BackdropStates">
+                <VisualState x:Name="Solid"/>
+                <VisualState x:Name="Mica">
+                    <VisualState.Setters>
+                        <Setter Target="Root.Background" Value="Transparent"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Oled">
+                    <VisualState.Setters>
+                        <Setter Target="Root.Background" Value="Black"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <!-- The strip that moves the window. It starts right of the pane button so that stays clickable. -->
+        <Border x:Name="TitleBar" Height="32" Margin="48,0,0,0" VerticalAlignment="Top" Background="Transparent" Canvas.ZIndex="1"/>
+
+        <!-- PaneDisplayMode Auto: the pane shrinks to icons and then to a menu button as the window gets narrower. -->
+        <NavigationView x:Name="NavView"
+                        PaneDisplayMode="Auto"
+                        IsBackButtonVisible="Collapsed"
+                        IsSettingsVisible="False"
+                        SelectionChanged="NavView_SelectionChanged"
+                        ItemInvoked="NavView_ItemInvoked">
+
+            <NavigationView.HeaderTemplate>
+                <DataTemplate x:DataType="x:String">
+                    <TextBlock Text="{x:Bind}" Style="{StaticResource TitleTextBlockStyle}" AutomationProperties.AutomationId="PageTitle"
+                               AutomationProperties.HeadingLevel="Level1"/>
+                </DataTemplate>
+            </NavigationView.HeaderTemplate>
+
+            <NavigationView.PaneCustomContent>
+                <!-- Only while the pane is open: there is no room for a tree next to a column of icons. -->
+                <controls:FolderTree x:Name="Folders" Visibility="{x:Bind NavView.IsPaneOpen, Mode=OneWay}" FolderChosen="Folders_FolderChosen"/>
+            </NavigationView.PaneCustomContent>
+
+            <NavigationView.FooterMenuItems>
+                <NavigationViewItem x:Name="NavAdd" Icon="Add" SelectsOnInvoked="False"
+                                    Content="{x:Bind l:Loc.Get('Main.Nav.NewTask')}"/>
+                <NavigationViewItem x:Name="NavAllTasks" Tag="Tasks" Icon="List"
+                                    Content="{x:Bind l:Loc.Get('Main.Nav.AllTasks')}"/>
+                <NavigationViewItem x:Name="NavDashboard" Tag="Dashboard" Icon="ViewAll"
+                                    Content="{x:Bind l:Loc.Get('Main.Nav.Dashboard')}"/>
+                <NavigationViewItem x:Name="NavQuickActions" Tag="QuickActions"
+                                    Content="{x:Bind l:Loc.Get('Main.Nav.QuickActions')}">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xEC4A;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem x:Name="NavScriptLibrary" Tag="ScriptLibrary" Icon="Library"
+                                    Content="{x:Bind l:Loc.Get('Main.Nav.Library')}"/>
+                <NavigationViewItem x:Name="NavScriptEditor" Tag="ScriptEditor" Icon="Edit"
+                                    Content="{x:Bind l:Loc.Get('Main.Nav.ScriptEditor')}"/>
+                <NavigationViewItem x:Name="NavSettings" Tag="Settings"
+                                    Content="{x:Bind l:Loc.Get('Main.Nav.Settings')}">
+                    <NavigationViewItem.Icon>
+                        <AnimatedIcon>
+                            <AnimatedIcon.Source>
+                                <animatedvisuals:AnimatedSettingsVisualSource/>
+                            </AnimatedIcon.Source>
+                            <AnimatedIcon.FallbackIconSource>
+                                <SymbolIconSource Symbol="Setting"/>
+                            </AnimatedIcon.FallbackIconSource>
+                        </AnimatedIcon>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.FooterMenuItems>
+
+            <Frame x:Name="PageHost" IsTabStop="False"/>
+        </NavigationView>
+    </Grid>
+</Page>

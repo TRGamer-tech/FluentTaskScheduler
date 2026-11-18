@@ -1,0 +1,95 @@
+using FluentTaskScheduler.Localization;
+using FluentTaskScheduler.ViewModels;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation.Peers;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using VirtualKey = Windows.System.VirtualKey;
+
+namespace FluentTaskScheduler.Dialogs;
+
+/// <summary>The form for creating and changing a task.</summary>
+public sealed partial class TaskEditorDialog : ContentDialog
+{
+    public TaskEditorDialog(TaskEditorViewModel viewModel)
+    {
+        ViewModel = viewModel;
+        InitializeComponent();
+    }
+
+    public TaskEditorViewModel ViewModel { get; }
+
+    public static Visibility VisibleIfNone(int count) => count == 0 ? Visibility.Visible : Visibility.Collapsed;
+
+    public static Visibility VisibleIfUnsupported(ActionViewModel? action) => action is { IsEditable: false } ? Visibility.Visible : Visibility.Collapsed;
+
+    /// <summary>For x:Bind: what a screen reader calls the button that takes the task at <paramref name="taskPath"/> off a list of completion actions, so that the buttons of the list can be told apart.</summary>
+    public static string RemoveButtonName(string taskPath) => Loc.Format("Settings.Names.RemoveFormat", taskPath);
+
+    private async void Save_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    {
+        // The dialog stays open until the task is really saved; what is in the way shows at the top.
+        // It is kept open from the start, so that a failure nobody foresaw does not close it and
+        // throw away what was entered.
+        ContentDialogButtonClickDeferral deferral = args.GetDeferral();
+        args.Cancel = true;
+        try
+        {
+            args.Cancel = !await ViewModel.SaveAsync();
+            if (args.Cancel) EditorScroller.ChangeView(null, 0, null);
+        }
+        finally
+        {
+            deferral.Complete();
+        }
+    }
+
+    // Entering an empty box lists all it can suggest; once the box holds something, the list waits
+    // for typing. An AutoSuggestBox puts back the text last typed into it when Tab is pressed while
+    // its list shows, and what the editor filled in, the task's own values or a chosen tag, was not
+    // typed: Tab would take it away again.
+    private void Category_GotFocus(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel.Category.Length == 0) EditorCategory.ItemsSource = ViewModel.SuggestCategories();
+    }
+
+    private void Tags_GotFocus(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel.Tags.Length == 0) EditorTags.ItemsSource = ViewModel.SuggestTags();
+    }
+
+    private void Category_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+    {
+        if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput) sender.ItemsSource = ViewModel.SuggestCategories();
+    }
+
+    private void Tags_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+    {
+        if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput) sender.ItemsSource = ViewModel.SuggestTags();
+    }
+
+    // With UpdateTextOnSelect off, browsing or clicking the list leaves the text as typed instead of
+    // putting the bare tag in place of all the tags; the chosen tag replaces only the one being typed.
+    private void Tags_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+    {
+        if (args.ChosenSuggestion is string tag) ViewModel.ChooseTag(tag);
+    }
+
+    // An AutoSuggestBox keeps Enter and Escape even when it has no list to close: Enter submits no
+    // suggestion, and Escape, too, puts back the text last typed into it. Without a list, the keys
+    // do here what they do in the editor's other fields: Escape cancels, and Enter presses Save,
+    // through the button, so that saving runs as after a click and ends with Save as the result.
+    private void SuggestionBox_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key is not (VirtualKey.Enter or VirtualKey.Escape) || ((AutoSuggestBox)sender).IsSuggestionListOpen) return;
+        e.Handled = true;
+        if (e.Key == VirtualKey.Enter) new ButtonAutomationPeer((Button)GetTemplateChild("PrimaryButton")).Invoke();
+        else Hide();
+    }
+
+    private void RemoveOnSuccess_Click(object sender, RoutedEventArgs e) =>
+        ViewModel.CompletionActions.RemoveOnSuccessCommand.Execute((string)((FrameworkElement)sender).Tag);
+
+    private void RemoveOnFailure_Click(object sender, RoutedEventArgs e) =>
+        ViewModel.CompletionActions.RemoveOnFailureCommand.Execute((string)((FrameworkElement)sender).Tag);
+}

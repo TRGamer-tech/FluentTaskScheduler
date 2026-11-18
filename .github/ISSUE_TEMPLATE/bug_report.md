@@ -1,32 +1,31 @@
 ---
 name: Bug report
-about: Create a report to help us improve FluentTaskScheduler
+about: Something in FluentTaskScheduler does not work as it should
 title: '[BUG] '
 labels: bug
 assignees: ''
 
 ---
 
-### Describe the bug
-A clear and concise description of what the bug is.
+### What happened
+What you did, what the app did, and what you expected it to do.
 
 ### Steps to reproduce
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
-
-### Expected behavior
-A clear and concise description of what you expected to happen.
+1.
+2.
+3.
 
 ### Environment
-- OS Version: [e.g. Windows 11 23H2]
-- App Version: [e.g. 1.5.0]
-- Install Method: [e.g. MSI Installer, Portable ZIP, winget, Scoop, Chocolatey, Source]
+- Windows version: [e.g. Windows 11 24H2]
+- App version: [shown in Settings, under About]
+- Installed with: [MSI, portable ZIP, winget, Scoop, Chocolatey, built from source]
+- App started as administrator: [yes / no]
+- App language: [English, German, Japanese, Chinese]
+
+### Logs
+The app writes its logs to `%LOCALAPPDATA%\TRGamer-tech\FluentTaskScheduler` (versions before 2.0:
+`%LOCALAPPDATA%\FluentTaskScheduler`). Please attach `App_Log.txt`, and `Crash_Log.txt` if the app
+crashed. They can name your tasks and folders; remove what you would rather not share.
 
 ### Screenshots
-If applicable, add screenshots to help explain your problem. 
-
-### Additional context
-Add any other context about the problem here.
+If they help to show the problem.

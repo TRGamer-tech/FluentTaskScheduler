@@ -1,0 +1,12 @@
+# Text is stored with LF and checked out with the line endings of the platform.
+* text=auto
+
+# Scripts that PowerShell and cmd run keep Windows line endings wherever they are checked out.
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Never text, whatever the content looks like.
+*.png binary
+*.ico binary
+*.bmp binary

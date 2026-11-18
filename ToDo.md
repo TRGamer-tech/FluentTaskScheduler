@@ -1,26 +1,105 @@
 # To Do:
 
 1. ***More TBD***
-2. **Weekly/Monthly triggers skip today.** If today is one of the selected days and the scheduled
+2. ~~**Weekly/Monthly triggers skip today.** If today is one of the selected days and the scheduled
    time hasn't passed yet, a Weekly or Monthly trigger should fire today and then continue on its
    normal cycle. Instead it always rolls to the next occurrence, skipping today even when it should
-   run. Daily triggers do not have this problem. Pre-existing behavior, not caused by the refactor.
+   run. Daily triggers do not have this problem. Pre-existing behavior, not caused by the refactor.~~
+   (Done: the editor keeps the start date you pick, and Windows runs a weekly or monthly trigger on
+   the first chosen day from that date on, today included.)
 3. **"Queue" / "Stop existing instance" policies don't apply to manual Run.** Manually clicking Run
    while a task is already running always starts a new instance in parallel for these two policies,
    even though "Do not start" and "Parallel" behave correctly. Likely a Windows Task Scheduler
    limitation: `RunEx` (manual run) only honors IgnoreNew/Parallel; Queue/StopExisting are only
    enforced when a trigger fires while an instance is running. Needs research for an app-side workaround.
-4. **Tray icon running-task badge is unreliable / unreadable.** Pre-existing: (a) the badge is only
+   (The README now says that a start from the app ignores the task's conditions and its rule for an
+   instance that is already running.)
+4. ~~**Tray icon running-task badge is unreliable / unreadable.** Pre-existing: (a) the badge is only
    recomputed when the task list reloads (page load, Refresh, F5), not when a task starts/stops/finishes;
    (b) it is drawn on a 32px bitmap with a 14px circle and ~7.5pt number, which Windows downscales to 16px
-   in the tray, making the digit an illegible blob. There is also no taskbar-button badge, only the tray icon.
+   in the tray, making the digit an illegible blob.~~ (Done: the count is read from Task Scheduler every
+   10 seconds, and the icon is drawn at the size the notification area shows it, with a 9 px digit at
+   16 px, for the display the taskbar is on.) There is still no taskbar-button badge, only the tray icon.
 5. ~~Translate the v1.9.0 additions (Snooze, Pipelines, Dashboard analytics, Library/Templates, onboarding slides) into `de-DE`, `ja-JP`, `zh-CN`.~~ (Done: all 217 v1.9.0 keys translated into all three locales; every `.resw` now has identical key counts.)
-6. Submit the updated Scoop / Chocolatey / WinGet manifests once the v1.9.0 GitHub Release is published.
+6. Submit the Scoop / Chocolatey / WinGet manifests of v2.0.0 once its GitHub Release is published. They are in `packaging/`, written by the release workflow for the files of the draft; CONTRIBUTING.md says where each one goes.
 7. ~~**Fix the in-app auto-updater's arch collision before ever uploading `releases.win.json`/`.nupkg` to a GitHub Release.**~~ (Done: Fixed in V1.9.0. Added -c win-x64/win-arm64 at pack time, and pass ExplicitChannel to UpdateOptions).
 
 # Changelog:
 
-## [Unreleased]
+## [V2.0.0] - 2026-11-18
+
+The app was rebuilt on a Core library that holds all logic and is tested on its own, with the
+window, pages and dialogs only binding to it. Two reviews went over every part of it, and every fix
+has a test; the UI tests drive the published app on Windows x64 and ARM64 in CI. It now runs on
+.NET 10 and Windows App SDK 2.7.
+
+### Fixed issues
+- Triggers keep the type and time you set, also for weekly and monthly triggers, and keep their time
+  zone (#21).
+- Saving a task keeps its run time limit, account and every setting the editor does not show (#28).
+- Tasks created in the Windows Task Scheduler show up, and the list follows tasks that other programs
+  create, change or delete while the history log is on (#29).
+- Tasks exported on another computer or for another user can be imported: the app shows what they run
+  and lets you choose the name, folder, account and privileges first (#30).
+- The welcome tour has a fixed height (#24), the app follows the WinUI 3 styles (#26), and the
+  navigation pane folds to icons and then to a menu button in narrow windows (#27).
+- The main page was split into a shell, the task list, the folder tree and dialogs (#25).
+- The SHA-256 table in the release notes is written by the release workflow from the files it
+  attaches, so it can no longer disagree with the downloads (#31).
+
+### Tasks and folders
+- Renaming or moving a task or folder updates the completion actions of other tasks that start it,
+  and keeps its snooze. A task Windows protects is left where it was instead of being copied.
+- The task list opens on the folder you chose last.
+- The editor suggests saved tags as well as categories, and separates tags at a Japanese or Chinese
+  comma too.
+- The task details fit a narrow window, and every failure is told in the app's language.
+- A disabled task shows no next run.
+
+### Snoozing, dashboard and notification area
+- A snooze follows its task when the task or its folder is moved or renamed, a snooze until a picked
+  time follows a change of time zone, and a run a snooze refuses no longer blames a global snooze.
+- The dashboard shows no figures from half-read data, reads only the task that ran after a run,
+  rests while its window is hidden, and writes hours the way your clock does.
+- The notification area icon comes back after Explorer restarts, and its running-task count and
+  pause sign can be read at any display scaling.
+
+### Quick actions, library and script editor
+- The output of sfc, DISM and other console programs arrives in full and in the right encoding.
+- Tab indents the selected lines of a script.
+- When a setting rebuilds the pages, as a change of language does, the script stays in the editor
+  with its output, and a script or quick action that is running runs on.
+
+### Your settings and scripts
+- The app keeps its files in `%LOCALAPPDATA%\TRGamer-tech\FluentTaskScheduler`, outside the folder
+  of the installer, and moves them there at its first start. Uninstalling and every way of updating
+  from 2.0 on leave them alone. Scripts saved with 1.9 also stay where tasks created back then run
+  them from.
+- "Delete App Data" in the settings takes them off the computer: it resumes snoozed tasks, switches
+  Start with Windows off, ends the app and deletes its files.
+- Start with Windows survives a reinstallation and an upgrade by a newer Setup MSI.
+- Uninstalling asks a running copy of the app to end first, and a start by the installer never
+  opens the window, also for an installation for all users.
+
+### Texts, updates and packaging
+- 263 texts that nothing showed were removed; German says "du" throughout; Japanese and Chinese use
+  Windows' own terms, and every text of both languages was reviewed again.
+- An update you put off is offered again instead of being installed at the next start.
+- The command line is answered by the program in the `current` folder; the README says so, and the
+  Scoop manifest points there.
+- A release installs, starts and uninstalls its MSI, and takes an installed 1.9.0 to the new
+  version the way its updater does, before it makes a draft. It also writes the manifests for
+  winget, Scoop and Chocolatey for the files it has built.
+- The README's screenshots are taken by the UI tests, and other UI tests change the display scaling
+  while the app runs.
+
+### Accessibility
+- Controls a screen reader could only call "button" or "combo box" have names, neighbours that were
+  called the same are told apart, and page titles and sections are headings.
+- A screen reader is told how a quick action ended, what a check for updates found and what the
+  next slide of the welcome tour says. The release notes can be scrolled with the keyboard.
+- Every page and dialog is checked against the rules of Accessibility Insights for Windows, and
+  walked with the Tab key, by the UI tests.
 
 ## [V1.9.0] - 2026-07-25
 
@@ -55,7 +134,7 @@
   segmented switcher and a shared search box.
 - 17 built-in templates across System Maintenance, Developer Tools, and Power & Utility (temp
   cleanup, restore points, DISM/SFC scan, Git fetch, Docker prune, project backup, idle shutdown,
-  and more). Deploying one opens the task editor pre-filled — nothing is registered until you save.
+  and more). Deploying one opens the task editor pre-filled; nothing is registered until you save.
 
 ### Localization fixes
 - Found and fixed the root cause of the app showing OS-language text regardless of the in-app
@@ -66,7 +145,7 @@
   framework-generated text follow the app language too, not just `.resw` lookups.
 - Task History entries are now built from the event's own data fields instead of Windows'
   pre-rendered (OS-language) description, for every event type the app understands.
-- The About page version number is read from the assembly at runtime — it can no longer drift out of
+- The About page version number is read from the assembly at runtime, so it can no longer drift out of
   sync with the actual build, and all four locales now carry a translated version format string.
 
 ### Settings & UI polish
@@ -109,11 +188,11 @@ bugs. Found and fixed 26 issues, from silent data loss to dead code:
 18. `WhatsNewDialog` could throw if GitHub returned `null` for a release's fields.
 
 **Lower severity (leaks, dead code, minor UX):**
-19. `EventLogReader` was never disposed — native handle leak.
+19. `EventLogReader` was never disposed: a native handle leak.
 20. `Error_Log.txt`/`Crash_Log.txt` had no size cap.
 21. Batch Stop didn't clear the spinning-ring state the way single-task Stop does.
 22. History detail dialog omitted `ExitCode`.
 23. Ctrl+N could throw if pressed while another dialog was already open.
-24. Dashboard language-switch edge case could zero out the dashboard for languages missing from a hardcoded string list (e.g. ja-JP) — replaced with a language-independent flag.
+24. Dashboard language-switch edge case could zero out the dashboard for languages missing from a hardcoded string list (e.g. ja-JP); replaced with a language-independent flag.
 25. Removed ~150 lines of dead COM interop code (`NlmInterop.cs`).
 26. `SettingsService` load/save failures are now logged instead of silently swallowed.

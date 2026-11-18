@@ -1,32 +1,89 @@
 name: Release
 
-# Automates the "Publishing a Release with VeloPack" steps from CONTRIBUTING.md: publish +
-# `vpk pack` per architecture, assemble Dist/, and attach everything to a GitHub Release.
-# Triggered by pushing a tag like V1.9.1 (matching the tag format vpk/CONTRIBUTING.md already use).
+# Builds both architectures, packs them with Velopack and checks the result on fresh machines:
+# the installer installs and uninstalls silently and leaves the user's files alone, and an
+# installed 1.9.0 gets to the new version the way its own updater does it. Only then are the
+# eight release files attached to a draft GitHub Release. Its notes end with the SHA-256 of the
+# four downloads, taken from the very files that are attached. The draft is reviewed and
+# published by hand.
+#
+# A pushed tag like V2.0.1 always ends in that draft. A manual run packs the version typed in,
+# runs the same checks and keeps the files as artifacts of the run, which makes it the way to
+# try the packaging out. With "draft" ticked it also creates the draft, for the commit it ran
+# on, or brings the existing draft of that version up to date. A release that is already
+# published is never touched; the tag that publishing a draft creates starts a run that sees
+# that and does nothing.
+#
+# Every run also keeps the manifests for winget, Scoop and Chocolatey, written for the files it
+# has built, as the artifact "package-manifests".
 on:
   push:
     tags: ['V*']
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to release (e.g. 1.9.1) — required for manual runs'
+        description: Version to pack, e.g. 2.0.1
         required: true
+      draft:
+        description: Create the draft release of that version, or bring it up to date
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  # The Velopack command line tool. Without a version the newest one would be installed, which
+  # is not necessarily one that understands the Velopack package the app references.
+  VPK_VERSION: 1.2.161
+  # Where the app keeps the user's settings, scripts and logs, below %LOCALAPPDATA%.
+  DATA_FOLDER: TRGamer-tech\FluentTaskScheduler
 
 jobs:
+  # Publishing a draft that a manual run made creates its tag, and that tag starts this workflow
+  # once more. There is nothing left to do then: the release is out, with the files that were
+  # checked. Such a run ends here, with nothing built and nothing failed.
+  already-published:
+    runs-on: ubuntu-latest
+    outputs:
+      published: ${{ steps.look.outputs.published }}
+    steps:
+      - name: Look for a published release of the pushed tag
+        id: look
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EVENT: ${{ github.event_name }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          $published = $false
+          if ($env:EVENT -eq 'push') {
+            # A tag without a release, or with a draft that this token is not shown, is not published.
+            $isDraft = gh release view $env:TAG --json isDraft --jq .isDraft 2>$null
+            $published = $LASTEXITCODE -eq 0 -and "$isDraft".Trim() -eq 'false'
+            if ($published) { "::notice::$env:TAG is published already, so this run builds nothing." }
+          }
+          "published=$("$published".ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+          exit 0
+
   package:
+    needs: already-published
+    if: needs.already-published.outputs.published != 'true'
     strategy:
       matrix:
         include:
           - platform: x64
-            rid: win-x64
-            channel: win-x64
-            runner: windows-latest
+            arch: x64
           - platform: ARM64
-            rid: win-arm64
-            channel: win-arm64
-            runner: windows-11-arm
+            arch: arm64
 
-    runs-on: ${{ matrix.runner }}
+    # Both architectures are built on an x64 machine: the WiX tools Velopack brings along for
+    # the MSI are x64 programs and do not start on the ARM64 runner.
+    runs-on: windows-latest
+
+    outputs:
+      version: ${{ steps.version.outputs.version }}
 
     steps:
       - name: Checkout
@@ -35,81 +92,565 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
 
+      # The version comes from the tag (V1.9.1 gives 1.9.1) and goes into the build, so the app,
+      # the installer and the update feed all carry the same number.
       - name: Determine version
         id: version
         shell: pwsh
+        env:
+          REQUESTED: ${{ inputs.version }}
+          TAG: ${{ github.ref_name }}
         run: |
-          $version = "${{ inputs.version }}"
-          if (-not $version) { $version = "${{ github.ref_name }}".TrimStart('V') }
+          $version = if ($env:REQUESTED) { $env:REQUESTED } else { $env:TAG -replace '^[Vv]', '' }
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "'$version' is not a version like 1.9.1." }
           "version=$version" >> $env:GITHUB_OUTPUT
 
-      - name: Install VeloPack CLI
-        run: dotnet tool install -g vpk
+      - name: Install Velopack CLI
+        run: dotnet tool install -g vpk --version ${{ env.VPK_VERSION }}
 
       - name: Publish
         run: >
-          dotnet publish
+          dotnet publish src/FluentTaskScheduler
           -c Release
-          -r ${{ matrix.rid }}
-          --self-contained
           -p:Platform=${{ matrix.platform }}
+          -p:Version=${{ steps.version.outputs.version }}
+          -o publish
 
-      - name: vpk pack
+      - name: Pack
         run: >
           vpk pack
           -u FluentTaskScheduler
           -v ${{ steps.version.outputs.version }}
-          -c ${{ matrix.channel }}
-          -o Releases/${{ matrix.platform }}
-          -p bin/${{ matrix.platform }}/Release/net8.0-windows10.0.19041.0/${{ matrix.rid }}/publish
+          -c win-${{ matrix.arch }}
+          -o Releases
+          -p publish
           -e FluentTaskScheduler.exe
           --msi --instLocation Either
-          --msiBanner Assets/MSI-Banner.bmp
-          --msiLogo Assets/MSI-Logo.bmp
+          --msiTopBanner Assets/MSI-Logo.bmp
+          --msiDialogBackground Assets/MSI-Banner.bmp
 
-      - name: Fix zero-dated Portable ZIP entries
+      # Package managers and the README link to these exact names, and release downloads are
+      # case-sensitive. The update feed (releases.*.json) and the update package keep the names
+      # Velopack gave them, because the app's updater looks for those.
+      - name: Collect release files
         shell: pwsh
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          CHANNEL: win-${{ matrix.arch }}
+          ARCH: ${{ matrix.arch }}
         run: |
+          $ErrorActionPreference = 'Stop'
+          Get-ChildItem Releases | Format-Table Name, Length
+
+          # Velopack dates every entry of the portable zip 1980-01-01.
           Add-Type -Assembly System.IO.Compression.FileSystem
+          $portable = "Releases/FluentTaskScheduler-$env:CHANNEL-Portable.zip"
+          $archive = [System.IO.Compression.ZipFile]::Open($portable, 'Update')
           $now = Get-Date
-          $zip = "Releases/${{ matrix.platform }}/FluentTaskScheduler-${{ matrix.rid }}-Portable.zip"
-          $archive = [System.IO.Compression.ZipFile]::Open($zip, 'Update')
           foreach ($entry in $archive.Entries) { $entry.LastWriteTime = $now }
           $archive.Dispose()
 
-      - name: Assemble Dist
+          New-Item -ItemType Directory -Force Dist | Out-Null
+          Copy-Item $portable "Dist/Portable-$env:ARCH.zip"
+          Copy-Item "Releases/FluentTaskScheduler-$env:CHANNEL.msi" "Dist/Setup-$env:ARCH.msi"
+          Copy-Item "Releases/releases.$env:CHANNEL.json" Dist/
+          Copy-Item "Releases/FluentTaskScheduler-$env:VERSION-$env:CHANNEL-full.nupkg" Dist/
+          Get-ChildItem Dist | Format-Table Name, Length
+
+      - name: Upload release files
+        uses: actions/upload-artifact@v7
+        with:
+          name: Dist-${{ matrix.arch }}
+          path: Dist/
+          if-no-files-found: error
+
+  # Installs what was just built the way winget and Chocolatey do, silently, and checks that
+  # the installed app answers and that uninstalling removes it. What the app keeps for the user
+  # (settings, scripts, logs) lies outside the install folder, and uninstalling leaves it alone.
+  # The installer starts the app for a moment when it installs and before it uninstalls; that
+  # the app does its part then is seen by its start with Windows, which an uninstall takes away
+  # and the installation that follows puts back, as when a newer installer replaces this one.
+  verify-installer:
+    needs: package
+    runs-on: windows-latest
+    timeout-minutes: 15
+    env:
+      # What Windows starts when this account signs in.
+      RUN_KEY: HKCU:\Software\Microsoft\Windows\CurrentVersion\Run
+    steps:
+      - name: Download release files
+        uses: actions/download-artifact@v8
+        with:
+          name: Dist-x64
+          path: Dist
+
+      - name: Install
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path Dist | Out-Null
-          $v = "${{ steps.version.outputs.version }}"
-          Copy-Item "Releases/${{ matrix.platform }}/FluentTaskScheduler-${{ matrix.rid }}-Portable.zip" "Dist/Portable-${{ matrix.platform }}.zip" -Force
-          Copy-Item "Releases/${{ matrix.platform }}/FluentTaskScheduler-${{ matrix.rid }}.msi" "Dist/Setup-${{ matrix.platform }}.msi" -Force
-          Copy-Item "Releases/${{ matrix.platform }}/releases.${{ matrix.channel }}.json" "Dist/" -Force
-          Copy-Item "Releases/${{ matrix.platform }}/FluentTaskScheduler-$v-full.nupkg" "Dist/" -Force
-          Get-Item "Releases/${{ matrix.platform }}/FluentTaskScheduler-$v-delta.nupkg" -ErrorAction SilentlyContinue | Copy-Item -Destination "Dist/" -Force
+          $ErrorActionPreference = 'Stop'
+          $msi = (Resolve-Path Dist/Setup-x64.msi).Path
 
-      - name: Upload Dist artifact
-        uses: actions/upload-artifact@v5
-        with:
-          name: Dist-${{ matrix.platform }}
-          path: Dist/
+          $install = Start-Process msiexec.exe -ArgumentList "/i `"$msi`" /qn /norestart /l*v install.log" -Wait -PassThru
+          if ($install.ExitCode -ne 0) {
+            Get-Content install.log -Tail 80
+            throw "The installer ended with exit code $($install.ExitCode)."
+          }
 
-  publish-release:
+          # Where the app goes depends on what the installer decides, so its own log is asked.
+          $folder = Select-String -Path install.log -Pattern 'Property\(S\): INSTALLFOLDER = (.+)$' |
+                    Select-Object -Last 1 | ForEach-Object { $_.Matches[0].Groups[1].Value.Trim() }
+          $exe = if ($folder) { Join-Path $folder 'current\FluentTaskScheduler.exe' }
+          if (-not $exe -or -not (Test-Path $exe)) {
+            Select-String -Path install.log -Pattern 'INSTALLFOLDER|TARGETDIR|ALLUSERS' | Select-Object -First 30 -ExpandProperty Line
+            if ($folder) { Get-ChildItem $folder -Recurse -Depth 1 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName }
+            throw 'The installed app was not found.'
+          }
+          "Installed: $exe, version $((Get-Item $exe).VersionInfo.FileVersion)"
+
+          "FTS_MSI=$msi" >> $env:GITHUB_ENV
+          "FTS_EXE=$exe" >> $env:GITHUB_ENV
+          "FTS_DATA=$(Join-Path $env:LOCALAPPDATA $env:DATA_FOLDER)" >> $env:GITHUB_ENV
+
+      - name: Run the installed app
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $list = Start-Process $env:FTS_EXE -ArgumentList '--list' -Wait -PassThru -NoNewWindow -RedirectStandardOutput list.json
+          if ($list.ExitCode -ne 0) { throw "The installed app answered --list with exit code $($list.ExitCode)." }
+          $answer = "$(Get-Content list.json -Raw)".Trim()
+          if (-not $answer.StartsWith('[')) { throw "The installed app answered --list with something that is no list of tasks: '$answer'" }
+          "The installed app lists $(@($answer | ConvertFrom-Json).Count) tasks."
+
+          # A start that only answers a command has no reason to save settings. The next steps
+          # need a settings file, so one is put where the app keeps it.
+          $settings = Join-Path $env:FTS_DATA 'settings.json'
+          if (-not (Test-Path $settings)) {
+            New-Item -ItemType Directory -Force $env:FTS_DATA | Out-Null
+            Set-Content $settings '{ "ReminderLeadMinutes": 17 }'
+          }
+
+      # What the switch "Start with Windows" in the app's settings writes: the program of this
+      # copy, in quotation marks, under the app's name.
+      - name: Let the app start with Windows
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # An account that never had a program start with it has no such key yet.
+          if (-not (Test-Path $env:RUN_KEY)) { New-Item $env:RUN_KEY -Force | Out-Null }
+          Set-ItemProperty $env:RUN_KEY -Name FluentTaskScheduler -Value "`"$env:FTS_EXE`""
+
+      - name: Uninstall, which leaves the user's files alone
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $uninstall = Start-Process msiexec.exe -ArgumentList "/x `"$env:FTS_MSI`" /qn /norestart" -Wait -PassThru
+          if ($uninstall.ExitCode -ne 0) { throw "Uninstalling ended with exit code $($uninstall.ExitCode)." }
+          if (Test-Path $env:FTS_EXE) { throw 'The app is still there after uninstalling.' }
+          if (-not (Test-Path (Join-Path $env:FTS_DATA 'settings.json'))) {
+            throw "Uninstalling removed the user's files in $env:FTS_DATA, which nobody asked for."
+          }
+
+          # The app's part in its uninstall: Windows no longer starts it, and a note says that it did.
+          if ((Get-ItemProperty $env:RUN_KEY).FluentTaskScheduler) { throw 'Windows would still start the uninstalled app at sign-in.' }
+          if (-not (Test-Path (Join-Path $env:FTS_DATA 'start-with-windows'))) {
+            throw "The app left no note in $env:FTS_DATA that it started with Windows, so a reinstallation could not put that back."
+          }
+
+      - name: Install again, which lets the app start with Windows again
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $install = Start-Process msiexec.exe -ArgumentList "/i `"$env:FTS_MSI`" /qn /norestart /l*v install-again.log" -Wait -PassThru
+          if ($install.ExitCode -ne 0) {
+            Get-Content install-again.log -Tail 80
+            throw "The installer ended with exit code $($install.ExitCode)."
+          }
+          if (-not (Test-Path $env:FTS_EXE)) { throw 'The second installation did not go where the first one went.' }
+
+          $started = (Get-ItemProperty $env:RUN_KEY).FluentTaskScheduler
+          if ($started -ne "`"$env:FTS_EXE`"") { throw "After the reinstallation Windows starts '$started' at sign-in, not the app." }
+          if (Test-Path (Join-Path $env:FTS_DATA 'start-with-windows')) { throw 'The note that the app started with Windows is still there after it was acted on.' }
+
+      - name: Uninstall for good
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $uninstall = Start-Process msiexec.exe -ArgumentList "/x `"$env:FTS_MSI`" /qn /norestart" -Wait -PassThru
+          if ($uninstall.ExitCode -ne 0) { throw "Uninstalling ended with exit code $($uninstall.ExitCode)." }
+          if (Test-Path $env:FTS_EXE) { throw 'The app is still there after uninstalling.' }
+
+      # The installer starts the app for its part in installing and uninstalling. What the app
+      # was asked to do then, and how that ended, is in the log of Velopack's library.
+      - name: Show Velopack's log
+        if: failure()
+        shell: pwsh
+        run: |
+          Get-Item (Join-Path $env:LOCALAPPDATA 'velopack\*.log') -ErrorAction SilentlyContinue |
+            ForEach-Object { "--- $($_.FullName)"; Get-Content $_.FullName -Tail 100 }
+
+      - name: Clean up
+        if: always()
+        shell: pwsh
+        run: |
+          $data = Join-Path $env:LOCALAPPDATA $env:DATA_FOLDER
+          if (Test-Path $data) { Remove-Item $data -Recurse -Force }
+          if (Test-Path $env:RUN_KEY) { Remove-ItemProperty $env:RUN_KEY -Name FluentTaskScheduler -ErrorAction SilentlyContinue }
+
+  # An installed 1.9.0 has to get to this version by itself. Its updater reads the feed
+  # (releases.*.json) attached to the release, downloads the package the feed names, compares
+  # size and hash, and hands the package to Velopack's Update.exe. The download needs a
+  # published release, so it cannot be gone through here; everything around it is.
+  #
+  # 1.9.0 is also the last version that keeps the user's files in the folder
+  # %LOCALAPPDATA%\FluentTaskScheduler, which is the very folder its installer puts the app in
+  # when it is installed per user. The new version moves them out of there at its first start,
+  # copies the saved scripts, and must take nothing with it that belongs to the installer.
+  verify-update:
     needs: package
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      VERSION: ${{ needs.package.outputs.version }}
     steps:
-      - name: Download all Dist artifacts
-        uses: actions/download-artifact@v6
+      - name: Download release files
+        uses: actions/download-artifact@v8
         with:
           pattern: Dist-*
           path: Dist
           merge-multiple: true
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+      - name: Check the update feeds
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          foreach ($channel in 'win-x64', 'win-arm64') {
+            $package = Get-Item "Dist/FluentTaskScheduler-$env:VERSION-$channel-full.nupkg"
+            $named = @((Get-Content "Dist/releases.$channel.json" -Raw | ConvertFrom-Json).Assets)
+            if ($named.Count -ne 1) { throw "releases.$channel.json names $($named.Count) packages; one is attached." }
+
+            # The updater takes the newest full package of the feed and looks for a file of that
+            # name in the release. It compares the hash letter for letter, so its case counts.
+            $attached = [ordered]@{
+              Version  = $env:VERSION
+              Type     = 'Full'
+              FileName = $package.Name
+              Size     = $package.Length
+              SHA1     = (Get-FileHash $package.FullName -Algorithm SHA1).Hash
+              SHA256   = (Get-FileHash $package.FullName -Algorithm SHA256).Hash
+            }
+            foreach ($property in $attached.Keys) {
+              if ("$($named[0].$property)" -cne "$($attached[$property])") {
+                throw "releases.$channel.json has $property '$($named[0].$property)'; the attached package has '$($attached[$property])'."
+              }
+            }
+            "releases.$channel.json names $($package.Name): $($package.Length) bytes, SHA-256 $($attached.SHA256)"
+          }
+
+      - name: Install 1.9.0
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $msi = Join-Path $env:RUNNER_TEMP 'FluentTaskScheduler-1.9.0-Setup-x64.msi'
+          Invoke-WebRequest 'https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/V1.9.0/Setup-x64.msi' -OutFile $msi -MaximumRetryCount 3 -RetryIntervalSec 5
+          $hash = (Get-FileHash $msi -Algorithm SHA256).Hash
+          if ($hash -ne 'AFAD2A1E61E4B3F87C1EE2B7ED4E55CFAC9B13DBC5AF7CA99745DA4977539362') {
+            throw "The installer of 1.9.0 is not the published one any more: its SHA-256 is $hash."
+          }
+
+          # The installer of 1.9.0 chooses its folder in a dialog. Without the dialog the app
+          # lands in the root of a drive, so the folder the dialog sets for "per user" is named.
+          $folder = Join-Path $env:LOCALAPPDATA 'FluentTaskScheduler'
+          $install = Start-Process msiexec.exe -ArgumentList "/i `"$msi`" /qn /norestart /l*v install-1.9.0.log INSTALLFOLDER=`"$folder`"" -Wait -PassThru
+          if ($install.ExitCode -ne 0) {
+            Get-Content install-1.9.0.log -Tail 80
+            throw "The installer of 1.9.0 ended with exit code $($install.ExitCode)."
+          }
+
+          $installed = Select-String -Path install-1.9.0.log -Pattern 'Property\(S\): INSTALLFOLDER = (.+)$' |
+                       Select-Object -Last 1 | ForEach-Object { $_.Matches[0].Groups[1].Value.Trim() }
+          $exe = Join-Path $folder 'current\FluentTaskScheduler.exe'
+          if ("$installed".TrimEnd('\') -ne $folder -or -not (Test-Path $exe)) {
+            Select-String -Path install-1.9.0.log -Pattern 'INSTALLFOLDER|TARGETDIR|ALLUSERS' | Select-Object -First 30 -ExpandProperty Line
+            throw "1.9.0 was to be installed in $folder; its installer says it went to '$installed'."
+          }
+          "Installed: $exe, version $((Get-Item $exe).VersionInfo.FileVersion)"
+
+          "FTS_OLD_MSI=$msi" >> $env:GITHUB_ENV
+          "FTS_ROOT=$folder" >> $env:GITHUB_ENV
+          "FTS_DATA=$(Join-Path $env:LOCALAPPDATA $env:DATA_FOLDER)" >> $env:GITHUB_ENV
+
+      - name: Put files where 1.9.0 keeps them
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Set-Content (Join-Path $env:FTS_ROOT 'settings.json') '{ "Theme": "Dark", "ReminderLeadMinutes": 17 }'
+
+          Set-Content saved-with-1.9.0.ps1 "Write-Output 'Saved with 1.9.0'"
+          New-Item -ItemType Directory -Force (Join-Path $env:FTS_ROOT 'Scripts') | Out-Null
+          Copy-Item saved-with-1.9.0.ps1 (Join-Path $env:FTS_ROOT 'Scripts\Saved with 1.9.0.ps1')
+
+      - name: Update the way the app does it
+        timeout-minutes: 10
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $updater = Join-Path $env:FTS_ROOT 'Update.exe'
+          $package = Get-Item "Dist/FluentTaskScheduler-$env:VERSION-win-x64-full.nupkg"
+
+          # Update.exe is a windowed program, and the one 1.9.0 installed (Velopack 0.0.1444)
+          # answers --help the way it reports an error: on the error output, with a failing
+          # exit code. So both outputs are caught in files and the exit code is not looked at.
+          function Show-Updater([string] $which) {
+            "--- $which is version $((Get-Item $updater).VersionInfo.ProductVersion) and says about itself:"
+            Start-Process $updater -ArgumentList '--help' -Wait -NoNewWindow -RedirectStandardOutput help.txt -RedirectStandardError help-error.txt
+            Get-Content help.txt, help-error.txt
+          }
+          Show-Updater 'The Update.exe that 1.9.0 installed'
+
+          # What the updater of 1.9.0 does once its download is complete (Velopack 0.0.1298,
+          # UpdateManager.DownloadUpdatesAsync): the package lies in "packages", and the
+          # Update.exe it carries under the name Squirrel.exe takes the place of the installed one.
+          $packages = Join-Path $env:FTS_ROOT 'packages'
+          New-Item -ItemType Directory -Force $packages | Out-Null
+          $downloaded = Join-Path $packages $package.Name
+          Copy-Item $package.FullName $downloaded
+
+          Add-Type -Assembly System.IO.Compression.FileSystem
+          $archive = [System.IO.Compression.ZipFile]::OpenRead($downloaded)
+          $carried = $archive.Entries | Where-Object { $_.FullName.EndsWith('Squirrel.exe') } | Select-Object -First 1
+          if ($carried) { [System.IO.Compression.ZipFileExtensions]::ExtractToFile($carried, $updater, $true) }
+          $archive.Dispose()
+          Show-Updater 'The Update.exe that applies the package'
+
+          # Then it starts Update.exe and ends (UpdateExe.Apply): "apply --package <file>
+          # --waitPid <the app>". Here no app has to end first. --silent and --norestart keep
+          # the progress window and the app's own window from opening on this machine.
+          $apply = Start-Process $updater -ArgumentList "--silent apply --package `"$downloaded`" --norestart" -Wait -PassThru
+          Get-Item (Join-Path $env:LOCALAPPDATA 'velopack\*.log') -ErrorAction SilentlyContinue |
+            ForEach-Object { "--- $($_.FullName)"; Get-Content $_.FullName -Tail 100 }
+          if ($apply.ExitCode -ne 0) { throw "Update.exe ended with exit code $($apply.ExitCode)." }
+
+      - name: Check the updated app and the user's files
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $exe = Join-Path $env:FTS_ROOT 'current\FluentTaskScheduler.exe'
+          $file = (Get-Item $exe).VersionInfo
+          $found = "$($file.FileMajorPart).$($file.FileMinorPart).$($file.FileBuildPart)"
+          if ($found -ne $env:VERSION) { throw "The app in $env:FTS_ROOT\current is version $found, not $env:VERSION." }
+
+          $list = Start-Process $exe -ArgumentList '--list' -Wait -PassThru -NoNewWindow -RedirectStandardOutput list.json
+          if ($list.ExitCode -ne 0) { throw "The updated app answered --list with exit code $($list.ExitCode)." }
+          $answer = "$(Get-Content list.json -Raw)".Trim()
+          if (-not $answer.StartsWith('[')) { throw "The updated app answered --list with something that is no list of tasks: '$answer'" }
+          "The updated app lists $(@($answer | ConvertFrom-Json).Count) tasks."
+
+          # The new version moves the user's files when it starts, and by now it has started.
+          $settings = Join-Path $env:FTS_DATA 'settings.json'
+          $saved = Join-Path $env:FTS_DATA 'Scripts\Saved with 1.9.0.ps1'
+          $wrong = @(
+            if (-not (Test-Path $settings)) { "settings.json did not arrive in $env:FTS_DATA." }
+            elseif ((Get-Content $settings -Raw | ConvertFrom-Json).ReminderLeadMinutes -ne 17) { 'settings.json lost the reminder time that was set with 1.9.0.' }
+
+            if (-not (Test-Path $saved)) { "The script did not arrive in $env:FTS_DATA\Scripts." }
+            elseif ((Get-FileHash $saved).Hash -ne (Get-FileHash saved-with-1.9.0.ps1).Hash) { 'The script is not the one that was saved with 1.9.0.' }
+
+            if (Test-Path (Join-Path $env:FTS_ROOT 'settings.json')) { 'settings.json is still in the install folder.' }
+
+            # A task that was created from a saved script with 1.9.0 names the script's file
+            # there, so the scripts are copied and the old ones stay.
+            if (-not (Test-Path (Join-Path $env:FTS_ROOT 'Scripts\Saved with 1.9.0.ps1'))) {
+              'The script is gone from the folder 1.9.0 kept it in, where tasks that were created back then run it from.'
+            }
+            foreach ($own in 'Update.exe', 'FluentTaskScheduler.exe', '.msi-installed', 'current\sq.version', "packages\FluentTaskScheduler-$env:VERSION-win-x64-full.nupkg") {
+              if (-not (Test-Path (Join-Path $env:FTS_ROOT $own))) { "$own belongs to the installer and is gone from the install folder." }
+            }
+          )
+          if ($wrong) {
+            $wrong
+            throw "The user's files did not move the way they should have."
+          }
+
+      - name: Uninstall, which leaves the user's files alone
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $uninstall = Start-Process msiexec.exe -ArgumentList "/x `"$env:FTS_OLD_MSI`" /qn /norestart /l*v uninstall-1.9.0.log" -Wait -PassThru
+          if ($uninstall.ExitCode -ne 0) {
+            Get-Content uninstall-1.9.0.log -Tail 80
+            throw "Uninstalling ended with exit code $($uninstall.ExitCode)."
+          }
+          if (Test-Path (Join-Path $env:FTS_ROOT 'current\FluentTaskScheduler.exe')) {
+            Select-String -Path uninstall-1.9.0.log -Pattern 'INSTALLFOLDER' | Select-Object -First 20 -ExpandProperty Line
+            throw 'The app is still there after uninstalling.'
+          }
+          foreach ($kept in 'settings.json', 'Scripts\Saved with 1.9.0.ps1') {
+            if (-not (Test-Path (Join-Path $env:FTS_DATA $kept))) { throw "Uninstalling removed $kept from $env:FTS_DATA, which nobody asked for." }
+          }
+          if (Test-Path $env:FTS_ROOT) {
+            "Uninstalling left this behind in ${env:FTS_ROOT}:"
+            Get-ChildItem $env:FTS_ROOT -Recurse -Depth 1 | Select-Object -ExpandProperty FullName
+          }
+
+      # Where Velopack writes down what it did: the Update.exe of 1.9.0 and everything newer in
+      # %LOCALAPPDATA%\velopack, the library in the app of 1.9.0 as velopack.log in the install
+      # folder, and each of them in the temp folder when it cannot write there.
+      - name: Show what happened
+        if: failure()
+        shell: pwsh
+        run: |
+          $root = Join-Path $env:LOCALAPPDATA 'FluentTaskScheduler'
+          $data = Join-Path $env:LOCALAPPDATA $env:DATA_FOLDER
+
+          foreach ($file in 'Update.exe', 'current\FluentTaskScheduler.exe') {
+            $item = Get-Item (Join-Path $root $file) -ErrorAction SilentlyContinue
+            if ($item) { "$file is version $($item.VersionInfo.ProductVersion)" } else { "$file is not there" }
+          }
+          foreach ($folder in $root, $data) {
+            "--- $folder"
+            Get-ChildItem $folder -Recurse -Depth 1 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
+          }
+          $logs = (Join-Path $env:LOCALAPPDATA 'velopack\*.log'), (Join-Path $root 'velopack.log'), (Join-Path $env:TEMP 'velopack*.log')
+          Get-Item $logs -ErrorAction SilentlyContinue |
+            ForEach-Object { "--- $($_.FullName)"; Get-Content $_.FullName -Tail 200 }
+
+  # The manifests for winget, Scoop and Chocolatey, rewritten for the files that were just built.
+  # They stay with the run and are picked up from there once the release is published.
+  package-manifests:
+    needs: package
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Download release files
+        uses: actions/download-artifact@v8
         with:
-          files: Dist/*
-          draft: true
-          generate_release_notes: true
+          pattern: Dist-*
+          path: Dist
+          merge-multiple: true
+
+      - name: Update the manifests
+        shell: pwsh
+        env:
+          VERSION: ${{ needs.package.outputs.version }}
+        run: ./packaging/Update-Manifests.ps1 -Version $env:VERSION -Downloads Dist
+
+      - name: Upload the manifests
+        uses: actions/upload-artifact@v7
+        with:
+          name: package-manifests
+          path: packaging/
+          if-no-files-found: error
+
+  draft-release:
+    # A pushed tag always drafts a release, a manual run when it was asked to; neither does
+    # unless everything above worked.
+    if: github.event_name == 'push' || inputs.draft
+    needs: [package, verify-installer, verify-update, package-manifests]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      VERSION: ${{ needs.package.outputs.version }}
+      TAG: V${{ needs.package.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Download release files
+        uses: actions/download-artifact@v8
+        with:
+          pattern: Dist-*
+          path: Dist
+          merge-multiple: true
+
+      - name: Look for a release of this version
+        id: existing
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $listed = gh release list --limit 1000 --json tagName,isDraft
+          if ($LASTEXITCODE -ne 0) { throw 'The releases could not be listed.' }
+          $releases = @($listed | ConvertFrom-Json | Where-Object { $_.tagName -ceq $env:TAG })
+
+          if ($releases | Where-Object { -not $_.isDraft }) {
+            throw "$env:TAG is published. A published release is not touched: its files are what people have downloaded."
+          }
+          if ($releases.Count -gt 1) { throw "There are $($releases.Count) drafts named $env:TAG. Delete all but one of them." }
+          "draft=$($releases.Count -eq 1)" >> $env:GITHUB_OUTPUT
+
+      # The notes are the ones written for this version, or else GitHub's list of what was
+      # merged. The table of hashes is always written here, from the files that get attached.
+      # A first line like "# V2.0.0 - The ... Update" in the written notes is the title of the
+      # release and not part of its text.
+      - name: Write the release notes
+        id: notes
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $written = ".github/release-notes/$env:TAG.md"
+          $title = ''
+          if (Test-Path $written) {
+            $notes = Get-Content $written -Raw
+            if ($notes -match 'Artifacts and Hashes') {
+              throw "$written has its own table of hashes. Take it out: the table is written by this workflow."
+            }
+            if ($notes -match '\A\s*# (?<title>[^\r\n]+)\r?\n') {
+              $title = $Matches.title.Trim()
+              $notes = $notes.Substring($Matches[0].Length).TrimStart()
+            }
+          } else {
+            $generated = gh api "repos/$env:GH_REPO/releases/generate-notes" -f "tag_name=$env:TAG" -f "target_commitish=$env:GITHUB_SHA" --jq .body
+            if ($LASTEXITCODE -ne 0) { throw 'GitHub did not generate release notes.' }
+            $notes = $generated -join "`n"
+          }
+
+          $table = @(
+            '## 📎 Artifacts and Hashes (for your reference)'
+            '| Artifact | SHA-256 Hash |'
+            '| :--- | :--- |'
+            foreach ($download in 'Setup-x64.msi', 'Setup-arm64.msi', 'Portable-x64.zip', 'Portable-arm64.zip') {
+              '| **{0}** | `{1}` |' -f $download, (Get-FileHash "Dist/$download" -Algorithm SHA256).Hash
+            }
+          )
+          Set-Content notes.md (@("$notes".TrimEnd(), '') + $table)
+          Get-Content notes.md
+          "title=$title" >> $env:GITHUB_OUTPUT
+
+      - name: Create the draft or bring it up to date
+        shell: pwsh
+        env:
+          DRAFT_EXISTS: ${{ steps.existing.outputs.draft }}
+          TITLE: ${{ steps.notes.outputs.title }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $files = @(
+            'Setup-x64.msi', 'Setup-arm64.msi', 'Portable-x64.zip', 'Portable-arm64.zip'
+            'releases.win-x64.json', 'releases.win-arm64.json'
+            "FluentTaskScheduler-$env:VERSION-win-x64-full.nupkg", "FluentTaskScheduler-$env:VERSION-win-arm64-full.nupkg"
+          ) | ForEach-Object { (Get-Item "Dist/$_").FullName }
+
+          if ($env:DRAFT_EXISTS -eq 'True') {
+            # Without a title in the notes, the one the draft has stays: it may have been given by hand.
+            $retitle = if ($env:TITLE) { '--title', $env:TITLE } else { @() }
+            gh release edit $env:TAG --target $env:GITHUB_SHA --notes-file notes.md @retitle
+            if ($LASTEXITCODE -ne 0) { throw "The draft $env:TAG could not be changed." }
+
+            $attached = gh release view $env:TAG --json assets --jq '.assets[].name'
+            if ($LASTEXITCODE -ne 0) { throw "The files of the draft $env:TAG could not be listed." }
+            foreach ($name in $attached) {
+              gh release delete-asset $env:TAG $name --yes
+              if ($LASTEXITCODE -ne 0) { throw "$name could not be removed from the draft $env:TAG." }
+            }
+            gh release upload $env:TAG $files
+            if ($LASTEXITCODE -ne 0) { throw "The files could not be attached to the draft $env:TAG." }
+          } else {
+            $title = if ($env:TITLE) { $env:TITLE } else { $env:TAG }
+            gh release create $env:TAG --draft --target $env:GITHUB_SHA --title $title --notes-file notes.md $files
+            if ($LASTEXITCODE -ne 0) { throw "The draft $env:TAG could not be created." }
+          }

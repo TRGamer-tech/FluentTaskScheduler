@@ -1,0 +1,206 @@
+using System.Runtime.InteropServices;
+using FlaUI.Core.AutomationElements;
+using FlaUI.Core.Definitions;
+using FlaUI.Core.Tools;
+
+namespace FluentTaskScheduler.UITests;
+
+/// <summary>The window frame and what it does for every page: navigation, the pane, the app language, dialogs, the clipboard.</summary>
+public class ShellTests
+{
+    private static readonly (string Item, string Heading)[] Pages =
+    [
+        ("NavAllTasks", "Scheduled Tasks"),
+        ("NavDashboard", "Dashboard"),
+        ("NavQuickActions", "Quick Actions"),
+        ("NavScriptLibrary", "Library"),
+        ("NavScriptEditor", "Script Editor"),
+        ("NavSettings", "Settings")
+    ];
+
+    [Fact]
+    public void EveryPageOpens_UnderItsOwnHeading()
+    {
+        using var app = AppSession.Launch("pages");
+        app.Snapshot("start");
+
+        foreach (var (item, heading) in Pages)
+        {
+            app.Require(item).Press();
+
+            // A page may take a while to load its data on a slow machine; the heading follows the page.
+            Assert.True(app.Find(e => e.AutomationId == "PageTitle" && e.Name == heading, timeoutMs: 30000) != null, $"The heading is not '{heading}' after choosing {item}.");
+            app.Snapshot(item);
+            Assert.False(app.HasExited, $"The app exited after choosing {item}.");
+        }
+    }
+
+    /// <summary>
+    /// The app opens its window at the size it last had, maybe on a larger screen. The size here
+    /// is larger than any screen the tests run on, so the window has to shrink and move to fit.
+    /// </summary>
+    [Fact]
+    public void TheWindow_OpensInsideTheScreen_EvenAtASizeRememberedFromALargerOne()
+    {
+        using var app = AppSession.Launch("placement", AppSession.FirstRunDone(("WindowWidth", 4000), ("WindowHeight", 3000)));
+
+        var window = app.Window.BoundingRectangle;
+        var screen = app.Screen;
+        app.Log($"Window {window}, screen {screen}");
+        Assert.True(screen.Contains(window), $"The window {window} reaches beyond the screen {screen}.");
+    }
+
+    [Fact]
+    public void StartingTheAppAgain_BringsBackTheWindowThatIsAlreadyOpen()
+    {
+        using var app = AppSession.Launch("second-start");
+        var window = app.Window.Patterns.Window.Pattern;
+        window.SetWindowVisualState(WindowVisualState.Minimized);
+        Assert.True(Retry.WhileFalse(() => window.WindowVisualState.Value == WindowVisualState.Minimized, TimeSpan.FromSeconds(10)).Success,
+            "The window could not be minimized.");
+
+        app.StartAgain();
+
+        Assert.True(Retry.WhileFalse(() => window.WindowVisualState.Value == WindowVisualState.Normal, TimeSpan.FromSeconds(10)).Success,
+            "The first instance's window stayed minimized.");
+    }
+
+    [Fact]
+    public void TheNavigationPane_ShrinksToIcons_ThenToAMenuButton_AsTheWindowNarrows()
+    {
+        using var app = AppSession.Launch("pane");
+
+        // The pane changes its mode at widths of 641 and 1008 effective pixels, while UI Automation
+        // sizes and measures in physical ones: at a display scale of 150%, 900 physical pixels are
+        // 600 effective ones.
+        double scale = GetDpiForWindow(app.Window.Properties.NativeWindowHandle.Value) / 96.0;
+        void ResizeTo(int width) => app.Resize((int)(width * scale), (int)(800 * scale));
+        int WidthOfAnEntry() => (int)(app.Require("NavDashboard").BoundingRectangle.Width / scale);
+
+        ResizeTo(1100);
+        app.Snapshot("wide");
+        int wide = WidthOfAnEntry();
+
+        ResizeTo(800);
+        app.Snapshot("medium");
+        int medium = WidthOfAnEntry();
+
+        ResizeTo(560);
+        app.Snapshot("narrow");
+        var narrowItem = app.Find("NavDashboard", 1500);
+        bool hiddenWhenNarrow = narrowItem == null || narrowItem.IsOffscreen;
+
+        app.Log($"Display scale {scale:P0}; NavDashboard width in effective pixels: wide {wide}, medium {medium}; hidden when narrow: {hiddenWhenNarrow}");
+        Assert.True(wide > 200, $"At 1100 effective pixels the pane should show labels, but its entries are {wide} wide.");
+        Assert.True(medium is > 0 and < 80, $"At 800 effective pixels the pane should show icons only, but its entries are {medium} wide.");
+        Assert.True(hiddenWhenNarrow, "At 560 effective pixels the pane should be closed.");
+
+        ResizeTo(1100);
+        Assert.True(WidthOfAnEntry() > 200, "The pane should open again when the window is wide again.");
+    }
+
+    [Fact]
+    public void TheChosenLanguage_IsUsed_WhateverWindowsIsSetTo()
+    {
+        using var app = AppSession.Launch("german", AppSession.FirstRunDone(("Language", "de-DE")));
+        app.Snapshot("start");
+
+        Assert.Equal("Einstellungen", app.Require("NavSettings").Name);
+        Assert.Equal("Geplante Aufgaben", app.Require("PageTitle").Name);
+    }
+
+    /// <summary>
+    /// Imported settings in another language rebuild the window under the message that says they
+    /// were imported. The rebuilt window asks at once for the welcome tour, which the imported
+    /// settings have not seen yet, and the tour has to wait for that message.
+    /// </summary>
+    [Fact]
+    public void ADialogOfARebuiltWindow_WaitsForTheMessageThatWasOpenBeforeTheRebuild()
+    {
+        using var app = AppSession.Launch("import-rebuild");
+        string file = Path.Combine(app.DataDir, "imported-settings.json");
+        File.WriteAllText(file, AppSession.FirstRunDone(("Language", "de-DE"), ("HasCompletedOnboarding", false)));
+
+        app.Require("NavSettings").Press();
+        app.Require("ImportSettingsButton", 30000).PressWithKeyboard();
+        app.ChooseFile(file);
+
+        // The message is worded before the language changes; the page under it already is in German.
+        Assert.True(app.FindByName("Import Successful", timeoutMs: 20000) != null, "The message that the settings were imported did not come up.");
+        Assert.True(app.Find(e => e.AutomationId == "PageTitle" && e.Name == "Einstellungen", 10000) != null, "The window was not rebuilt in German.");
+        app.Snapshot("message");
+        Assert.True(app.Find("TourSlideBody", 1000) == null, "The tour came up while the message was still open.");
+
+        app.Require("CloseButton").Press();
+
+        Assert.True(app.Find("TourSlideBody", 20000) != null, "The tour did not come up once the message was closed.");
+        app.Snapshot("tour");
+        Assert.False(app.HasExited);
+    }
+
+    /// <summary>
+    /// What the app copied stays on the clipboard after the app has gone, even when it was ended
+    /// the hard way. What is copied here is the script editor's output, which has a line once a
+    /// script is saved.
+    /// </summary>
+    [Fact]
+    public void TextCopiedInTheApp_IsStillOnTheClipboard_AfterTheAppHasEnded()
+    {
+        string name = "fts clipboard " + Guid.NewGuid().ToString("N")[..8];
+        string savedLine = $"[Saved to Library as '{name}']";
+        using (var app = AppSession.Launch("clipboard"))
+        {
+            app.Require("NavScriptEditor").Press();
+            app.Require("ScriptEditorName").AsTextBox().Text = name;
+            app.Require("ScriptEditorText").AsTextBox().Text = "Get-Date";
+            var save = app.Find(e => e.AutomationId == "ScriptEditorSave" && e.IsEnabled, 10000)
+                       ?? throw new InvalidOperationException("Save did not become available.");
+            save.AsButton().Invoke();
+            Assert.True(app.Find(e => e.Name == savedLine, 10000) != null, "The output does not confirm that the script was saved.");
+
+            app.Require("ScriptEditorCopyOutput").Press();
+            Assert.True(AppSession.Eventually(() => ClipboardText() == savedLine, 10), "The output did not reach the clipboard.");
+        }
+
+        // Ending the session has killed the app.
+        Assert.True(AppSession.Eventually(() => ClipboardText() == savedLine, 5), "The copied text left the clipboard with the app.");
+    }
+
+    [DllImport("user32.dll")]
+    private static extern uint GetDpiForWindow(nint window);
+
+    /// <summary>The text on the clipboard; null when there is none, or another program has the clipboard open.</summary>
+    private static string? ClipboardText()
+    {
+        if (!OpenClipboard(0)) return null;
+        try
+        {
+            nint data = GetClipboardData(UnicodeText);
+            if (data == 0) return null;
+            nint text = GlobalLock(data);
+            try { return Marshal.PtrToStringUni(text); }
+            finally { GlobalUnlock(data); }
+        }
+        finally
+        {
+            CloseClipboard();
+        }
+    }
+
+    private const uint UnicodeText = 13; // CF_UNICODETEXT
+
+    [DllImport("user32.dll")]
+    private static extern bool OpenClipboard(nint owner);
+
+    [DllImport("user32.dll")]
+    private static extern bool CloseClipboard();
+
+    [DllImport("user32.dll")]
+    private static extern nint GetClipboardData(uint format);
+
+    [DllImport("kernel32.dll")]
+    private static extern nint GlobalLock(nint memory);
+
+    [DllImport("kernel32.dll")]
+    private static extern bool GlobalUnlock(nint memory);
+}

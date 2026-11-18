@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!-- Everything that does not need a window: tasks, snoozing, history, settings and the view
+         models. Keeping it free of WinUI is what makes it testable without starting the app. -->
+    <PropertyGroup>
+        <TargetFramework>net10.0-windows</TargetFramework>
+        <RootNamespace>FluentTaskScheduler</RootNamespace>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="FluentTaskScheduler.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+        <PackageReference Include="Serilog" Version="4.4.0" />
+        <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+        <!-- Reads Task Scheduler's event log. TaskScheduler would bring an older version along. -->
+        <PackageReference Include="System.Diagnostics.EventLog" Version="10.0.15" />
+        <!-- Draws the notification area icon. Being referenced here also keeps the app off the version from 2019
+             that its notification package asks for, which has a known vulnerability. -->
+        <PackageReference Include="System.Drawing.Common" Version="10.0.15" />
+        <PackageReference Include="TaskScheduler" Version="2.12.2" />
+    </ItemGroup>
+
+</Project>
