@@ -160,10 +160,24 @@ public sealed class ProcessRunnerTests
     {
         Skip.IfNot(OperatingSystem.IsWindows(), SkipReason);
 
-        // "set /p" writes its prompt without ending the line; the line ends seconds later, after the ping.
-        await Run($"set /p answer=Working... & \"{WindowsTools.InSystemFolder("ping.exe")}\" -n 3 127.0.0.1 >nul & echo done");
+        string waitfor = WindowsTools.InSystemFolder("waitfor.exe");
+        string signal = $"FtsTests{Guid.NewGuid():N}";
 
-        Assert.Contains(_output, line => !line.IsComplete && line.Text.TrimEnd() == "Working...");
+        // "set /p" writes its prompt without ending the line. The line ends when this test says
+        // so, which it does once the prompt has been reported. A pause of a fixed length in the
+        // command proved too short once: with every other test running beside this one, the
+        // prompt was read two seconds late, together with the rest of its line.
+        Task<int> run = Run($"set /p answer=Working... & \"{waitfor}\" /t 20 {signal} >nul & echo done");
+        await WaitUntil(() => _output.Any(line => !line.IsComplete && line.Text.TrimEnd() == "Working..."));
+
+        // Until the command has got as far as waiting, nobody hears the signal.
+        while (await Task.WhenAny(run, Task.Delay(250)) != run)
+        {
+            using var send = Process.Start(new ProcessStartInfo(waitfor, $"/si {signal}") { UseShellExecute = false, CreateNoWindow = true })!;
+            await send.WaitForExitAsync();
+        }
+        await run;
+
         Assert.Contains(Lines, line => line.Text.StartsWith("Working...") && line.Text.TrimEnd().EndsWith("done"));
     }
 
