@@ -2,18 +2,18 @@
 
     <!-- Drives the built app through UI Automation. Needs a Windows desktop session. -->
     <PropertyGroup>
-        <TargetFramework>net8.0-windows</TargetFramework>
+        <TargetFramework>net10.0-windows</TargetFramework>
         <RootNamespace>FluentTaskScheduler.UITests</RootNamespace>
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FlaUI.UIA3" Version="4.0.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+        <PackageReference Include="FlaUI.UIA3" Version="5.0.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.12.0" />
         <PackageReference Include="xunit" Version="2.9.3" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
-        <PackageReference Include="Xunit.SkippableFact" Version="1.5.23" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="4.0.1" />
+        <PackageReference Include="Xunit.SkippableFact" Version="1.5.85" />
     </ItemGroup>
 
     <ItemGroup>

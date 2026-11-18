@@ -3,7 +3,7 @@
 FluentTaskScheduler is a Windows app for the tasks of the Windows Task Scheduler. It shows what is
 scheduled and when each task ran last, and, while Windows records task history, how its runs went.
 You can create, change, start, stop, snooze and move tasks without the Task Scheduler console that
-comes with Windows. Built with WinUI 3 and .NET 8.
+comes with Windows. Built with WinUI 3 and .NET 10.
 
 Every task in the app is an ordinary Windows task. It runs on its schedule whether or not the app is
 open.
@@ -352,7 +352,7 @@ See [CONTRIBUTING](CONTRIBUTING.md).
 
 ## Technology
 
-- [.NET 8](https://dotnet.microsoft.com/download/dotnet/8.0) and [WinUI 3](https://learn.microsoft.com/windows/apps/winui/winui3/) (Windows App SDK)
+- [.NET 10](https://dotnet.microsoft.com/download/dotnet/10.0) and [WinUI 3](https://learn.microsoft.com/windows/apps/winui/winui3/) (Windows App SDK)
 - [TaskScheduler Managed Wrapper](https://github.com/dahall/TaskScheduler) for the Task Scheduler
 - [Velopack](https://velopack.io/) for the installer and the updates
 - GitHub Actions builds the app for x64 and ARM64 (thanks, TalyNone), and runs the unit tests and UI

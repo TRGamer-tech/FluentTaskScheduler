@@ -6,9 +6,9 @@ Before you submit a pull request or open an issue asking why the project will no
 
 ## What you need
 
-- **The .NET 8 SDK.** That is all it takes to build the app and run the tests from the command line.
+- **The .NET 10 SDK.** That is all it takes to build the app and run the tests from the command line. `global.json` keeps the build on it when a newer SDK is installed as well, since the libraries treat warnings as errors and every SDK brings new ones.
 - **Windows 10 1809 or later** to run the app and the tests that need it. The larger part of the tests runs on any system the SDK runs on, a Mac included.
-- **Visual Studio 2022** (17.8 or later) with the "Windows application development" workload, if you want a debugger and a XAML editor. Open `FluentTaskScheduler.sln`.
+- **Visual Studio 2026** with the "WinUI application development" workload, if you want a debugger and a XAML editor. Open `FluentTaskScheduler.sln`. Visual Studio 2022 cannot build for .NET 10.
 
 ## Where things are
 

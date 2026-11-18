@@ -3,7 +3,7 @@
     <!-- Everything that does not need a window: tasks, snoozing, history, settings and the view
          models. Keeping it free of WinUI is what makes it testable without starting the app. -->
     <PropertyGroup>
-        <TargetFramework>net8.0-windows</TargetFramework>
+        <TargetFramework>net10.0-windows</TargetFramework>
         <RootNamespace>FluentTaskScheduler</RootNamespace>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
@@ -17,8 +17,7 @@
         <PackageReference Include="Serilog" Version="4.4.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
         <!-- Draws the notification area icon. -->
-        <PackageReference Include="System.Drawing.Common" Version="8.0.10" />
-        <PackageReference Include="System.Threading.AccessControl" Version="8.0.0" />
+        <PackageReference Include="System.Drawing.Common" Version="10.0.15" />
         <PackageReference Include="TaskScheduler" Version="2.12.2" />
     </ItemGroup>
 

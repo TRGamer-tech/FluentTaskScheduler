@@ -42,7 +42,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
 
       # The version comes from the tag (V1.9.1 gives 1.9.1) and goes into the build, so the app,
       # the installer and the update feed all carry the same number.

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0-windows</TargetFramework>
+        <TargetFramework>net10.0-windows</TargetFramework>
         <RootNamespace>FluentTaskScheduler.Tests</RootNamespace>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <IsPackable>false</IsPackable>
@@ -9,12 +9,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="coverlet.collector" Version="6.0.4" />
-        <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="9.10.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+        <PackageReference Include="coverlet.collector" Version="10.1.1" />
+        <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.11.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.12.0" />
         <PackageReference Include="xunit" Version="2.9.3" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
-        <PackageReference Include="Xunit.SkippableFact" Version="1.5.23" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="4.0.1" />
+        <PackageReference Include="Xunit.SkippableFact" Version="1.5.85" />
     </ItemGroup>
 
     <ItemGroup>
