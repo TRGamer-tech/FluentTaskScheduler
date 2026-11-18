@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using FluentTaskScheduler.Notifications;
 using FluentTaskScheduler.Scheduling;
 using FluentTaskScheduler.ViewModels;
@@ -250,10 +251,13 @@ public sealed class RecordingNavigator : IShellNavigator
     public void ShowScriptEditor() => Calls.Add("ShowScriptEditor");
 }
 
-/// <summary>A UI thread that is busy until the test lets it run what was posted to it.</summary>
+/// <summary>
+/// A UI thread that is busy until the test lets it run what was posted to it. Any thread may
+/// post, as to the real one.
+/// </summary>
 public sealed class BusyUiThread : IUiThread
 {
-    private readonly Queue<Action> _posted = new();
+    private readonly ConcurrentQueue<Action> _posted = new();
 
     public int PostedCount => _posted.Count;
 

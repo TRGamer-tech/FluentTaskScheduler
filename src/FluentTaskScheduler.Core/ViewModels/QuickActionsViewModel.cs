@@ -83,7 +83,16 @@ public sealed partial class QuickActionViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(IsRunning))]
     private void Cancel() => _run?.Stop();
 
-    /// <summary>Ends the action if it is running.</summary>
+    /// <summary>Takes over the run that the card of this action showed on the page this one replaces.</summary>
+    internal void ContinueFrom(QuickActionViewModel previous)
+    {
+        if (previous._run is not { } run) return;
+
+        previous._run = null;
+        Show(run);
+    }
+
+    /// <summary>Ends the action if it is running and no other card has taken its run over.</summary>
     internal void EndRun() => _run?.Abandon();
 
     /// <summary>Shows a run from now on: how it is doing, and then how it ended.</summary>
@@ -133,9 +142,17 @@ public sealed partial class QuickActionsViewModel : IDisposable
     private void RestartAsAdministrator() => _lifetime.RestartElevated();
 
     /// <summary>
-    /// Ends the actions that are still running. The window is closing, or it is getting new pages
-    /// (in another language, for one), which know nothing of these runs.
+    /// Takes over from the page this one replaces what its actions are running, and how the ones
+    /// that have ended went. A window gets new pages and view models when, for one, its language
+    /// changes. The page that was replaced shows nothing more after this, and disposing of it
+    /// ends nothing.
     /// </summary>
+    public void ContinueFrom(QuickActionsViewModel previous)
+    {
+        foreach (var (action, replaced) in Actions.Zip(previous.Actions)) action.ContinueFrom(replaced);
+    }
+
+    /// <summary>Ends the actions that are running and that no other page has taken over.</summary>
     public void Dispose()
     {
         foreach (QuickActionViewModel action in Actions) action.EndRun();

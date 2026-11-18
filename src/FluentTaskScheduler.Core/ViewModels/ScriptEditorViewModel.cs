@@ -169,16 +169,25 @@ public sealed partial class ScriptEditorViewModel(
     }
 
     /// <summary>
-    /// Takes over the script of the editor this one replaces, together with what of it is not
-    /// saved yet. A window gets new pages and view models when, for one, its language changes.
+    /// Takes over from the editor this one replaces: its script, together with what of it is not
+    /// saved yet, its output, and the run of the script if one is under way. A window gets new
+    /// pages and view models when, for one, its language changes. The editor that was replaced
+    /// shows nothing more after this, and disposing of it ends nothing.
     /// </summary>
     public void ContinueFrom(ScriptEditorViewModel previous)
     {
         Load(previous._scriptId, previous.Name, previous.Description, previous.Text);
         _saved = previous._saved;
+
+        foreach (OutputLine line in previous.Output) Output.Add(line);
+        _unfinished = previous._unfinished;
+        if (previous._run is not { } run) return;
+
+        previous._run = null;
+        Show(run);
     }
 
-    /// <summary>Ends the script if one is running.</summary>
+    /// <summary>Ends the script if one is running that no other editor has taken over.</summary>
     public void Dispose() => _run?.Abandon();
 
     private void Load(string? id, string name, string description, string text)

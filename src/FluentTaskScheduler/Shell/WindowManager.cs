@@ -144,7 +144,7 @@ public sealed class WindowManager(IServiceProvider services, ISettingsStore sett
     /// <summary>
     /// Builds every window's content anew, returning to the page that was showing. Needed for
     /// changes that existing elements do not pick up: the language, and resources read at load.
-    /// The script in the editor stays; scripts and quick actions that are running end.
+    /// The script in the editor stays, and a script or quick action that is running runs on.
     /// </summary>
     public void RebuildShells()
     {
@@ -163,9 +163,11 @@ public sealed class WindowManager(IServiceProvider services, ISettingsStore sett
 
         if (previous is not null)
         {
-            // The script in the editor may not be saved yet; it must not go with the old view models.
-            entry.Scope.ServiceProvider.GetRequiredService<ScriptEditorViewModel>()
-                .ContinueFrom(previous.ServiceProvider.GetRequiredService<ScriptEditorViewModel>());
+            // What must not go with the old view models: the script in the editor, which may not be
+            // saved yet, and whatever the editor or a quick action is running.
+            IServiceProvider before = previous.ServiceProvider, now = entry.Scope.ServiceProvider;
+            now.GetRequiredService<ScriptEditorViewModel>().ContinueFrom(before.GetRequiredService<ScriptEditorViewModel>());
+            now.GetRequiredService<QuickActionsViewModel>().ContinueFrom(before.GetRequiredService<QuickActionsViewModel>());
             previous.Dispose();
         }
 

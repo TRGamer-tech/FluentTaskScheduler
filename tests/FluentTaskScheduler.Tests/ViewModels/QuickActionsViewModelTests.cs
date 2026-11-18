@@ -19,6 +19,18 @@ public sealed class QuickActionsViewModelTests
 
     private static QuickActionViewModel Card(QuickActionsViewModel page, string id) => page.Actions.Single(action => action.Id == id);
 
+    /// <summary>
+    /// The page of the pages a window gets anew: it takes over from the one that was there,
+    /// which the window then disposes of together with its other old pages.
+    /// </summary>
+    private QuickActionsViewModel TakeOver(QuickActionsViewModel previous, IUiThread? ui = null)
+    {
+        QuickActionsViewModel successor = NewPage(elevated: true, ui: ui);
+        successor.ContinueFrom(previous);
+        previous.Dispose();
+        return successor;
+    }
+
     [Fact]
     public void WithoutAdministratorRights_ActionsThatNeedThemCannotRun_AndARestartIsOffered()
     {
@@ -230,6 +242,177 @@ public sealed class QuickActionsViewModelTests
 
         Assert.False(_runner.Last.WasStopped);
         Assert.Equal((QuickActionState.Succeeded, "Successfully flushed the DNS Resolver Cache."), (action.State, action.Detail));
+    }
+
+    [Fact]
+    public async Task AnActionThatIsRunning_IsStillRunningOnThePageThatTakesOver_WithTheLineItWroteLast()
+    {
+        QuickActionsViewModel page = NewPage(elevated: true);
+        await Card(page, "SfcScannow").RunCommand.ExecuteAsync(null);
+        _runner.Last.Writes("Beginning verification phase of system scan.").WritesUnfinished("Verification 12% complete.");
+
+        QuickActionsViewModel successor = TakeOver(page);
+
+        QuickActionViewModel action = Card(successor, "SfcScannow");
+        Assert.False(_runner.Last.WasStopped);
+        Assert.Equal(
+            (QuickActionState.Running, "QuickActions.Status.Running", "Verification 12% complete."),
+            (action.State, action.StatusText, action.Detail));
+        Assert.False(action.RunCommand.CanExecute(null));
+        Assert.True(action.CancelCommand.CanExecute(null));
+        Assert.All(successor.Actions.Where(other => other != action), other => Assert.Equal(QuickActionState.Idle, other.State));
+
+        _runner.Last.WritesUnfinished("Verification 57% complete.");
+
+        Assert.Equal("Verification 57% complete.", action.Detail);
+        _runner.Last.Exits();
+    }
+
+    [Fact]
+    public async Task AnActionThatSucceedsAfterAnotherPageTookOver_ShowsItsFindingsThere()
+    {
+        QuickActionsViewModel page = NewPage(elevated: true);
+        await Card(page, "SfcScannow").RunCommand.ExecuteAsync(null);
+        _runner.Last.Writes("Beginning verification phase of system scan.").WritesUnfinished("Verification 12% complete.");
+        QuickActionViewModel action = Card(TakeOver(page), "SfcScannow");
+
+        _runner.Last.Writes("Verification 100% complete.").Writes("Windows Resource Protection did not find any integrity violations.").Exits();
+
+        Assert.Equal(
+            (QuickActionState.Succeeded, "QuickActions.Status.Success",
+                "Beginning verification phase of system scan.\nVerification 100% complete.\nWindows Resource Protection did not find any integrity violations."),
+            (action.State, action.StatusText, action.Detail));
+        Assert.True(action.RunCommand.CanExecute(null));
+        Assert.False(action.CancelCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task AnActionThatFailsAfterAnotherPageTookOver_ShowsThereTheLastThingsTheProgramSaid()
+    {
+        QuickActionsViewModel page = NewPage(elevated: true);
+        await Card(page, "IPReleaseRenew").RunCommand.ExecuteAsync(null);
+        for (int line = 1; line <= 5; line++) _runner.Last.Writes($"line {line}");
+        QuickActionViewModel action = Card(TakeOver(page), "IPReleaseRenew");
+
+        _runner.Last.Writes("line 6").WritesError("unable to contact your DHCP server").Exits(1);
+
+        Assert.Equal(
+            (QuickActionState.Failed, "QuickActions.Status.ExitCode", "line 4\nline 5\nline 6\nunable to contact your DHCP server"),
+            (action.State, action.StatusText, action.Detail));
+    }
+
+    [Fact]
+    public async Task Cancel_OnThePageThatTookOver_EndsTheProgram_AndTheActionCanBeRunAgain()
+    {
+        QuickActionsViewModel page = NewPage(elevated: true);
+        await Card(page, "SfcScannow").RunCommand.ExecuteAsync(null);
+        _runner.Last.Writes("Verification 12% complete.");
+        QuickActionViewModel action = Card(TakeOver(page), "SfcScannow");
+
+        action.CancelCommand.Execute(null);
+
+        Assert.True(_runner.Last.WasStopped);
+        Assert.Equal((QuickActionState.Idle, "QuickActions.Status.Cancelled", ""), (action.State, action.StatusText, action.Detail));
+        Assert.True(action.RunCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task ActionsThatHaveEnded_KeepTheResultTheyShowed_OnThePageThatTakesOver()
+    {
+        QuickActionsViewModel page = NewPage(elevated: true);
+        await Card(page, "FlushDNS").RunCommand.ExecuteAsync(null);
+        _runner.Last.Writes("Successfully flushed the DNS Resolver Cache.").Exits();
+        await Card(page, "IPReleaseRenew").RunCommand.ExecuteAsync(null);
+        _runner.Last.WritesError("unable to contact your DHCP server").Exits(1);
+        await Card(page, "SfcScannow").RunCommand.ExecuteAsync(null);
+        Card(page, "SfcScannow").CancelCommand.Execute(null);
+        _runner.StartFailure = new InvalidOperationException("The system cannot find the file specified.");
+        await Card(page, "DismHealth").RunCommand.ExecuteAsync(null);
+
+        QuickActionsViewModel successor = TakeOver(page);
+
+        Assert.Equal(
+            [
+                ("FlushDNS", QuickActionState.Succeeded, "QuickActions.Status.Success", "Successfully flushed the DNS Resolver Cache."),
+                ("ClearTemp", QuickActionState.Idle, "", ""),
+                ("RestartExplorer", QuickActionState.Idle, "", ""),
+                ("IPReleaseRenew", QuickActionState.Failed, "QuickActions.Status.ExitCode", "unable to contact your DHCP server"),
+                ("SfcScannow", QuickActionState.Idle, "QuickActions.Status.Cancelled", ""),
+                ("DismHealth", QuickActionState.Failed, "QuickActions.Status.Error", "The system cannot find the file specified.")
+            ],
+            successor.Actions.Select(action => (action.Id, action.State, action.StatusText, action.Detail)));
+        Assert.All(successor.Actions, action => Assert.True(action.RunCommand.CanExecute(null)));
+    }
+
+    [Fact]
+    public async Task ALineTheUiThreadHadNotGotTo_WhenAnotherPageTookOver_IsShownThere()
+    {
+        var ui = new BusyUiThread();
+        QuickActionsViewModel page = NewPage(elevated: true, ui: ui);
+        await Card(page, "FlushDNS").RunCommand.ExecuteAsync(null);
+        _runner.Last.Writes("a").Writes("b");
+
+        QuickActionViewModel action = Card(TakeOver(page, ui), "FlushDNS");
+
+        Assert.Equal("b", action.Detail);
+
+        _runner.Last.Writes("c");
+        ui.RunPosted();
+
+        Assert.Equal("c", action.Detail);
+        Assert.Equal("", Card(page, "FlushDNS").Detail);
+        _runner.Last.Exits();
+    }
+
+    [Fact]
+    public async Task ThePageThatWasReplaced_RaisesNothingMore_WhateverBecomesOfItsActions()
+    {
+        QuickActionsViewModel page = NewPage(elevated: true);
+        QuickActionViewModel replaced = Card(page, "SfcScannow");
+        await replaced.RunCommand.ExecuteAsync(null);
+        _runner.Last.Writes("Verification 12% complete.");
+        var raised = new List<string>();
+        replaced.PropertyChanged += (_, e) => raised.Add($"property {e.PropertyName}");
+        replaced.RunCommand.CanExecuteChanged += (_, _) => raised.Add("can run");
+        replaced.CancelCommand.CanExecuteChanged += (_, _) => raised.Add("can cancel");
+
+        TakeOver(page);
+        _runner.Last.Writes("Verification 100% complete.").Exits();
+
+        Assert.Empty(raised);
+    }
+
+    [Fact]
+    public async Task AnAction_RunsOn_WhenTheWindowGetsNewPagesASecondTime()
+    {
+        QuickActionsViewModel page = NewPage(elevated: true);
+        await Card(page, "SfcScannow").RunCommand.ExecuteAsync(null);
+        _runner.Last.Writes("Verification 12% complete.");
+        QuickActionsViewModel second = TakeOver(page);
+        _runner.Last.Writes("Verification 57% complete.");
+
+        QuickActionViewModel action = Card(TakeOver(second), "SfcScannow");
+
+        Assert.False(_runner.Last.WasStopped);
+        Assert.Equal((QuickActionState.Running, "Verification 57% complete."), (action.State, action.Detail));
+
+        _runner.Last.Writes("Verification 100% complete.").Exits();
+
+        Assert.Equal(
+            (QuickActionState.Succeeded, "Verification 12% complete.\nVerification 57% complete.\nVerification 100% complete."),
+            (action.State, action.Detail));
+    }
+
+    [Fact]
+    public async Task ClosingThePageThatTookOver_EndsWhatIsStillRunning()
+    {
+        QuickActionsViewModel page = NewPage(elevated: true);
+        await Card(page, "SfcScannow").RunCommand.ExecuteAsync(null);
+        QuickActionsViewModel successor = TakeOver(page);
+
+        successor.Dispose();
+
+        Assert.True(_runner.Last.WasStopped);
     }
 
     [Theory]

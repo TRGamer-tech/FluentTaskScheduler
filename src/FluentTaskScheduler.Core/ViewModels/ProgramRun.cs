@@ -3,7 +3,9 @@ namespace FluentTaskScheduler.ViewModels;
 /// <summary>
 /// A program that a page runs and shows while it runs: the script in the editor, or a quick
 /// action. The run reports to the view model that shows it, on the UI thread, and that view
-/// model is the one to end it before its time.
+/// model is the one to end it before its time. When a window gets new pages, the new view model
+/// takes the run over from the old one: the program runs on, and the old view model hears
+/// nothing more of it.
 /// </summary>
 internal abstract class ProgramRun(IUiThread ui)
 {
@@ -20,8 +22,9 @@ internal abstract class ProgramRun(IUiThread ui)
     protected CancellationToken Cancellation => _cancellation.Token;
 
     /// <summary>
-    /// Makes a view model the one that shows the run. It is called at once, to show the run as it
-    /// stands, and from then on whenever there is news of the run. Call on the UI thread.
+    /// Makes a view model the one that shows the run, in place of the one that did. It is called
+    /// at once, to show the run as it stands, and from then on whenever there is news of the run.
+    /// Call on the UI thread.
     /// </summary>
     public void ReportTo(Action viewModel)
     {

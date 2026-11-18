@@ -28,6 +28,18 @@ public sealed class ScriptEditorViewModelTests : IDisposable
 
     private ScriptEditorViewModel NewEditor(IUiThread ui) => new(_store, _runner, _folder.Paths, ui, _prompts, _clipboard);
 
+    /// <summary>
+    /// The editor of the pages a window gets anew: it takes over from the one that was there,
+    /// which the window then disposes of together with its other old pages.
+    /// </summary>
+    private ScriptEditorViewModel TakeOver(ScriptEditorViewModel previous, IUiThread? ui = null)
+    {
+        ScriptEditorViewModel successor = NewEditor(ui ?? new InlineUiThread());
+        successor.ContinueFrom(previous);
+        previous.Dispose();
+        return successor;
+    }
+
     /// <summary>The copy of the script that the started program was told to run.</summary>
     private string RunCopy => Regex.Match(_runner.Last.Request.Arguments, "-File \"([^\"]+)\"").Groups[1].Value;
 
@@ -475,9 +487,7 @@ public sealed class ScriptEditorViewModelTests : IDisposable
         await _editor.OpenAsync(script);
         _editor.Text = "Get-Date -Format s";
 
-        ScriptEditorViewModel successor = NewEditor(new InlineUiThread());
-        successor.ContinueFrom(_editor);
-        _editor.Dispose();
+        ScriptEditorViewModel successor = TakeOver(_editor);
 
         Assert.Equal(("Clock", "Tells the time.", "Get-Date -Format s"), (successor.Name, successor.Description, successor.Text));
         _prompts.Confirm = false;
@@ -515,5 +525,213 @@ public sealed class ScriptEditorViewModelTests : IDisposable
         Assert.True(_runner.Last.WasStopped);
         Assert.False(File.Exists(RunCopy));
         Assert.Equal([Note("ScriptEditor.Status.Starting")], editor.Output.Select(Shown));
+    }
+
+    [Fact]
+    public void AScriptThatIsRunning_RunsOnInTheEditorThatTakesOver_WithWhatItWroteSoFar()
+    {
+        _editor.Text = "anything";
+        _editor.RunCommand.Execute(null);
+        _runner.Last.Writes("one").WritesError("two");
+
+        ScriptEditorViewModel successor = TakeOver(_editor);
+
+        Assert.False(_runner.Last.WasStopped);
+        Assert.True(File.Exists(RunCopy));
+        Assert.True(successor.IsRunning);
+        Assert.False(successor.RunCommand.CanExecute(null));
+        Assert.True(successor.StopCommand.CanExecute(null));
+        Assert.Equal([Note("ScriptEditor.Status.Starting"), Line("one"), Error("two")], successor.Output.Select(Shown));
+        _runner.Last.Exits();
+    }
+
+    [Fact]
+    public void WhatAScriptWritesAfterAnotherEditorTookOver_IsShownThere_AndSoIsItsEnd_Once()
+    {
+        _editor.Text = "anything";
+        _editor.RunCommand.Execute(null);
+        _runner.Last.Writes("one");
+        ScriptEditorViewModel successor = TakeOver(_editor);
+
+        _runner.Last.Writes("two").Exits(3);
+
+        Assert.Equal(
+            [Note("ScriptEditor.Status.Starting"), Line("one"), Line("two"), Note("ScriptEditor.Status.ExitCode")],
+            successor.Output.Select(Shown));
+        Assert.False(successor.IsRunning);
+        Assert.True(successor.RunCommand.CanExecute(null));
+        Assert.False(successor.StopCommand.CanExecute(null));
+        Assert.False(File.Exists(RunCopy));
+        Assert.Equal([Note("ScriptEditor.Status.Starting"), Line("one")], _editor.Output.Select(Shown));
+    }
+
+    [Fact]
+    public void Stop_InTheEditorThatTookOver_EndsTheScript_AndTheOutputSaysSo()
+    {
+        _editor.Text = "Start-Sleep 600";
+        _editor.RunCommand.Execute(null);
+        _runner.Last.Writes("still going");
+        ScriptEditorViewModel successor = TakeOver(_editor);
+
+        successor.StopCommand.Execute(null);
+
+        Assert.True(_runner.Last.WasStopped);
+        Assert.False(successor.IsRunning);
+        Assert.Equal(
+            [Note("ScriptEditor.Status.Starting"), Line("still going"), Note("ScriptEditor.Status.Stopped")],
+            successor.Output.Select(Shown));
+        Assert.False(File.Exists(RunCopy));
+    }
+
+    [Fact]
+    public void LinesTheUiThreadHadNotGotTo_WhenAnotherEditorTookOver_AreShownThere_OnceAndInOrder()
+    {
+        var ui = new BusyUiThread();
+        ScriptEditorViewModel editor = NewEditor(ui);
+        editor.Text = "anything";
+        editor.RunCommand.Execute(null);
+        _runner.Last.Writes("one");
+        ui.RunPosted();
+        _runner.Last.Writes("two").Writes("three");
+
+        ScriptEditorViewModel successor = TakeOver(editor, ui);
+        _runner.Last.Writes("four");
+        ui.RunPosted();
+
+        Assert.Equal(
+            [Note("ScriptEditor.Status.Starting"), Line("one"), Line("two"), Line("three"), Line("four")],
+            successor.Output.Select(Shown));
+        Assert.Equal([Note("ScriptEditor.Status.Starting"), Line("one")], editor.Output.Select(Shown));
+        _runner.Last.Exits();
+    }
+
+    [Fact]
+    public void ALineTheScriptHadNotFinished_WhenAnotherEditorTookOver_StillGivesWayToWhatBecomesOfIt()
+    {
+        _editor.Text = "anything";
+        _editor.RunCommand.Execute(null);
+        _runner.Last.Writes("Copying").WritesUnfinished("10%");
+        ScriptEditorViewModel successor = TakeOver(_editor);
+
+        _runner.Last.WritesUnfinished("80%").Writes("100%");
+
+        Assert.Equal([Note("ScriptEditor.Status.Starting"), Line("Copying"), Line("100%")], successor.Output.Select(Shown));
+        _runner.Last.Exits();
+    }
+
+    [Fact]
+    public void OnlyTheNewestLinesAreKept_AlsoWhenAnotherEditorTookOverOnTheWay()
+    {
+        _editor.Text = "anything";
+        _editor.RunCommand.Execute(null);
+        int written = 0;
+        while (written < ScriptEditorViewModel.MaxOutputLines - 10) _runner.Last.Writes($"line {++written}");
+        ScriptEditorViewModel successor = TakeOver(_editor);
+
+        while (written < ScriptEditorViewModel.MaxOutputLines + 10) _runner.Last.Writes($"line {++written}");
+
+        // The note the run began with and the first ten lines have made room.
+        Assert.Equal(ScriptEditorViewModel.MaxOutputLines, successor.Output.Count);
+        Assert.Equal(Line("line 11"), Shown(successor.Output[0]));
+        Assert.Equal(Line($"line {written}"), Shown(successor.Output[^1]));
+        _runner.Last.Exits();
+    }
+
+    [Fact]
+    public void TheEditorThatWasReplaced_RaisesNothingMore_WhateverBecomesOfTheScript()
+    {
+        _editor.Text = "anything";
+        _editor.RunCommand.Execute(null);
+        _runner.Last.Writes("one");
+        var raised = new List<string>();
+        _editor.PropertyChanged += (_, e) => raised.Add($"property {e.PropertyName}");
+        _editor.Output.CollectionChanged += (_, e) => raised.Add($"output {e.Action}");
+        _editor.RunCommand.CanExecuteChanged += (_, _) => raised.Add("can run");
+        _editor.StopCommand.CanExecuteChanged += (_, _) => raised.Add("can stop");
+
+        TakeOver(_editor);
+        _runner.Last.Writes("two").WritesUnfinished("three").Exits();
+
+        Assert.Empty(raised);
+    }
+
+    [Fact]
+    public void AScript_RunsOn_WhenTheWindowGetsNewPagesASecondTime()
+    {
+        _editor.Text = "Start-Sleep 600";
+        _editor.RunCommand.Execute(null);
+        _runner.Last.Writes("one");
+        ScriptEditorViewModel second = TakeOver(_editor);
+        _runner.Last.Writes("two");
+
+        ScriptEditorViewModel third = TakeOver(second);
+        _runner.Last.Writes("three");
+
+        Assert.False(_runner.Last.WasStopped);
+        Assert.True(third.IsRunning);
+
+        third.StopCommand.Execute(null);
+
+        Assert.True(_runner.Last.WasStopped);
+        Assert.Equal(
+            [Note("ScriptEditor.Status.Starting"), Line("one"), Line("two"), Line("three"), Note("ScriptEditor.Status.Stopped")],
+            third.Output.Select(Shown));
+        Assert.Equal([Note("ScriptEditor.Status.Starting"), Line("one"), Line("two")], second.Output.Select(Shown));
+        Assert.False(File.Exists(RunCopy));
+    }
+
+    [Fact]
+    public void DisposingTheEditorThatTookOver_EndsTheScript()
+    {
+        _editor.Text = "Start-Sleep 600";
+        _editor.RunCommand.Execute(null);
+        ScriptEditorViewModel successor = TakeOver(_editor);
+
+        successor.Dispose();
+
+        Assert.True(_runner.Last.WasStopped);
+        Assert.False(File.Exists(RunCopy));
+    }
+
+    [Fact]
+    public void TheOutputOfAScriptThatHasEnded_IsStillThere_InTheEditorThatTakesOver()
+    {
+        _editor.Text = "anything";
+        _editor.RunCommand.Execute(null);
+        _runner.Last.Writes("one").Exits();
+
+        ScriptEditorViewModel successor = TakeOver(_editor);
+
+        Assert.Equal(
+            [Note("ScriptEditor.Status.Starting"), Line("one"), Note("ScriptEditor.Status.ExitCode")],
+            successor.Output.Select(Shown));
+        Assert.False(successor.IsRunning);
+        Assert.True(successor.RunCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task WhatAScriptWritesOnAnotherThread_WhileEditorAfterEditorTakesOver_ArrivesOnceAndInOrder()
+    {
+        const int lines = 8 * ScriptEditorViewModel.MaxOutputLines;
+        var ui = new BusyUiThread();
+        ScriptEditorViewModel editor = NewEditor(ui);
+        editor.Text = "anything";
+        editor.RunCommand.Execute(null);
+        FakeProcess script = _runner.Last;
+        Task writing = Task.Run(() =>
+        {
+            for (int line = 1; line <= lines; line++) script.Writes($"line {line}");
+        });
+
+        // This thread is the UI thread: it hands the run from editor to editor for as long as the script writes.
+        while (!writing.IsCompleted) editor = TakeOver(editor, ui);
+        await writing;
+        ui.RunPosted();
+
+        // More was written than the output holds: it shows the newest lines, each of them once.
+        Assert.Equal(
+            Enumerable.Range(lines - ScriptEditorViewModel.MaxOutputLines + 1, ScriptEditorViewModel.MaxOutputLines).Select(line => $"line {line}"),
+            editor.Output.Select(line => line.Text));
+        script.Exits();
     }
 }

@@ -2,7 +2,11 @@ using FluentTaskScheduler.Processes;
 
 namespace FluentTaskScheduler.ViewModels;
 
-/// <summary>One run of a quick action: the program, the last lines it wrote, and how it ended.</summary>
+/// <summary>
+/// One run of a quick action: the program, the last lines it wrote, and how it ended. The card
+/// of the action keeps the run after its end as well: the card that replaces it on a new page
+/// then says in its own language how the run went.
+/// </summary>
 internal sealed class QuickActionRun : ProgramRun
 {
     /// <summary>How many lines of what the program wrote are shown once it has ended.</summary>
