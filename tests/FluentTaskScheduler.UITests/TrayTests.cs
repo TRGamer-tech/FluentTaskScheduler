@@ -97,11 +97,28 @@ public class TrayTests
         AutomationElement item = OpenIconsMenuAt(icon, app, path[0]) ?? throw new InvalidOperationException($"The icon's menu has no '{path[0]}' entry.");
         foreach (string name in path.Skip(1))
         {
-            item.Patterns.ExpandCollapse.Pattern.Expand();
+            OrClick(item, () => item.Patterns.ExpandCollapse.Pattern.Expand());
             item = Retry.WhileNull(() => MenuItem(app, name), TimeSpan.FromSeconds(10)).Result
                    ?? throw new InvalidOperationException($"The icon's menu has no '{name}' entry.");
         }
-        item.Press();
+        OrClick(item, item.Press);
+    }
+
+    /// <summary>
+    /// The icon's menu is one of Windows' own. On Windows 11 its entries do what UI Automation asks
+    /// of them; on Windows Server 2022, which is built on Windows 10, they answer that the
+    /// operation is not valid. An entry that says so is clicked instead.
+    /// </summary>
+    private static void OrClick(AutomationElement entry, Action ask)
+    {
+        try
+        {
+            ask();
+        }
+        catch (InvalidOperationException)
+        {
+            entry.Click();
+        }
     }
 
     // Now and then the ARM64 build machine loses a right-click on the icon, so it is tried again.

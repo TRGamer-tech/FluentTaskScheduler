@@ -61,6 +61,10 @@ public sealed class DisplayScalingTests : IDisposable
             tasks.Create($"Running{number}", NotificationAreaIcon.RunningTaskXml);
             tasks.Start($"Running{number}");
         }
+        // Starting a task only asks Task Scheduler to run it.
+        int running = 0;
+        Assert.True(AppSession.Eventually(() => (running = tasks.CountRunning()) == 10, 60),
+            $"Of the ten tasks the icon is to count, Task Scheduler runs {running}.");
         using var app = AppSession.Launch("scaling-icon", AppSession.FirstRunDone(("ShowNotifications", false), ("HasSeenTrayHint", true)));
         app.Window.Close();
         Assert.True(AppSession.Eventually(() => !app.IsWindowVisible), "Closing did not hide the window.");

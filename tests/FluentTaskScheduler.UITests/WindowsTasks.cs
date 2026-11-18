@@ -76,6 +76,10 @@ public sealed class WindowsTasks : IDisposable
     public bool IsRunning(string name) =>
         RunScript($"$scheduler.GetFolder('\\{Folder.TrimStart('\\')}').GetTask('{name}').State").Trim() == "4"; // TASK_STATE_RUNNING
 
+    /// <summary>How many tasks of the folder are running.</summary>
+    public int CountRunning() =>
+        int.Parse(RunScript($"@($scheduler.GetFolder('\\{Folder.TrimStart('\\')}').GetTasks(1) | Where-Object {{ $_.State -eq 4 }}).Count").Trim()); // TASK_STATE_RUNNING
+
     /// <summary>The task's definition as Task Scheduler stores it.</summary>
     public XElement Definition(string name)
     {

@@ -27,19 +27,38 @@ internal static class NotificationAreaIcon
     // The icon is a button named after its tooltip, in the taskbar or behind the arrow that shows
     // the hidden ones, where Windows puts a new icon. The arrow is found by its English name: on a
     // Windows in another language, the icon has to be shown in the taskbar itself.
+    //
+    // The arrow is tried more than once. On the ARM64 build machine the icon was not found behind
+    // it whenever a console window of the machine's own setup had come up in front of everything
+    // shortly before, so such a window is minimized first; and the build machines lose a click
+    // now and then. A click on the arrow also closes the hidden icons again, which is why each
+    // look takes its time before the next click.
     public static AutomationElement? Find(AppSession app)
     {
         if (Shown(app) is { } visible) return visible;
-        AutomationElement? arrow = ShellElements(app).FirstOrDefault(element =>
-            element.Is(ControlType.Button) && HasSize(element)
-            && (element.NameOrEmpty().Contains("Hidden Icons", StringComparison.OrdinalIgnoreCase) || element.NameOrEmpty().Contains("Chevron")));
-        if (arrow is null) return null;
-        arrow.Click();
-        return Retry.WhileNull(() => Shown(app), TimeSpan.FromSeconds(10)).Result;
+
+        for (int attempt = 0; attempt < 3; attempt++)
+        {
+            AppSession.StepOverAConsoleInFront();
+            AutomationElement? arrow = ShellElements(app).FirstOrDefault(element =>
+                element.Is(ControlType.Button) && HasSize(element)
+                && (element.NameOrEmpty().Contains("Hidden Icons", StringComparison.OrdinalIgnoreCase) || element.NameOrEmpty().Contains("Chevron")));
+            if (arrow is null) return null;
+            arrow.Click();
+            if (Retry.WhileNull(() => Shown(app), TimeSpan.FromSeconds(5)).Result is { } icon) return icon;
+        }
+        return null;
     }
 
-    public static AutomationElement Require(AppSession app) =>
-        Find(app) ?? throw new InvalidOperationException("The app has no icon in the notification area. Found there: " + Names(app));
+    /// <summary>The icon, or a failure that names what the notification area holds instead and leaves a picture of the whole screen.</summary>
+    public static AutomationElement Require(AppSession app)
+    {
+        if (Find(app) is { } icon) return icon;
+
+        string names = Names(app);
+        using (CaptureImage screen = Capture.Screen()) screen.ToFile(Path.Combine(app.ArtifactsDir, "no-icon-screen.png"));
+        throw new InvalidOperationException("The app has no icon in the notification area. Found there: " + names);
+    }
 
     /// <summary>
     /// Leaves a picture of the icon as the notification area shows it, and one eight times as

@@ -259,6 +259,20 @@ public sealed class AppSession : IDisposable
         }
     }
 
+    /// <summary>
+    /// For a test that is about to use the taskbar while the app's window is hidden, which is when
+    /// <see cref="GuardForeground"/> leaves the foreground alone: a console window that has the
+    /// foreground is minimized, where the build machine lets the tests do that. The build machines
+    /// open console windows of their own every minute or two.
+    /// </summary>
+    public static void StepOverAConsoleInFront()
+    {
+        if (Environment.GetEnvironmentVariable(CloseCoveringWindowsVariable) != "1") return;
+
+        nint foreground = TopLevelWindows.Foreground;
+        if (ConsoleClasses.Contains(TopLevelWindows.ClassOf(foreground))) StepOver(foreground, "has the foreground while a test uses the taskbar");
+    }
+
     /// <summary>Title, class and program of a window, to say in a message which one it is.</summary>
     private static string Describe(nint window)
     {
