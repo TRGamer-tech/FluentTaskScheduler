@@ -11,7 +11,8 @@ name: Release
 # runs the same checks and keeps the files as artifacts of the run, which makes it the way to
 # try the packaging out. With "draft" ticked it also creates the draft, for the commit it ran
 # on, or brings the existing draft of that version up to date. A release that is already
-# published is never touched.
+# published is never touched; the tag that publishing a draft creates starts a run that sees
+# that and does nothing.
 #
 # Every run also keeps the manifests for winget, Scoop and Chocolatey, written for the files it
 # has built, as the artifact "package-manifests".
@@ -39,7 +40,36 @@ env:
   DATA_FOLDER: TRGamer-tech\FluentTaskScheduler
 
 jobs:
+  # Publishing a draft that a manual run made creates its tag, and that tag starts this workflow
+  # once more. There is nothing left to do then: the release is out, with the files that were
+  # checked. Such a run ends here, with nothing built and nothing failed.
+  already-published:
+    runs-on: ubuntu-latest
+    outputs:
+      published: ${{ steps.look.outputs.published }}
+    steps:
+      - name: Look for a published release of the pushed tag
+        id: look
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EVENT: ${{ github.event_name }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          $published = $false
+          if ($env:EVENT -eq 'push') {
+            # A tag without a release, or with a draft that this token is not shown, is not published.
+            $isDraft = gh release view $env:TAG --json isDraft --jq .isDraft 2>$null
+            $published = $LASTEXITCODE -eq 0 -and "$isDraft".Trim() -eq 'false'
+            if ($published) { "::notice::$env:TAG is published already, so this run builds nothing." }
+          }
+          "published=$("$published".ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+          exit 0
+
   package:
+    needs: already-published
+    if: needs.already-published.outputs.published != 'true'
     strategy:
       matrix:
         include:

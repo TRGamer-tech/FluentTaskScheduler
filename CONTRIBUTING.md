@@ -77,7 +77,7 @@ This project uses [Velopack](https://velopack.io/) for installers and auto-updat
 
 1. Set `<Version>` in `src/FluentTaskScheduler/FluentTaskScheduler.csproj`. The workflow builds with the version of the tag whatever that file says, but a build on your own machine calls itself what is written there.
 2. Write the release notes as `.github/release-notes/V2.X.X.md`, named exactly like the tag. A first line like `# V2.X.X - The "..." Update` becomes the title of the release. Without that file the draft gets GitHub's list of the merged pull requests instead, and the tag as its title.
-3. Push the tag `V2.X.X`. Or start the workflow by hand ("Run workflow") on the branch you release from, type the version and tick **draft**: publishing that draft creates the tag on the commit the workflow ran on.
+3. Push the tag `V2.X.X`. Or start the workflow by hand ("Run workflow") on the branch you release from, type the version and tick **draft**: publishing that draft creates the tag on the commit the workflow ran on. (That new tag starts the workflow once more; it sees that the release is published and does nothing.)
 
 The workflow builds both architectures with that version and packs them. Before it makes the draft, it checks on fresh machines that:
 
