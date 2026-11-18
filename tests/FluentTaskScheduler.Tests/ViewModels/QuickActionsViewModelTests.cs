@@ -15,7 +15,9 @@ public sealed class QuickActionsViewModelTests
         new(_runner, lifetime ?? new FakeAppLifetime { IsElevated = elevated }, ui ?? new InlineUiThread(), _prompts);
 
     private QuickActionViewModel Action(string id, bool elevated = true, IUiThread? ui = null) =>
-        NewPage(elevated, ui: ui).Actions.Single(action => action.Id == id);
+        Card(NewPage(elevated, ui: ui), id);
+
+    private static QuickActionViewModel Card(QuickActionsViewModel page, string id) => page.Actions.Single(action => action.Id == id);
 
     [Fact]
     public void WithoutAdministratorRights_ActionsThatNeedThemCannotRun_AndARestartIsOffered()
@@ -50,7 +52,7 @@ public sealed class QuickActionsViewModelTests
     {
         QuickActionViewModel action = Action("FlushDNS");
 
-        Task run = action.RunCommand.ExecuteAsync(null);
+        await action.RunCommand.ExecuteAsync(null);
         _runner.Last.Writes("Windows IP Configuration").Writes("").Writes("  Successfully flushed the DNS Resolver Cache.  ");
 
         Assert.Equal(QuickAction.All.Single(definition => definition.Id == "FlushDNS").Request, _runner.Last.Request);
@@ -60,7 +62,6 @@ public sealed class QuickActionsViewModelTests
         Assert.True(action.CancelCommand.CanExecute(null));
 
         _runner.Last.Exits();
-        await run;
 
         Assert.Equal(
             (QuickActionState.Succeeded, "QuickActions.Status.Success", "Windows IP Configuration\nSuccessfully flushed the DNS Resolver Cache."),
@@ -74,7 +75,7 @@ public sealed class QuickActionsViewModelTests
     public async Task TheProgressOfAProgram_IsOneLineThatChanges_AndIsNotCountedAmongItsFindings()
     {
         QuickActionViewModel action = Action("SfcScannow");
-        Task run = action.RunCommand.ExecuteAsync(null);
+        await action.RunCommand.ExecuteAsync(null);
 
         _runner.Last.Writes("Beginning verification phase of system scan.").WritesUnfinished("Verification 12% complete.");
         Assert.Equal("Verification 12% complete.", action.Detail);
@@ -83,7 +84,6 @@ public sealed class QuickActionsViewModelTests
         Assert.Equal("Verification 57% complete.", action.Detail);
 
         _runner.Last.Writes("Verification 100% complete.").Writes("").Writes("Windows Resource Protection did not find any integrity violations.").Exits();
-        await run;
 
         Assert.Equal(
             "Beginning verification phase of system scan.\nVerification 100% complete.\nWindows Resource Protection did not find any integrity violations.",
@@ -95,7 +95,7 @@ public sealed class QuickActionsViewModelTests
     {
         var ui = new BusyUiThread();
         QuickActionViewModel action = Action("FlushDNS", ui: ui);
-        Task run = action.RunCommand.ExecuteAsync(null);
+        await action.RunCommand.ExecuteAsync(null);
 
         _runner.Last.Writes("a").Writes("b").Writes("c");
         Assert.Equal(1, ui.PostedCount);
@@ -104,7 +104,6 @@ public sealed class QuickActionsViewModelTests
         Assert.Equal("c", action.Detail);
 
         _runner.Last.Exits();
-        await run;
     }
 
     [Fact]
@@ -112,10 +111,9 @@ public sealed class QuickActionsViewModelTests
     {
         var ui = new BusyUiThread();
         QuickActionViewModel action = Action("FlushDNS", ui: ui);
-        Task run = action.RunCommand.ExecuteAsync(null);
+        await action.RunCommand.ExecuteAsync(null);
 
         _runner.Last.Writes("a").Writes("b").Exits();
-        await run;
         ui.RunPosted();
 
         Assert.Equal((QuickActionState.Succeeded, "a\nb"), (action.State, action.Detail));
@@ -126,9 +124,8 @@ public sealed class QuickActionsViewModelTests
     {
         QuickActionViewModel action = Action("IPReleaseRenew");
 
-        Task run = action.RunCommand.ExecuteAsync(null);
+        await action.RunCommand.ExecuteAsync(null);
         _runner.Last.Writes("Ethernet adapter Ethernet:").Writes("Default Gateway . . . : 192.168.1.1").Exits();
-        await run;
 
         Assert.Equal((QuickActionState.Succeeded, ""), (action.State, action.Detail));
         Assert.False(action.HasDetail);
@@ -139,10 +136,9 @@ public sealed class QuickActionsViewModelTests
     {
         QuickActionViewModel action = Action("IPReleaseRenew");
 
-        Task run = action.RunCommand.ExecuteAsync(null);
+        await action.RunCommand.ExecuteAsync(null);
         for (int line = 1; line <= 6; line++) _runner.Last.Writes($"line {line}");
         _runner.Last.WritesError("unable to contact your DHCP server").Exits(1);
-        await run;
 
         Assert.Equal(
             (QuickActionState.Failed, "QuickActions.Status.ExitCode", "line 4\nline 5\nline 6\nunable to contact your DHCP server"),
@@ -167,11 +163,10 @@ public sealed class QuickActionsViewModelTests
     public async Task Cancel_EndsTheProgram_AndTheActionCanBeRunAgain()
     {
         QuickActionViewModel action = Action("SfcScannow");
-        Task run = action.RunCommand.ExecuteAsync(null);
+        await action.RunCommand.ExecuteAsync(null);
         _runner.Last.Writes("Verification 12% complete.");
 
         action.CancelCommand.Execute(null);
-        await run;
 
         Assert.True(_runner.Last.WasStopped);
         Assert.Equal((QuickActionState.Idle, "QuickActions.Status.Cancelled", ""), (action.State, action.StatusText, action.Detail));
@@ -193,11 +188,10 @@ public sealed class QuickActionsViewModelTests
         Assert.Equal(QuickActionState.Idle, action.State);
 
         _prompts.Confirm = true;
-        Task run = action.RunCommand.ExecuteAsync(null);
+        await action.RunCommand.ExecuteAsync(null);
 
         Assert.Single(_runner.Started);
         _runner.Last.Exits();
-        await run;
     }
 
     [Fact]
@@ -205,9 +199,8 @@ public sealed class QuickActionsViewModelTests
     {
         foreach (QuickActionViewModel action in NewPage(elevated: true).Actions.Where(action => action.Id is not ("ClearTemp" or "RestartExplorer")))
         {
-            Task run = action.RunCommand.ExecuteAsync(null);
+            await action.RunCommand.ExecuteAsync(null);
             _runner.Last.Exits();
-            await run;
         }
 
         Assert.Empty(_prompts.Shown);
@@ -218,12 +211,25 @@ public sealed class QuickActionsViewModelTests
     public async Task ClosingThePage_EndsWhatIsStillRunning()
     {
         QuickActionsViewModel page = NewPage(elevated: true);
-        Task run = page.Actions.Single(action => action.Id == "SfcScannow").RunCommand.ExecuteAsync(null);
+        await Card(page, "SfcScannow").RunCommand.ExecuteAsync(null);
 
         page.Dispose();
-        await run;
 
         Assert.True(_runner.Last.WasStopped);
+    }
+
+    [Fact]
+    public async Task ClosingThePage_LeavesAnActionThatHasEndedAsItIs()
+    {
+        QuickActionsViewModel page = NewPage(elevated: true);
+        QuickActionViewModel action = Card(page, "FlushDNS");
+        await action.RunCommand.ExecuteAsync(null);
+        _runner.Last.Writes("Successfully flushed the DNS Resolver Cache.").Exits();
+
+        page.Dispose();
+
+        Assert.False(_runner.Last.WasStopped);
+        Assert.Equal((QuickActionState.Succeeded, "Successfully flushed the DNS Resolver Cache."), (action.State, action.Detail));
     }
 
     [Theory]

@@ -46,9 +46,8 @@ public sealed partial class ScriptEditorViewModel(
     /// <summary>How many lines of output are kept. Older lines make room for new ones.</summary>
     public const int MaxOutputLines = 5000;
 
-    private readonly List<(OutputLine Line, bool IsComplete)> _arrived = [];
-    private CancellationTokenSource? _run;
-    private bool _disposed;
+    /// <summary>The run of the script that this editor shows; null while there is none.</summary>
+    private ScriptRun? _run;
 
     /// <summary>The kind of the last line of the output while the script has not finished that line; null once it has.</summary>
     private OutputKind? _unfinished;
@@ -69,13 +68,14 @@ public sealed partial class ScriptEditorViewModel(
     private string _text = "";
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(StopCommand))]
+    [NotifyCanExecuteChangedFor(nameof(RunCommand), nameof(StopCommand))]
     private bool _isRunning;
 
     /// <summary>What the script wrote and how its runs ended, oldest line first.</summary>
     public ObservableCollection<OutputLine> Output { get; } = [];
 
     private bool HasText => !string.IsNullOrWhiteSpace(Text);
+    private bool CanRun => HasText && !IsRunning;
     private bool CanSave => HasText && !string.IsNullOrWhiteSpace(Name);
 
     /// <summary>
@@ -127,7 +127,7 @@ public sealed partial class ScriptEditorViewModel(
 
             _scriptId = scripts.Save(_scriptId, name, Description.Trim(), Text).Id;
             _saved = Current();
-            Show(OutputKind.Note, Loc.Format("ScriptEditor.Status.Saved", name));
+            Append([(new OutputLine(Loc.Format("ScriptEditor.Status.Saved", name), OutputKind.Note), IsComplete: true)]);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
@@ -140,57 +140,23 @@ public sealed partial class ScriptEditorViewModel(
     /// Runs the text as it stands in the editor, saved or not, the way a task created from the
     /// script would run it.
     /// </summary>
-    [RelayCommand(CanExecute = nameof(HasText))]
-    private async Task RunAsync()
+    [RelayCommand(CanExecute = nameof(CanRun))]
+    private void Run()
     {
-        // Not in the temp folder: clearing that is one of the quick actions.
-        string file = paths.File($"script-run-{Guid.NewGuid():N}.ps1");
-        using var run = new CancellationTokenSource();
-        _run = run;
-        IsRunning = true;
         ClearOutput();
-        try
-        {
-            ScriptFile.Write(file, Text);
-            Show(OutputKind.Note, Loc.Get("ScriptEditor.Status.Starting"));
 
-            // In the system folder, where Task Scheduler starts a task that names no folder of its own:
-            // a path relative to the current folder leads where it would lead in the task.
-            ProcessRequest request = WindowsTools.InUtf8Console(WindowsTools.PowerShell, PowerShellCommand.ForFile(file)) with
-            {
-                WorkingDirectory = Environment.SystemDirectory
-            };
-            int exitCode = await runner.RunAsync(
-                request,
-                line => Show(line.IsError ? OutputKind.Error : OutputKind.Output, line.Text, line.IsComplete),
-                run.Token);
-
-            Show(OutputKind.Note, Loc.Format("ScriptEditor.Status.ExitCode", exitCode));
-        }
-        catch (OperationCanceledException)
-        {
-            Show(OutputKind.Note, Loc.Get("ScriptEditor.Status.Stopped"));
-        }
-        catch (Exception ex) when (ex is ProcessStartException or IOException or UnauthorizedAccessException)
-        {
-            Serilog.Log.Error(ex, "The script in the editor could not be run from {Path}", file);
-            Show(OutputKind.Error, Loc.Format("ScriptEditor.Error.Start", ex.Message));
-        }
-        finally
-        {
-            _run = null;
-            IsRunning = false;
-            DeleteRunCopy(file);
-        }
+        // Not in the temp folder: clearing that is one of the quick actions.
+        Show(ScriptRun.Start(runner, ui, paths.File($"script-run-{Guid.NewGuid():N}.ps1"), Text));
     }
 
     [RelayCommand(CanExecute = nameof(IsRunning))]
-    private void Stop() => _run?.Cancel();
+    private void Stop() => _run?.Stop();
 
     [RelayCommand]
     private void ClearOutput()
     {
-        lock (_arrived) _arrived.Clear();
+        // What the script has written but the output does not show yet goes with the rest.
+        _run?.TakeLines();
         Output.Clear();
         _unfinished = null;
     }
@@ -213,11 +179,7 @@ public sealed partial class ScriptEditorViewModel(
     }
 
     /// <summary>Ends the script if one is running.</summary>
-    public void Dispose()
-    {
-        _disposed = true;
-        _run?.Cancel();
-    }
+    public void Dispose() => _run?.Abandon();
 
     private void Load(string? id, string name, string description, string text)
     {
@@ -240,35 +202,27 @@ public sealed partial class ScriptEditorViewModel(
             Loc.Get("ScriptEditor.Discard.Confirm"),
             isDestructive: true);
 
-    /// <summary>
-    /// Adds a line to the output, from any thread. A script can write faster than a list on
-    /// screen can follow, so lines are collected here and handed over together, once per turn
-    /// of the UI thread.
-    /// </summary>
-    /// <param name="isComplete">False for a line the script may still add to or write over; the next line of its kind replaces it.</param>
-    private void Show(OutputKind kind, string text, bool isComplete = true)
+    /// <summary>Shows a run from now on: that the script is running, what it writes, and that it has ended.</summary>
+    private void Show(ScriptRun run)
     {
-        lock (_arrived)
+        _run = run;
+        IsRunning = true;
+        run.ReportTo(() =>
         {
-            // Never more than the output can hold anyway, however long the UI thread takes.
-            if (_arrived.Count >= 2 * MaxOutputLines) _arrived.RemoveRange(0, MaxOutputLines);
+            Append(run.TakeLines());
+            if (!run.HasEnded) return;
 
-            _arrived.Add((new OutputLine(text, kind), isComplete));
-            if (_arrived.Count > 1) return; // the hand-over is already on its way
-        }
-        ui.Post(HandOverArrivedLines);
+            _run = null;
+            IsRunning = false;
+        });
     }
 
-    private void HandOverArrivedLines()
+    /// <summary>
+    /// Adds lines to the end of the output. A line that is not complete gives way to the next
+    /// line of its kind, which is what became of it.
+    /// </summary>
+    private void Append((OutputLine Line, bool IsComplete)[] lines)
     {
-        (OutputLine Line, bool IsComplete)[] lines;
-        lock (_arrived)
-        {
-            lines = [.. _arrived];
-            _arrived.Clear();
-        }
-        if (_disposed) return;
-
         if (lines.Length >= MaxOutputLines)
         {
             Output.Clear();
@@ -289,17 +243,5 @@ public sealed partial class ScriptEditorViewModel(
             _unfinished = isComplete ? null : line.Kind;
         }
         while (Output.Count > MaxOutputLines) Output.RemoveAt(0);
-    }
-
-    private static void DeleteRunCopy(string file)
-    {
-        try
-        {
-            File.Delete(file);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            Serilog.Log.Warning(ex, "The copy {Path} of a script that was run could not be removed", file);
-        }
     }
 }

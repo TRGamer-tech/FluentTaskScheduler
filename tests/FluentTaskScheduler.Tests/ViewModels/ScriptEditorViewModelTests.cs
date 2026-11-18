@@ -39,11 +39,11 @@ public sealed class ScriptEditorViewModelTests : IDisposable
     private static (string, OutputKind) Shown(OutputLine line) => (line.Text, line.Kind);
 
     [Fact]
-    public async Task Running_HandsWindowsPowerShellACopyOfTheText_ThatItCanReadWhateverTheLanguage()
+    public void Running_HandsWindowsPowerShellACopyOfTheText_ThatItCanReadWhateverTheLanguage()
     {
         _editor.Text = "Write-Output 'Zürich'\rWrite-Output '東京'";
 
-        Task run = _editor.RunCommand.ExecuteAsync(null);
+        _editor.RunCommand.Execute(null);
 
         ProcessRequest request = _runner.Last.Request;
         Assert.Equal(WindowsTools.InUtf8Console(WindowsTools.PowerShell, PowerShellCommand.ForFile(RunCopy)) with { WorkingDirectory = Environment.SystemDirectory }, request);
@@ -53,30 +53,28 @@ public sealed class ScriptEditorViewModelTests : IDisposable
         Assert.Equal("Write-Output 'Zürich'\r\nWrite-Output '東京'", System.Text.Encoding.UTF8.GetString(written[3..]));
 
         _runner.Last.Exits();
-        await run;
 
         Assert.False(File.Exists(RunCopy));
     }
 
     [Fact]
-    public async Task AScript_RunsInTheFolderThatATaskMadeFromItStartsIn()
+    public void AScript_RunsInTheFolderThatATaskMadeFromItStartsIn()
     {
         _editor.Text = "Get-ChildItem *.log";
 
-        Task run = _editor.RunCommand.ExecuteAsync(null);
+        _editor.RunCommand.Execute(null);
 
         // A task made from a script names no folder to start in, so Task Scheduler starts it in the system folder.
         Assert.Equal(Environment.SystemDirectory, _runner.Last.Request.WorkingDirectory);
         _runner.Last.Exits();
-        await run;
     }
 
     [Fact]
-    public async Task WhatTheScriptWrites_IsShownInTheOrderItArrived_WithErrorsMarked_AndHowItEnded()
+    public void WhatTheScriptWrites_IsShownInTheOrderItArrived_WithErrorsMarked_AndHowItEnded()
     {
         _editor.Text = "anything";
 
-        Task run = _editor.RunCommand.ExecuteAsync(null);
+        _editor.RunCommand.Execute(null);
         _runner.Last.Writes("one").WritesError("two").Writes("three");
 
         Assert.True(_editor.IsRunning);
@@ -84,7 +82,6 @@ public sealed class ScriptEditorViewModelTests : IDisposable
         Assert.Equal("two", _editor.Output[2].ToString());
 
         _runner.Last.Exits(3);
-        await run;
 
         Assert.False(_editor.IsRunning);
         Assert.Equal(Note("ScriptEditor.Status.ExitCode"), Shown(_editor.Output[^1]));
@@ -92,10 +89,10 @@ public sealed class ScriptEditorViewModelTests : IDisposable
     }
 
     [Fact]
-    public async Task ALineTheScriptHasNotFinished_IsShownAtOnce_AndGivesWayToWhatBecomesOfIt()
+    public void ALineTheScriptHasNotFinished_IsShownAtOnce_AndGivesWayToWhatBecomesOfIt()
     {
         _editor.Text = "anything";
-        Task run = _editor.RunCommand.ExecuteAsync(null);
+        _editor.RunCommand.Execute(null);
 
         _runner.Last.WritesUnfinished("Copying 10%");
         Assert.Equal(Line("Copying 10%"), Shown(_editor.Output[^1]));
@@ -106,30 +103,28 @@ public sealed class ScriptEditorViewModelTests : IDisposable
             [Note("ScriptEditor.Status.Starting"), Line("Copying 100%"), Line("Done"), Line("Continue? "), Error("no input")],
             _editor.Output.Select(Shown));
         _runner.Last.Exits();
-        await run;
     }
 
     [Fact]
-    public async Task RepeatedLines_AreEntriesOfTheirOwn_SoTheListOnScreenFindsTheLastOne()
+    public void RepeatedLines_AreEntriesOfTheirOwn_SoTheListOnScreenFindsTheLastOne()
     {
         _editor.Text = "Get-ChildItem";
-        Task run = _editor.RunCommand.ExecuteAsync(null);
+        _editor.RunCommand.Execute(null);
 
         _runner.Last.Writes("").Writes("    Directory: C:\\").Writes("");
 
         // The page scrolls to the last line, and the list on screen finds where that is with IndexOf.
         Assert.Equal(_editor.Output.Count - 1, _editor.Output.IndexOf(_editor.Output[^1]));
         _runner.Last.Exits();
-        await run;
     }
 
     [Fact]
-    public async Task OfAProgressDisplayThatChangedWhileTheUiThreadWasBusy_OnlyTheLatestStateIsShown()
+    public void OfAProgressDisplayThatChangedWhileTheUiThreadWasBusy_OnlyTheLatestStateIsShown()
     {
         var ui = new BusyUiThread();
         ScriptEditorViewModel editor = NewEditor(ui);
         editor.Text = "anything";
-        Task run = editor.RunCommand.ExecuteAsync(null);
+        editor.RunCommand.Execute(null);
         var changes = new List<string>();
         editor.Output.CollectionChanged += (_, e) => changes.Add($"{e.Action} {((OutputLine?)e.NewItems?[0])?.Text}");
 
@@ -138,35 +133,49 @@ public sealed class ScriptEditorViewModelTests : IDisposable
         _runner.Last.WritesUnfinished("4%").WritesUnfinished("5%").Writes("100%").Writes("Done");
         ui.RunPosted();
 
-        Assert.Equal(["Add ScriptEditor.Status.Starting", "Add 3%", "Replace 100%", "Add Done"], changes);
+        Assert.Equal(["Add 3%", "Replace 100%", "Add Done"], changes);
         _runner.Last.Exits();
-        await run;
     }
 
     [Fact]
-    public async Task ANewRun_StartsWithEmptyOutput()
+    public void ANewRun_StartsWithEmptyOutput()
     {
         _editor.Text = "anything";
-        Task first = _editor.RunCommand.ExecuteAsync(null);
+        _editor.RunCommand.Execute(null);
         _runner.Last.Writes("from the first run").Exits();
-        await first;
 
-        Task second = _editor.RunCommand.ExecuteAsync(null);
+        _editor.RunCommand.Execute(null);
 
         Assert.Equal([Note("ScriptEditor.Status.Starting")], _editor.Output.Select(Shown));
         _runner.Last.Exits();
-        await second;
     }
 
     [Fact]
-    public async Task Stop_EndsTheScript_AndTheOutputSaysSo()
+    public void WhatTheUiThreadGetsToOnlyAfterAScriptHasEnded_DoesNotDisturbTheNextRun()
+    {
+        var ui = new BusyUiThread();
+        ScriptEditorViewModel editor = NewEditor(ui);
+        editor.Text = "anything";
+        editor.RunCommand.Execute(null);
+        _runner.Last.Writes("from the first run").Exits();
+        editor.RunCommand.Execute(null);
+        _runner.Last.Writes("from the second run");
+
+        ui.RunPosted();
+
+        Assert.True(editor.IsRunning);
+        Assert.Equal([Note("ScriptEditor.Status.Starting"), Line("from the second run")], editor.Output.Select(Shown));
+        _runner.Last.Exits();
+    }
+
+    [Fact]
+    public void Stop_EndsTheScript_AndTheOutputSaysSo()
     {
         _editor.Text = "Start-Sleep 600";
-        Task run = _editor.RunCommand.ExecuteAsync(null);
+        _editor.RunCommand.Execute(null);
         _runner.Last.Writes("still going");
 
         _editor.StopCommand.Execute(null);
-        await run;
 
         Assert.True(_runner.Last.WasStopped);
         Assert.False(_editor.IsRunning);
@@ -175,12 +184,12 @@ public sealed class ScriptEditorViewModelTests : IDisposable
     }
 
     [Fact]
-    public async Task WhenPowerShellCannotBeStarted_TheOutputShowsAnError_AndTheEditorIsReadyAgain()
+    public void WhenPowerShellCannotBeStarted_TheOutputShowsAnError_AndTheEditorIsReadyAgain()
     {
         _editor.Text = "anything";
         _runner.StartFailure = new InvalidOperationException("The system cannot find the file specified.");
 
-        await _editor.RunCommand.ExecuteAsync(null);
+        _editor.RunCommand.Execute(null);
 
         Assert.Equal([Note("ScriptEditor.Status.Starting"), Error("ScriptEditor.Error.Start")], _editor.Output.Select(Shown));
         Assert.False(_editor.IsRunning);
@@ -189,7 +198,7 @@ public sealed class ScriptEditorViewModelTests : IDisposable
     }
 
     [Fact]
-    public async Task RunAndStop_AreAvailableOnlyWhenThereIsSomethingToRunOrToStop()
+    public void RunAndStop_AreAvailableOnlyWhenThereIsSomethingToRunOrToStop()
     {
         Assert.False(_editor.RunCommand.CanExecute(null));
         Assert.False(_editor.StopCommand.CanExecute(null));
@@ -200,43 +209,62 @@ public sealed class ScriptEditorViewModelTests : IDisposable
         _editor.Text = "Get-Date";
         Assert.True(_editor.RunCommand.CanExecute(null));
 
-        Task run = _editor.RunCommand.ExecuteAsync(null);
+        _editor.RunCommand.Execute(null);
         Assert.False(_editor.RunCommand.CanExecute(null));
         Assert.True(_editor.StopCommand.CanExecute(null));
 
         _runner.Last.Exits();
-        await run;
         Assert.True(_editor.RunCommand.CanExecute(null));
         Assert.False(_editor.StopCommand.CanExecute(null));
     }
 
     [Fact]
-    public async Task LinesThatArriveWhileTheUiThreadIsBusy_AreHandedOverTogether_InOrder()
+    public void LinesThatArriveWhileTheUiThreadIsBusy_AreHandedOverTogether_InOrder()
     {
         var ui = new BusyUiThread();
         ScriptEditorViewModel editor = NewEditor(ui);
         editor.Text = "anything";
-        Task run = editor.RunCommand.ExecuteAsync(null);
+        editor.RunCommand.Execute(null);
 
         _runner.Last.Writes("one").Writes("two").Writes("three");
 
-        Assert.Empty(editor.Output);
+        Assert.Equal([Note("ScriptEditor.Status.Starting")], editor.Output.Select(Shown));
         Assert.Equal(1, ui.PostedCount);
 
         ui.RunPosted();
 
         Assert.Equal([Note("ScriptEditor.Status.Starting"), Line("one"), Line("two"), Line("three")], editor.Output.Select(Shown));
         _runner.Last.Exits();
-        await run;
     }
 
     [Fact]
-    public async Task AScriptThatWritesWithoutEnd_OnlyKeepsTheNewestLines()
+    public void ALineThatArrivesWhileEarlierOnesAreBeingShown_IsShownAsWell_WithoutWaitingForTheNext()
     {
         var ui = new BusyUiThread();
         ScriptEditorViewModel editor = NewEditor(ui);
         editor.Text = "anything";
-        Task run = editor.RunCommand.ExecuteAsync(null);
+        editor.RunCommand.Execute(null);
+        FakeProcess script = _runner.Last;
+        // The script writes its second line at the very moment the first one is put on screen.
+        editor.Output.CollectionChanged += (_, e) =>
+        {
+            if (e.NewItems?[0] is OutputLine { Text: "one" }) script.Writes("two");
+        };
+
+        script.Writes("one");
+        ui.RunPosted();
+
+        Assert.Equal([Note("ScriptEditor.Status.Starting"), Line("one"), Line("two")], editor.Output.Select(Shown));
+        script.Exits();
+    }
+
+    [Fact]
+    public void AScriptThatWritesWithoutEnd_OnlyKeepsTheNewestLines()
+    {
+        var ui = new BusyUiThread();
+        ScriptEditorViewModel editor = NewEditor(ui);
+        editor.Text = "anything";
+        editor.RunCommand.Execute(null);
 
         // In portions, as a UI thread would get to see them, and once far more than fits at all.
         int written = 0;
@@ -252,16 +280,14 @@ public sealed class ScriptEditorViewModelTests : IDisposable
         Assert.Equal(ScriptEditorViewModel.MaxOutputLines, editor.Output.Count);
         Assert.Equal(Line($"line {written - ScriptEditorViewModel.MaxOutputLines + 1}"), Shown(editor.Output[0]));
         _runner.Last.Exits();
-        await run;
     }
 
     [Fact]
-    public async Task TheOutput_CanBeCopiedAsText_AndCleared()
+    public void TheOutput_CanBeCopiedAsText_AndCleared()
     {
         _editor.Text = "anything";
-        Task run = _editor.RunCommand.ExecuteAsync(null);
+        _editor.RunCommand.Execute(null);
         _runner.Last.Writes("one").WritesError("two").Exits();
-        await run;
 
         _editor.CopyOutputCommand.Execute(null);
         _editor.ClearOutputCommand.Execute(null);
@@ -271,12 +297,28 @@ public sealed class ScriptEditorViewModelTests : IDisposable
     }
 
     [Fact]
+    public void ClearingTheOutput_AlsoDropsWhatTheScriptHasWrittenButTheOutputDoesNotShowYet()
+    {
+        var ui = new BusyUiThread();
+        ScriptEditorViewModel editor = NewEditor(ui);
+        editor.Text = "anything";
+        editor.RunCommand.Execute(null);
+        _runner.Last.Writes("before");
+
+        editor.ClearOutputCommand.Execute(null);
+        _runner.Last.Writes("after");
+        ui.RunPosted();
+
+        Assert.Equal([Line("after")], editor.Output.Select(Shown));
+        _runner.Last.Exits();
+    }
+
+    [Fact]
     public async Task CopyingTheOutput_WhileAnotherProgramHoldsTheClipboard_SaysThatNothingWasCopied()
     {
         _editor.Text = "anything";
-        Task run = _editor.RunCommand.ExecuteAsync(null);
+        _editor.RunCommand.Execute(null);
         _runner.Last.Writes("one").Exits();
-        await run;
         _clipboard.IsBusy = true;
 
         await _editor.CopyOutputCommand.ExecuteAsync(null);
@@ -459,20 +501,19 @@ public sealed class ScriptEditorViewModelTests : IDisposable
     }
 
     [Fact]
-    public async Task Disposing_EndsARunningScript_AndNothingMoreReachesTheOutput()
+    public void Disposing_EndsARunningScript_AndNothingMoreReachesTheOutput()
     {
         var ui = new BusyUiThread();
         ScriptEditorViewModel editor = NewEditor(ui);
         editor.Text = "Start-Sleep 600";
-        Task run = editor.RunCommand.ExecuteAsync(null);
+        editor.RunCommand.Execute(null);
         _runner.Last.Writes("still going");
 
         editor.Dispose();
-        await run;
         ui.RunPosted();
 
         Assert.True(_runner.Last.WasStopped);
         Assert.False(File.Exists(RunCopy));
-        Assert.Empty(editor.Output);
+        Assert.Equal([Note("ScriptEditor.Status.Starting")], editor.Output.Select(Shown));
     }
 }

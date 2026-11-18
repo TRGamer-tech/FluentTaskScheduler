@@ -17,18 +17,13 @@ public enum QuickActionState
 /// <summary>One quick action on the page: what it is, whether it can run here, and how its last run went.</summary>
 public sealed partial class QuickActionViewModel : ObservableObject
 {
-    /// <summary>How many lines of what the program wrote are shown once it has ended.</summary>
-    private const int LinesKept = 4;
-
     private readonly QuickAction _action;
     private readonly IProcessRunner _runner;
     private readonly IUiThread _ui;
     private readonly IPrompts _prompts;
 
-    private readonly List<string> _lastLines = [];
-    private bool _lastLineIsUnfinished;
-    private bool _refreshQueued;
-    private CancellationTokenSource? _run;
+    /// <summary>The run the card shows, in progress or ended; null while it shows none.</summary>
+    private QuickActionRun? _run;
 
     internal QuickActionViewModel(QuickAction action, bool appIsElevated, IProcessRunner runner, IUiThread ui, IPrompts prompts)
     {
@@ -50,7 +45,7 @@ public sealed partial class QuickActionViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsRunning), nameof(IsNotRunning), nameof(HasSucceeded), nameof(HasFailed))]
-    [NotifyCanExecuteChangedFor(nameof(CancelCommand))]
+    [NotifyCanExecuteChangedFor(nameof(RunCommand), nameof(CancelCommand))]
     private QuickActionState _state;
 
     /// <summary>How the action is doing or how it ended, in a few words.</summary>
@@ -71,7 +66,9 @@ public sealed partial class QuickActionViewModel : ObservableObject
     public bool HasFailed => State == QuickActionState.Failed;
     public bool HasDetail => Detail.Length > 0;
 
-    [RelayCommand(CanExecute = nameof(IsAvailable))]
+    private bool CanRun => IsAvailable && IsNotRunning;
+
+    [RelayCommand(CanExecute = nameof(CanRun))]
     private async Task RunAsync()
     {
         if (_action.ConfirmFirst)
@@ -80,82 +77,37 @@ public sealed partial class QuickActionViewModel : ObservableObject
             if (!confirmed) return;
         }
 
-        using var run = new CancellationTokenSource();
-        _run = run;
-        lock (_lastLines)
-        {
-            _lastLines.Clear();
-            _lastLineIsUnfinished = false;
-        }
-        Show(QuickActionState.Running, Loc.Get("QuickActions.Status.Running"), detail: "");
-        try
-        {
-            int exitCode = await _runner.RunAsync(_action.Request, Keep, run.Token);
-            if (exitCode == 0) Show(QuickActionState.Succeeded, Loc.Get("QuickActions.Status.Success"), _action.ReportsFindings ? LastLines() : "");
-            else Show(QuickActionState.Failed, Loc.Format("QuickActions.Status.ExitCode", exitCode), LastLines());
-        }
-        catch (OperationCanceledException)
-        {
-            Show(QuickActionState.Idle, Loc.Get("QuickActions.Status.Cancelled"), detail: "");
-        }
-        catch (ProcessStartException ex)
-        {
-            Serilog.Log.Error(ex, "Quick action {Id} could not start {Program}", Id, ex.FileName);
-            Show(QuickActionState.Failed, Loc.Get("QuickActions.Status.Error"), ex.Message);
-        }
-        finally
-        {
-            _run = null;
-        }
+        Show(QuickActionRun.Start(_action, _runner, _ui));
     }
 
     [RelayCommand(CanExecute = nameof(IsRunning))]
-    private void Cancel() => _run?.Cancel();
+    private void Cancel() => _run?.Stop();
 
-    private void Show(QuickActionState state, string statusText, string detail)
-    {
-        State = state;
-        StatusText = statusText;
-        Detail = detail;
-    }
+    /// <summary>Ends the action if it is running.</summary>
+    internal void EndRun() => _run?.Abandon();
 
-    /// <summary>Takes a line the program wrote, on whatever thread it arrives.</summary>
-    private void Keep(ProcessOutput line)
+    /// <summary>Shows a run from now on: how it is doing, and then how it ended.</summary>
+    private void Show(QuickActionRun run)
     {
-        string text = line.Text.Trim();
-        lock (_lastLines)
+        _run = run;
+        run.ReportTo(() =>
         {
-            // A line the program had not finished (its progress, usually) gives way to what it wrote next.
-            if (_lastLineIsUnfinished) _lastLines.RemoveAt(_lastLines.Count - 1);
-            _lastLineIsUnfinished = false;
-            if (text.Length == 0) return;
-
-            _lastLines.Add(text);
-            if (_lastLines.Count > LinesKept) _lastLines.RemoveAt(0);
-            _lastLineIsUnfinished = !line.IsComplete;
-
-            // One refresh shows the newest line, however many arrived before the UI thread got to it.
-            if (_refreshQueued) return;
-            _refreshQueued = true;
-        }
-        _ui.Post(ShowNewestLine);
+            State = run.State;
+            StatusText = StatusOf(run);
+            Detail = run.Detail;
+        });
     }
 
-    private void ShowNewestLine()
+    /// <summary>How a run is doing or how it ended, in the language the app has now.</summary>
+    private static string StatusOf(QuickActionRun run) => run.State switch
     {
-        string newest;
-        lock (_lastLines)
-        {
-            _refreshQueued = false;
-            newest = _lastLines.LastOrDefault() ?? "";
-        }
-        if (IsRunning) Detail = newest;
-    }
-
-    private string LastLines()
-    {
-        lock (_lastLines) return string.Join('\n', _lastLines);
-    }
+        QuickActionState.Running => Loc.Get("QuickActions.Status.Running"),
+        QuickActionState.Succeeded => Loc.Get("QuickActions.Status.Success"),
+        QuickActionState.Failed when run.ExitCode is { } exitCode => Loc.Format("QuickActions.Status.ExitCode", exitCode),
+        QuickActionState.Failed => Loc.Get("QuickActions.Status.Error"),
+        // Idle again, after a run: it was stopped.
+        _ => Loc.Get("QuickActions.Status.Cancelled")
+    };
 }
 
 /// <summary>The Quick Actions page of one window.</summary>
@@ -186,6 +138,6 @@ public sealed partial class QuickActionsViewModel : IDisposable
     /// </summary>
     public void Dispose()
     {
-        foreach (QuickActionViewModel action in Actions) action.CancelCommand.Execute(null);
+        foreach (QuickActionViewModel action in Actions) action.EndRun();
     }
 }
