@@ -244,6 +244,27 @@ public class QuickActionsTests
     }
 
     [Fact]
+    public void TheResultOfAnAction_StaysOnItsCard_WhenAnotherLanguageBuildsThePagesAnew()
+    {
+        using var app = AppSession.Launch("quick-action-rebuild");
+        app.Require("NavQuickActions").Press();
+        app.Require("QuickAction.FlushDNS.Run").AsButton().Invoke();
+        Assert.True(app.Find(e => e.AutomationId == "QuickAction.FlushDNS.Status" && e.Name == "Success", 60000) != null, "Flush DNS did not report success.");
+        string whatWindowsSaid = app.Require("QuickAction.FlushDNS.Detail").Name;
+
+        app.Require("NavSettings").Press();
+        app.Require("LanguageChoice", 30000).AsComboBox().Select(2); // the language of Windows, English, German, ...
+        Assert.True(app.Find(e => e.AutomationId == "PageTitle" && e.Name == "Einstellungen", 10000) != null, "The pages were not built anew in German.");
+        app.Require("NavQuickActions").Press();
+
+        // The new card says in its own language how the run went; what Windows said stays as it was.
+        bool kept = app.Find(e => e.AutomationId == "QuickAction.FlushDNS.Status" && e.Name == "Erfolgreich", 10000) != null;
+        app.Snapshot("after-rebuild");
+        Assert.True(kept, "The card of the new pages does not say in German that Flush DNS succeeded.");
+        Assert.Equal(whatWindowsSaid, app.Find("QuickAction.FlushDNS.Detail")?.Name);
+    }
+
+    [Fact]
     public void ActionsThatNeedAdministratorRights_SaySo_AndCanOnlyRunWhenTheAppHasThem()
     {
         using var app = AppSession.Launch("quick-action-elevation");
