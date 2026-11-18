@@ -46,18 +46,7 @@ public sealed class TaskTests : IDisposable
         Toggle(app, "Fri");
 
         // A new trigger starts on the hour; picking 05 in the minutes makes it five past.
-        var timeButton = app.Find(element => element.AutomationId == "FlyoutButton" && element.Parent?.AutomationId == "TriggerStartTime")
-                         ?? throw new InvalidOperationException("The time picker has no button.");
-        timeButton.Patterns.Invoke.Pattern.Invoke();
-        var accept = app.Require("AcceptButton");
-        var fivePast = app.Find(element => element.ControlType == ControlType.ListItem && element.Name == "05"
-                                           && element.Parent?.AutomationId == "MinuteLoopingSelector")
-                       ?? throw new InvalidOperationException("The minutes do not offer 05.");
-        fivePast.Select();
-        Wait();
-        app.Snapshot("time-picker");
-        accept.Patterns.Invoke.Pattern.Invoke();
-        Wait();
+        PickMinutes(app, "05");
 
         app.Require("EditorProgram").AsTextBox().Text = "cmd.exe";
         app.Require("EditorArguments").AsTextBox().Text = "/c exit 0";
@@ -515,6 +504,47 @@ public sealed class TaskTests : IDisposable
         var button = app.Find(element => element.ControlType == ControlType.Button && element.Name == name && element.Patterns.Toggle.IsSupported)
                      ?? throw new InvalidOperationException($"No toggle button '{name}'.");
         button.Patterns.Toggle.Pattern.Toggle();
+    }
+
+    /// <summary>
+    /// Picks the minutes of a trigger's start in its time picker. The picker closes by itself when
+    /// a window of another program takes the foreground, as a console window of the build machine's
+    /// own setup does now and then, so a pick the picker closed under is made again.
+    /// </summary>
+    private static void PickMinutes(AppSession app, string minutes)
+    {
+        const int attempts = 3;
+        for (int attempt = 1; !TryPickMinutes(app, minutes); attempt++)
+        {
+            if (attempt == attempts) throw new InvalidOperationException($"In {attempts} attempts the time picker never stayed open until the minutes were picked.");
+        }
+    }
+
+    /// <returns>False if the picker closed before the pick was confirmed.</returns>
+    private static bool TryPickMinutes(AppSession app, string minutes)
+    {
+        app.Window.WaitForTheForeground();
+        var timeButton = app.Find(element => element.AutomationId == "FlyoutButton" && element.Parent?.AutomationId == "TriggerStartTime")
+                         ?? throw new InvalidOperationException("The time picker has no button.");
+        try
+        {
+            timeButton.Patterns.Invoke.Pattern.Invoke();
+            var accept = app.Require("AcceptButton");
+            var item = app.Find(element => element.ControlType == ControlType.ListItem && element.Name == minutes
+                                           && element.Parent?.AutomationId == "MinuteLoopingSelector")
+                       ?? throw new InvalidOperationException($"The minutes do not offer {minutes}.");
+            item.Select();
+            Wait();
+            app.Snapshot("time-picker");
+            accept.Patterns.Invoke.Pattern.Invoke();
+            Wait();
+            return true;
+        }
+        catch (Exception) when (app.Find("AcceptButton", 0) is null)
+        {
+            // Whatever step failed, it failed because the picker was no longer there.
+            return false;
+        }
     }
 
     private static string ProblemsShown(AppSession app, string infoBar = "EditorProblems") =>
