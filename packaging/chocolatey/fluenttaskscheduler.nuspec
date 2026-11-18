@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>fluenttaskscheduler</id>
-    <version>1.9.0</version>
+    <version>2.0.0</version>
     <title>Fluent Task Scheduler</title>
     <authors>TRGamer-tech</authors>
     <owners>TRGamer-tech</owners>
@@ -24,7 +24,7 @@ exports a task's history as CSV.
 **Requirements:** Windows 10 version 1809 (build 17763) or later, x64 or ARM64.
     ]]></description>
     <tags>task-scheduler automation windows winui3 fluent productivity admin</tags>
-    <releaseNotes>https://github.com/TRGamer-tech/FluentTaskScheduler/releases/tag/V1.9.0</releaseNotes>
+    <releaseNotes>https://github.com/TRGamer-tech/FluentTaskScheduler/releases/tag/V2.0.0</releaseNotes>
   </metadata>
   <files>
     <file src="tools\**" target="tools" />

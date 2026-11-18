@@ -21,7 +21,7 @@
    10 seconds, and the icon is drawn at the size the notification area shows it, with a 9 px digit at
    16 px, for the display the taskbar is on.) There is still no taskbar-button badge, only the tray icon.
 5. ~~Translate the v1.9.0 additions (Snooze, Pipelines, Dashboard analytics, Library/Templates, onboarding slides) into `de-DE`, `ja-JP`, `zh-CN`.~~ (Done: all 217 v1.9.0 keys translated into all three locales; every `.resw` now has identical key counts.)
-6. Submit the updated Scoop / Chocolatey / WinGet manifests once the v1.9.0 GitHub Release is published.
+6. Submit the Scoop / Chocolatey / WinGet manifests of v2.0.0 once its GitHub Release is published. They are in `packaging/`, written by the release workflow for the files of the draft; CONTRIBUTING.md says where each one goes.
 7. ~~**Fix the in-app auto-updater's arch collision before ever uploading `releases.win.json`/`.nupkg` to a GitHub Release.**~~ (Done: Fixed in V1.9.0. Added -c win-x64/win-arm64 at pack time, and pass ExplicitChannel to UpdateOptions).
 
 # Changelog:

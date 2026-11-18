@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.12.0.schema.json
 
 PackageIdentifier: TRGamer-tech.FluentTaskScheduler
-PackageVersion: 1.9.0
+PackageVersion: 2.0.0
 MinimumOSVersion: "10.0.17763.0"
 InstallerType: wix
 UpgradeBehavior: install
@@ -10,12 +10,12 @@ UpgradeBehavior: install
 # read it from an installer.
 Installers:
   - Architecture: x64
-    InstallerUrl: https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/V1.9.0/Setup-x64.msi
-    InstallerSha256: AFAD2A1E61E4B3F87C1EE2B7ED4E55CFAC9B13DBC5AF7CA99745DA4977539362
-    ProductCode: "{D6032D5F-4CFA-433C-90A0-822C539F39D4}"
+    InstallerUrl: https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/V2.0.0/Setup-x64.msi
+    InstallerSha256: 852F1F51B8F250B94C0A1D458F43E03B0E9FFB3883B50286BCEFDE2F5AFD83C4
+    ProductCode: "{0051CE23-E05B-45D8-AEB2-D4545DA6E749}"
   - Architecture: arm64
-    InstallerUrl: https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/V1.9.0/Setup-arm64.msi
-    InstallerSha256: 8CDF80B8DAD1D75F5D107CEFB5A3626DBC3FB627911C978641AF51771D2A54D1
-    ProductCode: "{4D44B950-958A-4E74-AC8F-8D19ECEDE472}"
+    InstallerUrl: https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/V2.0.0/Setup-arm64.msi
+    InstallerSha256: 4AE2C3E159321EE16947167198BBB4344FC44DCA45EC964CC53159831B16C812
+    ProductCode: "{428E62B9-C0ED-499B-BB73-A13C377C238C}"
 ManifestType: installer
 ManifestVersion: 1.12.0

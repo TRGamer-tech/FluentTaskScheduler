@@ -1,5 +1,5 @@
 {
-    "version": "1.9.0",
+    "version": "2.0.0",
     "description": "A WinUI 3 app to view, create, run, snooze and manage the tasks of the Windows Task Scheduler.",
     "homepage": "https://github.com/TRGamer-tech/FluentTaskScheduler",
     "license": {
@@ -9,12 +9,12 @@
     "notes": "Runs on Windows 10 1809 (build 17763) and later.",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/V1.9.0/Portable-x64.zip",
-            "hash": "979295ab079584af93941a0ea6c8491ee89e39ad844cb400e45b9af37944d4df"
+            "url": "https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/V2.0.0/Portable-x64.zip",
+            "hash": "1b2b611f90314e3d727dfa75cdd8442d9ab0c7c2471ff07fc88336eda6e6ba73"
         },
         "arm64": {
-            "url": "https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/V1.9.0/Portable-arm64.zip",
-            "hash": "8e5fa5cf9050bfd583a5e1496bf0f8b239a4a596cc3aec1a226fbfe48bd7c4a4"
+            "url": "https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/V2.0.0/Portable-arm64.zip",
+            "hash": "2ba637df9283a187c65404dde8262688c58f04bca8dde7d1280d13b4b38b4bd8"
         }
     },
     "bin": "current\\FluentTaskScheduler.exe",
