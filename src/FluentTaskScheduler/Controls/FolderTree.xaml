@@ -46,7 +46,10 @@
                   ItemInvoked="Tree_ItemInvoked">
             <TreeView.ItemTemplate>
                 <DataTemplate x:DataType="vm:FolderNode">
-                    <TreeViewItem ItemsSource="{x:Bind Children}" IsExpanded="{x:Bind IsExpanded, Mode=TwoWay}" ContextFlyout="{StaticResource FolderMenu}">
+                    <!-- IsExpanded is the one place for {Binding}: since Windows App SDK 1.6 the tree takes an item's
+                         expansion from its data only if it finds a binding expression on this property, which
+                         x:Bind does not make; otherwise it collapses the item and the folder with it. -->
+                    <TreeViewItem ItemsSource="{x:Bind Children}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}" ContextFlyout="{StaticResource FolderMenu}">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <FontIcon Glyph="&#xE8B7;" FontSize="14"/>
                             <TextBlock Text="{x:Bind Name}" TextTrimming="CharacterEllipsis"/>
