@@ -2,6 +2,7 @@
     x:Class="FluentTaskScheduler.Controls.HealthRing"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:l="using:FluentTaskScheduler.Localization"
     IsTabStop="False">
 
     <Grid>
@@ -26,11 +27,12 @@
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
 
-        <!-- A determinate ring draws its background as the track. The score is written next to
-             the ring, so a screen reader is not told it twice. -->
+        <!-- A determinate ring draws its background as the track. A ring that is active is always
+             there for a screen reader: the control puts itself back into the content view whatever
+             is set here. So it says what it measures, instead of being a progress bar of nothing. -->
         <ProgressRing x:Name="Ring" Width="48" Height="48" IsIndeterminate="False"
                       Value="{x:Bind Score, Mode=OneWay}"
                       Background="{ThemeResource ControlStrongStrokeColorDisabledBrush}"
-                      AutomationProperties.AccessibilityView="Raw"/>
+                      AutomationProperties.Name="{x:Bind l:Loc.Get('DashboardHealthScore.Text')}"/>
     </Grid>
 </UserControl>

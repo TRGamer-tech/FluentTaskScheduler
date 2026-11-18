@@ -140,8 +140,10 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel Spacing="4">
                             <TextBlock Text="{x:Bind l:Loc.Get('DashboardHealthScore.Text')}" Style="{StaticResource FigureNameStyle}"/>
+                            <!-- What the score means is the tile's tooltip, which only a pointer brings up. -->
                             <TextBlock x:Name="HealthFigure" Text="{x:Bind ViewModel.Figures.HealthText, Mode=OneWay}"
-                                       Style="{StaticResource TitleTextBlockStyle}"/>
+                                       Style="{StaticResource TitleTextBlockStyle}"
+                                       AutomationProperties.HelpText="{x:Bind l:Loc.Get('Dashboard.HealthCaption')}"/>
                             <TextBlock Text="{x:Bind ViewModel.Figures.HealthNote, Mode=OneWay}" Style="{StaticResource NoteStyle}" TextWrapping="Wrap"/>
                         </StackPanel>
                         <controls:HealthRing Grid.Column="1" VerticalAlignment="Center"
@@ -188,7 +190,9 @@
                     </Grid>
 
                     <!-- One cell per hour of the day, in one row however wide the page is. An hour
-                         without a run is a faint cell; the more runs, the stronger the accent over it. -->
+                         without a run is a faint cell; the more runs, the stronger the accent over it.
+                         The name puts a cell into the automation tree: a screen reader has neither
+                         the shade nor the tooltip to go by. -->
                     <ItemsRepeater Grid.Row="1" ItemsSource="{x:Bind ViewModel.Hours}">
                         <ItemsRepeater.Layout>
                             <UniformGridLayout MaximumRowsOrColumns="24" MinItemWidth="12" MinItemHeight="32"
@@ -197,7 +201,8 @@
                         <ItemsRepeater.ItemTemplate>
                             <DataTemplate x:DataType="vm:HourCell">
                                 <Grid CornerRadius="2" Background="{ThemeResource ControlAltFillColorTertiaryBrush}"
-                                      ToolTipService.ToolTip="{x:Bind Description}">
+                                      ToolTipService.ToolTip="{x:Bind Description}"
+                                      AutomationProperties.Name="{x:Bind Description}">
                                     <Border CornerRadius="2" Background="{ThemeResource AccentFillColorDefaultBrush}" Opacity="{x:Bind Shade}"/>
                                 </Grid>
                             </DataTemplate>

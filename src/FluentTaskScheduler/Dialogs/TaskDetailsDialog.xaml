@@ -195,17 +195,20 @@
                          IsOpen="{x:Bind ViewModel.HasProblem, Mode=OneWay}" Visibility="{x:Bind ViewModel.HasProblem, Mode=OneWay}"
                          Message="{x:Bind ViewModel.Problem, Mode=OneWay}"/>
 
-                <!-- The numbers double as filters for the list below. -->
+                <!-- The numbers double as filters for the list below. A button holds two texts and so has
+                     no name of its own for a screen reader; it is given one that says both. -->
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <Button x:Name="DetailsStatTotal" Style="{StaticResource StatButtonStyle}"
-                            Command="{x:Bind ViewModel.ShowCommand}" CommandParameter="{x:Bind vm:HistoryFilter.All}">
+                            Command="{x:Bind ViewModel.ShowCommand}" CommandParameter="{x:Bind vm:HistoryFilter.All}"
+                            AutomationProperties.Name="{x:Bind local:TaskDetailsDialog.StatName('Details.Stat.Total', ViewModel.TotalRuns), Mode=OneWay}">
                         <StackPanel>
                             <TextBlock Text="{x:Bind l:Loc.Get('Details.Stat.Total')}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                             <TextBlock Text="{x:Bind ViewModel.TotalRuns, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                         </StackPanel>
                     </Button>
                     <Button x:Name="DetailsStatSucceeded" Style="{StaticResource StatButtonStyle}"
-                            Command="{x:Bind ViewModel.ShowCommand}" CommandParameter="{x:Bind vm:HistoryFilter.Succeeded}">
+                            Command="{x:Bind ViewModel.ShowCommand}" CommandParameter="{x:Bind vm:HistoryFilter.Succeeded}"
+                            AutomationProperties.Name="{x:Bind local:TaskDetailsDialog.StatName('Details.Stat.Succeeded', ViewModel.SucceededRuns), Mode=OneWay}">
                         <StackPanel>
                             <TextBlock Text="{x:Bind l:Loc.Get('Details.Stat.Succeeded')}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                             <TextBlock Text="{x:Bind ViewModel.SucceededRuns, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}"
@@ -213,7 +216,8 @@
                         </StackPanel>
                     </Button>
                     <Button x:Name="DetailsStatFailed" Style="{StaticResource StatButtonStyle}"
-                            Command="{x:Bind ViewModel.ShowCommand}" CommandParameter="{x:Bind vm:HistoryFilter.Failed}">
+                            Command="{x:Bind ViewModel.ShowCommand}" CommandParameter="{x:Bind vm:HistoryFilter.Failed}"
+                            AutomationProperties.Name="{x:Bind local:TaskDetailsDialog.StatName('Details.Stat.Failed', ViewModel.FailedRuns), Mode=OneWay}">
                         <StackPanel>
                             <TextBlock Text="{x:Bind l:Loc.Get('Details.Stat.Failed')}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                             <TextBlock Text="{x:Bind ViewModel.FailedRuns, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}"

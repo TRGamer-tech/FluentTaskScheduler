@@ -60,7 +60,11 @@
                                     TextChanged="Tags_TextChanged" GotFocus="Tags_GotFocus" QuerySubmitted="Tags_QuerySubmitted"
                                     PreviewKeyDown="SuggestionBox_PreviewKeyDown"/>
                 </Grid>
+                <!-- Named, as the other switch of the form is: the app words "On" and "Off" itself, and a
+                     switch left to name itself then adds them to its header. A screen reader is told
+                     the state anyway. -->
                 <ToggleSwitch x:Name="EditorEnabled" Header="{x:Bind l:Loc.Get('Dialog.Enabled')}"
+                              AutomationProperties.Name="{x:Bind l:Loc.Get('Dialog.Enabled')}"
                               IsOn="{x:Bind ViewModel.Enabled, Mode=TwoWay}"/>
 
                 <!-- Triggers -->
@@ -73,7 +77,8 @@
                     <ListView x:Name="EditorTriggers" MinHeight="44" MaxHeight="140" SelectionMode="Single"
                               BorderThickness="1" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" CornerRadius="4"
                               ItemsSource="{x:Bind ViewModel.Triggers}"
-                              SelectedItem="{x:Bind ViewModel.SelectedTrigger, Mode=TwoWay}">
+                              SelectedItem="{x:Bind ViewModel.SelectedTrigger, Mode=TwoWay}"
+                              AutomationProperties.Name="{x:Bind l:Loc.Get('TriggerTitle.Text')}">
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="vm:TriggerViewModel">
                                 <TextBlock Text="{x:Bind Summary, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
@@ -91,14 +96,16 @@
                                 AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.Trigger.Remove')}">
                             <FontIcon Glyph="&#xE74D;" FontSize="14"/>
                         </Button>
+                        <!-- Triggers and actions are moved by buttons that read the same; a screen reader is
+                             told which of the two lists a button is for. -->
                         <Button x:Name="EditorMoveTriggerUp" Command="{x:Bind ViewModel.MoveTriggerUpCommand}"
                                 ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.MoveUp')}"
-                                AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.MoveUp')}">
+                                AutomationProperties.Name="{x:Bind l:ScreenReaderName.In('Editor.MoveUp', 'TriggerTitle.Text')}">
                             <FontIcon Glyph="&#xE70E;" FontSize="14"/>
                         </Button>
                         <Button x:Name="EditorMoveTriggerDown" Command="{x:Bind ViewModel.MoveTriggerDownCommand}"
                                 ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.MoveDown')}"
-                                AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.MoveDown')}">
+                                AutomationProperties.Name="{x:Bind l:ScreenReaderName.In('Editor.MoveDown', 'TriggerTitle.Text')}">
                             <FontIcon Glyph="&#xE70D;" FontSize="14"/>
                         </Button>
                     </StackPanel>
@@ -119,7 +126,8 @@
                     <ListView x:Name="EditorActions" MinHeight="44" MaxHeight="140" SelectionMode="Single"
                               BorderThickness="1" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" CornerRadius="4"
                               ItemsSource="{x:Bind ViewModel.Actions}"
-                              SelectedItem="{x:Bind ViewModel.SelectedAction, Mode=TwoWay}">
+                              SelectedItem="{x:Bind ViewModel.SelectedAction, Mode=TwoWay}"
+                              AutomationProperties.Name="{x:Bind l:Loc.Get('ActionTitle.Text')}">
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="vm:ActionViewModel">
                                 <TextBlock Text="{x:Bind Summary, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
@@ -145,12 +153,12 @@
                         </Button>
                         <Button x:Name="EditorMoveActionUp" Command="{x:Bind ViewModel.MoveActionUpCommand}"
                                 ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.MoveUp')}"
-                                AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.MoveUp')}">
+                                AutomationProperties.Name="{x:Bind l:ScreenReaderName.In('Editor.MoveUp', 'ActionTitle.Text')}">
                             <FontIcon Glyph="&#xE70E;" FontSize="14"/>
                         </Button>
                         <Button x:Name="EditorMoveActionDown" Command="{x:Bind ViewModel.MoveActionDownCommand}"
                                 ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.MoveDown')}"
-                                AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.MoveDown')}">
+                                AutomationProperties.Name="{x:Bind l:ScreenReaderName.In('Editor.MoveDown', 'ActionTitle.Text')}">
                             <FontIcon Glyph="&#xE70D;" FontSize="14"/>
                         </Button>
                     </StackPanel>
@@ -189,7 +197,11 @@
                         <StackPanel Spacing="8" Margin="28,0,0,0" Visibility="{x:Bind ViewModel.RunOnlyIfIdle, Mode=OneWay}">
                             <StackPanel Orientation="Horizontal" Spacing="12">
                                 <TextBlock Text="{x:Bind l:Loc.Get('ConditionIdleFor.Text')}" VerticalAlignment="Center"/>
+                                <!-- A box whose label is the text or the check box before it is named by that label,
+                                     here and in the settings below. Left to itself it would be called by the example
+                                     it shows while it is empty. -->
                                 <TextBox x:Name="EditorIdleDuration" Width="120" PlaceholderText="{x:Bind l:Loc.Get('Dialog.Ph.Idle')}"
+                                         AutomationProperties.Name="{x:Bind l:Loc.Get('ConditionIdleFor.Text')}"
                                          Text="{x:Bind ViewModel.IdleDuration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             </StackPanel>
                             <CheckBox x:Name="EditorStopOnIdleEnd" Content="{x:Bind l:Loc.Get('ConditionStopOnIdleEnd.Content')}" IsChecked="{x:Bind ViewModel.StopOnIdleEnd, Mode=TwoWay}"/>
@@ -220,15 +232,18 @@
                         <CheckBox x:Name="EditorLimitRunTime" Content="{x:Bind l:Loc.Get('Dialog.StopAfter')}" IsChecked="{x:Bind ViewModel.LimitRunTime, Mode=TwoWay}"/>
                         <TextBox x:Name="EditorTimeLimit" Width="160" HorizontalAlignment="Left" Margin="28,0,0,0"
                                  PlaceholderText="{x:Bind l:Loc.Get('Editor.Ph.Duration')}"
+                                 AutomationProperties.Name="{x:Bind l:Loc.Get('Dialog.StopAfter')}"
                                  Visibility="{x:Bind ViewModel.LimitRunTime, Mode=OneWay}"
                                  Text="{x:Bind ViewModel.TimeLimit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         <CheckBox x:Name="EditorRestartOnFailure" Content="{x:Bind l:Loc.Get('RestartOnFailure.Content')}" IsChecked="{x:Bind ViewModel.RestartOnFailure, Mode=TwoWay}"/>
                         <StackPanel Spacing="8" Margin="28,0,0,0" Visibility="{x:Bind ViewModel.RestartOnFailure, Mode=OneWay}">
                             <TextBox x:Name="EditorRestartInterval" Width="120" HorizontalAlignment="Left" PlaceholderText="{x:Bind l:Loc.Get('Dialog.Ph.Idle')}"
+                                     AutomationProperties.Name="{x:Bind l:Loc.Get('RestartOnFailure.Content')}"
                                      Text="{x:Bind ViewModel.RestartInterval, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <TextBlock Text="{x:Bind l:Loc.Get('Dialog.RestartUpTo')}" VerticalAlignment="Center"/>
                                 <NumberBox x:Name="EditorRestartCount" Minimum="1" Maximum="999" SpinButtonPlacementMode="Inline" MinWidth="120"
+                                           AutomationProperties.Name="{x:Bind l:Loc.Get('Dialog.RestartUpTo')}"
                                            Value="{x:Bind ViewModel.RestartCount, Mode=TwoWay}"/>
                                 <TextBlock Text="{x:Bind l:Loc.Get('Dialog.RestartTimes')}" VerticalAlignment="Center"/>
                             </StackPanel>
@@ -278,10 +293,12 @@
                           HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
                     <StackPanel Spacing="8">
                         <ToggleSwitch x:Name="EditorCompletionActionsEnabled" Header="{x:Bind l:Loc.Get('Pipeline.EnableSwitch')}"
+                                      AutomationProperties.Name="{x:Bind l:Loc.Get('Pipeline.EnableSwitch')}"
                                       IsOn="{x:Bind ViewModel.CompletionActions.Enabled, Mode=TwoWay}"/>
                         <TextBlock Text="{x:Bind l:Loc.Get('Pipeline.EnableSubtitle')}" TextWrapping="Wrap"
                                    Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
 
+                        <!-- The same picker, button and list twice, for success and for failure: each is named after its half. -->
                         <TextBlock Text="{x:Bind l:Loc.Get('Pipeline.SuccessHeader')}" Style="{StaticResource SectionTitleStyle}"/>
                         <TextBlock Text="{x:Bind l:Loc.Get('Pipeline.SuccessHint')}" TextWrapping="Wrap"
                                    Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
@@ -292,12 +309,15 @@
                             </Grid.ColumnDefinitions>
                             <ComboBox x:Name="OnSuccessPicker" HorizontalAlignment="Stretch"
                                       PlaceholderText="{x:Bind l:Loc.Get('Pipeline.PickTask')}"
+                                      AutomationProperties.Name="{x:Bind l:Loc.Get('Pipeline.SuccessHeader')}"
                                       ItemsSource="{x:Bind ViewModel.CompletionActions.OtherTasks}"/>
                             <Button x:Name="OnSuccessAdd" Grid.Column="1" Content="{x:Bind l:Loc.Get('Editor.CompletionActions.Add')}"
+                                    AutomationProperties.Name="{x:Bind l:ScreenReaderName.In('Editor.CompletionActions.Add', 'Pipeline.SuccessHeader')}"
                                     Command="{x:Bind ViewModel.CompletionActions.AddOnSuccessCommand}"
                                     CommandParameter="{x:Bind OnSuccessPicker.SelectedItem, Mode=OneWay}"/>
                         </Grid>
-                        <ListView x:Name="OnSuccessList" SelectionMode="None" ItemsSource="{x:Bind ViewModel.CompletionActions.OnSuccess}">
+                        <ListView x:Name="OnSuccessList" SelectionMode="None" ItemsSource="{x:Bind ViewModel.CompletionActions.OnSuccess}"
+                                  AutomationProperties.Name="{x:Bind l:Loc.Get('Pipeline.SuccessHeader')}">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="x:String">
                                     <Grid ColumnSpacing="8">
@@ -306,8 +326,9 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Text="{x:Bind}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                        <!-- (x:String) is the task's path itself. -->
                                         <Button x:Name="OnSuccessRemove" Grid.Column="1" Tag="{x:Bind}" Click="RemoveOnSuccess_Click"
-                                                AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.CompletionActions.Remove')}"
+                                                AutomationProperties.Name="{x:Bind local:TaskEditorDialog.RemoveButtonName((x:String))}"
                                                 ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.CompletionActions.Remove')}">
                                             <FontIcon Glyph="&#xE74D;" FontSize="12"/>
                                         </Button>
@@ -326,12 +347,15 @@
                             </Grid.ColumnDefinitions>
                             <ComboBox x:Name="OnFailurePicker" HorizontalAlignment="Stretch"
                                       PlaceholderText="{x:Bind l:Loc.Get('Pipeline.PickTask')}"
+                                      AutomationProperties.Name="{x:Bind l:Loc.Get('Pipeline.FailureHeader')}"
                                       ItemsSource="{x:Bind ViewModel.CompletionActions.OtherTasks}"/>
                             <Button x:Name="OnFailureAdd" Grid.Column="1" Content="{x:Bind l:Loc.Get('Editor.CompletionActions.Add')}"
+                                    AutomationProperties.Name="{x:Bind l:ScreenReaderName.In('Editor.CompletionActions.Add', 'Pipeline.FailureHeader')}"
                                     Command="{x:Bind ViewModel.CompletionActions.AddOnFailureCommand}"
                                     CommandParameter="{x:Bind OnFailurePicker.SelectedItem, Mode=OneWay}"/>
                         </Grid>
-                        <ListView x:Name="OnFailureList" SelectionMode="None" ItemsSource="{x:Bind ViewModel.CompletionActions.OnFailure}">
+                        <ListView x:Name="OnFailureList" SelectionMode="None" ItemsSource="{x:Bind ViewModel.CompletionActions.OnFailure}"
+                                  AutomationProperties.Name="{x:Bind l:Loc.Get('Pipeline.FailureHeader')}">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="x:String">
                                     <Grid ColumnSpacing="8">
@@ -341,7 +365,7 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Text="{x:Bind}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                                         <Button x:Name="OnFailureRemove" Grid.Column="1" Tag="{x:Bind}" Click="RemoveOnFailure_Click"
-                                                AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.CompletionActions.Remove')}"
+                                                AutomationProperties.Name="{x:Bind local:TaskEditorDialog.RemoveButtonName((x:String))}"
                                                 ToolTipService.ToolTip="{x:Bind l:Loc.Get('Editor.CompletionActions.Remove')}">
                                             <FontIcon Glyph="&#xE74D;" FontSize="12"/>
                                         </Button>

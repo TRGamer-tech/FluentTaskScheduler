@@ -36,7 +36,10 @@
 
             <StackPanel Orientation="Horizontal" Spacing="8" Visibility="{x:Bind Trigger.IsDaily, Mode=OneWay}">
                 <TextBlock Text="{x:Bind l:Loc.Get('Dialog.RecurEvery')}" VerticalAlignment="Center"/>
+                <!-- The box stands between two texts, which are its label on screen. A screen reader names
+                     the box alone, so it is named by both, here and for the weeks below. -->
                 <NumberBox x:Name="TriggerDaysInterval" Minimum="1" Maximum="365" SpinButtonPlacementMode="Inline" MinWidth="120"
+                           AutomationProperties.Name="{x:Bind l:ScreenReaderName.In('Dialog.RecurEvery', 'Editor.Unit.Days')}"
                            Value="{x:Bind Trigger.DaysInterval, Mode=TwoWay}"/>
                 <TextBlock Text="{x:Bind l:Loc.Get('Editor.Unit.Days')}" VerticalAlignment="Center"/>
             </StackPanel>
@@ -45,6 +48,7 @@
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <TextBlock Text="{x:Bind l:Loc.Get('Dialog.RecurEvery')}" VerticalAlignment="Center"/>
                     <NumberBox x:Name="TriggerWeeksInterval" Minimum="1" Maximum="52" SpinButtonPlacementMode="Inline" MinWidth="120"
+                               AutomationProperties.Name="{x:Bind l:ScreenReaderName.In('Dialog.RecurEvery', 'Editor.Unit.Weeks')}"
                                Value="{x:Bind Trigger.WeeksInterval, Mode=TwoWay}"/>
                     <TextBlock Text="{x:Bind l:Loc.Get('Editor.Unit.Weeks')}" VerticalAlignment="Center"/>
                 </StackPanel>
@@ -91,6 +95,7 @@
                 <CheckBox x:Name="TriggerCustomQuery" Content="{x:Bind l:Loc.Get('Editor.Trigger.CustomQuery')}" IsChecked="{x:Bind Trigger.CustomEventQuery, Mode=TwoWay}"/>
                 <TextBox x:Name="TriggerEventQuery" AcceptsReturn="True" Height="120" TextWrapping="Wrap" IsSpellCheckEnabled="False"
                          FontFamily="Consolas" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         AutomationProperties.Name="{x:Bind l:Loc.Get('Editor.Trigger.CustomQuery')}"
                          Visibility="{x:Bind Trigger.CustomEventQuery, Mode=OneWay}"
                          Text="{x:Bind Trigger.EventQueryXml, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </StackPanel>
@@ -123,7 +128,9 @@
             <StackPanel Spacing="12" Visibility="{x:Bind Trigger.Expires, Mode=OneWay}">
                 <DatePicker x:Name="TriggerEndDate" Header="{x:Bind l:Loc.Get('Editor.Trigger.ExpiryDate')}"
                             Date="{x:Bind Trigger.EndDate, Mode=TwoWay}"/>
+                <!-- "Time" on screen, like the time the trigger starts at; a screen reader is told which of the two it is. -->
                 <TimePicker x:Name="TriggerEndTime" Header="{x:Bind l:Loc.Get('Editor.Trigger.StartTime')}"
+                            AutomationProperties.Name="{x:Bind l:ScreenReaderName.In('Editor.Trigger.StartTime', 'Editor.Trigger.ExpiryDate')}"
                             Time="{x:Bind Trigger.EndTime, Mode=TwoWay}"/>
             </StackPanel>
         </StackPanel>

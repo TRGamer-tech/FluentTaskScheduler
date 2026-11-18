@@ -96,7 +96,8 @@
                             PlaceholderText="{x:Bind l:Loc.Get('SearchBox.PlaceholderText')}"
                             Text="{x:Bind ViewModel.SearchText, Mode=TwoWay}"/>
             <ComboBox x:Name="StatusFilterBox" Grid.Column="1" MinWidth="140" VerticalAlignment="Center"
-                      SelectedIndex="{x:Bind ViewModel.StatusFilterIndex, Mode=TwoWay}">
+                      SelectedIndex="{x:Bind ViewModel.StatusFilterIndex, Mode=TwoWay}"
+                      AutomationProperties.Name="{x:Bind l:Loc.Get('Main.Sort.Status')}">
                 <ComboBoxItem Content="{x:Bind l:Loc.Get('Main.Status.All')}"/>
                 <ComboBoxItem Content="{x:Bind l:Loc.Get('Main.Status.Running')}"/>
                 <ComboBoxItem Content="{x:Bind l:Loc.Get('Main.Status.Enabled')}"/>
@@ -208,7 +209,8 @@
                   SelectionMode="Extended" IsItemClickEnabled="True"
                   ItemsSource="{x:Bind ViewModel.Tasks}"
                   KeyboardAcceleratorPlacementMode="Hidden"
-                  ItemClick="TaskList_ItemClick" SelectionChanged="TaskList_SelectionChanged">
+                  ItemClick="TaskList_ItemClick" SelectionChanged="TaskList_SelectionChanged"
+                  AutomationProperties.Name="{x:Bind l:Loc.Get('Main.Header.ScheduledTasks')}">
             <ListView.KeyboardAccelerators>
                 <!-- Scoped to the list: Delete in the search box must not delete tasks. -->
                 <KeyboardAccelerator Key="E" Modifiers="Control" ScopeOwner="{x:Bind TaskList}" Invoked="EditAccelerator_Invoked"/>

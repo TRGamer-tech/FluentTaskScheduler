@@ -1,3 +1,4 @@
+using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation.Peers;
@@ -21,6 +22,9 @@ public sealed partial class TaskEditorDialog : ContentDialog
     public static Visibility VisibleIfNone(int count) => count == 0 ? Visibility.Visible : Visibility.Collapsed;
 
     public static Visibility VisibleIfUnsupported(ActionViewModel? action) => action is { IsEditable: false } ? Visibility.Visible : Visibility.Collapsed;
+
+    /// <summary>For x:Bind: what a screen reader calls the button that takes the task at <paramref name="taskPath"/> off a list of completion actions, so that the buttons of the list can be told apart.</summary>
+    public static string RemoveButtonName(string taskPath) => Loc.Format("Settings.Names.RemoveFormat", taskPath);
 
     private async void Save_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {

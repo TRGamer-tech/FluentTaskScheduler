@@ -266,7 +266,10 @@
                                 Description="{x:Bind ViewModel.UpdateMessage, Mode=OneWay}">
                     <StackPanel Orientation="Horizontal" Spacing="12">
                         <ProgressRing Width="20" Height="20" IsActive="{x:Bind ViewModel.CheckForUpdatesCommand.IsRunning, Mode=OneWay}"/>
+                        <!-- A card names the control it holds after its heading. This one holds two, so the
+                             button is named here: "Check" alone would not tell a screen reader what for. -->
                         <Button MinWidth="120" AutomationProperties.AutomationId="CheckForUpdatesButton"
+                                AutomationProperties.Name="{x:Bind l:Loc.Get('Settings.About.Update.Title')}"
                                 Content="{x:Bind l:Loc.Get('Settings.About.CheckBtn')}"
                                 Command="{x:Bind ViewModel.CheckForUpdatesCommand}"/>
                     </StackPanel>

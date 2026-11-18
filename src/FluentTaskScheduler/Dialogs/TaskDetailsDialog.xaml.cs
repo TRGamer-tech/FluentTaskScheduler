@@ -1,4 +1,5 @@
 using System.Globalization;
+using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -37,6 +38,9 @@ public sealed partial class TaskDetailsDialog : ContentDialog
     public static Visibility VisibleIfAny(IReadOnlyList<string> lines) => lines.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     public static Visibility VisibleUnless(bool value) => value ? Visibility.Collapsed : Visibility.Visible;
     public static string DateText(DateTime? time) => time?.ToString("g", CultureInfo.CurrentCulture) ?? "-";
+
+    /// <summary>For x:Bind: what a screen reader calls one of the numbers that filter the history: its caption and the number, e.g. "Failed 2".</summary>
+    public static string StatName(string captionKey, int runs) => $"{Loc.Get(captionKey)} {runs}";
 
     private void Request_Click(object sender, RoutedEventArgs e)
     {
