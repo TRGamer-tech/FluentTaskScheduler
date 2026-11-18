@@ -40,7 +40,14 @@ public sealed class FakeSnoozeService : ISnoozeService
 
     public Task SnoozeAllAsync(SnoozeEnd end) => RecordAsync($"SnoozeAll {Describe(end)}");
 
-    public Task ResumeAllAsync() => RecordAsync("ResumeAll");
+    /// <summary>When set, resuming also takes the snooze out of <see cref="State"/>, as the service does when Windows lets it.</summary>
+    public bool Resumes { get; set; }
+
+    public async Task ResumeAllAsync()
+    {
+        await RecordAsync("ResumeAll");
+        if (Resumes) Publish(State with { Global = null });
+    }
 
     public async Task<SnoozeTaskOutcome> SnoozeTaskAsync(string taskPath, SnoozeEnd end)
     {
@@ -48,7 +55,11 @@ public sealed class FakeSnoozeService : ISnoozeService
         return TaskOutcome;
     }
 
-    public Task ResumeTaskAsync(string taskPath) => RecordAsync($"ResumeTask {taskPath}");
+    public async Task ResumeTaskAsync(string taskPath)
+    {
+        await RecordAsync($"ResumeTask {taskPath}");
+        if (Resumes) Publish(State with { Tasks = [.. State.Tasks.Where(task => task.TaskPath != taskPath)] });
+    }
 
     public Task TaskMovedAsync(string fromPath, string toPath) => RecordAsync($"TaskMoved {fromPath} -> {toPath}");
 

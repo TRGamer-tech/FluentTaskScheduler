@@ -52,6 +52,42 @@ public class SettingsTests
     }
 
     [Fact]
+    public void TheEntryThatOpensTheDataFolder_SaysWhereTheFolderIs()
+    {
+        using var app = OpenSettings("settings-data-folder");
+
+        app.Require("OpenDataFolderLink");
+        bool named = app.Find(e => e.Name.Contains(app.DataDir, StringComparison.OrdinalIgnoreCase)) != null;
+        app.Snapshot("data-folder");
+
+        Assert.True(named, $"Nothing on the settings page names the data folder {app.DataDir}.");
+    }
+
+    [Fact]
+    public void DeletingTheAppsData_TakesItsFilesOffTheComputer_AndEndsTheApp()
+    {
+        using var app = OpenSettings("settings-delete-data");
+        string settings = Path.Combine(app.DataDir, "settings.json");
+        string notTheApps = Path.Combine(app.DataDir, "notes.txt");
+        File.WriteAllText(notTheApps, "A file of the user's own, which is not the app's to delete.");
+        Assert.True(File.Exists(settings), "The app has no settings file to begin with.");
+
+        app.Require("DeleteAppDataButton").Press();
+        app.Require("PrimaryButton");
+        app.Snapshot("asked");
+        app.Require("PrimaryButton").AsButton().Invoke();
+
+        Assert.True(AppSession.Eventually(() => app.HasExited, 30), "The app did not end after its data was to be deleted.");
+        string[] left = [];
+        bool gone = AppSession.Eventually(() =>
+        {
+            left = Directory.GetFileSystemEntries(app.DataDir).Select(Path.GetFileName).ToArray()!;
+            return left is ["notes.txt"];
+        }, 10);
+        Assert.True(gone, $"The data folder should hold nothing but notes.txt. It holds: {string.Join(", ", left)}");
+    }
+
+    [Fact]
     public void ACategoryAddedOnThePage_IsSaved()
     {
         using var app = OpenSettings("settings-categories");

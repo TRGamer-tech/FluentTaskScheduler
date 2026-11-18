@@ -103,7 +103,7 @@ public sealed class DataFolderMove
             }
         }
 
-        RemoveIfEmpty(from);
+        AppFiles.RemoveFolderIfEmpty(from);
     }
 
     private void TakeFolder(string from, string to, bool keepOriginals)
@@ -128,7 +128,7 @@ public sealed class DataFolderMove
             else MoveFile(entry, target);
         }
 
-        if (!keepOriginals) RemoveIfEmpty(from);
+        if (!keepOriginals) AppFiles.RemoveFolderIfEmpty(from);
     }
 
     private void MoveFile(string source, string target)
@@ -175,18 +175,6 @@ public sealed class DataFolderMove
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             // It stays, and nothing reads it. If it is in the old folder, the next start tries again.
-        }
-    }
-
-    private static void RemoveIfEmpty(string folder)
-    {
-        try
-        {
-            if (!Directory.EnumerateFileSystemEntries(folder).Any()) Directory.Delete(folder);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            // In use, gone already or no longer empty: then it stays, and an empty folder is in nobody's way.
         }
     }
 }

@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using FluentTaskScheduler.Localization;
 using FluentTaskScheduler.Logging;
 using FluentTaskScheduler.Settings;
+using FluentTaskScheduler.Snoozing;
 using FluentTaskScheduler.Updates;
 using Serilog;
 
@@ -34,6 +35,8 @@ public sealed partial class SettingsViewModel : ObservableObject, IDisposable
     private readonly IFilePicker _files;
     private readonly IPrompts _prompts;
     private readonly ILauncher _launcher;
+    private readonly ISnoozeService _snooze;
+    private readonly IAppLifetime _lifetime;
     private readonly IUiThread _ui;
 
     private int[] _leadMinutes = [];
@@ -50,6 +53,8 @@ public sealed partial class SettingsViewModel : ObservableObject, IDisposable
         IFilePicker files,
         IPrompts prompts,
         ILauncher launcher,
+        ISnoozeService snooze,
+        IAppLifetime lifetime,
         IUiThread ui)
     {
         _settings = settings;
@@ -63,6 +68,8 @@ public sealed partial class SettingsViewModel : ObservableObject, IDisposable
         _files = files;
         _prompts = prompts;
         _launcher = launcher;
+        _snooze = snooze;
+        _lifetime = lifetime;
         _ui = ui;
 
         ThemeNames = [Loc.Get("Settings.Theme.System"), Loc.Get("Settings.Theme.Light"), Loc.Get("Settings.Theme.Dark")];
@@ -257,8 +264,34 @@ public sealed partial class SettingsViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private Task OpenCrashLogAsync() => OpenLogAsync(LogKind.Crashes);
 
+    /// <summary>What the data folder is for and, on a line of its own, where it is.</summary>
+    public string DataFolderDescription => $"{Loc.Get("Settings.Adv.DataFolder.Desc")}\n{_paths.DataFolder}";
+
     [RelayCommand]
     private Task OpenDataFolderAsync() => OpenFolderAsync(_paths.DataFolder);
+
+    /// <summary>
+    /// The way to take the app's files off the computer: uninstalling leaves them, so that an
+    /// update or a reinstallation finds them again.
+    /// </summary>
+    [RelayCommand]
+    private async Task DeleteAppDataAsync()
+    {
+        bool confirmed = await _prompts.ConfirmAsync(
+            Loc.Get("Settings.Data.Delete.Confirm.Title"), Loc.Get("Settings.Data.Delete.Confirm.Content"), Loc.Get("Dialog.Common.Delete"), isDestructive: true);
+        if (!confirmed) return;
+
+        // A task that a snooze disabled would stay disabled, with nothing left to say why or to enable it again.
+        await _snooze.ResumeAllAsync();
+        foreach (TaskSnooze task in _snooze.State.Tasks) await _snooze.ResumeTaskAsync(task.TaskPath);
+        if (_snooze.State is not { Global: null, Tasks.Count: 0, PendingRestores.Count: 0 })
+        {
+            await _prompts.ShowErrorAsync(Loc.Get("Settings.Data.Delete.StillSnoozed"));
+            return;
+        }
+
+        _lifetime.ExitAndDeleteData();
+    }
 
     [RelayCommand]
     private Task OpenExecutionHistoryFolderAsync() => OpenFolderAsync(_paths.ExecutionHistoryFolder);

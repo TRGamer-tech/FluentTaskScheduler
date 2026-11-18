@@ -1,4 +1,5 @@
 using System.IO.Enumeration;
+using FluentTaskScheduler.Settings;
 
 namespace FluentTaskScheduler;
 
@@ -33,6 +34,7 @@ internal static class AppFiles
     [
         "settings.json", "settings.unreadable.json",
         "snooze.json", "snooze.unreadable-*.json",
+        StartWithWindowsNote.FileName,
         // Version 1.9: its snooze state and its list of saved scripts.
         "task_snoozes.json", "snooze_suppressed.json", "user_templates.json",
         // The logs with their numbered parts, and the part version 1.9 set aside when a log was full.
@@ -69,6 +71,19 @@ internal static class AppFiles
 
         if (Leftovers.Any(leftover => Is(leftover, name))) return AppFileKind.Leftover;
         return Files.Any(file => Is(file, name)) ? AppFileKind.File : null;
+    }
+
+    /// <summary>For a folder that the app's files have left: it is not left behind empty.</summary>
+    public static void RemoveFolderIfEmpty(string folder)
+    {
+        try
+        {
+            if (!Directory.EnumerateFileSystemEntries(folder).Any()) Directory.Delete(folder);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // In use, gone already or no longer empty: then it stays, and an empty folder is in nobody's way.
+        }
     }
 
     private static bool Is(string pattern, string name) => FileSystemName.MatchesSimpleExpression(pattern, name, ignoreCase: true);

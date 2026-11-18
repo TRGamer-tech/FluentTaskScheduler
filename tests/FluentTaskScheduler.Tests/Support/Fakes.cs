@@ -95,6 +95,14 @@ public sealed class FakeAppLifetime : IAppLifetime
 
     public void Exit() => ExitRequested = true;
 
+    public bool DataDeletionRequested { get; private set; }
+
+    public void ExitAndDeleteData()
+    {
+        DataDeletionRequested = true;
+        ExitRequested = true;
+    }
+
     public bool RestartElevated()
     {
         RestartElevatedRequested = true;

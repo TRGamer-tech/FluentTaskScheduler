@@ -859,5 +859,11 @@ Restart now to apply the update?</value></data>
   <data name="Trigger.DayOfMonthFormat" xml:space="preserve"><value>{0}</value></data>
   <data name="Trigger.LastDayOfMonth" xml:space="preserve"><value>last day</value></data>
   <data name="Text.ListSeparator" xml:space="preserve"><value>, </value></data>
+  <data name="Settings.Data.Delete.Title" xml:space="preserve"><value>Delete App Data</value></data>
+  <data name="Settings.Data.Delete.Desc" xml:space="preserve"><value>Remove your settings, saved scripts, execution history and logs from this computer. Uninstalling the app keeps them.</value></data>
+  <data name="Settings.Data.DeleteBtn" xml:space="preserve"><value>Delete...</value></data>
+  <data name="Settings.Data.Delete.Confirm.Title" xml:space="preserve"><value>Delete the app's data?</value></data>
+  <data name="Settings.Data.Delete.Confirm.Content" xml:space="preserve"><value>This removes your settings, saved scripts, execution history and logs from this computer and closes the app. Snoozed tasks are resumed first, and the app no longer starts with Windows. Your tasks stay, but a task that runs one of your saved scripts will no longer find it.</value></data>
+  <data name="Settings.Data.Delete.StillSnoozed" xml:space="preserve"><value>Some snoozed tasks could not be resumed, so nothing was deleted. Resume them first; a task that was snoozed while the app ran as administrator needs administrator rights for that.</value></data>
 </root>
 

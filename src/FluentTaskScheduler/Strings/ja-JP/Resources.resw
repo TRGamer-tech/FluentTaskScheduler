@@ -859,4 +859,10 @@
   <data name="Trigger.DayOfMonthFormat" xml:space="preserve"><value>{0}日</value></data>
   <data name="Trigger.LastDayOfMonth" xml:space="preserve"><value>最終日</value></data>
   <data name="Text.ListSeparator" xml:space="preserve"><value>、</value></data>
+  <data name="Settings.Data.Delete.Title" xml:space="preserve"><value>アプリ データの削除</value></data>
+  <data name="Settings.Data.Delete.Desc" xml:space="preserve"><value>設定、保存済みスクリプト、実行履歴、ログをこのコンピューターから削除します。アプリをアンインストールしても、これらは残ります。</value></data>
+  <data name="Settings.Data.DeleteBtn" xml:space="preserve"><value>削除...</value></data>
+  <data name="Settings.Data.Delete.Confirm.Title" xml:space="preserve"><value>アプリのデータを削除しますか?</value></data>
+  <data name="Settings.Data.Delete.Confirm.Content" xml:space="preserve"><value>設定、保存済みスクリプト、実行履歴、ログをこのコンピューターから削除し、アプリを終了します。スヌーズ中のタスクは先に再開され、アプリは Windows の起動時に開始されなくなります。タスクはそのまま残りますが、保存済みスクリプトを実行するタスクは、そのスクリプトを見つけられなくなります。</value></data>
+  <data name="Settings.Data.Delete.StillSnoozed" xml:space="preserve"><value>スヌーズ中の一部のタスクを再開できなかったため、何も削除されませんでした。先にタスクを再開してください。アプリを管理者として実行していたときにスヌーズしたタスクの再開には、管理者権限が必要です。</value></data>
 </root>

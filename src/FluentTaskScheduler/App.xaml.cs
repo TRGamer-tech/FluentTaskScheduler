@@ -91,6 +91,9 @@ public partial class App : Application, IAppLifetime, IDisposable
         // Starting the app again and clicking one of its notifications both ask for the window.
         var ui = _services.GetRequiredService<IUiThread>();
         _instance.OnShowRequested(() => ui.Post(windows.ShowMainWindow));
+
+        // The uninstaller asks a running app to end before it deletes the app's files.
+        _instance.OnExitRequested(() => ui.Post(Exit));
         var notifier = _services.GetRequiredService<ToastNotifier>();
         notifier.Activated += () => ui.Post(windows.ShowMainWindow);
         notifier.Start();
@@ -187,6 +190,15 @@ public partial class App : Application, IAppLifetime, IDisposable
 
     // Ends the message loop; Program then disposes the app, which saves what is pending.
     void IAppLifetime.Exit() => Exit();
+
+    /// <summary>Whether Program is to delete the app's data once this app is disposed.</summary>
+    internal bool DeletesDataOnExit { get; private set; }
+
+    void IAppLifetime.ExitAndDeleteData()
+    {
+        DeletesDataOnExit = true;
+        Exit();
+    }
 
     public bool RestartElevated()
     {

@@ -28,7 +28,8 @@ public sealed class AppPaths
 
         // Publisher, then product, as Windows programs do. It stays with the computer rather than
         // roaming with the account: nearly everything in it is about the tasks of this computer.
-        DataFolder = Path.Combine(localAppData, "TRGamer-tech", "FluentTaskScheduler");
+        PublisherFolder = Path.Combine(localAppData, "TRGamer-tech");
+        DataFolder = Path.Combine(PublisherFolder, "FluentTaskScheduler");
         Version19 = new AppPaths(Path.Combine(localAppData, "FluentTaskScheduler"));
     }
 
@@ -49,4 +50,7 @@ public sealed class AppPaths
     /// somebody chose: that one never was anywhere else.
     /// </summary>
     internal AppPaths? Version19 { get; }
+
+    /// <summary>The folder above the data folder, which is there for it alone; null for a data folder that somebody chose.</summary>
+    internal string? PublisherFolder { get; }
 }

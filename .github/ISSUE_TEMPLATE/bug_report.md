@@ -23,9 +23,9 @@ What you did, what the app did, and what you expected it to do.
 - App language: [English, German, Japanese, Chinese]
 
 ### Logs
-The app writes its logs to `%LOCALAPPDATA%\FluentTaskScheduler`. Please attach `App_Log.txt`, and
-`Crash_Log.txt` if the app crashed. They can name your tasks and folders; remove what you would
-rather not share.
+The app writes its logs to `%LOCALAPPDATA%\TRGamer-tech\FluentTaskScheduler` (versions before 2.0:
+`%LOCALAPPDATA%\FluentTaskScheduler`). Please attach `App_Log.txt`, and `Crash_Log.txt` if the app
+crashed. They can name your tasks and folders; remove what you would rather not share.
 
 ### Screenshots
 If they help to show the problem.

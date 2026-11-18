@@ -6,13 +6,15 @@ namespace FluentTaskScheduler;
 
 /// <summary>
 /// Makes sure a user runs the app once per Windows session. A second start asks the first
-/// instance to show its window and ends.
+/// instance to show its window and ends. The uninstaller's start asks it to end instead.
 /// </summary>
 public sealed class SingleInstance : IDisposable
 {
     private readonly Mutex _mutex;
     private readonly EventWaitHandle _showRequested;
+    private readonly EventWaitHandle _exitRequested;
     private RegisteredWaitHandle? _listener;
+    private RegisteredWaitHandle? _exitListener;
 
     /// <param name="name">Identifies the app; instances with the same name exclude each other.</param>
     /// <param name="waitForPrevious">How long to wait for an instance that is about to exit, as when the app restarts itself.</param>
@@ -40,6 +42,7 @@ public sealed class SingleInstance : IDisposable
         var eventSecurity = new EventWaitHandleSecurity();
         eventSecurity.AddAccessRule(new EventWaitHandleAccessRule(user, EventWaitHandleRights.FullControl, AccessControlType.Allow));
         _showRequested = EventWaitHandleAcl.Create(initialState: false, EventResetMode.AutoReset, name + "_Show", out _, eventSecurity);
+        _exitRequested = EventWaitHandleAcl.Create(initialState: false, EventResetMode.AutoReset, name + "_Exit", out _, eventSecurity);
     }
 
     public bool IsFirst { get; }
@@ -57,13 +60,40 @@ public sealed class SingleInstance : IDisposable
     public void OnShowRequested(Action show) =>
         _listener = ThreadPool.RegisterWaitForSingleObject(_showRequested, (_, _) => show(), null, Timeout.Infinite, executeOnlyOnce: false);
 
+    /// <summary>
+    /// From a later instance, on the thread that created it: asks the first one to end and waits
+    /// until it has, for as long as <paramref name="patience"/> lasts.
+    /// </summary>
+    /// <returns>False if the first instance is still running then.</returns>
+    public bool AskFirstToExit(TimeSpan patience)
+    {
+        _exitRequested.Set();
+        try
+        {
+            // The first instance holds the mutex until it ends.
+            if (!_mutex.WaitOne(patience)) return false;
+        }
+        catch (AbandonedMutexException)
+        {
+            // It ended without releasing the mutex, which is ended all the same.
+        }
+        _mutex.ReleaseMutex();
+        return true;
+    }
+
+    /// <summary>In the first instance: runs <paramref name="exit"/> on a pool thread when a later instance asks.</summary>
+    public void OnExitRequested(Action exit) =>
+        _exitListener = ThreadPool.RegisterWaitForSingleObject(_exitRequested, (_, _) => exit(), null, Timeout.Infinite, executeOnlyOnce: true);
+
     /// <summary>Must be called on the thread that created the instance, which is the one holding the mutex.</summary>
     public void Dispose()
     {
         _listener?.Unregister(null);
+        _exitListener?.Unregister(null);
         if (IsFirst) _mutex.ReleaseMutex();
         _mutex.Dispose();
         _showRequested.Dispose();
+        _exitRequested.Dispose();
     }
 
     private const int AnyProcess = -1;

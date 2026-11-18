@@ -228,11 +228,15 @@ ended and, where that helps, its last lines.
 - Show hidden tasks, on by default.
 - Confirm before deleting, on by default.
 - Logging, on by default, with errors in a file of their own unless Separate log files is switched
-  off. Links open the log files and the data folder.
+  off. Links open the log files.
 - Execution history log, off by default: the app keeps every finished run in monthly files of its
   own and deletes all but the twelve newest of them. The history of Windows is limited in size and
   overwrites itself.
 - Export and import of the settings as a JSON file.
+- Data folder: where the app keeps its files, with a link that opens the folder.
+- Delete app data: takes your settings, saved scripts, execution history and logs off the computer
+  and ends the app. Uninstalling does not do that. See
+  [Where the app keeps its files](#where-the-app-keeps-its-files).
 - Lists of categories and tags for your tasks.
 - About: the version, a check for updates, the release notes, the welcome tour, and links to the
   source code and to report a problem.
@@ -327,18 +331,38 @@ Administrator rights are needed to change tasks of other users or of Windows, to
 runs as SYSTEM or with highest privileges, to pick one particular network for a task's network
 condition, to switch on the task history, and for three of the quick actions. The app says so when Windows refuses, and can restart itself as administrator.
 
-## Where the app keeps its data
+## Where the app keeps its files
 
-The app keeps its own files in `%LOCALAPPDATA%\FluentTaskScheduler`: the settings
+The app keeps its own files in `%LOCALAPPDATA%\TRGamer-tech\FluentTaskScheduler`: the settings
 (`settings.json`), the logs, the scripts you saved in the library (`Scripts`; the built-in ones come
 with the app), the record of snoozes (`snooze.json`) and the execution history log
-(`ExecutionHistory`). The environment variable `FLUENTTASKSCHEDULER_DATA` moves all of it to another
-folder. The tasks themselves live in the Task Scheduler, not in the app.
+(`ExecutionHistory`). The Data section of the settings shows the path and opens the folder. The
+environment variable `FLUENTTASKSCHEDULER_DATA` makes the app use another folder instead. The tasks
+themselves live in the Task Scheduler, not in the app.
 
-An installation for you alone puts the app itself into the same folder, in `current` and
-`packages`. To start afresh, delete the files above rather than the folder. Uninstalling such an
-installation can remove the whole folder, settings and saved scripts included, so export the
-settings and copy the `Scripts` folder first if you want to keep them.
+**Uninstalling leaves these files where they are**, and so does every update, so a later
+installation finds your settings and scripts again. To take them off the computer as well, choose
+**Delete App Data** in the Data section of the settings before you uninstall: it resumes snoozed
+tasks, switches Start with Windows off, deletes the files and ends the app. A task that runs one of
+your saved scripts fails once the script is gone. Deleting the folder by hand while the app is
+closed does the same for the files; the portable ZIP has no uninstaller, so that is how a portable
+copy is removed for good. Tasks that are snoozed when the app is uninstalled stay disabled: resume
+them first, or enable them in the Task Scheduler of Windows.
+
+Versions before 2.0 kept these files in `%LOCALAPPDATA%\FluentTaskScheduler`. For an installation
+for you alone that is also the folder of the app itself, and uninstalling removed it with
+everything in it. Version 2.0 moves the files to the new folder the first time it starts, whether
+it opens a window or answers a command. The saved scripts are copied and stay in the old `Scripts`
+folder as well: a task you created from a script before 2.0 runs the script from there. When you
+change such a script in the editor, the app changes that copy too, and it deletes the copy with
+the script. That old folder is still removed by an uninstall, so create such a task anew from the
+library to make it independent of it.
+
+**Update from 1.9 to 2.0 from inside the app.** Running the Setup MSI of 2.0 over an older version,
+which is also what `winget upgrade` and Chocolatey do, lets the old version uninstall itself first,
+and for most installations that deletes the old folder with your settings and scripts before
+version 2.0 gets to move them. If you update that way, export your settings and copy the `Scripts`
+folder first. From 2.0 on, every way of updating keeps your files.
 
 Logging is on by default and can be switched off in the settings. What the app does goes to
 `App_Log.txt`. Its errors go to `Error_Log.txt` while the setting Separate log files is on (the

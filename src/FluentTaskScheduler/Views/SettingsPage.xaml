@@ -180,11 +180,6 @@
                                         Header="{x:Bind l:Loc.Get('Settings.Adv.CrashLog')}"
                                         Description="{x:Bind l:Loc.Get('Settings.Adv.CrashLogDesc')}"
                                         Command="{x:Bind ViewModel.OpenCrashLogCommand}"/>
-                        <c:SettingsLink Background="Transparent" BorderThickness="0" ActionGlyph="&#xE8A7;"
-                                        AutomationProperties.AutomationId="OpenDataFolderLink"
-                                        Header="{x:Bind l:Loc.Get('Settings.Adv.DataFolder.Title')}"
-                                        Description="{x:Bind l:Loc.Get('Settings.Adv.DataFolder.Desc')}"
-                                        Command="{x:Bind ViewModel.OpenDataFolderCommand}"/>
                     </StackPanel>
                 </Expander>
 
@@ -221,6 +216,19 @@
                     <Button MinWidth="120" AutomationProperties.AutomationId="ImportSettingsButton"
                             Content="{x:Bind l:Loc.Get('Settings.Data.ImportBtn')}"
                             Command="{x:Bind ViewModel.ImportCommand}"/>
+                </c:SettingsCard>
+
+                <c:SettingsLink Glyph="&#xE8B7;" ActionGlyph="&#xE8A7;" AutomationProperties.AutomationId="OpenDataFolderLink"
+                                Header="{x:Bind l:Loc.Get('Settings.Adv.DataFolder.Title')}"
+                                Description="{x:Bind ViewModel.DataFolderDescription}"
+                                Command="{x:Bind ViewModel.OpenDataFolderCommand}"/>
+
+                <c:SettingsCard Glyph="&#xE74D;"
+                                Header="{x:Bind l:Loc.Get('Settings.Data.Delete.Title')}"
+                                Description="{x:Bind l:Loc.Get('Settings.Data.Delete.Desc')}">
+                    <Button MinWidth="120" AutomationProperties.AutomationId="DeleteAppDataButton"
+                            Content="{x:Bind l:Loc.Get('Settings.Data.DeleteBtn')}"
+                            Command="{x:Bind ViewModel.DeleteAppDataCommand}"/>
                 </c:SettingsCard>
 
                 <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="{x:Bind l:Loc.Get('Settings.Section.Categories')}"/>

@@ -29,6 +29,48 @@ public class SingleInstanceTests
     }
 
     [SkippableFact]
+    public void ALaterInstance_CanAskTheFirstToEnd_AndLearnsThatItHas()
+    {
+        Skip.IfNot(OperatingSystem.IsWindows(), "Needs Windows.");
+        using var asked = new ManualResetEventSlim();
+        using var ready = new ManualResetEventSlim();
+
+        // The first instance, on a thread of its own as in a process of its own: it ends when asked.
+        var first = new Thread(() =>
+        {
+            using var instance = new SingleInstance(_name, TimeSpan.Zero);
+            instance.OnExitRequested(asked.Set);
+            ready.Set();
+            asked.Wait(TimeSpan.FromSeconds(20));
+        });
+        first.Start();
+        Assert.True(ready.Wait(TimeSpan.FromSeconds(10)));
+
+        using var later = new SingleInstance(_name, TimeSpan.Zero);
+        bool ended = later.AskFirstToExit(TimeSpan.FromSeconds(10));
+        first.Join();
+
+        Assert.False(later.IsFirst);
+        Assert.True(asked.IsSet, "The first instance was never asked to end.");
+        Assert.True(ended, "The later instance did not learn that the first one ended.");
+    }
+
+    [SkippableFact]
+    public void AFirstInstanceThatDoesNotEnd_IsNotWaitedForLongerThanAsked()
+    {
+        Skip.IfNot(OperatingSystem.IsWindows(), "Needs Windows.");
+        using var first = new SingleInstance(_name, TimeSpan.Zero);
+
+        bool ended = OnAnotherThread(() =>
+        {
+            using var later = new SingleInstance(_name, TimeSpan.Zero);
+            return later.AskFirstToExit(TimeSpan.FromMilliseconds(200));
+        });
+
+        Assert.False(ended);
+    }
+
+    [SkippableFact]
     public void AfterTheFirstInstanceIsGone_TheNextOneIsFirst()
     {
         Skip.IfNot(OperatingSystem.IsWindows(), "Needs Windows.");

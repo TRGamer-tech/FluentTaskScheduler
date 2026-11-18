@@ -1,6 +1,7 @@
 using System.Reflection;
 using FluentTaskScheduler.Logging;
 using FluentTaskScheduler.Settings;
+using FluentTaskScheduler.Snoozing;
 using FluentTaskScheduler.Tests.Support;
 using FluentTaskScheduler.Updates;
 using FluentTaskScheduler.ViewModels;
@@ -22,6 +23,7 @@ public sealed class SettingsViewModelTests : IDisposable
     private readonly ScriptedFilePicker _files = new();
     private readonly ScriptedPrompts _prompts = new();
     private readonly RecordingLauncher _launcher = new();
+    private readonly FakeSnoozeService _snooze = new() { Resumes = true };
     private readonly SettingsViewModel _page;
     private readonly List<string?> _changed = [];
 
@@ -43,7 +45,7 @@ public sealed class SettingsViewModelTests : IDisposable
     }
 
     private SettingsViewModel NewPage() => new(
-        _settings, _startup, _logging, _folder.Paths, _app, _updates, _notes, _dialogs, _files, _prompts, _launcher, new InlineUiThread());
+        _settings, _startup, _logging, _folder.Paths, _app, _updates, _notes, _dialogs, _files, _prompts, _launcher, _snooze, _lifetime, new InlineUiThread());
 
     private static readonly string[] SwitchNames =
     [
@@ -403,6 +405,71 @@ public sealed class SettingsViewModelTests : IDisposable
 
         Assert.Equal([_folder.Paths.DataFolder, _folder.Paths.ExecutionHistoryFolder], _launcher.Opened);
         Assert.True(Directory.Exists(_folder.Paths.ExecutionHistoryFolder));
+    }
+
+    [Fact]
+    public void TheEntryForTheDataFolder_SaysWhereTheFolderIs() =>
+        Assert.Equal($"Settings.Adv.DataFolder.Desc\n{_folder.Paths.DataFolder}", _page.DataFolderDescription);
+
+    [Fact]
+    public async Task DeletingTheAppsData_IsAskedFirst_AndLeftToTheEndOfTheApp()
+    {
+        await _page.DeleteAppDataCommand.ExecuteAsync(null);
+
+        Assert.Equal(["Settings.Data.Delete.Confirm.Title: Settings.Data.Delete.Confirm.Content [Dialog.Common.Delete]"], _prompts.Shown);
+        Assert.True(_lifetime.DataDeletionRequested);
+    }
+
+    [Fact]
+    public async Task ADeclinedDeletion_ChangesNothing()
+    {
+        _prompts.Confirm = false;
+        _snooze.Publish(new SnoozeState { Global = new GlobalSnooze(SnoozeWindow.UntilRestart, SuspendsTriggers: true, [@"\Backup"]) });
+
+        await _page.DeleteAppDataCommand.ExecuteAsync(null);
+
+        Assert.False(_lifetime.DataDeletionRequested);
+        Assert.False(_lifetime.ExitRequested);
+        Assert.Empty(_snooze.Calls);
+    }
+
+    [Fact]
+    public async Task BeforeTheAppsDataIsDeleted_EverySnoozeIsEnded_SoThatNoTaskStaysDisabled()
+    {
+        _snooze.Publish(new SnoozeState
+        {
+            Global = new GlobalSnooze(SnoozeWindow.UntilRestart, SuspendsTriggers: true, [@"\Backup"]),
+            Tasks = [new TaskSnooze(@"\Report", SnoozeWindow.UntilRestart), new TaskSnooze(@"\Sync", SnoozeWindow.UntilRestart)]
+        });
+
+        await _page.DeleteAppDataCommand.ExecuteAsync(null);
+
+        Assert.Equal(["ResumeAll", @"ResumeTask \Report", @"ResumeTask \Sync"], _snooze.Calls);
+        Assert.True(_lifetime.DataDeletionRequested);
+    }
+
+    [Fact]
+    public async Task WhileATaskCannotBeResumed_NothingIsDeleted_AndTheUserIsTold()
+    {
+        _snooze.Resumes = false;
+        _snooze.Publish(new SnoozeState { Tasks = [new TaskSnooze(@"\Report", SnoozeWindow.UntilRestart)] });
+
+        await _page.DeleteAppDataCommand.ExecuteAsync(null);
+
+        Assert.False(_lifetime.DataDeletionRequested);
+        Assert.False(_lifetime.ExitRequested);
+        Assert.Equal("Error: Settings.Data.Delete.StillSnoozed", _prompts.Shown[^1]);
+    }
+
+    [Fact]
+    public async Task ATaskThatASnoozeLeftDisabled_AlsoKeepsTheAppsData()
+    {
+        _snooze.Publish(new SnoozeState { PendingRestores = [new PendingRestore(@"\Backup", RestoreFailure.Error, "The task image is corrupt.")] });
+
+        await _page.DeleteAppDataCommand.ExecuteAsync(null);
+
+        Assert.False(_lifetime.DataDeletionRequested);
+        Assert.Equal("Error: Settings.Data.Delete.StillSnoozed", _prompts.Shown[^1]);
     }
 
     [Fact]
