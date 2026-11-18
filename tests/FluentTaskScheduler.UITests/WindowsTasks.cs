@@ -24,6 +24,17 @@ public sealed class WindowsTasks : IDisposable
     /// </summary>
     public static WindowsTasks Root { get; } = new("");
 
+    /// <summary>
+    /// A folder under a name a user might have given it, for tasks that are to pass for a user's
+    /// own. Like any other it is removed again with everything in it, which must never happen to
+    /// a folder that was there before: where the machine already has one of that name, the answer
+    /// is null.
+    /// </summary>
+    public static WindowsTasks? Named(string name) =>
+        RunScript($"try {{ $null = $scheduler.GetFolder('\\{name}'); 'taken' }} catch {{ 'free' }}").Trim() == "free"
+            ? new WindowsTasks(@"\" + name)
+            : null;
+
     public string Folder { get; }
 
     public string PathOf(string name) => Folder + @"\" + name;
@@ -57,6 +68,9 @@ public sealed class WindowsTasks : IDisposable
 
     /// <summary>Starts the task now, from outside the app.</summary>
     public void Start(string name) => Run($"/Run /TN \"{PathOf(name)}\"");
+
+    /// <summary>Ends the run of the task, if one is going on.</summary>
+    public void Stop(string name) => TryRun($"/End /TN \"{PathOf(name)}\"", out _);
 
     /// <summary>Whether the task is running: schtasks /Run only asks Task Scheduler to start it.</summary>
     public bool IsRunning(string name) =>
