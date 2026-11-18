@@ -33,12 +33,14 @@ dotnet publish src/FluentTaskScheduler -c Release -p:Platform=x64 -o publish
 
 # The UI tests, against that build. They need an elevated terminal and take over mouse and
 # keyboard while they run. Whatever they create in Task Scheduler is in a folder, or under
-# a name, that begins with FtsUiTests_.
+# a name, that begins with FtsUiTests_, with the one exception described below.
 $env:FTS_APP_EXE = "$PWD\publish\FluentTaskScheduler.exe"
 dotnet test tests/FluentTaskScheduler.UITests
 ```
 
 Every push to `main` and every pull request runs all of this on Windows for x64 and ARM64 (`.github/workflows/build.yml`). The UI tests leave screenshots of what they saw as an artifact of the run, which is the quickest way to find out why one of them failed.
+
+The screenshots in the README are taken by the UI tests as well, but only on request: when `FTS_README_SCREENSHOTS` is `1`, as it is for the x64 build of the workflow. They need a display at a scale of 100 % with room for a window of 1280 by 800 pixels. For these the tests fill a task folder `\Housekeeping` with tasks that look like a user's own, which is the exception to the rule about names, and remove the folder again afterwards. On a machine that already has a task folder of that name they take no pictures. The pictures are in the folder `readme` of the artifact `ui-artifacts-win-x64`, under the names they have in `Assets/`: look them over, then copy them there.
 
 ## How to contribute
 
