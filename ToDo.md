@@ -63,8 +63,9 @@ has a test; the UI tests drive the published app on Windows x64 and ARM64 in CI.
 
 ### Quick actions, library and script editor
 - The output of sfc, DISM and other console programs arrives in full and in the right encoding.
-- Tab indents the selected lines of a script; the script stays in the editor when a setting rebuilds
-  the pages.
+- Tab indents the selected lines of a script.
+- When a setting rebuilds the pages, as a change of language does, the script stays in the editor
+  with its output, and a script or quick action that is running runs on.
 
 ### Texts, updates and packaging
 - 263 texts that nothing showed were removed; German says "du" throughout; Japanese and Chinese use
