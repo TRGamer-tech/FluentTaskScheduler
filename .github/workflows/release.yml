@@ -556,15 +556,23 @@ jobs:
 
       # The notes are the ones written for this version, or else GitHub's list of what was
       # merged. The table of hashes is always written here, from the files that get attached.
+      # A first line like "# V2.0.0 - The ... Update" in the written notes is the title of the
+      # release and not part of its text.
       - name: Write the release notes
+        id: notes
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
           $written = ".github/release-notes/$env:TAG.md"
+          $title = ''
           if (Test-Path $written) {
             $notes = Get-Content $written -Raw
             if ($notes -match 'Artifacts and Hashes') {
               throw "$written has its own table of hashes. Take it out: the table is written by this workflow."
+            }
+            if ($notes -match '\A\s*# (?<title>[^\r\n]+)\r?\n') {
+              $title = $Matches.title.Trim()
+              $notes = $notes.Substring($Matches[0].Length).TrimStart()
             }
           } else {
             $generated = gh api "repos/$env:GH_REPO/releases/generate-notes" -f "tag_name=$env:TAG" -f "target_commitish=$env:GITHUB_SHA" --jq .body
@@ -582,11 +590,13 @@ jobs:
           )
           Set-Content notes.md (@("$notes".TrimEnd(), '') + $table)
           Get-Content notes.md
+          "title=$title" >> $env:GITHUB_OUTPUT
 
       - name: Create the draft or bring it up to date
         shell: pwsh
         env:
           DRAFT_EXISTS: ${{ steps.existing.outputs.draft }}
+          TITLE: ${{ steps.notes.outputs.title }}
         run: |
           $ErrorActionPreference = 'Stop'
           $files = @(
@@ -596,7 +606,9 @@ jobs:
           ) | ForEach-Object { (Get-Item "Dist/$_").FullName }
 
           if ($env:DRAFT_EXISTS -eq 'True') {
-            gh release edit $env:TAG --target $env:GITHUB_SHA --notes-file notes.md
+            # Without a title in the notes, the one the draft has stays: it may have been given by hand.
+            $retitle = if ($env:TITLE) { '--title', $env:TITLE } else { @() }
+            gh release edit $env:TAG --target $env:GITHUB_SHA --notes-file notes.md @retitle
             if ($LASTEXITCODE -ne 0) { throw "The draft $env:TAG could not be changed." }
 
             $attached = gh release view $env:TAG --json assets --jq '.assets[].name'
@@ -608,6 +620,7 @@ jobs:
             gh release upload $env:TAG $files
             if ($LASTEXITCODE -ne 0) { throw "The files could not be attached to the draft $env:TAG." }
           } else {
-            gh release create $env:TAG --draft --target $env:GITHUB_SHA --title $env:TAG --notes-file notes.md $files
+            $title = if ($env:TITLE) { $env:TITLE } else { $env:TAG }
+            gh release create $env:TAG --draft --target $env:GITHUB_SHA --title $title --notes-file notes.md $files
             if ($LASTEXITCODE -ne 0) { throw "The draft $env:TAG could not be created." }
           }

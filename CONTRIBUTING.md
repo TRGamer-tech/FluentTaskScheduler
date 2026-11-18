@@ -71,7 +71,7 @@ This project uses [Velopack](https://velopack.io/) for installers and auto-updat
 **To release:**
 
 1. Set `<Version>` in `src/FluentTaskScheduler/FluentTaskScheduler.csproj`. The workflow builds with the version of the tag whatever that file says, but a build on your own machine calls itself what is written there.
-2. Write the release notes as `.github/release-notes/V2.X.X.md`, named exactly like the tag. Without that file the draft gets GitHub's list of the merged pull requests instead.
+2. Write the release notes as `.github/release-notes/V2.X.X.md`, named exactly like the tag. A first line like `# V2.X.X - The "..." Update` becomes the title of the release. Without that file the draft gets GitHub's list of the merged pull requests instead, and the tag as its title.
 3. Push the tag `V2.X.X`. Or start the workflow by hand ("Run workflow") on the branch you release from, type the version and tick **draft**: publishing that draft creates the tag on the commit the workflow ran on.
 
 The workflow builds both architectures with that version and packs them. Before it makes the draft, it checks on fresh machines that:
@@ -79,7 +79,7 @@ The workflow builds both architectures with that version and packs them. Before 
 - **the installer works the way winget and Chocolatey run it.** The x64 MSI installs silently, the installed app answers `--list`, and uninstalling removes the app. The user's files in `%LOCALAPPDATA%\TRGamer-tech\FluentTaskScheduler` stay. An app that started with Windows no longer does after the uninstall, and does again after a reinstallation: that is how a newer installer replaces this one, and it shows that the app does its part when the installer starts it for a moment.
 - **an installed 1.9.0 gets to the new version.** Both update feeds name exactly the package that is attached, with its size and hashes. Then 1.9.0 is installed per user, with settings and a script where it keeps them, and the new package is applied the way its updater does it. The new app has to have the new version and answer `--list`, the files have to be in the new place and nothing of the installer with them, the script has to be in the old place as well (tasks created with 1.9.0 run it from there), and uninstalling has to leave the files in the new place.
 
-Only if all of that works does it create the draft and attach the files. It names the draft like the tag; give it its title there.
+Only if all of that works does it create the draft and attach the files.
 
 The notes of the draft end with a table, "Artifacts and Hashes", of the SHA-256 of the four downloads. The workflow writes it from the very files it attaches, so leave it out of your notes file.
 
