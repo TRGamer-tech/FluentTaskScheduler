@@ -95,6 +95,8 @@ jobs:
           FTS_UI_ARTIFACTS: ${{ github.workspace }}\ui-artifacts
           # A fresh runner can show Windows' first sign-in screens on top of everything.
           FTS_UI_CLOSE_COVERING_WINDOWS: 1
+          # The pictures of the README need more room than the screen of the ARM64 runner has.
+          FTS_README_SCREENSHOTS: ${{ matrix.platform == 'x64' && '1' || '0' }}
         # A test held up by a dialog or by an app that stopped answering is ended after ten
         # minutes instead of holding the runner for hours. No dump: nothing would upload it.
         run: >
