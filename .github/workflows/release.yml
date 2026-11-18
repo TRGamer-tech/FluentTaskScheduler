@@ -1,13 +1,14 @@
 name: Release
 
-# Builds both architectures, packs them with Velopack and checks on a fresh machine that the
-# installer installs and uninstalls silently and leaves the user's files alone. Only then are
-# the eight release files attached to a draft GitHub Release. Its notes end with the SHA-256
-# of the four downloads, taken from the very files that are attached. The draft is reviewed
-# and published by hand.
+# Builds both architectures, packs them with Velopack and checks the result on fresh machines:
+# the installer installs and uninstalls silently and leaves the user's files alone, and an
+# installed 1.9.0 gets to the new version the way its own updater does it. Only then are the
+# eight release files attached to a draft GitHub Release. Its notes end with the SHA-256 of the
+# four downloads, taken from the very files that are attached. The draft is reviewed and
+# published by hand.
 #
 # A pushed tag like V2.0.1 always ends in that draft. A manual run packs the version typed in,
-# runs the same check and keeps the files as artifacts of the run, which makes it the way to
+# runs the same checks and keeps the files as artifacts of the run, which makes it the way to
 # try the packaging out. With "draft" ticked it also creates the draft, for the commit it ran
 # on, or brings the existing draft of that version up to date. A release that is already
 # published is never touched.
@@ -244,11 +245,225 @@ jobs:
           $data = Join-Path $env:LOCALAPPDATA $env:DATA_FOLDER
           if (Test-Path $data) { Remove-Item $data -Recurse -Force }
 
+  # An installed 1.9.0 has to get to this version by itself. Its updater reads the feed
+  # (releases.*.json) attached to the release, downloads the package the feed names, compares
+  # size and hash, and hands the package to Velopack's Update.exe. The download needs a
+  # published release, so it cannot be gone through here; everything around it is.
+  #
+  # 1.9.0 is also the last version that keeps the user's files in the folder
+  # %LOCALAPPDATA%\FluentTaskScheduler, which is the very folder its installer puts the app in
+  # when it is installed per user. The new version moves them out of there at its first start,
+  # and must take nothing with it that belongs to the installer.
+  verify-update:
+    needs: package
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      VERSION: ${{ needs.package.outputs.version }}
+    steps:
+      - name: Download release files
+        uses: actions/download-artifact@v8
+        with:
+          pattern: Dist-*
+          path: Dist
+          merge-multiple: true
+
+      - name: Check the update feeds
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          foreach ($channel in 'win-x64', 'win-arm64') {
+            $package = Get-Item "Dist/FluentTaskScheduler-$env:VERSION-$channel-full.nupkg"
+            $named = @((Get-Content "Dist/releases.$channel.json" -Raw | ConvertFrom-Json).Assets)
+            if ($named.Count -ne 1) { throw "releases.$channel.json names $($named.Count) packages; one is attached." }
+
+            # The updater takes the newest full package of the feed and looks for a file of that
+            # name in the release. It compares the hash letter for letter, so its case counts.
+            $attached = [ordered]@{
+              Version  = $env:VERSION
+              Type     = 'Full'
+              FileName = $package.Name
+              Size     = $package.Length
+              SHA1     = (Get-FileHash $package.FullName -Algorithm SHA1).Hash
+              SHA256   = (Get-FileHash $package.FullName -Algorithm SHA256).Hash
+            }
+            foreach ($property in $attached.Keys) {
+              if ("$($named[0].$property)" -cne "$($attached[$property])") {
+                throw "releases.$channel.json has $property '$($named[0].$property)'; the attached package has '$($attached[$property])'."
+              }
+            }
+            "releases.$channel.json names $($package.Name): $($package.Length) bytes, SHA-256 $($attached.SHA256)"
+          }
+
+      - name: Install 1.9.0
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $msi = Join-Path $env:RUNNER_TEMP 'FluentTaskScheduler-1.9.0-Setup-x64.msi'
+          Invoke-WebRequest 'https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/V1.9.0/Setup-x64.msi' -OutFile $msi -MaximumRetryCount 3 -RetryIntervalSec 5
+          $hash = (Get-FileHash $msi -Algorithm SHA256).Hash
+          if ($hash -ne 'AFAD2A1E61E4B3F87C1EE2B7ED4E55CFAC9B13DBC5AF7CA99745DA4977539362') {
+            throw "The installer of 1.9.0 is not the published one any more: its SHA-256 is $hash."
+          }
+
+          # The installer of 1.9.0 chooses its folder in a dialog. Without the dialog the app
+          # lands in the root of a drive, so the folder the dialog sets for "per user" is named.
+          $folder = Join-Path $env:LOCALAPPDATA 'FluentTaskScheduler'
+          $install = Start-Process msiexec.exe -ArgumentList "/i `"$msi`" /qn /norestart /l*v install-1.9.0.log INSTALLFOLDER=`"$folder`"" -Wait -PassThru
+          if ($install.ExitCode -ne 0) {
+            Get-Content install-1.9.0.log -Tail 80
+            throw "The installer of 1.9.0 ended with exit code $($install.ExitCode)."
+          }
+
+          $installed = Select-String -Path install-1.9.0.log -Pattern 'Property\(S\): INSTALLFOLDER = (.+)$' |
+                       Select-Object -Last 1 | ForEach-Object { $_.Matches[0].Groups[1].Value.Trim() }
+          $exe = Join-Path $folder 'current\FluentTaskScheduler.exe'
+          if ("$installed".TrimEnd('\') -ne $folder -or -not (Test-Path $exe)) {
+            Select-String -Path install-1.9.0.log -Pattern 'INSTALLFOLDER|TARGETDIR|ALLUSERS' | Select-Object -First 30 -ExpandProperty Line
+            throw "1.9.0 was to be installed in $folder; its installer says it went to '$installed'."
+          }
+          "Installed: $exe, version $((Get-Item $exe).VersionInfo.FileVersion)"
+
+          "FTS_OLD_MSI=$msi" >> $env:GITHUB_ENV
+          "FTS_ROOT=$folder" >> $env:GITHUB_ENV
+          "FTS_DATA=$(Join-Path $env:LOCALAPPDATA $env:DATA_FOLDER)" >> $env:GITHUB_ENV
+
+      - name: Put files where 1.9.0 keeps them
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Set-Content (Join-Path $env:FTS_ROOT 'settings.json') '{ "Theme": "Dark", "ReminderLeadMinutes": 17 }'
+
+          Set-Content saved-with-1.9.0.ps1 "Write-Output 'Saved with 1.9.0'"
+          New-Item -ItemType Directory -Force (Join-Path $env:FTS_ROOT 'Scripts') | Out-Null
+          Copy-Item saved-with-1.9.0.ps1 (Join-Path $env:FTS_ROOT 'Scripts\Saved with 1.9.0.ps1')
+
+      - name: Update the way the app does it
+        timeout-minutes: 10
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $updater = Join-Path $env:FTS_ROOT 'Update.exe'
+          $package = Get-Item "Dist/FluentTaskScheduler-$env:VERSION-win-x64-full.nupkg"
+
+          # Update.exe is a windowed program, and the one 1.9.0 installed (Velopack 0.0.1444)
+          # answers --help the way it reports an error: on the error output, with a failing
+          # exit code. So both outputs are caught in files and the exit code is not looked at.
+          function Show-Updater([string] $which) {
+            "--- $which is version $((Get-Item $updater).VersionInfo.ProductVersion) and says about itself:"
+            Start-Process $updater -ArgumentList '--help' -Wait -NoNewWindow -RedirectStandardOutput help.txt -RedirectStandardError help-error.txt
+            Get-Content help.txt, help-error.txt
+          }
+          Show-Updater 'The Update.exe that 1.9.0 installed'
+
+          # What the updater of 1.9.0 does once its download is complete (Velopack 0.0.1298,
+          # UpdateManager.DownloadUpdatesAsync): the package lies in "packages", and the
+          # Update.exe it carries under the name Squirrel.exe takes the place of the installed one.
+          $packages = Join-Path $env:FTS_ROOT 'packages'
+          New-Item -ItemType Directory -Force $packages | Out-Null
+          $downloaded = Join-Path $packages $package.Name
+          Copy-Item $package.FullName $downloaded
+
+          Add-Type -Assembly System.IO.Compression.FileSystem
+          $archive = [System.IO.Compression.ZipFile]::OpenRead($downloaded)
+          $carried = $archive.Entries | Where-Object { $_.FullName.EndsWith('Squirrel.exe') } | Select-Object -First 1
+          if ($carried) { [System.IO.Compression.ZipFileExtensions]::ExtractToFile($carried, $updater, $true) }
+          $archive.Dispose()
+          Show-Updater 'The Update.exe that applies the package'
+
+          # Then it starts Update.exe and ends (UpdateExe.Apply): "apply --package <file>
+          # --waitPid <the app>". Here no app has to end first. --silent and --norestart keep
+          # the progress window and the app's own window from opening on this machine.
+          $apply = Start-Process $updater -ArgumentList "--silent apply --package `"$downloaded`" --norestart" -Wait -PassThru
+          Get-Item (Join-Path $env:LOCALAPPDATA 'velopack\*.log') -ErrorAction SilentlyContinue |
+            ForEach-Object { "--- $($_.FullName)"; Get-Content $_.FullName -Tail 100 }
+          if ($apply.ExitCode -ne 0) { throw "Update.exe ended with exit code $($apply.ExitCode)." }
+
+      - name: Check the updated app and the user's files
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $exe = Join-Path $env:FTS_ROOT 'current\FluentTaskScheduler.exe'
+          $file = (Get-Item $exe).VersionInfo
+          $found = "$($file.FileMajorPart).$($file.FileMinorPart).$($file.FileBuildPart)"
+          if ($found -ne $env:VERSION) { throw "The app in $env:FTS_ROOT\current is version $found, not $env:VERSION." }
+
+          $list = Start-Process $exe -ArgumentList '--list' -Wait -PassThru -NoNewWindow -RedirectStandardOutput list.json
+          if ($list.ExitCode -ne 0) { throw "The updated app answered --list with exit code $($list.ExitCode)." }
+          $answer = "$(Get-Content list.json -Raw)".Trim()
+          if (-not $answer.StartsWith('[')) { throw "The updated app answered --list with something that is no list of tasks: '$answer'" }
+          "The updated app lists $(@($answer | ConvertFrom-Json).Count) tasks."
+
+          # The new version moves the user's files when it starts, and by now it has started.
+          $settings = Join-Path $env:FTS_DATA 'settings.json'
+          $saved = Join-Path $env:FTS_DATA 'Scripts\Saved with 1.9.0.ps1'
+          $wrong = @(
+            if (-not (Test-Path $settings)) { "settings.json did not arrive in $env:FTS_DATA." }
+            elseif ((Get-Content $settings -Raw | ConvertFrom-Json).ReminderLeadMinutes -ne 17) { 'settings.json lost the reminder time that was set with 1.9.0.' }
+
+            if (-not (Test-Path $saved)) { "The script did not arrive in $env:FTS_DATA\Scripts." }
+            elseif ((Get-FileHash $saved).Hash -ne (Get-FileHash saved-with-1.9.0.ps1).Hash) { 'The script is not the one that was saved with 1.9.0.' }
+
+            foreach ($left in 'settings.json', 'Scripts\Saved with 1.9.0.ps1') {
+              if (Test-Path (Join-Path $env:FTS_ROOT $left)) { "$left is still in the install folder." }
+            }
+            foreach ($own in 'Update.exe', 'FluentTaskScheduler.exe', '.msi-installed', 'current\sq.version', "packages\FluentTaskScheduler-$env:VERSION-win-x64-full.nupkg") {
+              if (-not (Test-Path (Join-Path $env:FTS_ROOT $own))) { "$own belongs to the installer and is gone from the install folder." }
+            }
+          )
+          if ($wrong) {
+            $wrong
+            throw "The user's files did not move the way they should have."
+          }
+
+      - name: Uninstall, which leaves the user's files alone
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $uninstall = Start-Process msiexec.exe -ArgumentList "/x `"$env:FTS_OLD_MSI`" /qn /norestart /l*v uninstall-1.9.0.log" -Wait -PassThru
+          if ($uninstall.ExitCode -ne 0) {
+            Get-Content uninstall-1.9.0.log -Tail 80
+            throw "Uninstalling ended with exit code $($uninstall.ExitCode)."
+          }
+          if (Test-Path (Join-Path $env:FTS_ROOT 'current\FluentTaskScheduler.exe')) {
+            Select-String -Path uninstall-1.9.0.log -Pattern 'INSTALLFOLDER' | Select-Object -First 20 -ExpandProperty Line
+            throw 'The app is still there after uninstalling.'
+          }
+          foreach ($kept in 'settings.json', 'Scripts\Saved with 1.9.0.ps1') {
+            if (-not (Test-Path (Join-Path $env:FTS_DATA $kept))) { throw "Uninstalling removed $kept from $env:FTS_DATA, which nobody asked for." }
+          }
+          if (Test-Path $env:FTS_ROOT) {
+            "Uninstalling left this behind in ${env:FTS_ROOT}:"
+            Get-ChildItem $env:FTS_ROOT -Recurse -Depth 1 | Select-Object -ExpandProperty FullName
+          }
+
+      # Where Velopack writes down what it did: the Update.exe of 1.9.0 and everything newer in
+      # %LOCALAPPDATA%\velopack, the library in the app of 1.9.0 as velopack.log in the install
+      # folder, and each of them in the temp folder when it cannot write there.
+      - name: Show what happened
+        if: failure()
+        shell: pwsh
+        run: |
+          $root = Join-Path $env:LOCALAPPDATA 'FluentTaskScheduler'
+          $data = Join-Path $env:LOCALAPPDATA $env:DATA_FOLDER
+
+          foreach ($file in 'Update.exe', 'current\FluentTaskScheduler.exe') {
+            $item = Get-Item (Join-Path $root $file) -ErrorAction SilentlyContinue
+            if ($item) { "$file is version $($item.VersionInfo.ProductVersion)" } else { "$file is not there" }
+          }
+          foreach ($folder in $root, $data) {
+            "--- $folder"
+            Get-ChildItem $folder -Recurse -Depth 1 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
+          }
+          $logs = (Join-Path $env:LOCALAPPDATA 'velopack\*.log'), (Join-Path $root 'velopack.log'), (Join-Path $env:TEMP 'velopack*.log')
+          Get-Item $logs -ErrorAction SilentlyContinue |
+            ForEach-Object { "--- $($_.FullName)"; Get-Content $_.FullName -Tail 200 }
+
   draft-release:
     # A pushed tag always drafts a release, a manual run when it was asked to; neither does
     # unless everything above worked.
     if: github.event_name == 'push' || inputs.draft
-    needs: [package, verify-installer]
+    needs: [package, verify-installer, verify-update]
     runs-on: ubuntu-latest
     permissions:
       contents: write
