@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Security.Principal;
 using System.Text;
 using System.Text.Json.Nodes;
 using FlaUI.Core;
@@ -572,11 +573,28 @@ public sealed class AppSession : IDisposable
     {
         KeepAppFiles(dataDir, artifactsDir);
 
-        try { if (!app.HasExited) app.Kill(); } catch { }
+        try { if (!app.HasExited && !AskToEnd(app)) app.Kill(); } catch { }
         app.Dispose();
         automation.Dispose();
         EndRunningCopies();
         try { Directory.Delete(dataDir, recursive: true); } catch (IOException) { } catch (UnauthorizedAccessException) { }
+    }
+
+    /// <summary>
+    /// Asks the app to end the way its uninstaller does, and waits a few seconds for it. An app
+    /// that ends by itself takes its icon out of the notification area; one that is ended from
+    /// outside leaves the icon there until the mouse pointer passes over it, and the taskbar of
+    /// Windows 10 lines such icons up in front of the one the next test looks for.
+    /// </summary>
+    /// <returns>False if the app is still running.</returns>
+    private static bool AskToEnd(Application app)
+    {
+        // The name the app gives the request, in SingleInstance: one per Windows account.
+        string request = $"FluentTaskScheduler_{WindowsIdentity.GetCurrent().User!.Value}_Exit";
+        if (!EventWaitHandle.TryOpenExisting(request, out EventWaitHandle? exit)) return false;
+
+        using (exit) exit.Set();
+        return Retry.WhileFalse(() => app.HasExited, TimeSpan.FromSeconds(5), TimeSpan.FromMilliseconds(100)).Success;
     }
 
     private static void KeepAppFiles(string dataDir, string artifactsDir)
