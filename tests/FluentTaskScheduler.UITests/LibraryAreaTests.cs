@@ -1,5 +1,6 @@
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Input;
+using FlaUI.Core.Patterns;
 using FlaUI.Core.WindowsAPI;
 
 namespace FluentTaskScheduler.UITests;
@@ -98,6 +99,52 @@ public class ScriptEditorTests
     }
 
     [Fact]
+    public void AScriptThatIsRunning_RunsOn_WhenAnotherLanguageBuildsThePagesAnew()
+    {
+        using var app = AppSession.Launch("script-run-rebuild");
+        app.Require("NavScriptEditor").Press();
+
+        // A line every half second, for longer than the way through the settings can take; the test stops the script.
+        app.Require("ScriptEditorText").AsTextBox().Text = "1..240 | ForEach-Object { \"fts-line $_\"; Start-Sleep -Milliseconds 500 }";
+        PressWhenEnabled(app, "ScriptEditorRun");
+        Assert.True(app.Find(e => e.Name == "fts-line 2", 60000) != null, "The script did not start writing.");
+
+        app.Require("NavSettings").Press();
+        app.Require("LanguageChoice", 30000).AsComboBox().Select(2); // the language of Windows, English, German, ...
+        Assert.True(app.Find(e => e.AutomationId == "PageTitle" && e.Name == "Einstellungen", 10000) != null, "The pages were not built anew in German.");
+        app.Require("NavScriptEditor").Press();
+
+        // The output follows the script, so its newest lines are the ones in view.
+        int seen = 0;
+        bool shown = AppSession.Eventually(() => (seen = NewestLine(app)) > 0);
+        bool wroteOn = shown && AppSession.Eventually(() => NewestLine(app) > seen);
+        app.Snapshot("running-on");
+        Assert.True(shown, "The editor of the new pages shows nothing of what the script writes.");
+        Assert.True(wroteOn, $"No line after 'fts-line {seen}' arrived in the editor of the new pages.");
+        Assert.False(app.Require("ScriptEditorRun").IsEnabled, "Run is available although the script is still running.");
+
+        PressWhenEnabled(app, "ScriptEditorStop");
+
+        // The app speaks German by now, and so does the note on how the run ended.
+        bool stopped = app.Find(e => e.Name == "[Vom Benutzer gestoppt]", 20000) != null;
+        app.Snapshot("stopped");
+        Assert.True(stopped, "The output does not say in German that the script was stopped.");
+        Assert.True(app.Find(e => e.AutomationId == "ScriptEditorRun" && e.IsEnabled, 5000) != null, "Run is not available again after stopping.");
+
+        // The list only holds the lines around the ones in view, and the lines from before the change
+        // are at its top. Nothing more is written, so the output stays where it is scrolled to.
+        var scroll = app.Require("ScriptEditorOutput").Patterns.Scroll.Pattern;
+        bool keptEarlierLines = AppSession.Eventually(() =>
+        {
+            if (app.Find(e => e.Name == "fts-line 1", 500) != null) return true;
+            scroll.SetScrollPercent(ScrollPatternConstants.NoScroll, 0);
+            return false;
+        });
+        app.Snapshot("top");
+        Assert.True(keptEarlierLines, "The output no longer shows what the script wrote before the pages were built anew.");
+    }
+
+    [Fact]
     public void Tab_IndentsTheSelectedLines_InsteadOfReplacingThem()
     {
         using var app = AppSession.Launch("script-indent");
@@ -122,6 +169,15 @@ public class ScriptEditorTests
                      ?? throw new InvalidOperationException($"'{automationId}' did not become available.");
         button.AsButton().Invoke();
     }
+
+    /// <summary>The highest number among the lines "fts-line 1", "fts-line 2", ... that the output shows; 0 when it shows none of them.</summary>
+    private static int NewestLine(AppSession app) =>
+        AppSession.Walk(app.Require("ScriptEditorOutput"))
+            .Select(element => element.NameOrEmpty())
+            .Where(name => name.StartsWith("fts-line ", StringComparison.Ordinal))
+            .Select(name => int.Parse(name["fts-line ".Length..]))
+            .DefaultIfEmpty()
+            .Max();
 }
 
 /// <summary>The library: its two sections and what they list.</summary>
