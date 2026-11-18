@@ -83,7 +83,7 @@ public sealed class FakeTaskStore : ITaskStore
     private TaskRow RowOf(string path, TaskDraft draft) => new(path)
     {
         LastRunTime = _runTimes.GetValueOrDefault(path).Last,
-        NextRunTime = _runTimes.GetValueOrDefault(path).Next,
+        NextRunTime = draft.Enabled ? _runTimes.GetValueOrDefault(path).Next : null,
         IsEnabled = draft.Enabled,
         State = StateOf(path),
         IsHidden = draft.Hidden,

@@ -19,7 +19,9 @@ internal static class TaskRowReader
             row.State = ToRowState(task.State);
             row.IsEnabled = task.Enabled;
             row.LastRunTime = NullIfNever(task.LastRunTime);
-            row.NextRunTime = NullIfNever(task.NextRunTime);
+            // Task Scheduler names no next run for a disabled task, and the library then works one
+            // out from the triggers: a moment at which the task is not going to run.
+            row.NextRunTime = task.Enabled ? NullIfNever(task.NextRunTime) : null;
 
             var definition = task.Definition;
             var metadata = TaskMetadata.Split(definition.RegistrationInfo.Description);

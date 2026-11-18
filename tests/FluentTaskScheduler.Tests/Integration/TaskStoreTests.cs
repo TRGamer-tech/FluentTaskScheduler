@@ -274,6 +274,24 @@ public class TaskStoreTests
     }
 
     [SkippableFact]
+    public void ADisabledTask_HasNoNextRun_UntilItIsEnabledAgain()
+    {
+        Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
+        using var sandbox = new SchedulerSandbox();
+        string path = _store.Save(NewDraft("Resting"), sandbox.FolderPath);
+        Assert.NotNull(_store.GetTask(path)?.NextRunTime);
+
+        _store.SetEnabled(path, false);
+
+        Assert.Null(_store.GetTask(path)?.NextRunTime);
+        Assert.Null(Assert.Single(_store.GetTasks(), row => row.Path == path).NextRunTime);
+
+        _store.SetEnabled(path, true);
+
+        Assert.NotNull(_store.GetTask(path)?.NextRunTime);
+    }
+
+    [SkippableFact]
     public void ATaskDisabledWhileItRuns_IsReadAsDisabled()
     {
         Skip.IfNot(SchedulerSandbox.IsElevated, "needs an elevated token");
