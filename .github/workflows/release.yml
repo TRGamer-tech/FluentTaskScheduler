@@ -207,6 +207,8 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          # An account that never had a program start with it has no such key yet.
+          if (-not (Test-Path $env:RUN_KEY)) { New-Item $env:RUN_KEY -Force | Out-Null }
           Set-ItemProperty $env:RUN_KEY -Name FluentTaskScheduler -Value "`"$env:FTS_EXE`""
 
       - name: Uninstall, which leaves the user's files alone
@@ -264,7 +266,7 @@ jobs:
         run: |
           $data = Join-Path $env:LOCALAPPDATA $env:DATA_FOLDER
           if (Test-Path $data) { Remove-Item $data -Recurse -Force }
-          Remove-ItemProperty $env:RUN_KEY -Name FluentTaskScheduler -ErrorAction SilentlyContinue
+          if (Test-Path $env:RUN_KEY) { Remove-ItemProperty $env:RUN_KEY -Name FluentTaskScheduler -ErrorAction SilentlyContinue }
 
   # An installed 1.9.0 has to get to this version by itself. Its updater reads the feed
   # (releases.*.json) attached to the release, downloads the package the feed names, compares
