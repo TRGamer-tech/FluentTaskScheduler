@@ -2,7 +2,8 @@ name: Release
 
 # Builds both architectures, packs them with Velopack and checks on a fresh machine that the
 # installer installs and uninstalls silently. Only then are the eight release files attached
-# to a draft GitHub Release, which is reviewed and published by hand.
+# to a draft GitHub Release. Its notes end with the SHA-256 of the four downloads, taken from
+# the very files that are attached. The draft is reviewed and published by hand.
 #
 # A pushed tag like V2.0.1 always ends in that draft. A manual run packs the version typed in,
 # runs the same check and keeps the files as artifacts of the run, which makes it the way to
@@ -185,6 +186,9 @@ jobs:
       VERSION: ${{ needs.package.outputs.version }}
       TAG: V${{ needs.package.outputs.version }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
       - name: Download release files
         uses: actions/download-artifact@v8
         with:
@@ -207,13 +211,34 @@ jobs:
           if ($releases.Count -gt 1) { throw "There are $($releases.Count) drafts named $env:TAG. Delete all but one of them." }
           "draft=$($releases.Count -eq 1)" >> $env:GITHUB_OUTPUT
 
+      # The notes are the ones written for this version, or else GitHub's list of what was
+      # merged. The table of hashes is always written here, from the files that get attached.
       - name: Write the release notes
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $generated = gh api "repos/$env:GH_REPO/releases/generate-notes" -f "tag_name=$env:TAG" -f "target_commitish=$env:GITHUB_SHA" --jq .body
-          if ($LASTEXITCODE -ne 0) { throw 'GitHub did not generate release notes.' }
-          Set-Content notes.md $generated
+          $written = ".github/release-notes/$env:TAG.md"
+          if (Test-Path $written) {
+            $notes = Get-Content $written -Raw
+            if ($notes -match 'Artifacts and Hashes') {
+              throw "$written has its own table of hashes. Take it out: the table is written by this workflow."
+            }
+          } else {
+            $generated = gh api "repos/$env:GH_REPO/releases/generate-notes" -f "tag_name=$env:TAG" -f "target_commitish=$env:GITHUB_SHA" --jq .body
+            if ($LASTEXITCODE -ne 0) { throw 'GitHub did not generate release notes.' }
+            $notes = $generated -join "`n"
+          }
+
+          $table = @(
+            '## 📎 Artifacts and Hashes (for your reference)'
+            '| Artifact | SHA-256 Hash |'
+            '| :--- | :--- |'
+            foreach ($download in 'Setup-x64.msi', 'Setup-arm64.msi', 'Portable-x64.zip', 'Portable-arm64.zip') {
+              '| **{0}** | `{1}` |' -f $download, (Get-FileHash "Dist/$download" -Algorithm SHA256).Hash
+            }
+          )
+          Set-Content notes.md (@("$notes".TrimEnd(), '') + $table)
+          Get-Content notes.md
 
       - name: Create the draft or bring it up to date
         shell: pwsh
