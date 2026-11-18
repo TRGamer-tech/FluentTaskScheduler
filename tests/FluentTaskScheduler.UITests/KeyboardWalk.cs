@@ -47,11 +47,9 @@ internal static class KeyboardWalk
         AutomationElement current = first;
         while (true)
         {
-            app.Window.WaitForTheForeground();
-            if (backwards) Keyboard.TypeSimultaneously(VirtualKeyShort.SHIFT, VirtualKeyShort.TAB);
-            else Keyboard.Type(VirtualKeyShort.TAB);
-
-            AutomationElement next = FocusOnceIt(app, focused => !Same(focused, current))
+            // A key can get lost on a build machine, where another program's window may have the
+            // keyboard for a moment. So a press that moved nothing is made once more before it counts.
+            AutomationElement next = PressAndFollow() ?? PressAndFollow()
                                      ?? throw new InvalidOperationException($"{key} does not move the focus on from {stops[^1]}. The way there: {Listed(stops)}");
             if (Same(next, first)) return stops;
             if (stops.Count == MostStops)
@@ -59,6 +57,14 @@ internal static class KeyboardWalk
 
             stops.Add(Describe(next));
             current = next;
+        }
+
+        AutomationElement? PressAndFollow()
+        {
+            app.Window.WaitForTheForeground();
+            if (backwards) Keyboard.TypeSimultaneously(VirtualKeyShort.SHIFT, VirtualKeyShort.TAB);
+            else Keyboard.Type(VirtualKeyShort.TAB);
+            return FocusOnceIt(app, focused => !Same(focused, current));
         }
     }
 
