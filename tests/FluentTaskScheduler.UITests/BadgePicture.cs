@@ -7,12 +7,11 @@ namespace FluentTaskScheduler.UITests;
 /// area icon: the rectangle it takes up, and how much of that is purely its red or the white of
 /// its figures.
 /// <para>
-/// The second tells an icon that was drawn for the size it is shown at from one that was drawn
-/// smaller and stretched. Along every edge of the badge and of its figures lies a band of
-/// blended pixels. Drawn, the band is one pixel wide at any size, so a larger badge has a larger
-/// share of pure pixels than a smaller one. A picture that was stretched smoothly has a smaller
-/// share than the one it was stretched from: the band widens with everything else, and the
-/// smoothing blurs it further. Only a stretch that merely repeats pixels keeps the share.
+/// The second is for a person who compares two pictures, not for a test to judge. Along every
+/// edge of the badge and of its figures lies a band of blended pixels, one pixel wide when the
+/// icon is shown pixel for pixel. The taskbar does not always do that: at a scaling of 150 % the
+/// build machine shows the icon half a pixel off, which widens the band for an icon the app
+/// drew for that very size as much as for a stretched one.
 /// </para>
 /// </summary>
 /// <param name="Bounds">The rectangle of the picture that the badge takes up; empty if the picture shows no badge.</param>
