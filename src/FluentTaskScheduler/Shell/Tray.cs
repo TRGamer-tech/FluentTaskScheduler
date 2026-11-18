@@ -58,7 +58,11 @@ internal sealed class Tray(WindowManager windows, ISettingsStore settings, ITask
             var icon = new TrayIcon();
             icon.Clicked += windows.ShowLastHidden;
             icon.MenuRequested += () => icon.ShowMenu(BuildMenu());
-            icon.DpiChanged += Redraw;
+            icon.DpiChanged += () =>
+            {
+                Serilog.Log.Information("The notification area icon is drawn anew for a display of {Dpi} DPI", icon.Dpi);
+                Redraw();
+            };
             _icon = icon;
             Redraw();
             icon.Show();
