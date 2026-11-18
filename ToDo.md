@@ -43,7 +43,8 @@ has a test; the UI tests drive the published app on Windows x64 and ARM64 in CI.
 - The welcome tour has a fixed height (#24), the app follows the WinUI 3 styles (#26), and the
   navigation pane folds to icons and then to a menu button in narrow windows (#27).
 - The main page was split into a shell, the task list, the folder tree and dialogs (#25).
-- Releases no longer get a hand-made SHA-256 table; GitHub shows each download's hash (#31).
+- The SHA-256 table in the release notes is written by the release workflow from the files it
+  attaches, so it can no longer disagree with the downloads (#31).
 
 ### Tasks and folders
 - Renaming or moving a task or folder updates the completion actions of other tasks that start it,
@@ -73,7 +74,8 @@ has a test; the UI tests drive the published app on Windows x64 and ARM64 in CI.
 - An update you put off is offered again instead of being installed at the next start.
 - The command line is answered by the program in the `current` folder; the README says so, and the
   Scoop manifest points there.
-- A release installs, starts and uninstalls its MSI before it makes a draft.
+- A release installs, starts and uninstalls its MSI, and takes an installed 1.9.0 to the new
+  version the way its updater does, before it makes a draft.
 
 ## [V1.9.0] - 2026-07-25
 

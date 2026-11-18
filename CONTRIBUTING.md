@@ -18,7 +18,7 @@ Before you submit a pull request or open an issue asking why the project will no
 | `src/FluentTaskScheduler` | The app: window, pages, dialogs, controls, and what talks to Windows on behalf of the UI (notification area icon, notifications, file dialogs). |
 | `tests/FluentTaskScheduler.Tests` | Tests of Core. Most are plain unit tests. Those that register tasks in the real Task Scheduler or read the event log are skipped where that is not possible. |
 | `tests/FluentTaskScheduler.UITests` | Tests that start the built app and drive it through UI Automation. |
-| `packaging/` | Manifests for winget, Scoop and Chocolatey. |
+| `packaging/` | Manifests for winget, Scoop and Chocolatey, and the script that writes a release into them. |
 | `Assets/` | Images for the README and the installer. The app's own assets are in `src/FluentTaskScheduler/Assets`. |
 
 ## Building and testing
@@ -66,9 +66,24 @@ Please use the provided GitHub Issue templates. Fill them out completely. We can
 
 ## Publishing a release
 
-This project uses [Velopack](https://velopack.io/) for installers and auto-updates.
+This project uses [Velopack](https://velopack.io/) for installers and auto-updates. `.github/workflows/release.yml` does everything up to a **draft** GitHub Release, which you review and publish.
 
-**To release, push a tag.** Pushing `V1.X.X` runs `.github/workflows/release.yml`. It builds both architectures with the version taken from the tag and packs them. Then it installs the x64 MSI silently, the way winget and Chocolatey do, checks that the installed app answers `--list`, and uninstalls it again; only if that works does it attach everything to a **draft** GitHub Release. Review the draft, write the notes and publish it.
+**To release:**
+
+1. Set `<Version>` in `src/FluentTaskScheduler/FluentTaskScheduler.csproj`. The workflow builds with the version of the tag whatever that file says, but a build on your own machine calls itself what is written there.
+2. Write the release notes as `.github/release-notes/V2.X.X.md`, named exactly like the tag. Without that file the draft gets GitHub's list of the merged pull requests instead.
+3. Push the tag `V2.X.X`. Or start the workflow by hand ("Run workflow") on the branch you release from, type the version and tick **draft**: publishing that draft creates the tag on the commit the workflow ran on.
+
+The workflow builds both architectures with that version and packs them. Before it makes the draft, it checks on fresh machines that:
+
+- **the installer works the way winget and Chocolatey run it.** The x64 MSI installs silently, the installed app answers `--list`, and uninstalling removes the app. The user's files in `%LOCALAPPDATA%\TRGamer-tech\FluentTaskScheduler` stay, unless the settings say to remove them on uninstall; then they go too.
+- **an installed 1.9.0 gets to the new version.** Both update feeds name exactly the package that is attached, with its size and hashes. Then 1.9.0 is installed per user, with settings and a script where it keeps them, and the new package is applied the way its updater does it. The new app has to have the new version and answer `--list`, the files have to be in the new place and nothing of the installer with them, and uninstalling has to leave them there.
+
+Only if all of that works does it create the draft and attach the files. It names the draft like the tag; give it its title there.
+
+The notes of the draft end with a table, "Artifacts and Hashes", of the SHA-256 of the four downloads. The workflow writes it from the very files it attaches, so leave it out of your notes file.
+
+> **Never edit that table by hand, and never replace a file of a release by hand.** That is how the V1.9.0 notes came to advertise hashes that matched none of the downloads. Change what has to change in the repository and run the workflow again for the same version: as long as the release is a draft, it replaces every file and rewrites the notes and the table, and keeps the title. A published release it refuses to touch. Its files are what people have downloaded and what the package managers have hashed, so a fix for it is a new version.
 
 The draft contains, and has to keep, exactly these files:
 
@@ -77,34 +92,38 @@ The draft contains, and has to keep, exactly these files:
 | `Setup-x64.msi`, `Setup-arm64.msi` | The installers. The user chooses between "per user" and "machine-wide" when installing. |
 | `Portable-x64.zip`, `Portable-arm64.zip` | The app without an installer. |
 | `releases.win-x64.json`, `releases.win-arm64.json` | Tell an installed app that there is an update. |
-| `FluentTaskScheduler-1.X.X-win-x64-full.nupkg`, `...-win-arm64-full.nupkg` | What an installed app downloads to update itself. |
+| `FluentTaskScheduler-2.X.X-win-x64-full.nupkg`, `...-win-arm64-full.nupkg` | What an installed app downloads to update itself. |
 
 Without the last two kinds, auto-update silently does nothing. The names matter too: the package managers and the README link to the installers and zips by name, and the updater looks for the other files under the names Velopack gave them.
 
-To try the packaging out without releasing anything, start the workflow by hand ("Run workflow") and type a version. It then keeps the same files as artifacts of the run and publishes nothing.
+**One thing is left to try by hand after publishing.** An installed app only finds releases that are published and not marked as a pre-release, so no check before that can make 1.9.0 download anything. Install 1.9.0, let it find the update, and see it arrive. For the same reason, publish as a normal release: the updater passes over a pre-release.
+
+What else the checks leave open: they install and update the x64 files only, and of the ARM64 files they compare the feed with its package. And they take the way of the app's own updater. Installing the new MSI over an older version, which is what winget and Chocolatey do for an upgrade, is not gone through.
+
+To try the packaging out without releasing anything, start the workflow by hand and leave **draft** unticked. It runs the same checks and keeps the files as artifacts of the run.
 
 Two things the workflow settles that are easy to get wrong by hand:
 
 - It pins the version of Velopack's command line tool (`VPK_VERSION` in the workflow). Change it together with the `Velopack` package the app references.
 - It builds both architectures on an x64 machine. The tools Velopack uses to build the MSI are x64 programs and do not start on ARM64.
 
-> **Do not paste a SHA-256 table into the release notes.** GitHub already shows the SHA-256 of every asset next to it, and that value always describes the file that is actually attached. A hand-copied table goes stale the moment an asset is rebuilt and re-uploaded, which is exactly how the V1.9.0 notes ended up advertising hashes that matched none of the downloads.
-
 ---
 
 ## Publishing to package managers
 
-Ready-made manifests live in the `packaging/` folder. After each GitHub Release, update the **version number** and the **SHA-256 hashes** in these files, then follow the steps below.
+The manifests for winget, Scoop and Chocolatey live in the `packaging/` folder. Each names the version, links to the release and carries the SHA-256 of what it downloads. winget also wants the product code of each installer, and every build of an MSI gets a new one.
 
-### Get the SHA-256 hashes
+**None of that is typed in by hand.** `packaging/Update-Manifests.ps1` puts all of it into the manifests and leaves the rest of every file as it is. The release workflow runs it on the files it has built, makes no draft if that fails, and keeps the result as the artifact `package-manifests`. So, after publishing a release:
 
-Take the hashes from the **published release**, not from a local build. A local build is not necessarily the build that was uploaded, and package managers verify what users actually download:
+1. Download `package-manifests` from the workflow run that last wrote the draft you published. Every run builds anew, and with that the hashes and product codes change.
+2. Put its content over `packaging/`, commit it, and follow the steps below.
+
+The script also runs by hand, on the files of the published release. It needs Windows, because that is where the product codes can be read:
 
 ```powershell
-gh release view V1.X.X --repo TRGamer-tech/FluentTaskScheduler --json assets --jq '.assets[] | "\(.digest)  \(.name)"'
+gh release download V2.X.X --dir downloads --pattern "Setup-*.msi" --pattern "Portable-*.zip"
+.\packaging\Update-Manifests.ps1 -Version 2.X.X -Downloads downloads
 ```
-
-Each line reads `sha256:<hash>  <file name>`; the manifests want the hash without the `sha256:` prefix. The same values are shown next to each asset on the release page.
 
 ---
 
@@ -122,39 +141,19 @@ The three files follow the [winget multi-file manifest schema 1.12](https://gith
 
 **Submission steps:**
 
-1. Update `PackageVersion` in all three files to the new version.
-2. In the **installer manifest**, update both `InstallerUrl` values to the new release tag and both `InstallerSha256` values to the new hashes.
-3. Update both `ProductCode` values. Every build of an MSI gets a new one, and x64 and ARM64 differ. To read it from a downloaded installer:
-
-   ```powershell
-   $installer = New-Object -ComObject WindowsInstaller.Installer
-   $database = $installer.OpenDatabase("$PWD\Setup-x64.msi", 0)
-   $view = $database.OpenView("SELECT Value FROM Property WHERE Property = 'ProductCode'")
-   $view.Execute(); $view.Fetch().StringData(1)
-   ```
-
-4. Validate locally:
+1. Validate locally:
 
    ```powershell
    winget validate packaging\winget\
    ```
 
-5. Fork [microsoft/winget-pkgs](https://github.com/microsoft/winget-pkgs) and copy the three files to:
+2. Fork [microsoft/winget-pkgs](https://github.com/microsoft/winget-pkgs) and copy the three files to:
 
    ```
    manifests/t/TRGamer-tech/FluentTaskScheduler/<version>/
    ```
 
-6. Open a Pull Request. Automated validation runs; once it passes a maintainer will merge it.
-
-> **Tip:** `wingetcreate update` can do steps 1 to 3:
-> ```powershell
-> winget install wingetcreate
-> wingetcreate update TRGamer-tech.FluentTaskScheduler --version 1.X.X `
->   --urls "https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/V1.X.X/Setup-x64.msi|x64" `
->          "https://github.com/TRGamer-tech/FluentTaskScheduler/releases/download/V1.X.X/Setup-arm64.msi|arm64" `
->   --submit
-> ```
+3. Open a Pull Request. Automated validation runs; once it passes a maintainer will merge it.
 
 ---
 
@@ -166,15 +165,13 @@ Scoop uses the **portable zips** (no installer required).
 
 **Submission steps:**
 
-1. In `fluenttaskscheduler.json`, update `"version"` to the new version.
-2. Update both `"url"` values in the `architecture` block to the new release tag, and both `"hash"` values to the new hashes.
-3. Test locally:
+1. Test locally:
 
    ```powershell
    scoop install packaging\scoop\fluenttaskscheduler.json
    ```
 
-4. The published manifest lives in [ScoopInstaller/Extras](https://github.com/ScoopInstaller/Extras) as `bucket/fluenttaskscheduler.json`. Its `checkver` and `autoupdate` sections let the bucket pick up a new release by itself, with new URLs and hashes. Anything else that changes in the manifest here needs a pull request to that bucket.
+2. The published manifest lives in [ScoopInstaller/Extras](https://github.com/ScoopInstaller/Extras) as `bucket/fluenttaskscheduler.json`. Its `checkver` and `autoupdate` sections let the bucket pick up a new release by itself, with new URLs and hashes. Anything else that changes in the manifest here needs a pull request to that bucket.
 
 > **`bin` names the app in `current`, not the `FluentTaskScheduler.exe` at the top of the zip.** That one is Velopack's launcher: it starts the app and returns at once with its own exit code, so a command such as `FluentTaskScheduler --list` through the Scoop shim would not wait for the answer and would always report success. The shortcut keeps pointing at the launcher, which is the right thing to start the window with.
 
@@ -189,13 +186,11 @@ Scoop uses the **portable zips** (no installer required).
 | `fluenttaskscheduler.nuspec` | Package metadata |
 | `tools/chocolateyInstall.ps1` | Silent install script |
 
-The install script picks the x64 or the ARM64 installer itself, so both hashes go into it.
+The install script picks the x64 or the ARM64 installer itself, so it carries the hashes of both.
 
 **Submission steps:**
 
-1. Update `<version>` and the `<releaseNotes>` link in `fluenttaskscheduler.nuspec`.
-2. In `tools/chocolateyInstall.ps1`, update `$version` and both `$pkgHash` values: the first is the hash of `Setup-x64.msi`, the one inside `if ($isArm64)` that of `Setup-arm64.msi`. The download URLs follow from `$version`.
-3. Build and test the package locally:
+1. Build and test the package locally:
 
    ```powershell
    cd packaging\chocolatey
@@ -204,7 +199,7 @@ The install script picks the x64 or the ARM64 installer itself, so both hashes g
    choco uninstall fluenttaskscheduler -y            # cleanup
    ```
 
-4. Submit to the [Chocolatey Community Repository](https://community.chocolatey.org/packages/upload):
+2. Submit to the [Chocolatey Community Repository](https://community.chocolatey.org/packages/upload):
 
    ```powershell
    choco push fluenttaskscheduler.<version>.nupkg --source https://push.chocolatey.org/ --api-key <YOUR_API_KEY>
