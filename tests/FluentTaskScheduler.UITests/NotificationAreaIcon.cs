@@ -44,6 +44,7 @@ internal static class NotificationAreaIcon
                 element.Is(ControlType.Button) && HasSize(element)
                 && (element.NameOrEmpty().Contains("Hidden Icons", StringComparison.OrdinalIgnoreCase) || element.NameOrEmpty().Contains("Chevron")));
             if (arrow is null) return null;
+            app.StepOverWhatCovers(arrow.BoundingRectangle.Center());
             arrow.Click();
             if (Retry.WhileNull(() => Shown(app), TimeSpan.FromSeconds(5)).Result is { } icon) return icon;
         }

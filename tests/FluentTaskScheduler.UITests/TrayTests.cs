@@ -151,6 +151,7 @@ public class TrayTests
     {
         for (int attempt = 0; attempt < 3; attempt++)
         {
+            app.StepOverWhatCovers(icon.BoundingRectangle.Center());
             icon.RightClick();
             if (Retry.WhileNull(() => MenuItem(app, name), TimeSpan.FromSeconds(5)).Result is { } item) return item;
         }

@@ -6,7 +6,9 @@ using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Capturing;
 using FlaUI.Core.Definitions;
+using FlaUI.Core.Input;
 using FlaUI.Core.Tools;
+using FlaUI.Core.WindowsAPI;
 using FlaUI.UIA3;
 
 namespace FluentTaskScheduler.UITests;
@@ -133,9 +135,12 @@ public sealed class AppSession : IDisposable
 
     private const string DialogClass = "#32770";
 
-    /// <summary>Windows of the shell that tests work with: the taskbar, the hidden icons, menus and pop-ups.</summary>
-    private static readonly HashSet<string> ShellClasses =
-        ["Shell_TrayWnd", "Shell_SecondaryTrayWnd", "NotifyIconOverflowWindow", "TopLevelWindowForOverflowXamlIsland", "Xaml_WindowedPopupClass", "#32768"];
+    /// <summary>What the taskbar opens over the desktop: the hidden icons, menus and other pop-ups.</summary>
+    private static readonly HashSet<string> TaskbarPopUps =
+        ["NotifyIconOverflowWindow", "TopLevelWindowForOverflowXamlIsland", "Xaml_WindowedPopupClass", "#32768"];
+
+    /// <summary>Windows of the shell that tests work with: the taskbar and its pop-ups.</summary>
+    private static readonly HashSet<string> ShellClasses = ["Shell_TrayWnd", "Shell_SecondaryTrayWnd", .. TaskbarPopUps];
 
     /// <summary>Console windows, of Windows' own console or of Windows Terminal: closing one ends the programs in it.</summary>
     private static readonly HashSet<string> ConsoleClasses = ["ConsoleWindowClass", "CASCADIA_HOSTING_WINDOW_CLASS", "PseudoConsoleWindow"];
@@ -173,6 +178,10 @@ public sealed class AppSession : IDisposable
 
     private static bool IsInTheWay(nint window, int appProcess, nint appWindow) =>
         window != 0 && !IsTheApps(window, appProcess, appWindow) && !ShellClasses.Contains(TopLevelWindows.ClassOf(window));
+
+    /// <summary>Whether <paramref name="window"/> is a pop-up of the taskbar. The app's own pop-ups and menus are of the same classes.</summary>
+    private static bool IsATaskbarPopUp(nint window, int appProcess, nint appWindow) =>
+        window != 0 && !IsTheApps(window, appProcess, appWindow) && TaskbarPopUps.Contains(TopLevelWindows.ClassOf(window));
 
     /// <summary>Whether <paramref name="window"/> is the app's, or a dialog it opened, which another process may show.</summary>
     private static bool IsTheApps(nint window, int appProcess, nint appWindow) =>
@@ -223,9 +232,12 @@ public sealed class AppSession : IDisposable
     /// and console windows of the machine's own setup did. Where the build machine lets the tests
     /// get such windows out of the way, the app's window is brought back to the front while it is
     /// shown; a window that Windows does not take the foreground from is stepped over first. The
-    /// taskbar and its pop-ups are left to the tests that use them. Only a window that is in the
-    /// foreground at two looks in a row counts: one gets it for a moment whenever the app's window
-    /// is hidden or minimized, before Windows says that it is.
+    /// taskbar is left alone, and so are its pop-ups while the app's window is hidden, which is
+    /// when tests use them. One that is still open over a window that is shown was left there:
+    /// the hidden icons kept the foreground into the test after the one that had opened them, and
+    /// Escape closes them. Only a window that is in the foreground at two looks in a row counts:
+    /// one gets it for a moment whenever the app's window is hidden or minimized, before Windows
+    /// says that it is.
     /// </summary>
     private void GuardForeground()
     {
@@ -234,8 +246,9 @@ public sealed class AppSession : IDisposable
         {
             nint foreground = TopLevelWindows.Foreground;
             bool shown = TopLevelWindows.IsVisible(_windowHandle) && !TopLevelWindows.IsMinimized(_windowHandle);
+            bool isPopUp = IsATaskbarPopUp(foreground, _app.ProcessId, _windowHandle);
             nint seenBefore = _foreignInFront;
-            _foreignInFront = shown && IsInTheWay(foreground, _app.ProcessId, _windowHandle) ? foreground : 0;
+            _foreignInFront = shown && (isPopUp || IsInTheWay(foreground, _app.ProcessId, _windowHandle)) ? foreground : 0;
             if (_foreignInFront == 0 || _foreignInFront != seenBefore) return;
 
             // While the app has a dialog open, the foreground belongs to that rather than to the window under it.
@@ -246,7 +259,15 @@ public sealed class AppSession : IDisposable
                 _broughtBackOver = foreground;
                 return;
             }
-            StepOver(foreground, "keeps the foreground, so keys would not reach the app");
+            if (isPopUp)
+            {
+                Console.WriteLine($"Closing {Describe(foreground)} with Escape: it keeps the foreground, so keys would not reach the app.");
+                Keyboard.Type(VirtualKeyShort.ESCAPE);
+            }
+            else
+            {
+                StepOver(foreground, "keeps the foreground, so keys would not reach the app");
+            }
             TopLevelWindows.BringToFront(app);
         }
         catch (Exception ex)
@@ -272,6 +293,19 @@ public sealed class AppSession : IDisposable
 
         nint foreground = TopLevelWindows.Foreground;
         if (ConsoleClasses.Contains(TopLevelWindows.ClassOf(foreground))) StepOver(foreground, "has the foreground while a test uses the taskbar");
+    }
+
+    /// <summary>
+    /// For a click on the taskbar or on one of its pop-ups: a window of another program that lies
+    /// over the place is stepped over first, where the build machine lets the tests do that.
+    /// Windows 10 shows a notification right above the notification area, over the hidden icons.
+    /// </summary>
+    public void StepOverWhatCovers(System.Drawing.Point place)
+    {
+        if (Environment.GetEnvironmentVariable(CloseCoveringWindowsVariable) != "1") return;
+
+        nint onTop = TopLevelWindows.RootAt(place);
+        if (IsInTheWay(onTop, _app.ProcessId, _windowHandle)) StepOver(onTop, "covers a place in the taskbar that a test is about to click");
     }
 
     /// <summary>Title, class and program of a window, to say in a message which one it is.</summary>
