@@ -937,10 +937,13 @@ public sealed class TasksViewModelTests : IDisposable
         _store.Run(@"\Backup");
 
         // The reload has read the tasks, Backup still running among them. Before it hands them
-        // over, the run ends and is reported.
+        // over, the run ends and is reported. In the app the report waits for the UI thread, which
+        // is busy asking for the reload until that call returns; here it waits for the same moment.
+        using var asked = new ManualResetEventSlim();
         _store.Listed = () =>
         {
             _store.Listed = null;
+            asked.Wait(TimeSpan.FromSeconds(30));
             _store.Finish(@"\Backup");
             _stream.Complete(FakeTaskEventStream.Finished(@"\Backup", RunStatus.Succeeded));
 
@@ -948,7 +951,9 @@ public sealed class TasksViewModelTests : IDisposable
             // be overwritten with what the reload holds. One that takes turns is still waiting.
             Assert.False(_tasks.PendingReads.Wait(TimeSpan.FromMilliseconds(250)));
         };
-        await _tasks.ReloadAsync();
+        Task reload = _tasks.ReloadAsync();
+        asked.Set();
+        await reload;
         await _tasks.PendingReads;
 
         Assert.Equal(TaskRowState.Ready, Row(@"\Backup").State);
