@@ -102,10 +102,12 @@ public sealed class WindowsTasks : IDisposable
     {
         if (Folder.Length == 0) return;
 
-        // schtasks has no command for folders; the scripting interface of Task Scheduler does.
+        // schtasks has no command for folders; the scripting interface of Task Scheduler does. A
+        // task that is still running is ended first: deleting it would leave its program running
+        // into the tests that follow.
         string name = Folder.TrimStart('\\');
         RunScript($"try {{ $folder = $scheduler.GetFolder('\\{name}') }} catch {{ exit }}; " + // a test that registered nothing has no folder
-                  $"$folder.GetTasks(1) | ForEach-Object {{ $folder.DeleteTask($_.Name, 0) }}; " +
+                  $"$folder.GetTasks(1) | ForEach-Object {{ try {{ $_.Stop(0) }} catch {{ }}; $folder.DeleteTask($_.Name, 0) }}; " +
                   $"$scheduler.GetFolder('\\').DeleteFolder('{name}', 0)");
     }
 

@@ -128,7 +128,7 @@ internal sealed class DisplayScaling : IDisposable
         if (!Steps.Contains(percent)) throw new ArgumentOutOfRangeException(nameof(percent), percent, "The display does not offer this scaling.");
 
         answer = "";
-        if (Percent == percent) return true;
+        if (Percent == percent && MainDisplayDpi() == 96 * percent / 100) return true;
 
         var request = new SetScaleStep { Header = HeaderOf<SetScaleStep>(SetStep, _adapter, _source), Step = Array.IndexOf(Scalings, percent) + _lowestStep };
         int error = DisplayConfigSetDeviceInfo(ref request);
@@ -154,10 +154,14 @@ internal sealed class DisplayScaling : IDisposable
         return followed;
     }
 
-    /// <summary>Gives the display the scaling it had when this was created. Whether it has it then, <see cref="Percent"/> tells.</summary>
+    /// <summary>Gives the display the scaling it had when this was created.</summary>
+    /// <returns>False if the display does not have it then; <paramref name="answer"/> says what Windows answered instead.</returns>
+    public bool TryRestore(out string answer) => TrySet(Original, out answer);
+
+    /// <summary>Puts the display back as <see cref="TryRestore"/> does, and Windows' question about blurry apps with it.</summary>
     public void Dispose()
     {
-        TrySet(Original, out _);
+        TryRestore(out _);
 
         using RegistryKey desktop = Registry.CurrentUser.CreateSubKey(DesktopKey);
         if (_noBlurryAppsQuestionBefore is null) desktop.DeleteValue(NoBlurryAppsQuestion, throwOnMissingValue: false);

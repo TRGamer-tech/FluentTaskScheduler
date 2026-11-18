@@ -63,7 +63,7 @@
         </Grid.RowDefinitions>
 
         <!-- What everything below is narrowed to. -->
-        <Grid Padding="24,0,24,8" ColumnSpacing="8">
+        <Grid Padding="24,8,24,8" ColumnSpacing="8">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" MaxWidth="240"/>
                 <ColumnDefinition Width="*" MaxWidth="240"/>
