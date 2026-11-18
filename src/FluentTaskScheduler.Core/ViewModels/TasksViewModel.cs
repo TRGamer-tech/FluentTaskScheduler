@@ -73,6 +73,7 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
     private List<string> _storeOrder = [];
     private readonly Dictionary<string, DateTimeOffset> _watched = new(StringComparer.OrdinalIgnoreCase);
     private readonly ITimer _watchTimer;
+    private Task _watchCheck = Task.CompletedTask;
     private readonly ITimer _reloadTimer;
     private bool _reloadPlanned;
 
@@ -687,8 +688,14 @@ public sealed partial class TasksViewModel : ObservableObject, IDisposable
         _watchTimer.Change(WatchInterval, WatchInterval);
     }
 
-    /// <summary>Asks Task Scheduler about the watched tasks and stops watching those that have settled. Runs on the UI thread.</summary>
-    internal async Task CheckWatchedAsync()
+    /// <summary>
+    /// Asks Task Scheduler about the watched tasks and stops watching those that have settled.
+    /// Runs on the UI thread, and one check at a time: a tick of the timer that comes before Task
+    /// Scheduler has answered the last one joins that check instead of asking again.
+    /// </summary>
+    internal Task CheckWatchedAsync() => _watchCheck.IsCompleted ? _watchCheck = CheckWatchedOnceAsync() : _watchCheck;
+
+    private async Task CheckWatchedOnceAsync()
     {
         List<string> paths = [.. _watched.Keys];
         if (paths.Count == 0) return;

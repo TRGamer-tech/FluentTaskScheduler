@@ -96,9 +96,21 @@ public sealed class FakeTaskStore : ITaskStore
 
     public bool Exists(string path) => _tasks.ContainsKey(path);
 
-    public IReadOnlyDictionary<string, TaskRowState> GetStates(IEnumerable<string> paths) =>
-        paths.Where(Exists).Distinct(StringComparer.OrdinalIgnoreCase)
-             .ToDictionary(path => path, StateOf, StringComparer.OrdinalIgnoreCase);
+    /// <summary>When set, a question about states is counted and stays unanswered until this is.</summary>
+    public ManualResetEventSlim? StatesHeldBack { get; set; }
+
+    /// <summary>How often the states of tasks were asked for.</summary>
+    public int StatesAsked => _statesAsked;
+
+    private int _statesAsked;
+
+    public IReadOnlyDictionary<string, TaskRowState> GetStates(IEnumerable<string> paths)
+    {
+        Interlocked.Increment(ref _statesAsked);
+        StatesHeldBack?.Wait(TimeSpan.FromSeconds(30));
+        return paths.Where(Exists).Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(path => path, StateOf, StringComparer.OrdinalIgnoreCase);
+    }
 
     public int CountRunningTasks() => _running.Count;
 

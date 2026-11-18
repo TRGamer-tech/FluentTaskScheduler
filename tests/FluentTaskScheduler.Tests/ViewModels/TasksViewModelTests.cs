@@ -272,6 +272,32 @@ public sealed class TasksViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task WhileTaskSchedulerHasNotAnsweredYet_ALaterTickAsksNothingMore_AndJoinsTheCheckUnderWay()
+    {
+        await _tasks.ReloadAsync();
+        await _tasks.RunCommand.ExecuteAsync(Row(@"\Backup"));
+        using var answer = new ManualResetEventSlim();
+        _store.StatesHeldBack = answer;
+        int askedBefore = _store.StatesAsked;
+
+        Task first = _tasks.CheckWatchedAsync();
+        Task second = _tasks.CheckWatchedAsync();
+
+        // Ten minutes of ticks, every two seconds, while the first question is still open.
+        _time.Advance(TimeSpan.FromMinutes(10));
+        Assert.True(SpinWait.SpinUntil(() => _store.StatesAsked > askedBefore, TimeSpan.FromSeconds(10)), "Task Scheduler was never asked.");
+        Assert.Same(first, second);
+        Assert.Equal(askedBefore + 1, _store.StatesAsked);
+
+        answer.Set();
+        await first;
+        _store.StatesHeldBack = null;
+        await _tasks.CheckWatchedAsync();
+
+        Assert.Equal(askedBefore + 2, _store.StatesAsked);
+    }
+
+    [Fact]
     public async Task WhileTasksAreSnoozed_NothingIsStarted_AndTheUserIsTold()
     {
         await _tasks.ReloadAsync();
