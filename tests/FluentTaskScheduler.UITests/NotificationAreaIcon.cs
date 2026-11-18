@@ -29,19 +29,13 @@ internal static class NotificationAreaIcon
     // Windows in another language, the icon has to be shown in the taskbar itself.
     public static AutomationElement? Find(AppSession app)
     {
-        // Windows puts more than the tooltip into the name, at least a leading blank. The shell also
-        // keeps elements for icons it does not show, the hidden ones while their flyout is closed,
-        // which have no size.
-        AutomationElement? Search() => ShellElements(app).FirstOrDefault(element =>
-            element.Is(ControlType.Button) && element.NameOrEmpty().Trim().StartsWith("FluentTaskScheduler") && HasSize(element));
-
-        if (Search() is { } visible) return visible;
+        if (Shown(app) is { } visible) return visible;
         AutomationElement? arrow = ShellElements(app).FirstOrDefault(element =>
             element.Is(ControlType.Button) && HasSize(element)
             && (element.NameOrEmpty().Contains("Hidden Icons", StringComparison.OrdinalIgnoreCase) || element.NameOrEmpty().Contains("Chevron")));
         if (arrow is null) return null;
         arrow.Click();
-        return Retry.WhileNull(Search, TimeSpan.FromSeconds(10)).Result;
+        return Retry.WhileNull(() => Shown(app), TimeSpan.FromSeconds(10)).Result;
     }
 
     public static AutomationElement Require(AppSession app) =>
@@ -53,12 +47,24 @@ internal static class NotificationAreaIcon
     /// </summary>
     public static void SavePicture(AppSession app, string name)
     {
-        AutomationElement icon = Require(app);
-        // A pointer over the icon would highlight it and bring up its tooltip.
-        Mouse.MoveTo(app.Screen.Center());
-        Thread.Sleep(600); // the hidden icons may just have opened, the icon just been drawn anew
+        Require(app);
 
-        using CaptureImage picture = Capture.Element(icon);
+        // On the build machine, the element found while the hidden icons opened had no place on
+        // the screen any more a moment later, and the picture of no place is a single black
+        // pixel. So the picture is taken of the place where a second look finds the icon, a look
+        // that opens nothing; until one does, the hidden icons are opened again.
+        Rectangle place = default;
+        AppSession.Eventually(() =>
+        {
+            Find(app);
+            // A pointer over the icon would highlight it and bring up its tooltip.
+            Mouse.MoveTo(app.Screen.Center());
+            Thread.Sleep(600); // the hidden icons may just have opened, the icon just been drawn anew
+            place = Shown(app)?.BoundingRectangle ?? default;
+            return place is { Width: > 1, Height: > 1 };
+        });
+
+        using CaptureImage picture = Capture.Rectangle(place);
         picture.ToFile(Path.Combine(app.ArtifactsDir, $"icon-{name}.png"));
         using var enlarged = new Bitmap(picture.Bitmap.Width * 8, picture.Bitmap.Height * 8);
         using (Graphics graphics = Graphics.FromImage(enlarged))
@@ -69,6 +75,12 @@ internal static class NotificationAreaIcon
         }
         enlarged.Save(Path.Combine(app.ArtifactsDir, $"icon-{name}-x8.png"));
     }
+
+    // Windows puts more than the tooltip into the name, at least a leading blank. The shell also
+    // keeps elements for icons it does not show, the hidden ones while their flyout is closed,
+    // which have no size.
+    private static AutomationElement? Shown(AppSession app) => ShellElements(app).FirstOrDefault(element =>
+        element.Is(ControlType.Button) && element.NameOrEmpty().Trim().StartsWith("FluentTaskScheduler") && HasSize(element));
 
     private static bool HasSize(AutomationElement element)
     {
