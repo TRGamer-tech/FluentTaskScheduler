@@ -210,6 +210,21 @@ public sealed class ScriptEditorViewModelTests : IDisposable
     }
 
     [Fact]
+    public void AFailureTheRunnerDoesNotDeclare_ShowsAsAnErrorInTheOutput_AndTheEditorIsReadyAgain()
+    {
+        _editor.Text = "anything";
+        _editor.RunCommand.Execute(null);
+        _runner.Last.Writes("one");
+
+        _runner.Last.RunFails(new InvalidOperationException("No process is associated with this object."));
+
+        Assert.Equal([Note("ScriptEditor.Status.Starting"), Line("one"), Error("ScriptEditor.Error.Start")], _editor.Output.Select(Shown));
+        Assert.False(_editor.IsRunning);
+        Assert.True(_editor.RunCommand.CanExecute(null));
+        Assert.False(File.Exists(RunCopy));
+    }
+
+    [Fact]
     public void RunAndStop_AreAvailableOnlyWhenThereIsSomethingToRunOrToStop()
     {
         Assert.False(_editor.RunCommand.CanExecute(null));

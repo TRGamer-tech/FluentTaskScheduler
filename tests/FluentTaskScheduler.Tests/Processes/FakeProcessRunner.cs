@@ -64,4 +64,10 @@ public sealed class FakeProcess
     }
 
     public void Exits(int exitCode = 0) => _exit.TrySetResult(exitCode);
+
+    /// <summary>
+    /// Ends the run with a failure that <see cref="IProcessRunner"/> does not declare, as a fault
+    /// in the runner itself would.
+    /// </summary>
+    public void RunFails(Exception failure) => _exit.TrySetException(failure);
 }

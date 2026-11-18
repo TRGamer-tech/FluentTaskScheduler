@@ -62,7 +62,16 @@ internal abstract class ProgramRun(IUiThread ui)
     {
         HasEnded = true;
         _cancellation.Dispose();
-        _viewModel?.Invoke();
+        try
+        {
+            _viewModel?.Invoke();
+        }
+        catch (Exception ex)
+        {
+            // Nothing awaits a run. What the view model fails with while it shows the end would go
+            // unheard, or be taken by the run for a failure of its program.
+            Serilog.Log.Error(ex, "The view model of a run failed to show that the run has ended");
+        }
     }
 
     private void ReportQueued()

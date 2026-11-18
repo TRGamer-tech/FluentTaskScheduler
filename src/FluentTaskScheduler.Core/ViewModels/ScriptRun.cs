@@ -65,8 +65,10 @@ internal sealed class ScriptRun : ProgramRun
         {
             Keep(OutputKind.Note, Loc.Get("ScriptEditor.Status.Stopped"));
         }
-        catch (Exception ex) when (ex is ProcessStartException or IOException or UnauthorizedAccessException)
+        catch (Exception ex)
         {
+            // The copy could not be written, or PowerShell could not be started. Whatever else went
+            // wrong is said here as well: nothing awaits a run, so it would go unheard.
             Serilog.Log.Error(ex, "The script in the editor could not be run from {Path}", file);
             Keep(OutputKind.Error, Loc.Format("ScriptEditor.Error.Start", ex.Message));
         }

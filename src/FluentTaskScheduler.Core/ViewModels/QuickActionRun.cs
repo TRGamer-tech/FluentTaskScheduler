@@ -30,7 +30,7 @@ internal sealed class QuickActionRun : ProgramRun
     /// <summary>Running until the program has ended; idle afterwards for a run that was stopped.</summary>
     public QuickActionState State { get; private set; } = QuickActionState.Running;
 
-    /// <summary>What the program ended with; null while it runs, and when it was stopped or could not be started.</summary>
+    /// <summary>What the program ended with; null while it runs, and when it was stopped or could not be run to its end.</summary>
     public int? ExitCode { get; private set; }
 
     /// <summary>
@@ -55,6 +55,13 @@ internal sealed class QuickActionRun : ProgramRun
         catch (ProcessStartException ex)
         {
             Serilog.Log.Error(ex, "Quick action {Id} could not start {Program}", _action.Id, ex.FileName);
+            End(QuickActionState.Failed, ex.Message);
+        }
+        catch (Exception ex)
+        {
+            // Nothing awaits a run. A failure the runner does not declare would go unheard, and the
+            // card would show the action as running for good.
+            Serilog.Log.Error(ex, "Running the program of quick action {Id} failed", _action.Id);
             End(QuickActionState.Failed, ex.Message);
         }
     }

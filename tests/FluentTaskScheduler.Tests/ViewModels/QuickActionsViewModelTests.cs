@@ -172,6 +172,41 @@ public sealed class QuickActionsViewModelTests
     }
 
     [Fact]
+    public async Task AFailureTheRunnerDoesNotDeclare_EndsTheActionAsFailed_WithWhatWentWrong()
+    {
+        QuickActionViewModel action = Action("SfcScannow");
+        await action.RunCommand.ExecuteAsync(null);
+        _runner.Last.Writes("Verification 12% complete.");
+
+        _runner.Last.RunFails(new InvalidOperationException("No process is associated with this object."));
+
+        Assert.Equal(
+            (QuickActionState.Failed, "QuickActions.Status.Error", "No process is associated with this object."),
+            (action.State, action.StatusText, action.Detail));
+        Assert.True(action.RunCommand.CanExecute(null));
+        Assert.False(action.CancelCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task WhatAPageFailsWith_WhileItShowsHowAnActionEnded_IsNotTakenForAFailureOfTheAction()
+    {
+        QuickActionViewModel action = Action("FlushDNS");
+        await action.RunCommand.ExecuteAsync(null);
+        var shown = new List<QuickActionState>();
+        action.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName != nameof(QuickActionViewModel.State)) return;
+
+            shown.Add(action.State);
+            throw new InvalidOperationException("The page could not show this.");
+        };
+
+        _runner.Last.Exits();
+
+        Assert.Equal([QuickActionState.Succeeded], shown);
+    }
+
+    [Fact]
     public async Task Cancel_EndsTheProgram_AndTheActionCanBeRunAgain()
     {
         QuickActionViewModel action = Action("SfcScannow");
